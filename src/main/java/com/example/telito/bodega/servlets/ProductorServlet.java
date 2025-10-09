@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * Este Servlet actúa como el Controlador para todas las acciones
  * relacionadas con el rol de Productor.
  */
-@WebServlet(name = "ProductorServlet", value = "/ProductorServlet")
+@WebServlet("/ProductorServlet")
 public class ProductorServlet extends HttpServlet {
 
     /**
@@ -67,7 +67,7 @@ public class ProductorServlet extends HttpServlet {
                 request.setAttribute("todasLasCategorias", todasLasCategorias);
 
                 // 5. Redirigimos la petición al JSP para que muestre los datos
-                view = request.getRequestDispatcher("productor/misProductos.jsp");
+                view = request.getRequestDispatcher("/productor/misProductos.jsp");
                 view.forward(request, response);
                 break;
 

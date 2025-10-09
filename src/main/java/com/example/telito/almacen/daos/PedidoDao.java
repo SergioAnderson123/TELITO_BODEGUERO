@@ -13,7 +13,7 @@ public class PedidoDao {
 
     private String url = "jdbc:mysql://localhost:3306/telito4"; // Reemplaza con tu base de datos
     private String user = "root";
-    private String pass = "chupamela2005"; // Reemplaza con tu contraseña
+    private String pass = "root"; // Reemplaza con tu contraseña
 
 
     public ArrayList<Pedido> listarPedidosPendientes() {

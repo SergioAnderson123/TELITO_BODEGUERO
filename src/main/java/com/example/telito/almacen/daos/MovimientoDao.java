@@ -12,7 +12,7 @@ public class MovimientoDao {
 
     private String url = "jdbc:mysql://localhost:3306/telito4";
     private String user = "root";
-    private String pass = "chupamela2005";
+    private String pass = "root";
 
     public void registrarMovimiento(Movimiento movimiento) {
         String sql = "INSERT INTO movimientos_inventario (lote_id, tipo, cantidad, motivo, pedido_id, usuario_id) " +

@@ -12,7 +12,7 @@ import com.example.telito.logistica.daos.MovimientoInventarioDao;
 import java.io.IOException;
 import java.util.ArrayList;
 
-@WebServlet(name = "MovimientoProductoServlet", value = "/MovimientoProductoServlet")
+@WebServlet("/logistica/MovimientoProductoServlet")
 public class MovimientoProductoServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request,

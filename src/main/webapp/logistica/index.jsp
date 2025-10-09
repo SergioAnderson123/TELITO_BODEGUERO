@@ -1,1 +1,1 @@
-<!-- Placeholder for logistica directory -->
+<% response.sendRedirect(request.getContextPath() + "/logistica/MovimientoProductoServlet"); %>

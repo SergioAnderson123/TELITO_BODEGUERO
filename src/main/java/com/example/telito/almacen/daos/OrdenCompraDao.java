@@ -11,7 +11,7 @@ public class OrdenCompraDao {
 
     private String url = "jdbc:mysql://localhost:3306/telito4";
     private String user = "root";
-    private String pass = "chupamela2005";
+    private String pass = "root";
 
 
     public ArrayList<OrdenCompra> listarOrdenesPendientes() {

@@ -17,7 +17,7 @@ public class LoteDao {
     // Datos de conexión
     private String user = "root";
     private String pass = "root";
-    private String url = "jdbc:mysql://127.0.0.1:3306/telito4?useSSL=false&serverTimezone=UTC";
+    private String url = "jdbc:mysql://localhost:3306/telito4";
 
     /**
      * Registra un nuevo lote en la base de datos

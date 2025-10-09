@@ -20,7 +20,7 @@ public class ProductoDao {
     // Datos de conexión. Es una buena práctica tenerlos como atributos de la clase.
     private String user = "root";
     private String pass = "root"; // ¡Asegúrate de que sea tu contraseña de MySQL!
-    private String url = "jdbc:mysql://127.0.0.1:3306/telito4?useSSL=false&serverTimezone=UTC";
+    private String url = "jdbc:mysql://localhost:3306/telito4";
 
     // --- MÉTODO PARA LISTAR PRODUCTOS ---
     public ArrayList<Producto> listarProductosPorProductor(int productorId) {

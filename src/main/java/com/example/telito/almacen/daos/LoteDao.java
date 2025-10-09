@@ -8,7 +8,7 @@ public class LoteDao {
 
     private String url = "jdbc:mysql://localhost:3306/telito4";
     private String user = "root";
-    private String pass = "chupamela2005";
+    private String pass = "root";
 
     public ArrayList<Lote> listarLotes() {
         ArrayList<Lote> lista = new ArrayList<>(); // 1. Prepara una lista vacía
