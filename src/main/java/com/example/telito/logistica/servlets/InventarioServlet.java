@@ -28,7 +28,7 @@ public class InventarioServlet extends HttpServlet {
 
         // Forward a la JSP que mantiene el diseño idéntico
         // LÍNEA CORREGIDA
-        String vista = "/Inventario/inventario.jsp";
+        String vista = "/logistica/Inventario/inventario.jsp";
         RequestDispatcher rd = request.getRequestDispatcher(vista);
         rd.forward(request, response);
     }

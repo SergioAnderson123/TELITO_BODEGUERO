@@ -46,7 +46,7 @@ public class PlanTransporteServlet extends HttpServlet {
                 request.setAttribute("listaConductores", conductorDao.listarConductores());
                 request.setAttribute("listaPlanes", listaPlanes);
 
-                rd = request.getRequestDispatcher("/Distribucion/distribucion.jsp");
+                rd = request.getRequestDispatcher("/logistica/Distribucion/distribucion.jsp");
                 rd.forward(request, response);
                 break;
 
@@ -61,7 +61,7 @@ public class PlanTransporteServlet extends HttpServlet {
                 request.setAttribute("listaVehiculos", vehiculoDao.listarVehiculos());
                 request.setAttribute("listaDistritos", distritoDao.listarDistritos());
 
-                rd = request.getRequestDispatcher("/Distribucion/form_plan_transporte.jsp");
+                rd = request.getRequestDispatcher("/logistica/Distribucion/form_plan_transporte.jsp");
                 rd.forward(request, response);
                 break;
         }

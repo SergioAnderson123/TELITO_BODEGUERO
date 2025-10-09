@@ -12,7 +12,7 @@ import com.example.telito.logistica.daos.MovimientoInventarioDao;
 import java.io.IOException;
 import java.util.ArrayList;
 
-@WebServlet("/logistica/MovimientoProductoServlet")
+@WebServlet("/MovimientoProductoServlet")
 public class MovimientoProductoServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request,
@@ -28,7 +28,7 @@ public class MovimientoProductoServlet extends HttpServlet {
 
         // Forward a la JSP que mantiene el diseño
 // LÍNEA CORREGIDA
-        String vista = "/MovimientoProducto/product-movement.jsp";        RequestDispatcher rd = request.getRequestDispatcher(vista);
+        String vista = "/logistica/MovimientoProducto/product-movement.jsp";        RequestDispatcher rd = request.getRequestDispatcher(vista);
         rd.forward(request, response);
     }
 

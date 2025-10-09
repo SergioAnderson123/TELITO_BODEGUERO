@@ -28,7 +28,7 @@ public class JobServlet extends HttpServlet {
 
             // Como mandar a la vista  -> job/lista.jsp
 
-            String vista = "job/lista.jsp";
+            String vista = "/logistica/job/lista.jsp";
             request.setAttribute("lista", list);
             RequestDispatcher rd = request.getRequestDispatcher(vista);
             rd.forward(request,response);

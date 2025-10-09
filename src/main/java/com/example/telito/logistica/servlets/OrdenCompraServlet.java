@@ -50,14 +50,14 @@ public class OrdenCompraServlet extends HttpServlet {
                 // 4. Enviamos la lista de órdenes filtrada a la vista
                 request.setAttribute("listaOrdenes", listaOrdenes);
 
-                rd = request.getRequestDispatcher("/OrdenLista/purchase-order.jsp");
+                rd = request.getRequestDispatcher("/logistica/OrdenLista/purchase-order.jsp");
                 rd.forward(request, response);
                 break;
 
             case "crear":
                 request.setAttribute("listaProductos", productoDao.listarProductos());
                 request.setAttribute("listaProveedores", proveedorDao.listarProveedores());
-                rd = request.getRequestDispatcher("/OrdenLista/form_orden_compra.jsp");
+                rd = request.getRequestDispatcher("/logistica/OrdenLista/form_orden_compra.jsp");
                 rd.forward(request, response);
                 break;
         }

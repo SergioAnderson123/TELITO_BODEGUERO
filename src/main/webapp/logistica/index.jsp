@@ -1,1 +1,1 @@
-<% response.sendRedirect(request.getContextPath() + "/logistica/MovimientoProductoServlet"); %>
+<% response.sendRedirect(request.getContextPath() + "/MovimientoProductoServlet"); %>
