@@ -1,5 +1,5 @@
-<%@ page import="com.example.webbappadministrador.beans.PlantillaConfig" %>
-<%@ page import="com.example.webbappadministrador.beans.PlantillaMapeo" %>
+<%@ page import="com.example.telito.administrador.beans.PlantillaConfig" %>
+<%@ page import="com.example.telito.administrador.beans.PlantillaMapeo" %>
 <%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 

@@ -1,4 +1,4 @@
-<%@ page import="com.example.webbappadministrador.beans.Usuario" %>
+<%@ page import="com.example.telito.administrador.beans.Usuario" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <% Usuario usuario = (Usuario) request.getAttribute("usuario"); %>

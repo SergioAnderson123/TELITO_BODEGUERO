@@ -1,4 +1,4 @@
-<%@ page import="com.example.webbappadministrador.beans.AlertaConfig" %>
+<%@ page import="com.example.telito.administrador.beans.AlertaConfig" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
