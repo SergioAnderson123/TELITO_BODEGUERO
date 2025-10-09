@@ -2,14 +2,14 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <html>
 <head>
-    <jsp:include page="/layouts/head.jsp">
+    <jsp:include page="/almacen/layouts/head.jsp">
         <jsp:param name="pageTitle" value="Registrar Entrada"/>
     </jsp:include>
 </head>
 <body>
 <div class="dashboard-main-wrapper">
-    <jsp:include page="/layouts/header_almacen.jsp"/>
-    <jsp:include page="/layouts/sidebar_almacen.jsp">
+    <jsp:include page="/almacen/layouts/header_almacen.jsp"/>
+    <jsp:include page="/almacen/layouts/sidebar_almacen.jsp">
         <jsp:param name="activeMenu" value="Registrar entradas"/>
     </jsp:include>
 

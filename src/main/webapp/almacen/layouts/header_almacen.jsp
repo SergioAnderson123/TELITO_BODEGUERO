@@ -6,7 +6,7 @@
             </button>
 
             <a class="navbar-brand d-flex align-items-center ms-3" href="${pageContext.request.contextPath}/LoteServlet">
-                <img src="${pageContext.request.contextPath}/dist/assets/images/telito-CfoOZLNj.jpg"
+                <img src="${pageContext.request.contextPath}/almacen/dist/assets/images/telito-CfoOZLNj.jpg"
                      alt="Logo Telito" style="height:32px; width:auto;" class="me-2">
                 <span class="fw-bold">Telito Bodeguero</span>
             </a>

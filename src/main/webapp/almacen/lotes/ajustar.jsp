@@ -4,15 +4,15 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <jsp:include page="/layouts/head.jsp">
+    <jsp:include page="/almacen/layouts/head.jsp">
         <jsp:param name="pageTitle" value="Ajuste de Inventario"/>
     </jsp:include>
 </head>
 
 <body>
 <div class="dashboard-main-wrapper">
-    <jsp:include page="/layouts/header_almacen.jsp" />
-    <jsp:include page="/layouts/sidebar_almacen.jsp">
+    <jsp:include page="/almacen/layouts/header_almacen.jsp" />
+    <jsp:include page="/almacen/layouts/sidebar_almacen.jsp">
         <jsp:param name="activeMenu" value="Gestión de inventario"/>
     </jsp:include>
 
@@ -28,7 +28,7 @@
                     </div>
                 </div>
 
-                <form method="post" action="${pageContext.request.contextPath}/LoteServlet">
+                <form method="post" action="${pageContext.request.contextPath}/almacen/LoteServlet">
                     <%-- CAMBIO: El formulario ahora envuelve ambas tarjetas --%>
 
                     <%-- CAMBIO CRUCIAL: Campo oculto para enviar el ID del lote --%>
@@ -98,7 +98,7 @@
                                 </div>
                                 <div class="card-footer text-end">
                                     <%-- CAMBIO: El botón cancelar ahora apunta al servlet --%>
-                                    <a href="${pageContext.request.contextPath}/LoteServlet" class="btn btn-outline-secondary">Cancelar</a>
+                                    <a href="${pageContext.request.contextPath}/almacen/LoteServlet" class="btn btn-outline-secondary">Cancelar</a>
                                     <%-- CAMBIO: El botón confirmar ahora es de tipo 'submit' --%>
                                     <button type="submit" class="btn btn-primary">Confirmar ajuste</button>
                                 </div>
@@ -108,7 +108,7 @@
                 </form>
             </div>
         </div>
-        <jsp:include page="/layouts/footer.jsp" />
+        <jsp:include page="/almacen/layouts/footer.jsp" />
     </div>
 
     <%-- (Opcional) Puedes añadir un script para calcular la diferencia automáticamente --%>

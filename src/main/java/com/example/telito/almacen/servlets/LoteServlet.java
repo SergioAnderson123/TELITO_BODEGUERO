@@ -1,7 +1,7 @@
-package com.example.inventario.servlets;
+package com.example.telito.almacen.servlets;
 
-import com.example.inventario.beans.Lote;
-import com.example.inventario.daos.LoteDao;
+import com.example.telito.almacen.beans.Lote;
+import com.example.telito.almacen.daos.LoteDao;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 // Esta anotación mapea el servlet a la URL /LoteServlet
-@WebServlet(name = "LoteServlet", value = "/LoteServlet")
+@WebServlet("/almacen/LoteServlet")
 public class LoteServlet extends HttpServlet {
 
     // El método doGet se encarga de MOSTRAR las páginas
@@ -29,7 +29,7 @@ public class LoteServlet extends HttpServlet {
                 // 1. Obtener la lista de lotes del DAO
                 request.setAttribute("listaLotes", loteDao.listarLotes());
                 // 2. Enviar los datos al JSP para que los muestre
-                RequestDispatcher view = request.getRequestDispatcher("lotes/gestionarStock.jsp");
+                RequestDispatcher view = request.getRequestDispatcher("/almacen/lotes/gestionarStock.jsp");
                 view.forward(request, response);
                 break;
 
@@ -43,11 +43,11 @@ public class LoteServlet extends HttpServlet {
                     // 3. Guardar el lote encontrado en el request
                     request.setAttribute("loteAjustar", lote);
                     // 4. Enviar al usuario al formulario de ajuste
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("lotes/ajustar.jsp");
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("/almacen/lotes/ajustar.jsp");
                     dispatcher.forward(request, response);
                 } else {
                     // Si no se encuentra un lote con ese ID, se redirige a la lista
-                    response.sendRedirect(request.getContextPath() + "/LoteServlet");
+                    response.sendRedirect(request.getContextPath() + "/almacen/LoteServlet");
                 }
                 break;
         }
@@ -67,7 +67,7 @@ public class LoteServlet extends HttpServlet {
         loteDao.actualizarStock(idLote, nuevoStock);
 
         // 3. Redirigir al usuario de vuelta al servlet (esto ejecutará el doGet de nuevo)
-        response.sendRedirect(request.getContextPath() + "/LoteServlet");
+        response.sendRedirect(request.getContextPath() + "/almacen/LoteServlet");
     }
 }
 

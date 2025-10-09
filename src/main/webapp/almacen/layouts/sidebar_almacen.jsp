@@ -11,21 +11,21 @@
 
                 <li class="nav-item">
                     <a class="nav-link <c:if test="${param.activeMenu == 'Gestion de inventario'}">active</c:if>"
-                        href="${pageContext.request.contextPath}/LoteServlet?action=lista">
+                        href="${pageContext.request.contextPath}/almacen/LoteServlet?action=lista">
                         <i class="fas fa-fw fa-box"></i>Gestion de inventario
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link <c:if test="${param.activeMenu == 'Registrar entradas'}">active</c:if>"
-                       href="${pageContext.request.contextPath}/EntradaServlet?action=lista">
+                       href="${pageContext.request.contextPath}/almacen/EntradaServlet?action=lista">
                         <i class="fas fa-fw fa-arrow-down"></i>Registrar entradas
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link <c:if test="${param.activeMenu == 'Registrar salidas'}">active</c:if>"
-                       href="${pageContext.request.contextPath}/PedidoServlet?action=lista">
+                       href="${pageContext.request.contextPath}/almacen/PedidoServlet?action=lista">
                         <i class="fas fa-fw fa-arrow-up"></i>Registrar salidas
                     </a>
                 </li>

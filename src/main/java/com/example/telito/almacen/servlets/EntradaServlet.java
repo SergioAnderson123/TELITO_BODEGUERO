@@ -1,13 +1,13 @@
-package com.example.inventario.servlets;
+package com.example.telito.almacen.servlets;
 
-import com.example.inventario.beans.Lote;
-import com.example.inventario.beans.Movimiento;
-import com.example.inventario.beans.OrdenCompra;
-import com.example.inventario.daos.LoteDao;
-import com.example.inventario.daos.MovimientoDao;
-import com.example.inventario.daos.OrdenCompraDao;
+import com.example.telito.almacen.beans.Lote;
+import com.example.telito.almacen.beans.Movimiento;
+import com.example.telito.almacen.beans.OrdenCompra;
+import com.example.telito.almacen.daos.LoteDao;
+import com.example.telito.almacen.daos.MovimientoDao;
+import com.example.telito.almacen.daos.OrdenCompraDao;
 
-import com.example.inventario.daos.UbicacionDao;
+import com.example.telito.almacen.daos.UbicacionDao;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 
-@WebServlet(name = "EntradaServlet", value = "/EntradaServlet")
+@WebServlet("/almacen/EntradaServlet")
 public class EntradaServlet extends HttpServlet {
 
     /**
@@ -37,7 +37,7 @@ public class EntradaServlet extends HttpServlet {
             case "lista":
                 // Muestra la lista de órdenes de compra pendientes
                 request.setAttribute("listaOrdenes", ordenCompraDao.listarOrdenesPendientes());
-                view = request.getRequestDispatcher("entradas/listaOrdenes.jsp");
+                view = request.getRequestDispatcher("/almacen/entradas/listaOrdenes.jsp");
                 view.forward(request, response);
                 break;
 
@@ -48,7 +48,7 @@ public class EntradaServlet extends HttpServlet {
                 request.setAttribute("ordenCompra", oc);
                 UbicacionDao ubicacionDao = new UbicacionDao();
                 request.setAttribute("listaUbicaciones", ubicacionDao.listar());
-                view = request.getRequestDispatcher("entradas/registrarEntrada.jsp");
+                view = request.getRequestDispatcher("/almacen/entradas/registrarEntrada.jsp");
                 view.forward(request, response);
                 break;
         }
@@ -98,12 +98,12 @@ public class EntradaServlet extends HttpServlet {
             ordenCompraDao.actualizarEstado(idOrden, "Recibido");
 
             // 5. Se redirige a la lista de inventario principal para ver el nuevo lote
-            response.sendRedirect(request.getContextPath() + "/LoteServlet");
+            response.sendRedirect(request.getContextPath() + "/almacen/LoteServlet");
 
         } catch (NumberFormatException | NullPointerException e) {
             // Manejo de error si los datos del formulario son inválidos
             // Podrías reenviar al formulario con un mensaje de error
-            response.sendRedirect(request.getContextPath() + "/EntradaServlet");
+            response.sendRedirect(request.getContextPath() + "/almacen/EntradaServlet");
         }
     }
 }

@@ -1,12 +1,12 @@
-package com.example.inventario.servlets;
+package com.example.telito.almacen.servlets;
 
-import com.example.inventario.beans.Lote;
-import com.example.inventario.beans.Movimiento;
-import com.example.inventario.beans.Pedido;
-import com.example.inventario.beans.PedidoItem;
-import com.example.inventario.daos.LoteDao;
-import com.example.inventario.daos.MovimientoDao;
-import com.example.inventario.daos.PedidoDao;
+import com.example.telito.almacen.beans.Lote;
+import com.example.telito.almacen.beans.Movimiento;
+import com.example.telito.almacen.beans.Pedido;
+import com.example.telito.almacen.beans.PedidoItem;
+import com.example.telito.almacen.daos.LoteDao;
+import com.example.telito.almacen.daos.MovimientoDao;
+import com.example.telito.almacen.daos.PedidoDao;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

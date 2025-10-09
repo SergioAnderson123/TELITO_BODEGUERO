@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Preparación de Pedido - Telito</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../assets/images/favicon.ico">
+    
+    <!-- CSS -->
+    
+
+    <style>
+        /* Oculta las flechas en los campos de tipo número */        
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+  <script type="module" crossorigin src="../../assets/js/Preparar pedido-DJhIVISY.js"></script>
+  <link rel="modulepreload" crossorigin href="../../assets/js/app-xycYImM_.js">
+  <link rel="stylesheet" crossorigin href="../../assets/css/style-CSLFZwYx.css">
+  <script type="module">import.meta.url;import("_").catch(()=>1);(async function*(){})().next();window.__vite_is_modern_browser=true</script>
+  <script type="module">!function(){if(window.__vite_is_modern_browser)return;console.warn("vite: loading legacy chunks, syntax error above and the same error below should be ignored");var e=document.getElementById("vite-legacy-polyfill"),n=document.createElement("script");n.src=e.src,n.onload=function(){System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))},document.body.appendChild(n)}();</script>
+</head>
+
+<body>
+    <div class="dashboard-main-wrapper">
+
+        <div class="dashboard-header">
+            <nav class="navbar navbar-expand fixed-top">
+                <div class="container-fluid">
+                    <!-- Mobile Sidebar Toggle -->
+                    <button class="navbar-toggler sidebar-toggler me-3 d-lg-none" type="button" aria-label="Toggle sidebar">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    
+                    <!-- Brand -->
+                    <a class="navbar-brand d-flex align-items-center ms-3" href="../../index.html">
+                        <!-- Icono (puedes cambiar el src por tu propio logo en /assets/images/) -->
+                        <img src="../../assets/images/telito-CfoOZLNj.jpg" alt="Logo Telito" style="height:32px; width:auto;" class="me-2">
+                        <span class="fw-bold">Telito Bodeguero</span>
+                    </a>
+        
+                    
+                    
+                    
+                    <!-- Right Side Items - Always visible -->
+                    <ul class="navbar-nav ms-auto navbar-right-top">
+                        <!-- Mobile Search Toggle -->
+                        <li class="nav-item d-md-none">
+                            <a class="nav-link nav-icons" href="#" data-bs-toggle="modal" data-bs-target="#searchModal">
+                                <i class="fas fa-search"></i>
+                            </a>
+                        </li>
+                        
+                        
+                        <!-- User Profile -->
+                        <li class="nav-item dropdown nav-user ms-2">
+                            <a class="nav-link p-0" href="#" id="navbarUser" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://ui-avatars.com/api/?name=John+Abraham&background=5969ff&color=fff" alt="User" class="user-avatar-md rounded-circle">
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end nav-user-dropdown" aria-labelledby="navbarUser">
+                                <div class="nav-user-info">
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://ui-avatars.com/api/?name=John+Abraham&background=5969ff&color=fff" alt="User" class="rounded-circle me-3" width="50">
+                                        <div>
+                                            <h6 class="mb-0">Eduardo Rodas</h6>
+                                            <small class="text-muted">eduardo@example.com</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a class="dropdown-item text-danger" href="#"><i class="fas fa-power-off me-2"></i>Logout</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>        <div class="nav-left-sidebar sidebar-dark">
+            <div class="menu-list">
+                <nav class="navbar navbar-expand navbar-light">
+                    <ul class="navbar-nav flex-column w-100">
+                        <li class="nav-divider">
+                            Menu
+                        </li>
+        
+                        <li class="nav-item">
+                            <a class="nav-link " href="../../index.html">
+                                <i class="fas fa-fw fa-box"></i>Gestión de inventario
+                            </a>
+                        </li>  
+        
+                        <li class="nav-item">
+                            <a class="nav-link " href="../../pages/misc/Registrar-entradas.html">
+                                <i class="fas fa-fw fa-arrow-down"></i>Registrar entradas
+                            </a>
+                        </li>  
+                        <li class="nav-item">
+                            <a class="nav-link active" href="../../pages/misc/Registrar-salidas.html">
+                                <i class="fas fa-fw fa-arrow-up"></i>Registrar salidas
+                            </a>
+                        </li>                     
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="dashboard-wrapper">
+            <div class="dashboard-content">
+                <div class="container-fluid">
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-header">
+                                <h2 class="pageheader-title fs-1">Preparación de Pedido</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Detalles del Pedido</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Número de pedido</th>
+                                        <th>Destino</th>
+                                        <th>Cliente</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#PED-003</td>
+                                        <td>Tienda Norte</td>
+                                        <td>Cliente Ejemplo S.A.C.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Lista de productos del pedido #PED-003</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+
+                                        <table class="table">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th>Código de producto</th>
+                                                    <th>Producto</th>
+                                                    <th>Ubicación</th>
+                                                    <th class="text-center">Cantidad requerida</th>
+                                                    <th class="text-center" style="width: 15%;">Cantidad recogida</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>XXXX</td>
+                                                    <td>Leche</td>
+                                                    <td>Pasillo X</td>
+                                                    <td class="text-center cantidad-requerida">50</td>
+                                                    <td>
+                                                        <input type="number" class="form-control text-center cantidad-recogida-input" value="50">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>XXXX</td>
+                                                    <td>Atun</td>
+                                                    <td>Pasillo X</td>
+                                                    <td class="text-center cantidad-requerida">50</td>
+                                                    <td>
+                                                        <input type="number" class="form-control text-center cantidad-recogida-input" value="48">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>XXXX</td>
+                                                    <td>Fideos</td>
+                                                    <td>Pasillo X</td>
+                                                    <td class="text-center cantidad-requerida">50</td>
+                                                    <td>
+                                                        <input type="number" class="form-control text-center cantidad-recogida-input" value="51">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="modal fade" id="incidenciaModal" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-danger text-white">
+                                                        <h5 class="modal-title">Reportar Incidencia</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>La cantidad recogida es <b>menor</b> a la cantidad requerida.</p>
+                                                        <p>Por favor, indique el motivo de la incidencia.</p>
+                                                        
+                                                        <select class="form-select mt-3">
+                                                            <option selected>Seleccione un motivo...</option>
+                                                            <option value="1">Producto Dañado</option>
+                                                            <option value="2">No se encontró el producto</option>
+                                                            <option value="3">Otro</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Confirmar Incidencia</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-end">
+                                    <a class="btn btn-primary" href="../../pedido-despachado-correctamente.html">Finalizar preparación</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <div class="container-fluid px-4">
+                        <div class="row">
+                
+                        </div>
+                    </div>
+                </div>            </div>
+        </div>
+    </div>
+    <!-- Core JavaScript -->
+    
+    
+
+<script>
+// Esto asegura que todo se haya cargado antes de ejecutar el script
+document.addEventListener('DOMContentLoaded', function () {
+
+    // 1. Se busca TODOS los campos de "cantidad recogida"
+    const inputsCantidadRecogida = document.querySelectorAll('.cantidad-recogida-input');
+    
+    // 2. Se prepara el modal de Bootstrap para poder mostrarlo con JS
+    const modalElement = document.getElementById('incidenciaModal');
+    const incidenciaModal = new bootstrap.Modal(modalElement);
+
+    // 3. Se recorre cada uno de los campos que encontramos
+    inputsCantidadRecogida.forEach(function (input) {
+        
+        // 4. A cada campo se le dice que "escuche" cuando el usuario cambie el valor
+        input.addEventListener('change', function () {
+            
+            // 5. Cuando cambia, se busca la fila (<tr>) más cercana a este input
+            const fila = input.closest('tr');
+            
+            // 6. Dentro de esa fila, se busca la celda de "cantidad requerida"
+            const celdaRequerida = fila.querySelector('.cantidad-requerida');
+            
+            // 7. Se obtienen los valores y se convierten a números
+            const cantidadRequerida = parseInt(celdaRequerida.textContent);
+            const cantidadRecogida = parseInt(input.value);
+
+            // 8. Se comparan los valores
+            if (cantidadRecogida < cantidadRequerida) {
+                // Si la cantidad recogida es menor, mostramos la ventana emergente
+                incidenciaModal.show();
+            }
+        });
+    });
+});
+</script>
+  <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
+  <script nomodule crossorigin id="vite-legacy-polyfill" src="../../assets/js/polyfills-legacy-1usy8bJY.js"></script>
+  <script nomodule crossorigin id="vite-legacy-entry" data-src="../../assets/js/Preparar pedido-legacy-B5I2sc6E.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
+</body>
+
+</html>

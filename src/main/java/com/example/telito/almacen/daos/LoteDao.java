@@ -1,6 +1,6 @@
-package com.example.inventario.daos;
+package com.example.telito.almacen.daos;
 
-import com.example.inventario.beans.Lote;
+import com.example.telito.almacen.beans.Lote;
 import java.sql.*;
 import java.util.ArrayList;
 

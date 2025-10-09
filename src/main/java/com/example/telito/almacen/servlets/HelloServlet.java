@@ -1,4 +1,4 @@
-package com.example.inventario.servlets;
+package com.example.telito.almacen.servlets;
 
 import java.io.*;
 

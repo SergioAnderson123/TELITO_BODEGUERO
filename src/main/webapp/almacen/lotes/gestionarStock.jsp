@@ -5,17 +5,17 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <jsp:include page="/layouts/head.jsp">
+    <jsp:include page="/almacen/layouts/head.jsp">
         <jsp:param name="pageTitle" value="Gestión de Inventario"/>
     </jsp:include>
 </head>
 <body>
 <div class="dashboard-main-wrapper">
-    <jsp:include page="/layouts/sidebar_almacen.jsp">
+    <jsp:include page="/almacen/layouts/sidebar_almacen.jsp">
         <jsp:param name="activeMenu" value='Gestion de inventario'/>
         <jsp:param name="activePage" value='Gestion de inventario'/>
     </jsp:include>
-    <jsp:include page="/layouts/header_almacen.jsp" />
+    <jsp:include page="/almacen/layouts/header_almacen.jsp" />
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
             <div class="container-fluid">
@@ -95,7 +95,7 @@
                 </div>
             </div>
         </div>
-        <jsp:include page="/layouts/footer.jsp" />
+        <jsp:include page="/almacen/layouts/footer.jsp" />
     </div>
 </div>
 

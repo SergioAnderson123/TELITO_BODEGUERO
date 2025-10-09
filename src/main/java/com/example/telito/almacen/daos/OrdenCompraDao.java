@@ -1,8 +1,8 @@
-package com.example.inventario.daos;
+package com.example.telito.almacen.daos;
 
-import com.example.inventario.beans.OrdenCompra;
-import com.example.inventario.beans.Producto;
-import com.example.inventario.beans.Proveedor;
+import com.example.telito.almacen.beans.OrdenCompra;
+import com.example.telito.almacen.beans.Producto;
+import com.example.telito.almacen.beans.Proveedor;
 
 import java.sql.*;
 import java.util.ArrayList;

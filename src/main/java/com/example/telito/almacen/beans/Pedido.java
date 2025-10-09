@@ -1,4 +1,4 @@
-package com.example.inventario.beans;
+package com.example.telito.almacen.beans;
 
 import java.sql.Timestamp;
 import java.util.List;

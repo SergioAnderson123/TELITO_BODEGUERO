@@ -48,7 +48,8 @@
         <div class="role-options">
             <a href="administrador/index.jsp">Administrador</a>
             <a href="productor/index.jsp">Productor</a>
-            <a href="logistica/index.jsp">Logística</a>
+            <a href="logistica/index.jsp">Logistica</a>
+            <a href="almacen/index.jsp">Almacen</a>
         </div>
     </div>
 </body>

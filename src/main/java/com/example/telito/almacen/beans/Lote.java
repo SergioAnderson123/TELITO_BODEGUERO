@@ -1,4 +1,4 @@
-package com.example.inventario.beans;
+package com.example.telito.almacen.beans;
 
 import java.sql.Date;
 

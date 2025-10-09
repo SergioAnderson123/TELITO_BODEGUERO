@@ -1,9 +1,10 @@
-package com.example.inventario.daos;
+package com.example.telito.almacen.daos;
 
-import com.example.inventario.beans.Cliente;
-import com.example.inventario.beans.Lote;
-import com.example.inventario.beans.Pedido;
-import com.example.inventario.beans.PedidoItem;
+
+import com.example.telito.almacen.beans.Cliente;
+import com.example.telito.almacen.beans.Lote;
+import com.example.telito.almacen.beans.Pedido;
+import com.example.telito.almacen.beans.PedidoItem;
 
 import java.sql.*;
 import java.util.ArrayList;

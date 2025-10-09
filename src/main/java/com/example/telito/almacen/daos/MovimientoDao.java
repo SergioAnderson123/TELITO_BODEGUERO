@@ -1,6 +1,7 @@
-package com.example.inventario.daos;
+package com.example.telito.almacen.daos;
 
-import com.example.inventario.beans.Movimiento;
+
+import com.example.telito.almacen.beans.Movimiento;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
