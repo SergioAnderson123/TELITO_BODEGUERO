@@ -36,7 +36,7 @@
           <a href="<%= request.getContextPath() %>/UsuarioServlet"><i class="fas fa-users fa-fw"></i> Gestión de Usuarios</a>
           <a href="<%= request.getContextPath() %>/ProductoServlet?action=listarInventario"><i class="fas fa-boxes-stacked fa-fw"></i> Inventario General</a>
           <a href="<%= request.getContextPath() %>/administrador/acceso-roles.jsp"><i class="fas fa-user-shield fa-fw"></i> Acceso a Roles</a>
-          <a href="<%= request.getContextPath() %>/reportes-globales.jsp"><i class="fas fa-chart-pie fa-fw"></i> Reportes Globales</a>
+          <a href="<%= request.getContextPath() %>/administrador/reportes-globales.jsp"><i class="fas fa-chart-pie fa-fw"></i> Reportes Globales</a>
           <a href="<%= request.getContextPath() %>/administrador/configuracion.jsp"><i class="fas fa-cogs fa-fw"></i> Configuración</a>
       </nav>
       <div class="sidebar-footer"><a href="#"><i class="fas fa-sign-out-alt fa-fw"></i> Cerrar sesión</a></div>
@@ -76,7 +76,7 @@
 
     <div class="row mt-4">
       <div class="col-12"><h3 class="mb-3" style="font-weight: 700;">Accesos rápidos</h3></div>
-      <div class="col-lg-3 col-md-6 mb-4"><a href="<%= request.getContextPath() %>/reportes-globales.jsp" class="card quick-link-card"><i class="fas fa-chart-pie"></i><h5>Reportes globales</h5><span>KPIs y tableros</span></a></div>
+      <div class="col-lg-3 col-md-6 mb-4"><a href="<%= request.getContextPath() %>/administrador/reportes-globales.jsp" class="card quick-link-card"><i class="fas fa-chart-pie"></i><h5>Reportes globales</h5><span>KPIs y tableros</span></a></div>
       <div class="col-lg-3 col-md-6 mb-4"><a href="<%= request.getContextPath() %>/administrador/acceso-roles.jsp" class="card quick-link-card"><i class="fas fa-user-shield"></i><h5>Roles y permisos</h5><span>Asignación y políticas</span></a></div>
       <div class="col-lg-3 col-md-6 mb-4"><a href="<%= request.getContextPath() %>/administrador/configuracion.jsp" class="card quick-link-card"><i class="fas fa-cogs"></i><h5>Configuración</h5><span>Sistema y plantillas</span></a></div>
       <div class="col-lg-3 col-md-6 mb-4"><a href="#" class="card quick-link-card"><i class="fas fa-chart-line"></i><h5>Reportes globales</h5><span>Indicadores y métricas</span></a></div>
