@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet(name = "PedidoServlet", value = "/PedidoServlet")
+@WebServlet("/almacen/PedidoServlet")
 
 public class PedidoServlet extends HttpServlet {
 
@@ -32,7 +32,7 @@ public class PedidoServlet extends HttpServlet {
         switch (action) {
             case "lista":
                 request.setAttribute("listaPedidos", pedidoDao.listarPedidosPendientes());
-                view = request.getRequestDispatcher("pedidos/listaPedidos.jsp");
+                view = request.getRequestDispatcher("/almacen/pedidos/listaPedidos.jsp");
                 view.forward(request, response);
                 break;
 
@@ -42,10 +42,10 @@ public class PedidoServlet extends HttpServlet {
 
                 if (pedido != null) {
                     request.setAttribute("pedido", pedido);
-                    view = request.getRequestDispatcher("pedidos/prepararPedido.jsp");
+                    view = request.getRequestDispatcher("/almacen/pedidos/prepararPedido.jsp");
                     view.forward(request, response);
                 } else {
-                    response.sendRedirect(request.getContextPath() + "/PedidoServlet");
+                    response.sendRedirect(request.getContextPath() + "/almacen/PedidoServlet");
                 }
                 break;
         }
@@ -118,15 +118,15 @@ public class PedidoServlet extends HttpServlet {
                 pedidoDao.actualizarEstado(idPedido, "Despachado");
 
                 // 4. Redirigimos a la lista principal
-                response.sendRedirect(request.getContextPath() + "/PedidoServlet");
+                response.sendRedirect(request.getContextPath() + "/almacen/PedidoServlet");
             } else {
                 // Si hubo un error de stock o selección, reenviamos al formulario
                 request.setAttribute("pedido", pedidoDao.buscarPedidoPorId(idPedido)); // Re-cargamos los datos del pedido
-                RequestDispatcher dispatcher = request.getRequestDispatcher("pedidos/prepararPedido.jsp");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/almacen/pedidos/prepararPedido.jsp");
                 dispatcher.forward(request, response);
             }
         } else {
-            response.sendRedirect(request.getContextPath() + "/PedidoServlet");
+            response.sendRedirect(request.getContextPath() + "/almacen/PedidoServlet");
         }
     }
 

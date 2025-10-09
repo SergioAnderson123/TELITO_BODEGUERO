@@ -1,1 +1,1 @@
-<% response.sendRedirect(request.getContextPath() + "/LoteServlet"); %>
+<% response.sendRedirect(request.getContextPath() + "/almacen/LoteServlet"); %>

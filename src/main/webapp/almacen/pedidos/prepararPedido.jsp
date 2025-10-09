@@ -4,15 +4,15 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <jsp:include page="/layouts/head.jsp">
+    <jsp:include page="/almacen/layouts/head.jsp">
         <jsp:param name="pageTitle" value="Preparación de Pedido"/>
     </jsp:include>
 </head>
 
 <body>
 <div class="dashboard-main-wrapper">
-    <jsp:include page="/layouts/header_almacen.jsp"/>
-    <jsp:include page="/layouts/sidebar_almacen.jsp">
+    <jsp:include page="/almacen/layouts/header_almacen.jsp"/>
+    <jsp:include page="/almacen/layouts/sidebar_almacen.jsp">
         <jsp:param name="activeMenu" value="Registrar salidas"/>
     </jsp:include>
 
@@ -50,7 +50,7 @@
                     </div>
                 </div>
 
-                <form method="post" action="${pageContext.request.contextPath}/PedidoServlet">
+                <form method="post" action="${pageContext.request.contextPath}/almacen/PedidoServlet">
 
                     <input type="hidden" name="id_pedido" value="${pedido.idPedido}">
 
@@ -111,7 +111,7 @@
                 </form>
 
             </div>
-            <jsp:include page="/layouts/footer.jsp"/>
+            <jsp:include page="/almacen/layouts/footer.jsp"/>
         </div>
     </div>
 </body>
