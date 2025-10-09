@@ -25,7 +25,7 @@
           <a href="<%= request.getContextPath() %>/UsuarioServlet"><i class="fas fa-users fa-fw"></i> Gestión de Usuarios</a>
           <a href="<%= request.getContextPath() %>/ProductoServlet?action=listarInventario"><i class="fas fa-boxes-stacked fa-fw"></i> Inventario General</a>
           <a href="<%= request.getContextPath() %>/acceso-roles.jsp"><i class="fas fa-user-shield fa-fw"></i> Acceso a Roles</a>
-          <a href="<%= request.getContextPath() %>/reportes-globales.jsp" class="active"><i class="fas fa-chart-pie fa-fw"></i> Reportes Globales</a>
+          <a href="<%= request.getContextPath() %>/administrador/reportes-globales.jsp" class="active"><i class="fas fa-chart-pie fa-fw"></i> Reportes Globales</a>
           <a href="<%= request.getContextPath() %>/administrador/configuracion.jsp"><i class="fas fa-cogs fa-fw"></i> Configuración</a>
       </nav>
       <div class="sidebar-footer"><a href="#"><i class="fas fa-sign-out-alt fa-fw"></i> Cerrar sesión</a></div>
@@ -156,7 +156,8 @@
                     legend: { position: 'top', align: 'end', labels: { font: { size: 13, family: "'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif" }, usePointStyle: true, pointStyle: 'circle' } },
                     tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(0, 0, 0, 0.7)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 }, padding: 12, cornerRadius: 4 }
                 },
-                scales: { y: { beginAtZero: true, grid: { color: '#e9e9e9', drawBorder: false } }, x: { grid: { display: false } } }
+                scales: { y: { beginAtZero: true, grid: { color: '#e9e9e9', drawBorder: false } }, x: { grid: { display: false } }
+                }
             }
         });
       } catch (e) { console.error("Error al renderizar el Gráfico 4 (Almacén):", e); }
