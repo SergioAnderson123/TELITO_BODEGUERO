@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -46,10 +47,10 @@
         <h1>Bienvenido a Telito Bodeguero</h1>
         <p>Por favor, selecciona tu rol para continuar:</p>
         <div class="role-options">
-            <a href="administrador/index.jsp">Administrador</a>
-            <a href="productor/index.jsp">Productor</a>
-            <a href="logistica/index.jsp">Logistica</a>
-            <a href="almacen/index.jsp">Almacen</a>
+            <a href="${pageContext.request.contextPath}/inicio">Administrador</a>
+            <a href="${pageContext.request.contextPath}/ProductorServlet">Productor</a>
+            <a href="${pageContext.request.contextPath}/InventarioServlet">Logistica</a>
+            <a href="${pageContext.request.contextPath}/almacen/LoteServlet">Almacen</a>
         </div>
     </div>
 </body>

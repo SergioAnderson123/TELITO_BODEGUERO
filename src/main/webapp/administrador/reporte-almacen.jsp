@@ -9,7 +9,7 @@
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/administrador/assets/css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -24,7 +24,7 @@
           <a href="<%= request.getContextPath() %>/inicio"><i class="fas fa-home fa-fw"></i> Pestaña principal</a>
           <a href="<%= request.getContextPath() %>/UsuarioServlet"><i class="fas fa-users fa-fw"></i> Gestión de Usuarios</a>
           <a href="<%= request.getContextPath() %>/ProductoServlet?action=listarInventario"><i class="fas fa-boxes-stacked fa-fw"></i> Inventario General</a>
-          <a href="<%= request.getContextPath() %>/acceso-roles.jsp"><i class="fas fa-user-shield fa-fw"></i> Acceso a Roles</a>
+          <a href="<%= request.getContextPath() %>/administrador/acceso-roles.jsp"><i class="fas fa-user-shield fa-fw"></i> Acceso a Roles</a>
           <a href="<%= request.getContextPath() %>/administrador/reportes-globales.jsp" class="active"><i class="fas fa-chart-pie fa-fw"></i> Reportes Globales</a>
           <a href="<%= request.getContextPath() %>/administrador/configuracion.jsp"><i class="fas fa-cogs fa-fw"></i> Configuración</a>
       </nav>
@@ -98,7 +98,7 @@
         new Chart(document.getElementById('movimientosDiaChart'), {
             type: 'pie',
             data: { labels: movLabels, datasets: [{ data: movData, backgroundColor: [ TELITO_COLORS.green, TELITO_COLORS.red, TELITO_COLORS.yellow ], borderColor: '#fff', borderWidth: 2, hoverOffset: 8 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 13, family: "'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif" }, padding: 20, usePointStyle: true, pointStyle: 'circle' } }, tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.7)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 }, padding: 12, cornerRadius: 4, callbacks: { label: function(context) { let label = context.label || ''; if (label) { label += ': '; } if (context.parsed !== null) { label += context.parsed + ' Movimientos'; } return label; } } } }, animation: { animateScale: true, animateRotate: true } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 13, family: "\'Segoe UI\', \'Roboto\', \'Helvetica Neue\', \'Arial\', sans-serif" }, padding: 20, usePointStyle: true, pointStyle: 'circle' } }, tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.7)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 }, padding: 12, cornerRadius: 4, callbacks: { label: function(context) { let label = context.label || ''; if (label) { label += ': '; } if (context.parsed !== null) { label += context.parsed + ' Movimientos'; } return label; } } } }, animation: { animateScale: true, animateRotate: true } }
         });
       } catch (e) { console.error("Error al renderizar el Gráfico 1 (Almacén):", e); }
 
@@ -124,7 +124,7 @@
         new Chart(document.getElementById('ajustesChart'), {
             type: 'doughnut',
             data: { labels: ajustesLabels, datasets: [{ data: ajustesData, backgroundColor: [ TELITO_COLORS.orange, TELITO_COLORS.yellow, TELITO_COLORS.purple, TELITO_COLORS.grey ], borderColor: '#fff', borderWidth: 2, hoverOffset: 8 }] },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { font: { size: 13, family: "'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif" }, padding: 20, usePointStyle: true, pointStyle: 'circle' } }, tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.7)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 }, padding: 12, cornerRadius: 4, callbacks: { label: function(context) { let label = context.label || ''; if (label) { label += ': '; } if (context.parsed !== null) { label += context.parsed + ' Ajustes'; } return label; } } } }, animation: { animateScale: true, animateRotate: true } }
+            options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { font: { size: 13, family: "\'Segoe UI\', \'Roboto\', \'Helvetica Neue\', \'Arial\', sans-serif" }, padding: 20, usePointStyle: true, pointStyle: 'circle' } }, tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.7)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 }, padding: 12, cornerRadius: 4, callbacks: { label: function(context) { let label = context.label || ''; if (label) { label += ': '; } if (context.parsed !== null) { label += context.parsed + ' Ajustes'; } return label; } } } }, animation: { animateScale: true, animateRotate: true } }
         });
       } catch (e) { console.error("Error al renderizar el Gráfico 3 (Almacén):", e); }
       
@@ -153,11 +153,10 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'top', align: 'end', labels: { font: { size: 13, family: "'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif" }, usePointStyle: true, pointStyle: 'circle' } },
+                    legend: { position: 'top', align: 'end', labels: { font: { size: 13, family: "\'Segoe UI\', \'Roboto\', \'Helvetica Neue\', \'Arial\', sans-serif" }, usePointStyle: true, pointStyle: 'circle' } },
                     tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(0, 0, 0, 0.7)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 }, padding: 12, cornerRadius: 4 }
                 },
-                scales: { y: { beginAtZero: true, grid: { color: '#e9e9e9', drawBorder: false } }, x: { grid: { display: false } }
-                }
+                scales: { y: { beginAtZero: true, grid: { color: '#e9e9e9', drawBorder: false } }, x: { grid: { display: false } } }
             }
         });
       } catch (e) { console.error("Error al renderizar el Gráfico 4 (Almacén):", e); }

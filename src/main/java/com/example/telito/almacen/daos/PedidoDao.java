@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class PedidoDao {
 
-    private String url = "jdbc:mysql://localhost:3306/telito4"; // Reemplaza con tu base de datos
+    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero"; // Corrected database name
     private String user = "root";
     private String pass = "root"; // Reemplaza con tu contraseña
 

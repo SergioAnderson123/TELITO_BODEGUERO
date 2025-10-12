@@ -33,13 +33,13 @@ public class PlantillaServlet extends HttpServlet {
                 // Carga la lista de plantillas para la tabla de gestión.
                 ArrayList<PlantillaConfig> listaPlantillas = plantillaDAO.listarPlantillas();
                 request.setAttribute("listaPlantillas", listaPlantillas);
-                view = request.getRequestDispatcher("gestion-plantillas.jsp");
+                view = request.getRequestDispatcher("/administrador/gestion-plantillas.jsp");
                 view.forward(request, response);
                 break;
 
             case "formCrear":
                 // Muestra el formulario para crear una plantilla nueva.
-                view = request.getRequestDispatcher("form-plantilla.jsp");
+                view = request.getRequestDispatcher("/administrador/form-plantilla.jsp");
                 view.forward(request, response);
                 break;
 
@@ -50,7 +50,7 @@ public class PlantillaServlet extends HttpServlet {
                     PlantillaConfig plantilla = plantillaDAO.obtenerPlantillaPorId(idPlantilla);
                     if (plantilla != null) {
                         request.setAttribute("plantilla", plantilla);
-                        view = request.getRequestDispatcher("form-plantilla.jsp");
+                        view = request.getRequestDispatcher("/administrador/form-plantilla.jsp");
                         view.forward(request, response);
                     } else {
                         session.setAttribute("errorMsg", "La plantilla que se intenta editar no existe.");

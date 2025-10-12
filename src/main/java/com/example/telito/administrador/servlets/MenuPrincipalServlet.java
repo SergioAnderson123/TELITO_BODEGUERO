@@ -31,7 +31,7 @@ public class MenuPrincipalServlet extends HttpServlet {
         request.setAttribute("alertasAbiertas", alertasAbiertas); // Nuevo atributo
 
         // Enviamos la petición al JSP para que renderice la vista
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/administrador/index.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/administrador/menu-principal.jsp");
         dispatcher.forward(request, response);
     }
 

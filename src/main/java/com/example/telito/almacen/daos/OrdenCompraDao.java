@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class OrdenCompraDao {
 
-    private String url = "jdbc:mysql://localhost:3306/telito4";
+    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero"; // Corrected database name
     private String user = "root";
     private String pass = "root";
 

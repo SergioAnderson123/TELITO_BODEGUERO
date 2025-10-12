@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.example.telito.logistica.beans.MovimientoInventarioBean" %>
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -14,6 +13,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/logistica/assets/style.css">
 </head>
 <body>
 <div class="dashboard-main-wrapper">
@@ -50,7 +50,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/planes-transporte">
                             <i class="fas fa-fw fa-truck"></i>Distribución y Transporte
                         </a>
                     </li>
@@ -291,7 +291,7 @@
     .menu-list { height: 100%; overflow-y: auto; padding-top: 20px; }
     .nav-left-sidebar .navbar { padding: 0; }
     .nav-left-sidebar .navbar-nav { width: 100%; }
-    .nav-left-sidebar .nav-link { padding: 12px 30px !important; color: #8287a0 !important; font-size: 0.875rem; display: flex; align-items: center; transition: all 0.2s ease; border-left: 3px solid transparent; text-decoration: none; }
+    .nav-left-sidebar .nav-link { padding: 12px 30px !important; font-size: 0.875rem; display: flex; align-items: center; transition: all 0.2s ease; border-left: 3px solid transparent; text-decoration: none; }
     .nav-left-sidebar .nav-link i { width: 20px; margin-right: 10px; font-size: 1rem; text-align: left; }
     .nav-left-sidebar .nav-link:hover { background-color: rgba(255, 255, 255, 0.08) !important; color: #ffffff !important; }
     .nav-left-sidebar .nav-link.active { background-color: rgba(255, 255, 255, 0.08) !important; color: #ffffff !important; border-left-color: #007bff; font-weight: 500; }

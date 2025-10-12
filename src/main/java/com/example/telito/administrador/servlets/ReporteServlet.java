@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@WebServlet(name = "ReporteServlet", value = "/reportes")
+@WebServlet(name = "ReporteServlet", value = "/administrador/reportes")
 public class ReporteServlet extends HttpServlet {
 
     @Override
@@ -44,7 +44,7 @@ public class ReporteServlet extends HttpServlet {
                 request.setAttribute("pedidosMesLabelsJson", gson.toJson(new ArrayList<>(pedidosMes.keySet())));
                 request.setAttribute("pedidosMesDataJson", gson.toJson(new ArrayList<>(pedidosMes.values())));
 
-                RequestDispatcher view = request.getRequestDispatcher("reporte-logistica.jsp");
+                RequestDispatcher view = request.getRequestDispatcher("/administrador/reporte-logistica.jsp");
                 view.forward(request, response);
                 break;
             }
@@ -75,7 +75,7 @@ public class ReporteServlet extends HttpServlet {
                 request.setAttribute("actividadEntradasJson", gson.toJson(entradas));
                 request.setAttribute("actividadSalidasJson", gson.toJson(salidas));
 
-                RequestDispatcher view = request.getRequestDispatcher("reporte-almacen.jsp");
+                RequestDispatcher view = request.getRequestDispatcher("/administrador/reporte-almacen.jsp");
                 view.forward(request, response);
                 break;
             }
@@ -100,7 +100,7 @@ public class ReporteServlet extends HttpServlet {
                 request.setAttribute("lotesUbicacionLabelsJson", gson.toJson(new ArrayList<>(lotesUbicacion.keySet())));
                 request.setAttribute("lotesUbicacionDataJson", gson.toJson(new ArrayList<>(lotesUbicacion.values())));
 
-                RequestDispatcher view = request.getRequestDispatcher("reporte-productor.jsp");
+                RequestDispatcher view = request.getRequestDispatcher("/administrador/reporte-productor.jsp");
                 view.forward(request, response);
                 break;
             }

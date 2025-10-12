@@ -13,6 +13,7 @@
     <link rel="icon" type="image/x-icon" href="${pageContext.request.contextPath}/assets/images/favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/logistica/assets/style.css">
 </head>
 <body>
 <div class="dashboard-main-wrapper">
@@ -75,9 +76,9 @@
                             <label for="filtroConductor" class="form-label">Conductor</label>
                             <select id="filtroConductor" name="conductor" class="form-select">
                                 <option value="" selected>Todos</option>
-                                <% ArrayList<com.example.telito.logistica.beans.ConductorBean> listaConductores = (ArrayList<com.example.telito.logistica.beans.ConductorBean>) request.getAttribute("listaConductores");
+                                <% ArrayList<ConductorBean> listaConductores = (ArrayList<ConductorBean>) request.getAttribute("listaConductores");
                                     if(listaConductores != null){
-                                        for(com.example.telito.logistica.beans.ConductorBean conductor : listaConductores){ %>
+                                        for(ConductorBean conductor : listaConductores){ %>
                                 <option value="<%= conductor.getId() %>" ${param.conductor == conductor.getId() ? 'selected' : ''} >
                                     <%= conductor.getNombreCompleto() %>
                                 </option>
@@ -130,9 +131,9 @@
                                     </thead>
                                     <tbody>
                                     <%
-                                        ArrayList<com.example.telito.logistica.beans.PlanTransporteBean> listaPlanes = (ArrayList<com.example.telito.logistica.beans.PlanTransporteBean>) request.getAttribute("listaPlanes");
+                                        ArrayList<PlanTransporteBean> listaPlanes = (ArrayList<PlanTransporteBean>) request.getAttribute("listaPlanes");
                                         if (listaPlanes != null && !listaPlanes.isEmpty()) {
-                                            for (com.example.telito.logistica.beans.PlanTransporteBean plan : listaPlanes) {
+                                            for (PlanTransporteBean plan : listaPlanes) {
                                     %>
                                     <tr>
                                         <td><%= plan.getNumeroViaje() %></td>
@@ -209,8 +210,5 @@
     function changePage(direction){const totalPages=Math.ceil(filteredRows.length/rowsPerPage);if(direction==='prev'&&currentPage>1){goToPage(currentPage-1);}else if(direction==='next'&&currentPage<totalPages){goToPage(currentPage+1);}}
     function sortTable(n,tableId){if(filteredRows.length===0)return;const dir=sortDirections[n]?'asc':'desc';sortDirections[n]=!sortDirections[n];filteredRows.sort(function(a,b){let x=a.getElementsByTagName("TD")[n].textContent||a.getElementsByTagName("TD")[n].innerText;let y=b.getElementsByTagName("TD")[n].textContent||b.getElementsByTagName("TD")[n].innerText;if(n===6){let xParts=x.split('/');let yParts=y.split('/');if(xParts.length===3&&yParts.length===3){let xDate=new Date(xParts[2],xParts[1]-1,xParts[0]);let yDate=new Date(yParts[2],yParts[1]-1,yParts[0]);x=xDate.getTime();y=yDate.getTime();}}else{x=x.toLowerCase();y=y.toLowerCase();}if(dir==="asc"){if(x<y)return -1;if(x>y)return 1;return 0;}else{if(x>y)return -1;if(x<y)return 1;return 0;}});currentPage=1;displayPage(currentPage);updatePaginationControls();const table=document.getElementById(tableId);let ths=table.getElementsByTagName('th');for(let j=0;j<ths.length;j++){ths[j].classList.remove('active');}ths[n].classList.add('active');}
 </script>
-<style>
-    body{background-color:#efeff6;}.dashboard-main-wrapper{display:flex;min-height:100vh;background-color:#efeff6;}.nav-left-sidebar{width:260px;position:fixed;top:60px;left:0;z-index:1000;background-color:#0e0c28 !important;height:calc(100vh - 60px);box-shadow:0 0 28px 0 rgba(82,63,105,0.08);}.dashboard-wrapper{margin-left:260px;width:calc(100% - 260px);background-color:#efeff6;min-height:100vh;}.dashboard-header{position:fixed;top:0;left:260px;right:0;z-index:999;height:60px;}.dashboard-content{padding-top:80px;min-height:calc(100vh - 60px);padding-left:20px;padding-right:20px;}.menu-list{height:100%;overflow-y:auto;padding-top:20px;}.nav-left-sidebar .navbar{padding:0;}.nav-left-sidebar .navbar-nav{width:100%;}.nav-left-sidebar .nav-link{padding:12px 30px !important;color:#8287a0 !important;font-size:0.875rem;display:flex;align-items:center;border-left:3px solid transparent;}.nav-left-sidebar .nav-link:hover,.nav-left-sidebar .nav-link.active{background-color:rgba(255,255,255,0.08) !important;color:#ffffff !important;border-left-color:#007bff;}.nav-divider{padding:20px 30px 10px;color:rgba(255,255,255,0.5) !important;font-size:0.75rem;text-transform:uppercase;}.dashboard-nav{box-shadow:0 1px 3px rgba(0,0,0,0.1);border-bottom:1px solid #e5e5e5;background-color:#ffffff !important;height:60px;}.navbar-brand{font-weight:700;font-size:1.2rem;color:#2c3e50 !important;}.concept-brand{position:absolute;left:20px;top:50%;transform:translateY(-50%);z-index:1001;}.page-header{margin-bottom:30px;}.pageheader-title{font-size:24px;font-weight:700;color:#3d405c;}.card{border:none;box-shadow:0 2px 10px rgba(0,0,0,0.1);border-radius:10px;}.table{margin-bottom:0;}.table thead th{border-bottom:2px solid #dee2e6;font-weight:600;color:#495057;background-color:#f8f9fa;padding:15px 12px;}.table tbody tr:hover{background-color:#f8f9fa;}.table td{padding:12px;vertical-align:middle;}.badge{padding:6px 12px;font-size:12px;font-weight:500;}.pagination-info{font-size:.875rem;color:#6c757d}.pagination .page-link{color:#495057;background-color:#fff;border:1px solid #dee2e6;padding:.375rem .75rem;font-size:.875rem;border-radius:.25rem;transition:all .2s ease}.pagination .page-link:hover{color:#0e0c28;background-color:#f8f9fa;border-color:#dee2e6}.pagination .page-item.active .page-link{color:#fff;background-color:#0e0c28;border-color:#0e0c28}.pagination .page-item.disabled .page-link{color:#adb5bd;background-color:#fff;border-color:#dee2e6}
-</style>
 </body>
 </html>

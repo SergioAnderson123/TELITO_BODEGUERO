@@ -1,1 +1,1 @@
-<% response.sendRedirect(request.getContextPath() + "/ProductorServlet"); %>
+<jsp:forward page="/ProductorServlet" />

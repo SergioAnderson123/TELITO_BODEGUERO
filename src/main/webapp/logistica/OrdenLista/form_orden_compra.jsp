@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="com.example.telito.logistica.beans.ProductoBean" %> <%-- Asumimos que tienes un ProductoBean --%>
-<%@ page import="com.example.telito.logistica.beans.ProveedorBean" %> <%-- Asumimos que tienes un ProveedorBean --%>
+<%@ page import="org.example.webbapplogistica.model.beans.ProductoBean" %> <%-- Asumimos que tienes un ProductoBean --%>
+<%@ page import="org.example.webbapplogistica.model.beans.ProveedorBean" %> <%-- Asumimos que tienes un ProveedorBean --%>
 <!doctype html>
 <html lang="es">
 <head>
@@ -10,7 +10,7 @@
     <title>Generar Orden de Compra - Sistema de Logística</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/styles/dashboard.css"> <%-- Reutilizamos el estilo --%>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/logistica/assets/style.css">
 </head>
 <body>
 <div class="dashboard-main-wrapper">
@@ -166,9 +166,5 @@
         });
     });
 </script>
-<style>
-    /* Reutilizamos los estilos del dashboard */
-    body{background-color:#efeff6;}.dashboard-main-wrapper{display:flex;min-height:100vh;}.nav-left-sidebar{width:260px;position:fixed;top:60px;left:0;z-index:1000;background-color:#0e0c28 !important;height:calc(100vh - 60px);box-shadow:0 0 28px 0 rgba(82,63,105,0.08);}.dashboard-wrapper{margin-left:260px;width:calc(100% - 260px);min-height:100vh;}.dashboard-header{position:fixed;top:0;left:260px;right:0;z-index:999;height:60px;}.dashboard-content{padding-top:80px;min-height:calc(100vh - 60px);padding-left:20px;padding-right:20px;}.menu-list{height:100%;overflow-y:auto;padding-top:20px;}.nav-left-sidebar .navbar{padding:0;}.nav-left-sidebar .navbar-nav{width:100%;}.nav-left-sidebar .nav-link{padding:12px 30px !important;color:#8287a0 !important;font-size:0.875rem;display:flex;align-items:center;border-left:3px solid transparent;}.nav-left-sidebar .nav-link i{width:20px;margin-right:10px;font-size:1rem;}.nav-left-sidebar .nav-link:hover,.nav-left-sidebar .nav-link.active{background-color:rgba(255,255,255,0.08) !important;color:#ffffff !important;border-left-color:#007bff;}.nav-divider{padding:20px 30px 10px;color:rgba(255,255,255,0.5) !important;font-size:0.75rem;text-transform:uppercase;}.dashboard-nav{box-shadow:0 1px 3px rgba(0,0,0,0.1);border-bottom:1px solid #e5e5e5;background-color:#ffffff !important;height:60px;}.navbar-brand{font-weight:700;font-size:1.2rem;color:#2c3e50 !important;}.concept-brand{position:absolute;left:20px;top:50%;transform:translateY(-50%);z-index:1001;}.page-header{margin-bottom:30px;}.pageheader-title{font-size:24px;font-weight:700;color:#3d405c;}.card{border:none;box-shadow:0 2px 10px rgba(0,0,0,0.1);border-radius:10px;}
-</style>
 </body>
 </html>

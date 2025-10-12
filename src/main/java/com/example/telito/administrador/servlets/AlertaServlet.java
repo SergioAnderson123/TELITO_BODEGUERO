@@ -36,13 +36,13 @@ public class AlertaServlet extends HttpServlet {
                 // Carga la lista de reglas para mostrarla en la tabla de gestion-alertas.jsp
                 ArrayList<AlertaConfig> listaAlertas = alertaDAO.listarAlertas();
                 request.setAttribute("listaAlertas", listaAlertas);
-                view = request.getRequestDispatcher("gestion-alertas.jsp");
+                view = request.getRequestDispatcher("/administrador/gestion-alertas.jsp");
                 view.forward(request, response);
                 break;
 
             case "formCrear":
                 // Solo muestra el formulario para crear una nueva regla.
-                view = request.getRequestDispatcher("crear-alerta.jsp");
+                view = request.getRequestDispatcher("/administrador/crear-alerta.jsp");
                 view.forward(request, response);
                 break;
 
@@ -53,7 +53,7 @@ public class AlertaServlet extends HttpServlet {
                     AlertaConfig alerta = alertaDAO.obtenerAlertaPorId(idAlerta);
                     if (alerta != null) {
                         request.setAttribute("alerta", alerta);
-                        view = request.getRequestDispatcher("editar-alerta.jsp");
+                        view = request.getRequestDispatcher("/administrador/editar-alerta.jsp");
                         view.forward(request, response);
                     } else {
                         session.setAttribute("errorMsg", "La regla de alerta que se intenta editar no existe.");

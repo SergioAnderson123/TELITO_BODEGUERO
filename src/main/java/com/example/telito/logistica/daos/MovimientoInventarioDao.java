@@ -31,7 +31,7 @@ public class MovimientoInventarioDao {
                 DATE_FORMAT(mi.fecha, '%d/%m/%Y') as fechaFormateada,
                 p.nombre AS nombreProducto,
                 mi.tipo,
-                COALESCE(d.nombre, 'N/A') AS destino,
+                COALESCE(ubi.nombre, 'N/A') AS destino, -- Changed to ubi.nombre
                 l.codigo_lote AS codigoLote,
                 CONCAT(u.nombres, ' ', u.apellidos) AS responsable,
                 COALESCE(mi.motivo, 'Sin observaciones') AS observaciones
@@ -39,7 +39,7 @@ public class MovimientoInventarioDao {
             INNER JOIN lotes l ON mi.lote_id = l.id_lote
             INNER JOIN productos p ON l.producto_id = p.id_producto  
             INNER JOIN usuarios u ON mi.usuario_id = u.id_usuario
-            LEFT JOIN distritos d ON l.distrito_id = d.idDistrito
+            LEFT JOIN ubicaciones ubi ON l.ubicacion_id = ubi.id_ubicacion -- Changed join to ubicaciones
             ORDER BY mi.fecha DESC
             """;
 

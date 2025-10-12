@@ -5,10 +5,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Reportes Globales – Telito Bodeguero</title>
-  <meta name="viewport" content="width=device=width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/administrador/assets/css/style.css">
 </head>
 <body>
   <div class="topbar">
@@ -39,7 +39,7 @@
       <p class="page-subtitle">Elige el tablero de indicadores que deseas visualizar.</p>
 
       <div class="menu-grid">
-        <a class="menu-card" href="<%= request.getContextPath() %>/reportes?action=logistica">
+        <a class="menu-card" href="<%= request.getContextPath() %>/administrador/reportes?action=logistica">
           <div class="menu-card-icon icon-logistica"><i class="fas fa-chart-line"></i></div>
           <div>
             <div class="menu-card-title">Reporte Logística</div>
@@ -47,7 +47,7 @@
           </div>
         </a>
 
-        <a class="menu-card" href="<%= request.getContextPath() %>/reportes?action=productor">
+        <a class="menu-card" href="<%= request.getContextPath() %>/administrador/reportes?action=productor">
           <div class="menu-card-icon icon-productor"><i class="fas fa-seedling"></i></div>
            <div>
             <div class="menu-card-title">Reporte Productor</div>
@@ -55,7 +55,7 @@
           </div>
         </a>
 
-        <a class="menu-card" href="<%= request.getContextPath() %>/reportes?action=almacen">
+        <a class="menu-card" href="<%= request.getContextPath() %>/administrador/reportes?action=almacen">
           <div class="menu-card-icon icon-almacen"><i class="fas fa-warehouse"></i></div>
            <div>
             <div class="menu-card-title">Reporte Almacén</div>
@@ -70,12 +70,11 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const sidebarToggle = document.getElementById('sidebar-toggle');
       const sidebar = document.getElementById('sidebar');
       const content = document.getElementById('content');
       const header = document.getElementById('header');
-
-      if (sidebarToggle && sidebar && content && header) {
+      const sidebarToggle = document.getElementById('sidebar-toggle');
+      if (sidebarToggle) {
         sidebarToggle.addEventListener('click', () => {
           sidebar.classList.toggle('hidden');
           content.classList.toggle('full-width');

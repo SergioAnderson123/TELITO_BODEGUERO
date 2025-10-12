@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class LoteDao {
 
-    private String url = "jdbc:mysql://localhost:3306/telito4";
+    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero"; // Corrected database name
     private String user = "root";
     private String pass = "root";
 

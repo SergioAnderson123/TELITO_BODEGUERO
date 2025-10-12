@@ -9,6 +9,7 @@
 <html>
 <head>
     <title>Title</title>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/logistica/assets/style.css">
 </head>
 <body>
     <h1>Lista de Trabajos</h1>

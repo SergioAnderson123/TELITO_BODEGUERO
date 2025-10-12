@@ -11,7 +11,7 @@ public class Usuario {
     private String password;
     private boolean activo;
     private Rol rol; // Objeto Rol para representar la llave foránea
-
+    private String urlFoto;
     // Getters y Setters
     public int getIdUsuario() {
         return idUsuario;
@@ -69,4 +69,11 @@ public class Usuario {
         this.rol = rol;
     }
 
+    public String getUrlFoto() {
+        return urlFoto;
+    }
+
+    public void setUrlFoto(String urlFoto) {
+        this.urlFoto = urlFoto;
+    }
 }
