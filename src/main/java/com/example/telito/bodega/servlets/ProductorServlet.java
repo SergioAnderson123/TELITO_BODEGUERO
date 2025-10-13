@@ -37,37 +37,36 @@ public class ProductorServlet extends HttpServlet {
         
         ProductoDao productoDao = new ProductoDao();
         LoteDao loteDao = new LoteDao();
-        RequestDispatcher view;
 
         switch (action) {
             case "listarProductos":
-                // 1. Obtenemos la lista de productos desde el DAO
-                ArrayList<Producto> listaProductos = productoDao.listarProductosPorProductor(idProductor);
+// Reemplaza la lógica en tu ProductorServlet con esto:
 
-                // 2. Obtenemos los datos para las tarjetas de estadísticas desde el DAO
-                int totalProductos = productoDao.contarTotalProductos(idProductor);
-                int fueraDeStock = productoDao.contarProductosFueraDeStock(idProductor);
-                int totalCategorias = productoDao.contarTotalCategorias(idProductor);
+// Asumiendo que esta lógica está en un case "listar" de tu método doGet
 
-                // 3. Calculamos el número de lotes para cada producto
-                for (Producto producto : listaProductos) {
-                    int numeroLotes = productoDao.contarLotesPorProducto(producto.getIdProducto());
-                    // Podríamos agregar un campo al bean Producto para almacenar esto
-                    // Por ahora lo pasaremos como atributo separado en el request
-                }
+// 1. Instancias el DAO
 
-                // 4. Obtenemos todas las categorías para el modal de agregar producto
+// 2. Obtienes el ID del productor (ej. desde la sesión)
+                int productorId = 2; // Reemplaza esto con la lógica para obtener el ID real
+
+// 3. Obtienes la lista de productos (que ya incluye el conteo de lotes)
+                ArrayList<Producto> listaProductos = productoDao.listarProductosPorProductor(productorId);
+
+// 4. Obtienes las estadísticas y otras listas necesarias
+                int totalProductos = productoDao.contarTotalProductos(productorId);
+                int fueraDeStock = productoDao.contarProductosFueraDeStock(productorId);
+                int totalCategorias = productoDao.contarTotalCategorias(productorId);
                 ArrayList<Categoria> todasLasCategorias = productoDao.listarTodasLasCategorias();
 
-                // 5. Enviamos todos los datos a la vista (JSP)
+// 5. Envías todos los datos a la vista (JSP)
                 request.setAttribute("listaProductos", listaProductos);
                 request.setAttribute("totalProductos", totalProductos);
                 request.setAttribute("fueraDeStock", fueraDeStock);
                 request.setAttribute("totalCategorias", totalCategorias);
                 request.setAttribute("todasLasCategorias", todasLasCategorias);
 
-                // 5. Redirigimos la petición al JSP para que muestre los datos
-                view = request.getRequestDispatcher("/productor/misProductos.jsp");
+// 6. Rediriges la petición al JSP para que muestre los datos
+                RequestDispatcher view = request.getRequestDispatcher("productor/misProductos.jsp");
                 view.forward(request, response);
                 break;
 

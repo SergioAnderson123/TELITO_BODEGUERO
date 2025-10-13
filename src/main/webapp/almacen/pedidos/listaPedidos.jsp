@@ -28,6 +28,12 @@
                     </div>
                 </div>
 
+                <div class="mx-auto d-none d-md-block mb-4">
+                    <div class="top-search-bar">
+                        <i class="fas fa-search search-icon"></i>
+                        <input class="form-control" type="search" placeholder="Buscar por número de pedido o destino..." aria-label="Search" id="searchInput">
+                    </div>
+                </div>
                 <div class="row mt-4">
                     <div class="col-12">
                         <div class="card">
@@ -63,13 +69,29 @@
                                                 </td>
                                                 <td>
                                                     <c:if test="${pedido.estadoPreparacion == 'Pendiente'}">
-                                                        <a href="PedidoServlet?action=preparar&id=${pedido.idPedido}" class="btn btn-primary btn-sm">Preparar</a>
+                                                    <a href="PedidoServlet?action=preparar&id=${pedido.idPedido}" class="btn btn-primary btn-sm">Preparar</a>
                                                     </c:if>
                                                 </td>
                                             </tr>
                                         </c:forEach>
                                         </tbody>
                                     </table>
+
+                                    <nav class="mt-4" aria-label="Page navigation">
+                                        <ul class="pagination justify-content-center">
+                                            <li class="page-item <c:if test='${paginaActual == 1}'>disabled</c:if>">
+                                                <a class="page-link" href="PedidoServlet?page=${paginaActual - 1}">Anterior</a>
+                                            </li>
+
+                                            <li class="page-item active" aria-current="page">
+                                                <span class="page-link">Página ${paginaActual} de ${totalPaginas}</span>
+                                            </li>
+
+                                            <li class="page-item <c:if test='${paginaActual == totalPaginas}'>disabled</c:if>">
+                                                <a class="page-link" href="PedidoServlet?page=${paginaActual + 1}">Siguiente</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
                                 </div>
                             </div>
                         </div>
@@ -79,6 +101,30 @@
             <jsp:include page="/almacen/layouts/footer.jsp"/>
         </div>
     </div>
-    <%-- Tus scripts JS --%>
+</div>
+
+<script>
+    // Tu script de búsqueda no necesita cambios.
+    // Nota: Ahora solo filtrará los resultados de la página actual.
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchInput');
+        const table = document.querySelector('.table');
+        const tableRows = table.querySelectorAll('tbody tr');
+
+        searchInput.addEventListener('keyup', function (event) {
+            const searchTerm = event.target.value.toLowerCase();
+            tableRows.forEach(row => {
+                const numeroPedidoText = row.cells[0].textContent.toLowerCase();
+                const destinoText = row.cells[1].textContent.toLowerCase();
+                if (numeroPedidoText.includes(searchTerm) || destinoText.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+
 </body>
 </html>

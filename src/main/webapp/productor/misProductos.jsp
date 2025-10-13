@@ -311,16 +311,14 @@
                 <td><%= p.getCategoria().getNombre() %></td>
                 <td>S/ <%= String.format("%.2f", p.getPrecioActual()) %></td>
                 <td>
-                    <%
-                        // Contamos los lotes para este producto
-                        com.example.telito.bodega.daos.ProductoDao productoDao = new com.example.telito.bodega.daos.ProductoDao();
-                        int numeroLotes = productoDao.contarLotesPorProducto(p.getIdProducto());
-                        String badgeClass = numeroLotes > 0 ? "bg-success" : "bg-danger";
-                    %>
-                    <span class="badge <%= badgeClass %>"><%= numeroLotes %></span>
+                    <%-- Leemos el número de lotes directamente del objeto Producto --%>
+                    <span class="badge ${p.numeroLotes > 0 ? 'bg-success' : 'bg-danger'}">
+                     <c:out value="${p.numeroLotes}"/>
+                    </span>
+
                 </td>
                 <td>
-                    <button type="button" class="btn btn-sm" 
+                    <button type="button" class="btn btn-sm"
                             style="background-color: #ff6b6b; color: white; border: none; padding: 6px 12px; border-radius: 6px;"
                             onclick="confirmarEliminacion(<%= p.getIdProducto() %>, '<%= p.getNombre() %>')"
                             title="Eliminar producto"

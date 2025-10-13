@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 @WebServlet("/almacen/EntradaServlet")
 public class EntradaServlet extends HttpServlet {
@@ -35,8 +36,28 @@ public class EntradaServlet extends HttpServlet {
 
         switch (action) {
             case "lista":
-                // Muestra la lista de órdenes de compra pendientes
-                request.setAttribute("listaOrdenes", ordenCompraDao.listarOrdenesPendientes());
+                // 1. Definir cuántos registros se mostrarán por página
+                int registrosPorPagina = 10;
+
+                // 2. Obtener el número de página solicitado (si no existe, es la página 1)
+                String pageStr = request.getParameter("page");
+                int paginaActual = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
+
+                // 3. Calcular el total de páginas
+                int totalRegistros = ordenCompraDao.contarOrdenesPendientes();
+                int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
+
+                // 4. Calcular el OFFSET para la consulta SQL
+                int offset = (paginaActual - 1) * registrosPorPagina;
+
+                // 5. Obtener la lista de órdenes para la página actual
+                ArrayList<OrdenCompra> listaPaginada = ordenCompraDao.listarOrdenesPaginadas(offset, registrosPorPagina);
+
+                // 6. Enviar los datos a la vista (JSP)
+                request.setAttribute("listaOrdenes", listaPaginada);
+                request.setAttribute("paginaActual", paginaActual);
+                request.setAttribute("totalPaginas", totalPaginas);
+
                 view = request.getRequestDispatcher("/almacen/entradas/listaOrdenes.jsp");
                 view.forward(request, response);
                 break;

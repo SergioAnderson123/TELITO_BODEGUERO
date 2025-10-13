@@ -10,48 +10,70 @@ public class LoteDao {
     private String user = "root";
     private String pass = "root";
 
-    public ArrayList<Lote> listarLotes() {
-        ArrayList<Lote> lista = new ArrayList<>(); // 1. Prepara una lista vacía
+    public ArrayList<Lote> listarLotes(int pagina) {
+        ArrayList<Lote> lista = new ArrayList<>();
+
+        // 1. Definimos cuántos registros queremos por página
+        int registrosPorPagina = 10;
+        // 2. Calculamos el 'offset', que es desde qué fila empezar a contar
+        int offset = (pagina - 1) * registrosPorPagina;
+
+        // 3. La consulta SQL ahora incluye LIMIT y OFFSET para la paginación
+        String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, " +
+                "p.nombre AS nombre_producto, u.nombre AS nombre_ubicacion " +
+                "FROM lotes l " +
+                "INNER JOIN productos p ON l.producto_id = p.id_producto " +
+                "INNER JOIN ubicaciones u ON l.ubicacion_id = u.id_ubicacion " +
+                "LIMIT ? OFFSET ?";
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
         }catch(ClassNotFoundException e){
             throw new RuntimeException(e);
         }
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             // 4. Usamos PreparedStatement para pasar los parámetros de LIMIT y OFFSET
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-        // 2. La consulta SQL que une las 3 tablas
-        String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, p.nombre AS nombre_producto, u.nombre AS nombre_ubicacion " +
-                " FROM lotes l " + " INNER JOIN productos p ON (l.producto_id = p.id_producto) " +
-                " INNER JOIN ubicaciones u ON (l.ubicacion_id = u.id_ubicacion) ";
+            pstmt.setInt(1, registrosPorPagina);
+            pstmt.setInt(2, offset);
 
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Lote lote = new Lote();
+                    lote.setIdLote(rs.getInt("id_lote"));
+                    lote.setCodigoLote(rs.getString("codigo_lote"));
+                    lote.setStockActual(rs.getInt("stock_actual"));
+                    lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
+                    lote.setNombreProducto(rs.getString("nombre_producto"));
+                    lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
+                    lista.add(lote);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al listar los lotes", e);
+        }
+        return lista;
+    }
+
+    public int contarTotalLotes() {
+        int total = 0;
+        String sql = "SELECT COUNT(*) FROM lotes"; // Consulta para contar todas las filas
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
         }catch(ClassNotFoundException e){
             throw new RuntimeException(e);
         }
-
-        // 3. Bloque try-with-resources para la conexión
-        try (
-             Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
-            // 4. Bucle para procesar cada fila del resultado
-            while (rs.next()) {
-
-                Lote lote = new Lote();
-                lote.setIdLote(rs.getInt("id_lote"));
-                lote.setCodigoLote(rs.getString("codigo_lote"));
-                lote.setStockActual(rs.getInt("stock_actual"));
-                lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
-                lote.setNombreProducto(rs.getString("nombre_producto"));
-                lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
-                lista.add(lote);
-
+            if (rs.next()) {
+                total = rs.getInt(1);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error al listar los lotessss", e);
+            throw new RuntimeException(e);
         }
-        return lista; // 7. Devuelve la lista completa
+        return total;
     }
 
     public void actualizarStock(int idLote, int nuevoStock) {

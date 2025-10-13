@@ -88,6 +88,27 @@
                                         </c:forEach>
                                         </tbody>
                                     </table>
+                                    <%-- Paginación --%>
+                                    <nav class="mt-4">
+                                        <ul class="pagination justify-content-center">
+
+                                            <%-- Botón "Anterior" --%>
+                                            <li class="page-item ${paginaActual == 1 ? 'disabled' : ''}">
+                                                <a class="page-link" href="LoteServlet?page=${paginaActual - 1}">Anterior</a>
+                                            </li>
+
+                                            <%-- Indicador de página --%>
+                                            <li class="page-item active" aria-current="page">
+                                                <span class="page-link">Página ${paginaActual} de ${totalPaginas}</span>
+                                            </li>
+
+                                            <%-- Botón "Siguiente" --%>
+                                            <li class="page-item ${paginaActual == totalPaginas ? 'disabled' : ''}">
+                                                <a class="page-link" href="LoteServlet?page=${paginaActual + 1}">Siguiente</a>
+                                            </li>
+
+                                        </ul>
+                                    </nav>
                                 </div>
                             </div>
                         </div>

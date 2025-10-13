@@ -9,6 +9,26 @@ public class Producto {
     private double precioActual;
     private Usuario productor;
     private Categoria categoria;
+    private int numeroLotes;
+    private double stockTotal;
+    // Y sus respectivos getter y setter
+
+
+    public double getStockTotal() {
+        return stockTotal;
+    }
+
+    public void setStockTotal(double stockTotal) {
+        this.stockTotal = stockTotal;
+    }
+
+    public int getNumeroLotes() {
+        return numeroLotes;
+    }
+
+    public void setNumeroLotes(int numeroLotes) {
+        this.numeroLotes = numeroLotes;
+    }
 
     public int getIdProducto() {
         return idProducto;

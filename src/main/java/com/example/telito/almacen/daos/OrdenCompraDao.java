@@ -13,27 +13,45 @@ public class OrdenCompraDao {
     private String user = "root";
     private String pass = "root";
 
+    public int contarOrdenesPendientes() {
+        String sql = "SELECT COUNT(*) FROM ordenes_compra WHERE estado = 'Aprobado'";
+        int total = 0;
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return total;
+    }
 
-    public ArrayList<OrdenCompra> listarOrdenesPendientes() {
+    public ArrayList<OrdenCompra> listarOrdenesPaginadas(int offset, int limit) {
         ArrayList<OrdenCompra> lista = new ArrayList<>();
         String sql = "SELECT oc.id_orden_compra, prod.nombre, prov.nombre, oc.cantidad, oc.estado " +
                 "FROM ordenes_compra oc " +
                 "INNER JOIN productos prod ON (oc.producto_id = prod.id_producto) " +
                 "INNER JOIN proveedores prov ON (oc.proveedor_id = prov.id_proveedor) " +
-                "WHERE oc.estado = 'Aprobado'";
+                "WHERE oc.estado = 'Aprobado' LIMIT ? OFFSET ?";
 
         try (Connection conn = DriverManager.getConnection(url, user, pass);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                OrdenCompra oc = new OrdenCompra();
-                oc.setIdOrdenCompra(rs.getInt(1));
-                oc.setNombreProducto(rs.getString(2));
-                oc.setNombreProveedor(rs.getString(3));
-                oc.setCantidad(rs.getInt(4));
-                oc.setEstado(rs.getString(5));
-                lista.add(oc);
+            pstmt.setInt(1, limit);
+            pstmt.setInt(2, offset);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    OrdenCompra oc = new OrdenCompra();
+                    oc.setIdOrdenCompra(rs.getInt(1));
+                    oc.setNombreProducto(rs.getString(2));
+                    oc.setNombreProveedor(rs.getString(3));
+                    oc.setCantidad(rs.getInt(4));
+                    oc.setEstado(rs.getString(5));
+                    lista.add(oc);
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

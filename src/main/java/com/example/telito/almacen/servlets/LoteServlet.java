@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 
 // Esta anotación mapea el servlet a la URL /LoteServlet
 @WebServlet("/almacen/LoteServlet")
@@ -26,9 +27,22 @@ public class LoteServlet extends HttpServlet {
 
         switch (action) {
             case "lista":
-                // 1. Obtener la lista de lotes del DAO
-                request.setAttribute("listaLotes", loteDao.listarLotes());
-                // 2. Enviar los datos al JSP para que los muestre
+                String pageStr = request.getParameter("page");
+                int page = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
+
+                // 2. Llamamos a los dos nuevos métodos del DAO
+                ArrayList<Lote> listaLotes = loteDao.listarLotes(page);
+                int totalRegistros = loteDao.contarTotalLotes();
+
+                // 3. Calculamos el número total de páginas
+                int registrosPorPagina = 10;
+                int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
+
+                // 4. Pasamos toda la información al JSP
+                request.setAttribute("listaLotes", listaLotes);
+                request.setAttribute("paginaActual", page);
+                request.setAttribute("totalPaginas", totalPaginas);
+
                 RequestDispatcher view = request.getRequestDispatcher("/almacen/lotes/gestionarStock.jsp");
                 view.forward(request, response);
                 break;

@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 @WebServlet("/almacen/PedidoServlet")
 
@@ -31,7 +32,28 @@ public class PedidoServlet extends HttpServlet {
 
         switch (action) {
             case "lista":
-                request.setAttribute("listaPedidos", pedidoDao.listarPedidosPendientes());
+                // 1. Definir registros por página
+                int registrosPorPagina = 10;
+
+                // 2. Obtener la página actual desde el parámetro URL (default: 1)
+                String pageStr = request.getParameter("page");
+                int paginaActual = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
+
+                // 3. Calcular el total de páginas
+                int totalRegistros = pedidoDao.contarPedidos();
+                int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
+
+                // 4. Calcular el OFFSET para la consulta
+                int offset = (paginaActual - 1) * registrosPorPagina;
+
+                // 5. Obtener la lista paginada desde el DAO
+                ArrayList<Pedido> listaPaginada = pedidoDao.listarPedidosPaginados(offset, registrosPorPagina);
+
+                // 6. Enviar todos los datos necesarios al JSP
+                request.setAttribute("listaPedidos", listaPaginada);
+                request.setAttribute("paginaActual", paginaActual);
+                request.setAttribute("totalPaginas", totalPaginas);
+
                 view = request.getRequestDispatcher("/almacen/pedidos/listaPedidos.jsp");
                 view.forward(request, response);
                 break;
@@ -39,6 +61,15 @@ public class PedidoServlet extends HttpServlet {
             case "preparar":
                 int idPedido = Integer.parseInt(request.getParameter("id"));
                 Pedido pedido = pedidoDao.buscarPedidoPorId(idPedido);
+
+                // ----- LÍNEAS DE DEPURACIÓN -----
+                System.out.println("--- Depurando PedidoServlet ---");
+                System.out.println("Buscando items para el pedido ID: " + idPedido);
+                if (pedido != null) {
+                    System.out.println("Items encontrados en la base de datos: " + pedido.getItems().size());
+                } else {
+                    System.out.println("¡No se encontró el pedido con ese ID!");
+                }
 
                 if (pedido != null) {
                     request.setAttribute("pedido", pedido);

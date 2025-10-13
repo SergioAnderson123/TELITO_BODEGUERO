@@ -17,7 +17,7 @@ public class LoteDao {
     // Datos de conexión
     private String user = "root";
     private String pass = "root";
-    private String url = "jdbc:mysql://localhost:3306/telito4";
+    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
 
     /**
      * Registra un nuevo lote en la base de datos
@@ -91,6 +91,9 @@ public class LoteDao {
                     System.out.println("DEBUG: No se encontró producto con SKU: " + sku);
                 }
             }
+
+
+
         } catch (SQLException e) {
             System.out.println("ERROR: Error al buscar producto por SKU: " + e.getMessage());
             e.printStackTrace();

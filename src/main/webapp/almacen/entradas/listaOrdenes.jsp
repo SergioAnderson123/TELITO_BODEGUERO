@@ -28,7 +28,14 @@
                     </div>
                 </div>
 
-                <div class="row mt-4">
+                <div class="mx-auto d-none d-md-block mb-4">
+                    <div class="top-search-bar">
+                        <i class="fas fa-search search-icon"></i>
+                        <input class="form-control" type="search" placeholder="Buscar por producto o proveedor..." aria-label="Search" id="searchInput">
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-12">
                         <div class="card">
                             <h5 class="card-header">Tabla de Órdenes de Compra</h5>
@@ -51,33 +58,63 @@
                                                 <td>${orden.nombreProveedor}</td>
                                                 <td>${orden.cantidad}</td>
                                                 <td>
-                                                        <%-- Lógica para mostrar el badge de estado --%>
-                                                    <c:choose>
-                                                        <c:when test="${orden.estado == 'Aprobado'}">
-                                                            <span class="badge bg-info text-dark">Aprobado</span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="badge bg-secondary">${orden.estado}</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
+                                                    <span class="badge bg-info text-dark">${orden.estado}</span>
                                                 </td>
                                                 <td>
-                                                        <%-- Botón que lleva al formulario de recepción --%>
                                                     <a class="btn btn-primary btn-sm" href="EntradaServlet?action=recibir&id=${orden.idOrdenCompra}">Registrar Entrada</a>
                                                 </td>
                                             </tr>
                                         </c:forEach>
                                         </tbody>
                                     </table>
+
+                                    <nav class="mt-4" aria-label="Page navigation">
+                                        <ul class="pagination justify-content-center">
+                                            <li class="page-item <c:if test='${paginaActual == 1}'>disabled</c:if>">
+                                                <a class="page-link" href="EntradaServlet?page=${paginaActual - 1}">Anterior</a>
+                                            </li>
+
+                                            <li class="page-item active" aria-current="page">
+                                                <span class="page-link">Página ${paginaActual} de ${totalPaginas}</span>
+                                            </li>
+
+                                            <li class="page-item <c:if test='${paginaActual == totalPaginas}'>disabled</c:if>">
+                                                <a class="page-link" href="EntradaServlet?page=${paginaActual + 1}">Siguiente</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
             <jsp:include page="/almacen/layouts/footer.jsp"/>
         </div>
     </div>
+</div>
+
+<script>
+    // Tu script de búsqueda existente no necesita cambios
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchInput');
+        const table = document.querySelector('.table');
+        const tableRows = table.querySelectorAll('tbody tr');
+
+        searchInput.addEventListener('keyup', function (event) {
+            const searchTerm = event.target.value.toLowerCase();
+            tableRows.forEach(row => {
+                const productoText = row.cells[0].textContent.toLowerCase();
+                const proveedorText = row.cells[1].textContent.toLowerCase();
+                if (productoText.includes(searchTerm) || proveedorText.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+
 </body>
 </html>

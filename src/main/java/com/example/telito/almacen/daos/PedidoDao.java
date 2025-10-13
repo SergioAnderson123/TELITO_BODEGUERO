@@ -15,35 +15,53 @@ public class PedidoDao {
     private String user = "root";
     private String pass = "root"; // Reemplaza con tu contraseña
 
-
-    public ArrayList<Pedido> listarPedidosPendientes() {
+    public int contarPedidos() {
+        String sql = "SELECT COUNT(*) FROM pedidos";
+        int total = 0;
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return total;
+    }
+    public ArrayList<Pedido> listarPedidosPaginados(int offset, int limit) {
         ArrayList<Pedido> listaPedidos = new ArrayList<>();
-        // Asumimos que la tabla 'pedidos' tiene una columna 'destino'
         String sql = "SELECT p.id_pedido, p.numero_pedido, p.destino, p.estado_preparacion " +
-                " FROM pedidos p ";
+                " FROM pedidos p LIMIT ? OFFSET ?";
 
-        try{Class.forName("com.mysql.cj.jdbc.Driver");
-        }catch(ClassNotFoundException e){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
 
         try (Connection conn = DriverManager.getConnection(url, user, pass);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                Pedido pedido = new Pedido();
-                pedido.setIdPedido(rs.getInt("id_pedido"));
-                pedido.setNumeroPedido(rs.getString("numero_pedido"));
-                pedido.setDestino(rs.getString("destino"));
-                pedido.setEstadoPreparacion(rs.getString("estado_preparacion"));
-                listaPedidos.add(pedido);
+            pstmt.setInt(1, limit);
+            pstmt.setInt(2, offset);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Pedido pedido = new Pedido();
+                    pedido.setIdPedido(rs.getInt("id_pedido"));
+                    pedido.setNumeroPedido(rs.getString("numero_pedido"));
+                    pedido.setDestino(rs.getString("destino"));
+                    pedido.setEstadoPreparacion(rs.getString("estado_preparacion"));
+                    listaPedidos.add(pedido);
+                }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error al listar los pedidosss", e);
+            throw new RuntimeException("Error al listar los pedidos", e);
         }
         return listaPedidos;
     }
+
 
 
     public Pedido buscarPedidoPorId(int idPedido) {
