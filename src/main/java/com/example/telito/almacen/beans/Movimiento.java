@@ -1,16 +1,27 @@
 package com.example.telito.almacen.beans;
 
+import java.sql.Timestamp;
+
 public class Movimiento {
+    // Atributos originales (IDs)
     private int idMovimiento;
     private int loteId;
-    private Integer usuarioId; // Usamos Integer (objeto) para permitir valores nulos
+    private Integer usuarioId;
     private Integer pedidoId;
     private Integer ordenCompraId;
-    private String tipoMovimiento; // "entrada" o "salida"
+    private String tipoMovimiento;
     private int cantidad;
     private String motivo;
-    // No necesitamos la fecha, la base de datos la pone por defecto
 
+    // --- NUEVOS ATRIBUTOS PARA MOSTRAR EN LA VISTA ---
+    private String codigoLote;
+    private String nombreProducto;
+    private String nombreUsuario;
+    private String numeroPedido;
+    private String numeroOrdenCompra;
+    private Timestamp fecha; // Usamos Timestamp para obtener fecha y hora
+
+    // --- GETTERS Y SETTERS (Incluyendo los nuevos) ---
 
     public int getIdMovimiento() {
         return idMovimiento;
@@ -52,14 +63,6 @@ public class Movimiento {
         this.ordenCompraId = ordenCompraId;
     }
 
-    public int getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
-    }
-
     public String getTipoMovimiento() {
         return tipoMovimiento;
     }
@@ -68,11 +71,67 @@ public class Movimiento {
         this.tipoMovimiento = tipoMovimiento;
     }
 
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
     public String getMotivo() {
         return motivo;
     }
 
     public void setMotivo(String motivo) {
         this.motivo = motivo;
+    }
+
+    public String getCodigoLote() {
+        return codigoLote;
+    }
+
+    public void setCodigoLote(String codigoLote) {
+        this.codigoLote = codigoLote;
+    }
+
+    public String getNombreProducto() {
+        return nombreProducto;
+    }
+
+    public void setNombreProducto(String nombreProducto) {
+        this.nombreProducto = nombreProducto;
+    }
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+    }
+
+    public String getNumeroPedido() {
+        return numeroPedido;
+    }
+
+    public void setNumeroPedido(String numeroPedido) {
+        this.numeroPedido = numeroPedido;
+    }
+
+    public String getNumeroOrdenCompra() {
+        return numeroOrdenCompra;
+    }
+
+    public void setNumeroOrdenCompra(String numeroOrdenCompra) {
+        this.numeroOrdenCompra = numeroOrdenCompra;
+    }
+
+    public Timestamp getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Timestamp fecha) {
+        this.fecha = fecha;
     }
 }
