@@ -1,12 +1,10 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-<div class="nav-left-sidebar sidebar-dark">
+<div class="nav-left-sidebar">
     <div class="menu-list">
-        <nav class="navbar navbar-expand navbar-light">
+        <nav class="navbar navbar-expand">
             <ul class="navbar-nav flex-column w-100">
-                <li class="nav-divider">
-                    Menu
-                </li>
+                <li class="nav-divider"><i class="fas fa-bars me-2"></i>Menú</li>
 
                 <li class="nav-item">
                     <a class="nav-link <c:if test='${param.activeMenu == "Gestion de inventario"}'>active</c:if>"

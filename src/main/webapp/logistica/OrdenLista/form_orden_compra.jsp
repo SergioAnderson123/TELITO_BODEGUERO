@@ -44,7 +44,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/planes-transporte">
                             <i class="fas fa-fw fa-truck"></i>Distribución y Transporte
                         </a>
                     </li>

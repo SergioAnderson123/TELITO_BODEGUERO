@@ -14,7 +14,7 @@ public class OrdenCompraDao {
 
         String sql = """
             SELECT
-                oc.numero_Orden AS numero_orden,
+                oc.numero AS numero_orden,
                 p.nombre AS nombre_proveedor,
                 pr.nombre AS nombre_producto,
                 oc.cantidad AS cantidad_paquetes,
@@ -34,7 +34,7 @@ public class OrdenCompraDao {
         List<Object> params = new ArrayList<>();
 
         if (busqueda != null && !busqueda.trim().isEmpty()) {
-            sql += " AND (oc.numero_Orden LIKE ? OR pr.nombre LIKE ?)";
+            sql += " AND (oc.numero LIKE ? OR pr.nombre LIKE ?)";
             params.add("%" + busqueda.trim() + "%");
             params.add("%" + busqueda.trim() + "%");
         }
@@ -47,7 +47,7 @@ public class OrdenCompraDao {
             params.add(estado.trim());
         }
 
-        sql += " ORDER BY oc.numero_Orden DESC";
+        sql += " ORDER BY oc.numero DESC";
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -101,7 +101,7 @@ public class OrdenCompraDao {
         String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
         String username = "root";
         String password = "root";
-        String sql = "INSERT INTO ordenes_compra (numero_Orden, proveedor_id, producto_id, cantidad, usuario_id, estado, monto_total) " +
+        String sql = "INSERT INTO ordenes_compra (numero, proveedor_id, producto_id, cantidad, usuario_id, estado, monto_total) " +
                 "VALUES (?, ?, ?, ?, ?, 'Pendiente', ?)";
         try (Connection conn = DriverManager.getConnection(url, username, password);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

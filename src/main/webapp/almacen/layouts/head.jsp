@@ -7,3 +7,4 @@
 <link rel="icon" type="image/x-icon" href="${pageContext.request.contextPath}/almacen/dist/assets/images/telito-CfoOZLNj.jpg">
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/almacen/dist/assets/css/style-CSLFZwYx.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/almacen/assets/css/style.css">

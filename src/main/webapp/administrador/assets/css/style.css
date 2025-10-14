@@ -63,11 +63,21 @@ h1, h2, h3, h4, h5, h6, button, strong, b { font-weight: 400 !important; }
     letter-spacing: 2px;
 }
 .sidebar nav { flex: 1; padding: 0; }
-.sidebar nav a { color: #8d99ae; display: flex; align-items: center; gap: 15px; padding: 15px 20px; transition: all 0.2s ease; font-size: 0.95rem; border-left: 3px solid transparent; }
+.sidebar nav a {
+    color: #8d99ae;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    border-left: 3px solid transparent;
+}
 .sidebar nav a i { width: 20px; font-size: 1.1rem; color: #8d99ae; transition: color 0.2s ease; }
 .sidebar nav a:hover {
     background: rgba(131, 197, 190, 0.12);
     color: #ffffff;
+    transform: translateX(5px);
 }
 .sidebar nav a:hover i { color: #ffffff; }
 .sidebar nav a.active {
@@ -88,7 +98,7 @@ h1, h2, h3, h4, h5, h6, button, strong, b { font-weight: 400 !important; }
 
 /* Tarjetas de Acceso Rápido (Dashboard) - Usa .card de Bootstrap */
 .quick-link-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem; text-align: center; transition: transform .2s, box-shadow .2s; height: 100%; }
-.quick-link-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+.quick-link-card:hover { transform: translateY(-5px) scale(1.05); box-shadow: var(--shadow-md); }
 .quick-link-card i { font-size: 2rem; margin-bottom: 1rem; color: var(--color-primary); }
 .quick-link-card h5 { font-weight: 700; color: var(--color-dark-gray); }
 .quick-link-card span { font-size: 0.9rem; color: var(--color-medium-gray); }
