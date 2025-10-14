@@ -13,7 +13,15 @@ public class Lote {
     private String nombreUbicacion;
     private int productoId;
     private int ubicacionId;
+    private int distritoId; // <-- AÑADIR ESTE CAMPO
 
+    // --- AÑADIR GETTERS Y SETTERS PARA distritoId ---
+    public int getDistritoId() {
+        return distritoId;
+    }
+    public void setDistritoId(int distritoId) {
+        this.distritoId = distritoId;
+    }
     // Getters y Setters para todos los campos...
     public int getIdLote() { return idLote; }
     public void setIdLote(int idLote) { this.idLote = idLote; }

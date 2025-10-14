@@ -1,9 +1,6 @@
 package com.example.telito.almacen.servlets;
 
-import com.example.telito.almacen.beans.Lote;
-import com.example.telito.almacen.beans.Movimiento;
-import com.example.telito.almacen.beans.Pedido;
-import com.example.telito.almacen.beans.PedidoItem;
+import com.example.telito.almacen.beans.*; // Importa todos tus beans
 import com.example.telito.almacen.daos.LoteDao;
 import com.example.telito.almacen.daos.MovimientoDao;
 import com.example.telito.almacen.daos.PedidoDao;
@@ -13,43 +10,33 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession; // Importante para obtener el usuario
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 @WebServlet("/almacen/PedidoServlet")
-
 public class PedidoServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // --- TU MÉTODO doGet ESTÁ PERFECTO, NO NECESITA CAMBIOS ---
         String action = request.getParameter("action") == null ? "lista" : request.getParameter("action");
         PedidoDao pedidoDao = new PedidoDao();
         RequestDispatcher view;
 
         switch (action) {
             case "lista":
-                // 1. Definir registros por página
                 int registrosPorPagina = 10;
-
-                // 2. Obtener la página actual desde el parámetro URL (default: 1)
                 String pageStr = request.getParameter("page");
                 int paginaActual = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
-
-                // 3. Calcular el total de páginas
                 int totalRegistros = pedidoDao.contarPedidos();
                 int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
-
-                // 4. Calcular el OFFSET para la consulta
                 int offset = (paginaActual - 1) * registrosPorPagina;
-
-                // 5. Obtener la lista paginada desde el DAO
                 ArrayList<Pedido> listaPaginada = pedidoDao.listarPedidosPaginados(offset, registrosPorPagina);
 
-                // 6. Enviar todos los datos necesarios al JSP
                 request.setAttribute("listaPedidos", listaPaginada);
                 request.setAttribute("paginaActual", paginaActual);
                 request.setAttribute("totalPaginas", totalPaginas);
@@ -61,15 +48,6 @@ public class PedidoServlet extends HttpServlet {
             case "preparar":
                 int idPedido = Integer.parseInt(request.getParameter("id"));
                 Pedido pedido = pedidoDao.buscarPedidoPorId(idPedido);
-
-                // ----- LÍNEAS DE DEPURACIÓN -----
-                System.out.println("--- Depurando PedidoServlet ---");
-                System.out.println("Buscando items para el pedido ID: " + idPedido);
-                if (pedido != null) {
-                    System.out.println("Items encontrados en la base de datos: " + pedido.getItems().size());
-                } else {
-                    System.out.println("¡No se encontró el pedido con ese ID!");
-                }
 
                 if (pedido != null) {
                     request.setAttribute("pedido", pedido);
@@ -83,82 +61,90 @@ public class PedidoServlet extends HttpServlet {
     }
 
     /**
-     * Este método se encarga de PROCESAR el formulario de "Finalizar preparación".
-     * Descuenta el stock y registra el movimiento.
+     * MÉTODO COMPLETAMENTE IMPLEMENTADO
+     * Procesa el formulario de "Finalizar preparación", descuenta el stock y registra los movimientos.
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Obtenemos el usuario de la sesión para registrar quién hizo el movimiento
+        HttpSession session = request.getSession();
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        int usuarioId = (usuario != null) ? usuario.getIdUsuario() : 1; // Usamos 1 como fallback si no hay sesión
+
+        // Instanciamos los DAOs
         PedidoDao pedidoDao = new PedidoDao();
         LoteDao loteDao = new LoteDao();
         MovimientoDao movimientoDao = new MovimientoDao();
 
         int idPedido = Integer.parseInt(request.getParameter("id_pedido"));
+
+        // Volvemos a buscar el pedido para tener la información completa de sus items
         Pedido pedido = pedidoDao.buscarPedidoPorId(idPedido);
 
         if (pedido != null) {
             boolean stockSuficiente = true;
 
-            // --- BUCLE DE VERIFICACIÓN (ahora lee la selección del usuario) ---
+            // --- PASO 1: BUCLE DE VERIFICACIÓN ---
+            // Primero, revisamos que todo esté en orden antes de hacer cambios en la BD.
             for (PedidoItem item : pedido.getItems()) {
-                // CAMBIO: Leemos el ID del lote que el usuario seleccionó en el formulario
+                // Leemos el ID del lote que el usuario seleccionó para este producto
                 String idLoteSeleccionadoStr = request.getParameter("lote_seleccionado_" + item.getProductoId());
 
-                // Verificamos si se seleccionó una opción para este producto
-                if (idLoteSeleccionadoStr == null) {
+                if (idLoteSeleccionadoStr == null || idLoteSeleccionadoStr.isEmpty()) {
                     stockSuficiente = false;
                     request.setAttribute("error", "Debe seleccionar un lote para el producto: " + item.getNombreProducto());
-                    break; // Salimos del bucle si falta una selección
+                    break;
                 }
 
                 int idLote = Integer.parseInt(idLoteSeleccionadoStr);
                 Lote lote = loteDao.buscarLotePorId(idLote);
 
-                // La validación de stock sigue siendo la misma
                 if (lote == null || lote.getStockActual() < item.getCantidadRequerida()) {
                     stockSuficiente = false;
-                    request.setAttribute("error", "No hay stock suficiente en el lote seleccionado para: " + item.getNombreProducto());
-                    break; // Salimos del bucle si no hay stock
+                    request.setAttribute("error", "Stock insuficiente en el lote seleccionado para: " + item.getNombreProducto());
+                    break;
                 }
             }
 
-            // --- Si todas las verificaciones pasaron, procedemos a despachar ---
+            // --- PASO 2: EJECUCIÓN ---
+            // Si todas las verificaciones pasaron, procedemos a actualizar la base de datos.
             if (stockSuficiente) {
                 for (PedidoItem item : pedido.getItems()) {
-                    // CAMBIO: Leemos de nuevo la selección para asegurar consistencia
                     int idLote = Integer.parseInt(request.getParameter("lote_seleccionado_" + item.getProductoId()));
                     Lote lote = loteDao.buscarLotePorId(idLote);
 
                     int nuevoStock = lote.getStockActual() - item.getCantidadRequerida();
 
-                    // 1. Actualizamos el stock del LOTE SELECCIONADO
+                    // 1. Actualizamos el stock del lote
                     loteDao.actualizarStock(idLote, nuevoStock);
 
-                    // 2. Registramos el movimiento
+                    // 2. Registramos el movimiento de salida
                     Movimiento movimiento = new Movimiento();
                     movimiento.setLoteId(idLote);
                     movimiento.setPedidoId(idPedido);
+                    movimiento.setUsuarioId(usuarioId); // Guardamos quién hizo el despacho
                     movimiento.setTipoMovimiento("Salida");
                     movimiento.setCantidad(item.getCantidadRequerida());
-                    movimiento.setMotivo("Despacho de pedido: " + pedido.getNumeroPedido());
+                    movimiento.setMotivo("Pedido cliente"); // Motivo estandarizado
                     movimientoDao.registrarMovimiento(movimiento);
                 }
 
-                // 3. Actualizamos el estado del pedido
+                // 3. Actualizamos el estado del pedido a "Despachado"
                 pedidoDao.actualizarEstado(idPedido, "Despachado");
 
-                // 4. Redirigimos a la lista principal
+                // 4. Redirigimos a la lista de pedidos
                 response.sendRedirect(request.getContextPath() + "/almacen/PedidoServlet");
             } else {
-                // Si hubo un error de stock o selección, reenviamos al formulario
-                request.setAttribute("pedido", pedidoDao.buscarPedidoPorId(idPedido)); // Re-cargamos los datos del pedido
+                // Si hubo un error, volvemos a cargar la página de preparación mostrando el mensaje de error
+                request.setAttribute("pedido", pedidoDao.buscarPedidoPorId(idPedido));
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/almacen/pedidos/prepararPedido.jsp");
                 dispatcher.forward(request, response);
             }
         } else {
+            // Si por alguna razón el pedido no se encuentra, volvemos a la lista
             response.sendRedirect(request.getContextPath() + "/almacen/PedidoServlet");
         }
     }
-
 }

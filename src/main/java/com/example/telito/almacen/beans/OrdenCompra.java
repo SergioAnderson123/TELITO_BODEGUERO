@@ -6,10 +6,13 @@ public class OrdenCompra {
     private int productoId;
     private int cantidad;
     private String estado;
+    private String numeroOrden; // Campo añadido
 
     // Campos extra de las tablas relacionadas
     private String nombreProveedor;
     private String nombreProducto;
+
+    // --- GETTERS Y SETTERS (Incluyendo el nuevo) ---
 
     public int getIdOrdenCompra() {
         return idOrdenCompra;
@@ -49,6 +52,14 @@ public class OrdenCompra {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public String getNumeroOrden() {
+        return numeroOrden;
+    }
+
+    public void setNumeroOrden(String numeroOrden) {
+        this.numeroOrden = numeroOrden;
     }
 
     public String getNombreProveedor() {

@@ -11,7 +11,11 @@
 
 <body>
 <div class="dashboard-main-wrapper">
+
+    <%-- ===== INICIO DE LA CORRECCIÓN ===== --%>
     <jsp:include page="/almacen/layouts/header_almacen.jsp"/>
+    <%-- ===== FIN DE LA CORRECCIÓN ===== --%>
+
     <jsp:include page="/almacen/layouts/sidebar_almacen.jsp">
         <jsp:param name="activeMenu" value="Registrar entradas"/>
     </jsp:include>
@@ -35,59 +39,60 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <h5 class="card-header">Tabla de Órdenes de Compra</h5>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead class="bg-light">
-                                        <tr>
-                                            <th scope="col">Producto</th>
-                                            <th scope="col">Proveedor</th>
-                                            <th scope="col">Cantidad Esperada</th>
-                                            <th scope="col">Estado</th>
-                                            <th scope="col">Acción</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <c:forEach var="orden" items="${listaOrdenes}">
-                                            <tr>
-                                                <td>${orden.nombreProducto}</td>
-                                                <td>${orden.nombreProveedor}</td>
-                                                <td>${orden.cantidad}</td>
-                                                <td>
-                                                    <span class="badge bg-info text-dark">${orden.estado}</span>
-                                                </td>
-                                                <td>
-                                                    <a class="btn btn-primary btn-sm" href="EntradaServlet?action=recibir&id=${orden.idOrdenCompra}">Registrar Entrada</a>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
-                                        </tbody>
-                                    </table>
+                <div class="card">
+                    <h5 class="card-header">Tabla de Órdenes de Compra</h5>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="bg-light">
+                                <tr>
+                                    <th scope="col">Número de Orden</th>
+                                    <th scope="col">Producto</th>
+                                    <th scope="col">Proveedor</th>
+                                    <th scope="col">Cantidad Esperada</th>
+                                    <th scope="col">Estado</th>
+                                    <th scope="col">Acción</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <c:forEach var="orden" items="${listaOrdenes}">
+                                    <tr>
+                                        <td><c:out value="${orden.numeroOrden}"/></td>
+                                        <td><c:out value="${orden.nombreProducto}"/></td>
+                                        <td><c:out value="${orden.nombreProveedor}"/></td>
+                                        <td><c:out value="${orden.cantidad}"/></td>
+                                        <td>
+                                            <span class="badge bg-info text-dark"><c:out value="${orden.estado}"/></span>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-primary btn-sm"
+                                               href="${pageContext.request.contextPath}/almacen/EntradaServlet?action=recibir&id=${orden.idOrdenCompra}">
+                                                Registrar Entrada
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                                </tbody>
+                            </table>
 
-                                    <nav class="mt-4" aria-label="Page navigation">
-                                        <ul class="pagination justify-content-center">
-                                            <li class="page-item <c:if test='${paginaActual == 1}'>disabled</c:if>">
-                                                <a class="page-link" href="EntradaServlet?page=${paginaActual - 1}">Anterior</a>
-                                            </li>
+                            <nav class="mt-4" aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item <c:if test='${paginaActual == 1}'>disabled</c:if>">
+                                        <a class="page-link" href="EntradaServlet?page=${paginaActual - 1}">Anterior</a>
+                                    </li>
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link">Página ${paginaActual} de ${totalPaginas}</span>
+                                    </li>
+                                    <li class="page-item <c:if test='${paginaActual == totalPaginas}'>disabled</c:if>">
+                                        <a class="page-link" href="EntradaServlet?page=${paginaActual + 1}">Siguiente</a>
+                                    </li>
+                                </ul>
+                            </nav>
 
-                                            <li class="page-item active" aria-current="page">
-                                                <span class="page-link">Página ${paginaActual} de ${totalPaginas}</span>
-                                            </li>
-
-                                            <li class="page-item <c:if test='${paginaActual == totalPaginas}'>disabled</c:if>">
-                                                <a class="page-link" href="EntradaServlet?page=${paginaActual + 1}">Siguiente</a>
-                                            </li>
-                                        </ul>
-                                    </nav>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
             <jsp:include page="/almacen/layouts/footer.jsp"/>
         </div>
@@ -95,26 +100,17 @@
 </div>
 
 <script>
-    // Tu script de búsqueda existente no necesita cambios
     document.addEventListener('DOMContentLoaded', function () {
         const searchInput = document.getElementById('searchInput');
-        const table = document.querySelector('.table');
-        const tableRows = table.querySelectorAll('tbody tr');
-
+        const tableRows = document.querySelectorAll('.table tbody tr');
         searchInput.addEventListener('keyup', function (event) {
             const searchTerm = event.target.value.toLowerCase();
             tableRows.forEach(row => {
-                const productoText = row.cells[0].textContent.toLowerCase();
-                const proveedorText = row.cells[1].textContent.toLowerCase();
-                if (productoText.includes(searchTerm) || proveedorText.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                const rowText = row.textContent.toLowerCase();
+                row.style.display = rowText.includes(searchTerm) ? '' : 'none';
             });
         });
     });
 </script>
-
 </body>
 </html>

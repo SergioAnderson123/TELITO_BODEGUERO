@@ -70,9 +70,20 @@
                                         <td><c:out value="${mov.codigoLote}"/></td>
                                         <td>
                                             <c:choose>
-                                                <c:when test="${mov.tipoMovimiento == 'Entrada'}"><span class="badge bg-success">Entrada</span></c:when>
-                                                <c:when test="${mov.tipoMovimiento == 'Salida'}"><span class="badge bg-danger">Salida</span></c:when>
-                                                <c:otherwise><span class="badge bg-secondary"><c:out value="${mov.tipoMovimiento}"/></span></c:otherwise>
+                                                <%-- NUEVA CONDICIÓN: Revisa si el motivo es un ajuste --%>
+                                                <c:when test="${mov.motivo.startsWith('Ajuste de inventario')}">
+                                                    <span class="badge bg-warning text-dark">Ajuste</span>
+                                                </c:when>
+                                                <%-- El resto de las condiciones se mantienen --%>
+                                                <c:when test="${mov.tipoMovimiento == 'Entrada'}">
+                                                    <span class="badge bg-success">Entrada</span>
+                                                </c:when>
+                                                <c:when test="${mov.tipoMovimiento == 'Salida'}">
+                                                    <span class="badge bg-danger">Salida</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="badge bg-secondary"><c:out value="${mov.tipoMovimiento}"/></span>
+                                                </c:otherwise>
                                             </c:choose>
                                         </td>
                                         <td><c:out value="${mov.cantidad}"/></td>

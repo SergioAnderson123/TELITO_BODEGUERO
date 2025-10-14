@@ -17,18 +17,32 @@ import java.util.ArrayList;
 @WebServlet("/almacen/MovimientoServlet")
 public class MovimientoServlet extends HttpServlet {
 
+// En tu archivo: MovimientoServlet.java
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // --- INICIO: CÓDIGO TEMPORAL PARA SIMULAR LOGIN (BORRAR LUEGO) ---
+        HttpSession session = request.getSession();
+
+        // Para probar, creamos un usuario "falso" y lo ponemos en la sesión.
+        // Cambia el ID para probar con diferentes usuarios.
+        Usuario usuarioSimulado = new Usuario();
+        usuarioSimulado.setIdUsuario(1); // <-- CAMBIA ESTE NÚMERO (1, 2, etc.) PARA PROBAR
+        usuarioSimulado.setNombres("Usuario de Prueba"); // Nombre opcional para depuración
+
+        // Lo guardamos en la sesión con la clave que el resto del código espera.
+        session.setAttribute("usuarioLogueado", usuarioSimulado);
+        // --- FIN: CÓDIGO TEMPORAL ---
+
+
+        // El resto de tu código no necesita cambios y ahora funcionará
         String action = request.getParameter("action") == null ? "listar" : request.getParameter("action");
         MovimientoDao movimientoDao = new MovimientoDao();
 
-        // Obtenemos la sesión para saber qué usuario está logueado
-        HttpSession session = request.getSession();
-        // Reemplaza "usuarioLogueado" con el nombre del atributo que usas en tu LoginServlet
+        // El servlet ahora obtiene el usuario que acabamos de simular
         Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
-
 
         switch (action) {
             case "listar":
@@ -36,37 +50,26 @@ public class MovimientoServlet extends HttpServlet {
                 String pageStr = request.getParameter("page");
                 int paginaActual = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
 
-                // Leemos el nuevo parámetro de filtro
                 String filtro = request.getParameter("filtro");
-
                 int totalRegistros;
                 ArrayList<Movimiento> listaMovimientos;
 
-                // --- INICIO: LÓGICA DE FILTRADO ---
-                // Si el filtro es "mios" y hay un usuario en la sesión...
                 if ("mios".equals(filtro) && usuarioLogueado != null) {
                     int usuarioId = usuarioLogueado.getIdUsuario();
-
-                    // Contamos y listamos solo los movimientos de ese usuario
                     totalRegistros = movimientoDao.contarMovimientosPorUsuario(usuarioId);
                     int offset = (paginaActual - 1) * registrosPorPagina;
                     listaMovimientos = movimientoDao.listarMovimientosPorUsuarioPaginado(usuarioId, registrosPorPagina, offset);
-
                 } else {
-                    // Si no, mostramos todos los movimientos (comportamiento por defecto)
                     totalRegistros = movimientoDao.contarTotalMovimientos();
                     int offset = (paginaActual - 1) * registrosPorPagina;
                     listaMovimientos = movimientoDao.listarMovimientosPaginado(registrosPorPagina, offset);
                 }
-                // --- FIN: LÓGICA DE FILTRADO ---
 
                 int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
 
-                // Enviamos todos los datos necesarios al JSP
                 request.setAttribute("listaMovimientos", listaMovimientos);
                 request.setAttribute("paginaActual", paginaActual);
                 request.setAttribute("totalPaginas", totalPaginas);
-                // También enviamos el filtro actual para que el JSP lo recuerde
                 request.setAttribute("filtroActual", filtro);
 
                 RequestDispatcher view = request.getRequestDispatcher("/almacen/movimientos/historialMovimientos.jsp");

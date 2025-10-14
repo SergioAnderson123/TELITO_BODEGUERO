@@ -22,11 +22,11 @@ public class UbicacionDao {
             while (rs.next()) {
                 Ubicacion ubicacion = new Ubicacion();
                 ubicacion.setIdUbicacion(rs.getInt("id_ubicacion"));
-                ubicacion.setPasillo(rs.getString("nombre"));
+                ubicacion.setNombre(rs.getString("nombre")); // Asume que la columna se llama 'nombre'
                 lista.add(ubicacion);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error al listar ubicaciones", e);
         }
         return lista;
     }

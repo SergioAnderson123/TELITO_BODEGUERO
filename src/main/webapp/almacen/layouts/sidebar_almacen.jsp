@@ -21,7 +21,6 @@
                         <i class="fas fa-fw fa-arrow-down"></i>Registrar entradas
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link <c:if test='${param.activeMenu == "Registrar salidas"}'>active</c:if>"
                        href="${pageContext.request.contextPath}/almacen/PedidoServlet?action=lista">
@@ -35,6 +34,7 @@
                         <i class="fas fa-history"></i>Historial de Movimientos
                     </a>
                 </li>
+
             </ul>
         </nav>
     </div>

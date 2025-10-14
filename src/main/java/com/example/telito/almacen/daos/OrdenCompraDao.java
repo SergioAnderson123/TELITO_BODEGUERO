@@ -1,36 +1,42 @@
 package com.example.telito.almacen.daos;
 
 import com.example.telito.almacen.beans.OrdenCompra;
-import com.example.telito.almacen.beans.Producto;
-import com.example.telito.almacen.beans.Proveedor;
-
 import java.sql.*;
 import java.util.ArrayList;
 
 public class OrdenCompraDao {
 
-    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero"; // Corrected database name
-    private String user = "root";
-    private String pass = "root";
+    private final String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
+    private final String user = "root";
+    private final String pass = "root";
+
+    // Carga del driver una sola vez para mayor eficiencia
+    static {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Error al cargar el driver de MySQL", e);
+        }
+    }
 
     public int contarOrdenesPendientes() {
         String sql = "SELECT COUNT(*) FROM ordenes_compra WHERE estado = 'Aprobado'";
-        int total = 0;
         try (Connection conn = DriverManager.getConnection(url, user, pass);
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
-                total = rs.getInt(1);
+                return rs.getInt(1);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error al contar órdenes pendientes", e);
         }
-        return total;
+        return 0;
     }
 
     public ArrayList<OrdenCompra> listarOrdenesPaginadas(int offset, int limit) {
         ArrayList<OrdenCompra> lista = new ArrayList<>();
-        String sql = "SELECT oc.id_orden_compra, prod.nombre, prov.nombre, oc.cantidad, oc.estado " +
+        // Se añade oc.numero_orden a la consulta
+        String sql = "SELECT oc.id_orden_compra, oc.numero_orden, prod.nombre, prov.nombre, oc.cantidad, oc.estado " +
                 "FROM ordenes_compra oc " +
                 "INNER JOIN productos prod ON (oc.producto_id = prod.id_producto) " +
                 "INNER JOIN proveedores prov ON (oc.proveedor_id = prov.id_proveedor) " +
@@ -45,24 +51,25 @@ public class OrdenCompraDao {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     OrdenCompra oc = new OrdenCompra();
-                    oc.setIdOrdenCompra(rs.getInt(1));
-                    oc.setNombreProducto(rs.getString(2));
-                    oc.setNombreProveedor(rs.getString(3));
-                    oc.setCantidad(rs.getInt(4));
-                    oc.setEstado(rs.getString(5));
+                    oc.setIdOrdenCompra(rs.getInt("id_orden_compra"));
+                    oc.setNumeroOrden(rs.getString("numero_orden"));
+                    oc.setNombreProducto(rs.getString("prod.nombre"));
+                    oc.setNombreProveedor(rs.getString("prov.nombre"));
+                    oc.setCantidad(rs.getInt("cantidad"));
+                    oc.setEstado(rs.getString("estado"));
                     lista.add(oc);
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error al listar órdenes paginadas", e);
         }
         return lista;
     }
 
-
     public OrdenCompra buscarOrdenPorId(int idOrden) {
         OrdenCompra oc = null;
-        String sql = "SELECT oc.id_orden_compra, oc.producto_id, oc.proveedor_id, oc.cantidad, oc.estado, prod.nombre, prov.nombre " +
+        // Se añade oc.numero_orden a la consulta
+        String sql = "SELECT oc.id_orden_compra, oc.numero_orden, oc.producto_id, oc.proveedor_id, oc.cantidad, oc.estado, prod.nombre, prov.nombre " +
                 "FROM ordenes_compra oc " +
                 "INNER JOIN productos prod ON (oc.producto_id = prod.id_producto) " +
                 "INNER JOIN proveedores prov ON (oc.proveedor_id = prov.id_proveedor) " +
@@ -76,6 +83,7 @@ public class OrdenCompraDao {
                 if (rs.next()) {
                     oc = new OrdenCompra();
                     oc.setIdOrdenCompra(rs.getInt("id_orden_compra"));
+                    oc.setNumeroOrden(rs.getString("numero_orden"));
                     oc.setProductoId(rs.getInt("producto_id"));
                     oc.setProveedorId(rs.getInt("proveedor_id"));
                     oc.setCantidad(rs.getInt("cantidad"));
@@ -85,7 +93,7 @@ public class OrdenCompraDao {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error al buscar orden por ID", e);
         }
         return oc;
     }
@@ -98,7 +106,7 @@ public class OrdenCompraDao {
             pstmt.setInt(2, idOrden);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error al actualizar estado de la orden", e);
         }
     }
 }
