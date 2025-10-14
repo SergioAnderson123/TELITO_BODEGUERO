@@ -19,7 +19,7 @@ public class DistritoDao {
 
             while (rs.next()) {
                 Distrito distrito = new Distrito();
-                distrito.setIdDistrito(rs.getInt("id_distrito"));
+                distrito.setIdDistrito(rs.getInt("idDistrito"));
                 distrito.setNombre(rs.getString("nombre"));
                 lista.add(distrito);
             }
