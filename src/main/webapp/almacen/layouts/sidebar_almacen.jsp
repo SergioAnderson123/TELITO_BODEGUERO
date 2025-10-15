@@ -34,6 +34,12 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/">
+                        <i class="fas fa-th-large"></i>Ir a Roles
+                    </a>
+                </li>
+
             </ul>
         </nav>
     </div>

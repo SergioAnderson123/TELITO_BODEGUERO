@@ -14,7 +14,7 @@ public class OrdenCompraDao {
 
         String sql = """
             SELECT
-                oc.numero AS numero_orden,
+                oc.id_orden_compra AS id_orden,
                 p.nombre AS nombre_proveedor,
                 pr.nombre AS nombre_producto,
                 oc.cantidad AS cantidad_paquetes,
@@ -34,9 +34,16 @@ public class OrdenCompraDao {
         List<Object> params = new ArrayList<>();
 
         if (busqueda != null && !busqueda.trim().isEmpty()) {
-            sql += " AND (oc.numero LIKE ? OR pr.nombre LIKE ?)";
+            sql += " AND (pr.nombre LIKE ?";
             params.add("%" + busqueda.trim() + "%");
-            params.add("%" + busqueda.trim() + "%");
+
+            // Si el usuario ingresa algo como OC001 o 001, intentamos filtrar por id
+            String digits = busqueda.replaceAll("\\D", "");
+            if (!digits.isEmpty()) {
+                sql += " OR oc.id_orden_compra = ?";
+                params.add(Integer.parseInt(digits));
+            }
+            sql += ")";
         }
         if (proveedorId != null && !proveedorId.trim().isEmpty()) {
             sql += " AND p.id_proveedor = ?";
@@ -47,7 +54,7 @@ public class OrdenCompraDao {
             params.add(estado.trim());
         }
 
-        sql += " ORDER BY oc.numero DESC";
+        sql += " ORDER BY oc.id_orden_compra DESC";
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -68,7 +75,8 @@ public class OrdenCompraDao {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    String numeroOrden = rs.getString("numero_orden");
+                    int idOrden = rs.getInt("id_orden");
+                    String numeroOrden = String.format("OC%03d", idOrden);
                     String nombreProveedor = rs.getString("nombre_proveedor");
                     String nombreProducto = rs.getString("nombre_producto");
                     int cantidadPaquetes = rs.getInt("cantidad_paquetes");
@@ -101,16 +109,24 @@ public class OrdenCompraDao {
         String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
         String username = "root";
         String password = "root";
-        String sql = "INSERT INTO ordenes_compra (numero, proveedor_id, producto_id, cantidad, usuario_id, estado, monto_total) " +
-                "VALUES (?, ?, ?, ?, ?, 'Pendiente', ?)";
+        String sql;
+        boolean includeNumero = numeroOrden != null && !numeroOrden.isEmpty();
+        if (includeNumero) {
+            sql = "INSERT INTO ordenes_compra (numero, proveedor_id, producto_id, cantidad, usuario_id, estado, monto_total) VALUES (?, ?, ?, ?, ?, 'Pendiente', ?)";
+        } else {
+            sql = "INSERT INTO ordenes_compra (proveedor_id, producto_id, cantidad, usuario_id, estado, monto_total) VALUES (?, ?, ?, ?, 'Pendiente', ?)";
+        }
         try (Connection conn = DriverManager.getConnection(url, username, password);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, numeroOrden);
-            pstmt.setInt(2, proveedorId);
-            pstmt.setInt(3, productoId);
-            pstmt.setInt(4, cantidad);
-            pstmt.setInt(5, usuarioId);
-            pstmt.setDouble(6, montoTotal);
+            int idx = 1;
+            if (includeNumero) {
+                pstmt.setString(idx++, numeroOrden);
+            }
+            pstmt.setInt(idx++, proveedorId);
+            pstmt.setInt(idx++, productoId);
+            pstmt.setInt(idx++, cantidad);
+            pstmt.setInt(idx++, usuarioId);
+            pstmt.setDouble(idx, montoTotal);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
