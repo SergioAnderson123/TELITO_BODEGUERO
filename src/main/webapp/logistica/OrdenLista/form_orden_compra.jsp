@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="org.example.webbapplogistica.model.beans.ProductoBean" %> <%-- Asumimos que tienes un ProductoBean --%>
-<%@ page import="org.example.webbapplogistica.model.beans.ProveedorBean" %> <%-- Asumimos que tienes un ProveedorBean --%>
+<%@ page import="com.example.telito.logistica.beans.ProductoBean" %>
+<%@ page import="com.example.telito.logistica.beans.ProveedorBean" %>
 <!doctype html>
 <html lang="es">
 <head>

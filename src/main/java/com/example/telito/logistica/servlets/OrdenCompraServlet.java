@@ -77,13 +77,9 @@ public class OrdenCompraServlet extends HttpServlet {
             int cantidad = Integer.parseInt(request.getParameter("cantidad"));
             double montoTotal = Double.parseDouble(request.getParameter("monto_total"));
 
-            int ultimoId = ordenCompraDao.obtenerUltimoId();
-            int nuevoId = ultimoId + 1;
-            String numeroOrden = String.format("OC%03d", nuevoId);
-
             int usuarioId = 1;
-
-            ordenCompraDao.crearOrdenCompra(numeroOrden, proveedorId, productoId, cantidad, usuarioId, montoTotal);
+            // dejamos que DB genere id y nosotros mostraremos OC### en la vista
+            ordenCompraDao.crearOrdenCompra(null, proveedorId, productoId, cantidad, usuarioId, montoTotal);
             response.sendRedirect(request.getContextPath() + "/orden-compra");
         } else {
             doGet(request, response);
