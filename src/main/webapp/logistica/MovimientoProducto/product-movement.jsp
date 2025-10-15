@@ -4,69 +4,21 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Movimiento de Producto - Sistema de Logística</title>
-    <meta name="description" content="Sistema de gestión logística - Movimiento de Productos">
-
-    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/logistica/assets/style.css">
+    <jsp:include page="/logistica/layouts/head.jsp">
+        <jsp:param name="pageTitle" value="Movimiento de Producto"/>
+    </jsp:include>
 </head>
 <body>
 <div class="dashboard-main-wrapper">
-    <div class="dashboard-header">
-        <nav class="navbar navbar-expand-lg bg-white fixed-top dashboard-nav">
-            <div class="container-fluid">
-                <a class="navbar-brand concept-brand" href="#">
-                    <strong>Concept</strong>
-                </a>
-            </div>
-        </nav>
-    </div>
-
-    <div class="nav-left-sidebar sidebar-dark">
-        <div class="menu-list">
-            <nav class="navbar navbar-expand navbar-light">
-                <ul class="navbar-nav flex-column w-100">
-                    <li class="nav-divider">Menu</li>
-                    <li class="my-2"></li>
-
-                    <li class="nav-item">
-                        <a class="nav-link ${currentPage == 'movimientos' ? 'active' : ''}" href="${pageContext.request.contextPath}/MovimientoProductoServlet">
-                            <i class="fas fa-fw fa-exchange-alt"></i>Movimiento de Productos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link ${currentPage == 'inventario' ? 'active' : ''}" href="${pageContext.request.contextPath}/InventarioServlet">
-                            <i class="fas fa-fw fa-warehouse"></i>Gestión de Inventario
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link ${currentPage == 'orden-compra' ? 'active' : ''}" href="${pageContext.request.contextPath}/orden-compra">
-                            <i class="fas fa-fw fa-file-invoice-dollar"></i>Orden de Compra
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/planes-transporte">
-                            <i class="fas fa-fw fa-truck"></i>Distribución y Transporte
-                        </a>
-                    </li>
-                    <li class="my-5"></li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-
+    <jsp:include page="/logistica/layouts/sidebar_logistica.jsp">
+        <jsp:param name="activeMenu" value='Movimiento'/>
+    </jsp:include>
+    <jsp:include page="/logistica/layouts/header_logistica.jsp" />
     <div class="dashboard-wrapper">
-        <div class="container-fluid dashboard-content">
+        <div class="dashboard-content">
             <div class="row">
                 <div class="col-12">
-                    <div class="page-header">
-                        <h1 class="pageheader-title">Movimiento de Producto</h1>
-                    </div>
+                    <div class="page-header"><h2><i class="fas fa-exchange-alt me-2"></i>Movimiento de Producto</h2></div>
                 </div>
             </div>
 
@@ -144,27 +96,11 @@
                 </div>
             </div>
         </div>
-
-        <div class="footer">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
-                        Copyright © 2025. Todos los derechos reservados.
-                    </div>
-                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
-                        <div class="text-md-right footer-links d-none d-sm-block">
-                            <a href="javascript: void(0);">Acerca</a>
-                            <a href="javascript: void(0);">Soporte</a>
-                            <a href="javascript: void(0);">Contacto</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <jsp:include page="/logistica/layouts/footer.jsp" />
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // Variables de paginación
     let currentPage = 1;
@@ -280,42 +216,5 @@
         goToPage(1);
     }
 </script>
-
-<style>
-    body { background-color: #efeff6; }
-    .dashboard-main-wrapper { display: flex; min-height: 100vh; }
-    .nav-left-sidebar { width: 260px; position: fixed; top: 60px; left: 0; z-index: 1000; background-color: #0e0c28 !important; height: calc(100vh - 60px); box-shadow: 0 0 28px 0 rgba(82, 63, 105, 0.08); }
-    .dashboard-wrapper { margin-left: 260px; width: calc(100% - 260px); min-height: 100vh; }
-    .dashboard-header { position: fixed; top: 0; left: 260px; right: 0; z-index: 999; height: 60px; }
-    .dashboard-content { padding-top: 80px; min-height: calc(100vh - 60px); padding-left: 20px; padding-right: 20px; }
-    .menu-list { height: 100%; overflow-y: auto; padding-top: 20px; }
-    .nav-left-sidebar .navbar { padding: 0; }
-    .nav-left-sidebar .navbar-nav { width: 100%; }
-    .nav-left-sidebar .nav-link { padding: 12px 30px !important; font-size: 0.875rem; display: flex; align-items: center; transition: all 0.2s ease; border-left: 3px solid transparent; text-decoration: none; }
-    .nav-left-sidebar .nav-link i { width: 20px; margin-right: 10px; font-size: 1rem; text-align: left; }
-    .nav-left-sidebar .nav-link:hover { background-color: rgba(255, 255, 255, 0.08) !important; color: #ffffff !important; }
-    .nav-left-sidebar .nav-link.active { background-color: rgba(255, 255, 255, 0.08) !important; color: #ffffff !important; border-left-color: #007bff; font-weight: 500; }
-    .nav-divider { padding: 20px 30px 10px; color: rgba(255, 255, 255, 0.5) !important; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; list-style: none; }
-    .dashboard-nav { box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-bottom: 1px solid #e5e5e5; background-color: #ffffff !important; height: 60px; padding: 0; }
-    .navbar-brand { font-weight: 700; font-size: 1.2rem; color: #2c3e50 !important; text-decoration: none; }
-    .concept-brand { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); z-index: 1001; margin: 0 !important; }
-    .page-header { margin-bottom: 30px; }
-    .pageheader-title { font-size: 24px; font-weight: 700; color: #3d405c; }
-    .card { border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-radius: 10px; }
-    .table thead th { border-bottom: 2px solid #dee2e6; font-weight: 600; color: #495057; background-color: #f8f9fa; }
-    .table tbody tr:hover { background-color: #f8f9fa; }
-    .table td, .table th { padding: 12px; vertical-align: middle; }
-    .badge { padding: 6px 12px; font-size: 12px; font-weight: 500; }
-    .footer { background-color: #f8f9fa; padding: 20px 0; margin-top: 40px; border-top: 1px solid #e5e5e6; }
-    .text-muted { color: #6c757d !important; }
-
-    /* Estilos de Paginación */
-    .pagination-info { font-size: 0.875rem; color: #6c757d; }
-    .pagination { margin-bottom: 0; }
-    .pagination .page-link { color: #495057; background-color: #fff; border: 1px solid #dee2e6; transition: all 0.2s ease; }
-    .pagination .page-link:hover { color: #0e0c28; background-color: #f8f9fa; }
-    .pagination .page-item.active .page-link { z-index: 3; color: #fff; background-color: #0e0c28; border-color: #0e0c28; }
-    .pagination .page-item.disabled .page-link { color: #adb5bd; }
-</style>
 </body>
 </html>

@@ -12,7 +12,6 @@ import com.example.telito.logistica.daos.DistritoDao;
 import com.example.telito.logistica.daos.LoteDao;
 import com.example.telito.logistica.daos.PlanTransporteDao;
 import com.example.telito.logistica.daos.VehiculoDao;
-
 import java.io.IOException;
 import java.util.ArrayList;
 

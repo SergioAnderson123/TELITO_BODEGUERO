@@ -5,62 +5,22 @@
 <!doctype html>
 <html lang="es">
 <head>
-    <%-- ... (La sección <head> no cambia) ... --%>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Distribución y Transporte - Sistema de Logística</title>
-    <meta name="description" content="Sistema de gestión logística - Distribución y Transporte">
-    <link rel="icon" type="image/x-icon" href="${pageContext.request.contextPath}/assets/images/favicon.ico">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/logistica/assets/style.css">
+    <jsp:include page="/logistica/layouts/head.jsp">
+        <jsp:param name="pageTitle" value="Distribución y Transporte"/>
+    </jsp:include>
 </head>
 <body>
 <div class="dashboard-main-wrapper">
-    <div class="dashboard-header">
-        <nav class="navbar navbar-expand-lg bg-white fixed-top dashboard-nav">
-            <div class="container-fluid">
-                <a class="navbar-brand concept-brand" href="#"><strong>Concept</strong></a>
-            </div>
-        </nav>
-    </div>
-    <div class="nav-left-sidebar sidebar-dark">
-        <div class="menu-list">
-            <nav class="navbar navbar-expand navbar-light">
-                <ul class="navbar-nav flex-column w-100">
-                    <li class="nav-divider">Menu</li>
-                    <li class="my-2"></li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/MovimientoProductoServlet">
-                            <i class="fas fa-fw fa-exchange-alt"></i>Movimiento de Productos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/InventarioServlet">
-                            <i class="fas fa-fw fa-warehouse"></i>Gestión de Inventario
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/orden-compra">
-                            <i class="fas fa-fw fa-file-invoice-dollar"></i>Orden de Compra
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="${pageContext.request.contextPath}/planes-transporte">
-                            <i class="fas fa-fw fa-truck"></i>Distribución y Transporte
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-
+    <jsp:include page="/logistica/layouts/sidebar_logistica.jsp">
+        <jsp:param name="activeMenu" value='Distribucion'/>
+    </jsp:include>
+    <jsp:include page="/logistica/layouts/header_logistica.jsp" />
     <div class="dashboard-wrapper">
-        <div class="container-fluid dashboard-content">
+        <div class="dashboard-content">
             <div class="row">
                 <div class="col-12">
                     <div class="page-header">
-                        <h1 class="pageheader-title">Planes de Transporte</h1>
+                        <h2><i class="fas fa-truck me-2"></i>Planes de Transporte</h2>
                     </div>
                 </div>
             </div>
@@ -194,11 +154,11 @@
                 </div>
             </div>
         </div>
+        <jsp:include page="/logistica/layouts/footer.jsp" />
     </div>
 </div>
 
-<%-- El script de paginación y los estilos no cambian --%>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     let currentPage = 1, rowsPerPage = 9, allRows = [], filteredRows = [], sortDirections = Array(8).fill(true);
     document.addEventListener('DOMContentLoaded', function(){initializePagination();});
