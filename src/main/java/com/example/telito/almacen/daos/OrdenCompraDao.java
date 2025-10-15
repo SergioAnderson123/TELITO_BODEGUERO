@@ -35,7 +35,6 @@ public class OrdenCompraDao {
 
     public ArrayList<OrdenCompra> listarOrdenesPaginadas(int offset, int limit) {
         ArrayList<OrdenCompra> lista = new ArrayList<>();
-        // Se añade oc.numero_orden a la consulta
         String sql = "SELECT oc.id_orden_compra, oc.numero_orden, prod.nombre, prov.nombre, oc.cantidad, oc.estado " +
                 "FROM ordenes_compra oc " +
                 "INNER JOIN productos prod ON (oc.producto_id = prod.id_producto) " +
@@ -66,14 +65,20 @@ public class OrdenCompraDao {
         return lista;
     }
 
+    /**
+     * MÉTODO CORREGIDO
+     * Busca una orden de compra por su ID y ahora también incluye el lote_id asociado.
+     */
     public OrdenCompra buscarOrdenPorId(int idOrden) {
         OrdenCompra oc = null;
-        // Se añade oc.numero_orden a la consulta
-        String sql = "SELECT oc.id_orden_compra, oc.numero_orden, oc.producto_id, oc.proveedor_id, oc.cantidad, oc.estado, prod.nombre, prov.nombre " +
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Se añade oc.lote_id a la consulta SQL
+        String sql = "SELECT oc.id_orden_compra, oc.numero_orden, oc.producto_id, oc.proveedor_id, oc.lote_id, oc.cantidad, oc.estado, prod.nombre, prov.nombre " +
                 "FROM ordenes_compra oc " +
                 "INNER JOIN productos prod ON (oc.producto_id = prod.id_producto) " +
                 "INNER JOIN proveedores prov ON (oc.proveedor_id = prov.id_proveedor) " +
                 "WHERE oc.id_orden_compra = ?";
+        // --- FIN DE LA CORRECCIÓN ---
 
         try (Connection conn = DriverManager.getConnection(url, user, pass);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -86,6 +91,7 @@ public class OrdenCompraDao {
                     oc.setNumeroOrden(rs.getString("numero_orden"));
                     oc.setProductoId(rs.getInt("producto_id"));
                     oc.setProveedorId(rs.getInt("proveedor_id"));
+                    oc.setLoteId(rs.getInt("lote_id")); // <-- SE LEE EL NUEVO CAMPO
                     oc.setCantidad(rs.getInt("cantidad"));
                     oc.setEstado(rs.getString("estado"));
                     oc.setNombreProducto(rs.getString("prod.nombre"));

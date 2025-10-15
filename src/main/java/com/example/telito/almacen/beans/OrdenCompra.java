@@ -7,6 +7,15 @@ public class OrdenCompra {
     private int cantidad;
     private String estado;
     private String numeroOrden; // Campo añadido
+    private int loteId;
+
+    public int getLoteId() {
+        return loteId;
+    }
+
+    public void setLoteId(int loteId) {
+        this.loteId = loteId;
+    }
 
     // Campos extra de las tablas relacionadas
     private String nombreProveedor;

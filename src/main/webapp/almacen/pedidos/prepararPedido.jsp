@@ -105,7 +105,7 @@
                                     </div>
                                 </div>
                                 <div class="card-footer text-end">
-                                    <a href="${pageContext.request.contextPath}/PedidoServlet" class="btn btn-outline-secondary">Volver a la lista</a>
+                                    <a href="${pageContext.request.contextPath}/almacen/PedidoServlet" class="btn btn-outline-secondary">Volver a la lista</a>
                                     <button type="submit" class="btn btn-primary">Finalizar preparación</button>
                                 </div>
                             </div>

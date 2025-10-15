@@ -14,7 +14,16 @@ public class Lote {
     private int productoId;
     private int ubicacionId;
     private int distritoId; // <-- AÑADIR ESTE CAMPO
+    private String estado;
 
+    // --- AÑADIR GETTERS Y SETTERS PARA 'estado' ---
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
     // --- AÑADIR GETTERS Y SETTERS PARA distritoId ---
     public int getDistritoId() {
         return distritoId;
