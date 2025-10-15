@@ -20,12 +20,18 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
-                        <div class="page-header"><h2 class="pageheader-title fs-1">Registrar Entrada de Inventario</h2></div>
+                        <div class="page-header">
+                            <h2><i class="fas fa-plus-circle me-2"></i>Registrar Entrada de Inventario</h2>
+                            <p class="text-muted">Registra la recepción de productos en el almacén según la orden de compra.</p>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
+                            <div class="card-header">
+                                <h5>Formulario de Recepción</h5>
+                            </div>
                             <div class="card-body">
                                 <form method="POST" action="${pageContext.request.contextPath}/almacen/EntradaServlet">
                                     <input type="hidden" name="id_orden_compra" value="${ordenCompra.idOrdenCompra}">
@@ -106,6 +112,9 @@
         }
     });
 </script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

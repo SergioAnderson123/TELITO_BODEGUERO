@@ -23,13 +23,16 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="page-header">
-                            <h2 class="pageheader-title fs-1">Preparación de Pedido</h2>
+                            <h2><i class="fas fa-boxes me-2"></i>Preparación de Pedido</h2>
+                            <p class="text-muted">Selecciona los lotes específicos para preparar el pedido.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <div class="card-header"><h5>Detalles del Pedido</h5></div>
+                    <div class="card-header">
+                        <h5>Detalles del Pedido</h5>
+                    </div>
                     <div class="card-body">
                         <table class="table table-bordered mb-0">
                             <thead class="bg-light">
@@ -58,7 +61,7 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h5 class="mb-0">Lista de productos del pedido ${pedido.numeroPedido}</h5>
+                                    <h5>Lista de Productos del Pedido ${pedido.numeroPedido}</h5>
                                 </div>
                                 <div class="card-body">
                                     <c:if test="${not empty error}">
@@ -114,5 +117,9 @@
             <jsp:include page="/almacen/layouts/footer.jsp"/>
         </div>
     </div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

@@ -89,6 +89,14 @@ public class ProductorServlet extends HttpServlet {
                 view = request.getRequestDispatcher("productor/actualizarPrecios.jsp");
                 view.forward(request, response);
                 break;
+
+            case "ordenesCompra":
+                // Mostrar la vista de órdenes de compra
+                // TODO: En el futuro, aquí se cargarían las órdenes reales desde la base de datos
+                // Por ahora, la vista maneja datos de ejemplo
+                view = request.getRequestDispatcher("productor/ordenesDeCompra.jsp");
+                view.forward(request, response);
+                break;
             // Aquí puedes agregar más 'cases' para navegar a otras páginas
             case "buscarProductoPorSkuJson":
                 String sku = request.getParameter("sku");

@@ -23,7 +23,8 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="page-header">
-                            <h2 class="pageheader-title fs-1">Historial de Movimientos de Inventario</h2>
+                            <h2><i class="fas fa-history me-2"></i>Historial de Movimientos</h2>
+                            <p class="text-muted">Consulta el registro completo de movimientos de inventario.</p>
                         </div>
                     </div>
                 </div>
@@ -47,7 +48,9 @@
                     </div>
                 </div>
                 <div class="card">
-                    <h5 class="card-header">Registro de todos los movimientos</h5>
+                    <div class="card-header">
+                        <h5>Registro de Movimientos</h5>
+                    </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -147,5 +150,9 @@
         });
     });
 </script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

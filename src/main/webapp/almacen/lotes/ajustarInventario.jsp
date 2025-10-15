@@ -20,16 +20,20 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
-                        <div class="page-header"><h2 class="pageheader-title fs-1">Ajuste de inventario</h2></div>
+                        <div class="page-header">
+                            <h2><i class="fas fa-edit me-2"></i>Ajuste de Inventario</h2>
+                            <p class="text-muted">Ajusta el stock real de productos según el conteo físico realizado.</p>
+                        </div>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-lg-5">
                         <div class="card">
+                            <div class="card-header">
+                                <h5>Datos del Producto</h5>
+                            </div>
                             <div class="card-body">
-                                <h4 class="card-title">Datos del Producto</h4>
-                                <hr>
                                 <p><strong>Producto:</strong> <c:out value="${lote.nombreProducto}"/></p>
                                 <p><strong>Código (Lote):</strong> <c:out value="${lote.codigoLote}"/></p>
                                 <p><strong>Cantidad actual:</strong> <span id="stockActualSpan" class="badge bg-primary fs-5">${lote.stockActual}</span></p>
@@ -39,9 +43,10 @@
 
                     <div class="col-lg-7">
                         <div class="card">
+                            <div class="card-header">
+                                <h5>Formulario de Ajuste</h5>
+                            </div>
                             <div class="card-body">
-                                <h4 class="card-title">Formulario de Ajuste</h4>
-                                <hr>
                                 <form method="POST" action="${pageContext.request.contextPath}/almacen/LoteServlet?action=guardarAjuste">
 
                                     <input type="hidden" name="idLote" value="${lote.idLote}">
@@ -110,5 +115,9 @@
         });
     });
 </script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
