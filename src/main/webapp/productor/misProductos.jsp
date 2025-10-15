@@ -318,11 +318,8 @@
                 <td><%= p.getCategoria().getNombre() %></td>
                 <td>S/ <%= String.format("%.2f", p.getPrecioActual()) %></td>
                 <td>
-                    <%-- Leemos el número de lotes directamente del objeto Producto --%>
-                    <span class="badge ${p.numeroLotes > 0 ? 'bg-success' : 'bg-danger'}">
-                     <c:out value="${p.numeroLotes}"/>
-                    </span>
-
+                    <% int lotes = p.getNumeroLotes(); %>
+                    <span class="badge <%= (lotes > 0) ? "bg-success" : "bg-danger" %>"><%= lotes %></span>
                 </td>
                 <td>
                     <button type="button" class="btn btn-sm"

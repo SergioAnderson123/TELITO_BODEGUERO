@@ -209,7 +209,7 @@
                                 <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Formulario de Registro de Lotes</h5>
                             </div>
                             <div class="card-body">
-                                <form id="registrarLoteForm" class="needs-validation" novalidate method="POST" action="ProductorServlet">
+                                <form id="registrarLoteForm" class="needs-validation" novalidate method="POST" action="<%= request.getContextPath() %>/ProductorServlet">
                                     <input type="hidden" name="action" value="registrarLote">
                                     
                                     <div class="row">

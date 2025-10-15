@@ -48,7 +48,7 @@ public class ProductoDao {
                 "INNER JOIN usuarios u ON (p.productor_id = u.id_usuario) " +
                 "LEFT JOIN (SELECT producto_id, SUM(stock_actual) as stock_total FROM lotes GROUP BY producto_id) l_sum ON (p.id_producto = l_sum.producto_id) " +
                 "LEFT JOIN lotes ON p.id_producto = lotes.producto_id " +
-                "WHERE p.productor_id = ? AND u.activo = 1 " +
+                "WHERE p.productor_id = ? AND u.activo = 1 AND p.activo = 1 " +
                 "GROUP BY p.id_producto";
 
         try (Connection conn = DriverManager.getConnection(url, user, pass);
@@ -111,7 +111,7 @@ public class ProductoDao {
     }
 
     public int contarTotalProductos(int productorId) {
-        String sql = "SELECT COUNT(*) FROM productos p JOIN usuarios u ON p.productor_id = u.id_usuario WHERE productor_id = ? AND u.activo = 1";
+        String sql = "SELECT COUNT(*) FROM productos p JOIN usuarios u ON p.productor_id = u.id_usuario WHERE productor_id = ? AND u.activo = 1 AND p.activo = 1";
         try (Connection conn = DriverManager.getConnection(url, user, pass);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productorId);
@@ -127,7 +127,7 @@ public class ProductoDao {
     }
 
     public int contarTotalCategorias(int productorId) {
-        String sql = "SELECT COUNT(DISTINCT categoria_id) FROM productos p JOIN usuarios u WHERE p.productor_id = ? AND u.activo = 1";
+        String sql = "SELECT COUNT(DISTINCT categoria_id) FROM productos p JOIN usuarios u WHERE p.productor_id = ? AND u.activo = 1 AND p.activo = 1";
         try (Connection conn = DriverManager.getConnection(url, user, pass);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productorId);
@@ -148,7 +148,7 @@ public class ProductoDao {
                 "JOIN usuarios u ON p.productor_id = u.id_usuario " +
                 "LEFT JOIN (SELECT producto_id, SUM(stock_actual) as stock_total FROM lotes GROUP BY producto_id) l " +
                 "ON (p.id_producto = l.producto_id) " +
-                "WHERE p.productor_id = ? AND u.activo = 1 AND (l.stock_total IS NULL OR l.stock_total = 0)";
+                "WHERE p.productor_id = ? AND u.activo = 1 AND p.activo = 1 AND (l.stock_total IS NULL OR l.stock_total = 0)";
 
         try (Connection conn = DriverManager.getConnection(url, user, pass);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

@@ -19,33 +19,73 @@ public class LoteDao {
     private String pass = "root";
     private String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
 
-    /**
-     * Registra un nuevo lote en la base de datos
-     */
-    public boolean registrarLote(String codigoLote, String skuProducto, int cantidadStock, 
-                                String fechaCaducidad, String distrito) {
+    static {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            System.out.println("ERROR: No se pudo cargar el driver MySQL: " + e.getMessage());
+            throw new RuntimeException("Error al cargar el driver de MySQL", e);
+        }
+    }
+
+    /**
+     * MÉTODO CORREGIDO
+     * Registra un nuevo lote creado por un productor.
+     * Asigna el estado 'No Registrado' por defecto.
+     * Ahora requiere los IDs de ubicación y distrito.
+     */
+    public boolean registrarLote(String codigoLote, int productoId, int cantidadStock,
+                                 String fechaCaducidad, int ubicacionId, int distritoId) {
+
+        // Se añaden las columnas 'distrito_id' y 'estado' al INSERT
+        String sql = "INSERT INTO lotes (codigo_lote, producto_id, stock_actual, fecha_vencimiento, ubicacion_id, distrito_id, estado) " +
+                "VALUES (?, ?, ?, ?, ?, ?, 'No Registrado')";
+
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, codigoLote);
+            pstmt.setInt(2, productoId);
+            pstmt.setInt(3, cantidadStock);
+
+            if (fechaCaducidad != null && !fechaCaducidad.isEmpty()) {
+                pstmt.setDate(4, java.sql.Date.valueOf(fechaCaducidad));
+            } else {
+                pstmt.setNull(4, java.sql.Types.DATE);
+            }
+
+            pstmt.setInt(5, ubicacionId);
+            pstmt.setInt(6, distritoId);
+
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
+
+        } catch (SQLException e) {
+            System.err.println("ERROR: Error al registrar el lote: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
+    }
 
-        // Primero obtenemos el ID del producto por SKU
+    /**
+     * Sobrecarga compatible con el otro proyecto: recibe SKU y nombre de distrito,
+     * resuelve los IDs internamente y registra el lote.
+     */
+    public boolean registrarLote(String codigoLote, String skuProducto, int cantidadStock,
+                                 String fechaCaducidad, String distritoNombre) {
         int productoId = obtenerIdProductoPorSKU(skuProducto);
         if (productoId == 0) {
-            System.out.println("ERROR: No se encontró el producto con SKU: " + skuProducto);
             return false;
         }
-
-        // Obtenemos o creamos la ubicación
-        int ubicacionId = obtenerOCrearUbicacion(distrito);
+        int ubicacionId = obtenerOCrearUbicacion(distritoNombre);
         if (ubicacionId == 0) {
-            System.out.println("ERROR: No se pudo obtener/crear la ubicación: " + distrito);
+            return false;
+        }
+        int distritoId = obtenerOCrearDistrito(distritoNombre);
+        if (distritoId == 0) {
             return false;
         }
 
-        String sql = "INSERT INTO lotes (codigo_lote, producto_id, ubicacion_id, stock_actual, fecha_vencimiento) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO lotes (codigo_lote, producto_id, ubicacion_id, stock_actual, fecha_vencimiento, estado, distrito_id) VALUES (?, ?, ?, ?, ?, 'No Registrado', ?)";
 
         try (Connection conn = DriverManager.getConnection(url, user, pass);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -54,155 +94,171 @@ public class LoteDao {
             pstmt.setInt(2, productoId);
             pstmt.setInt(3, ubicacionId);
             pstmt.setInt(4, cantidadStock);
-            
+
             if (fechaCaducidad != null && !fechaCaducidad.isEmpty()) {
-                pstmt.setDate(5, java.sql.Date.valueOf(fechaCaducidad));
+                try {
+                    // Intento formato ISO (yyyy-MM-dd) que envía <input type="date">
+                    pstmt.setDate(5, java.sql.Date.valueOf(fechaCaducidad));
+                } catch (IllegalArgumentException ex) {
+                    // Intento dd/MM/yyyy por si el navegador envía ese formato
+                    try {
+                        String[] p = fechaCaducidad.split("/");
+                        if (p.length == 3) {
+                            String iso = p[2] + "-" + (p[1].length()==1? ("0"+p[1]) : p[1]) + "-" + (p[0].length()==1? ("0"+p[0]) : p[0]);
+                            pstmt.setDate(5, java.sql.Date.valueOf(iso));
+                        } else {
+                            pstmt.setNull(5, java.sql.Types.DATE);
+                        }
+                    } catch (Exception e2) {
+                        pstmt.setNull(5, java.sql.Types.DATE);
+                    }
+                }
             } else {
                 pstmt.setNull(5, java.sql.Types.DATE);
             }
+            pstmt.setInt(6, distritoId);
 
-            int filasAfectadas = pstmt.executeUpdate();
-            System.out.println("DEBUG: Lote registrado exitosamente. Filas afectadas: " + filasAfectadas);
-            return filasAfectadas > 0;
+            return pstmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.out.println("ERROR: Error al registrar el lote: " + e.getMessage());
+            System.err.println("ERROR: Error al registrar el lote (simple): " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 
-    /**
-     * Obtiene el ID del producto por su SKU
-     */
-    private int obtenerIdProductoPorSKU(String sku) {
-        int productoId = 0;
-        
+    // Obtiene o crea un distrito y retorna su ID
+    private int obtenerOCrearDistrito(String nombreDistrito) {
+        int distritoId = 0;
+        String sqlSelect = "SELECT idDistrito FROM distritos WHERE nombre = ?";
         try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement pstmt = conn.prepareStatement("SELECT id_producto FROM productos WHERE codigo_sku = ?")) {
-
-            pstmt.setString(1, sku);
-            
+             PreparedStatement pstmt = conn.prepareStatement(sqlSelect)) {
+            pstmt.setString(1, nombreDistrito);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    productoId = rs.getInt("id_producto");
-                    System.out.println("DEBUG: Producto encontrado - ID: " + productoId + ", SKU: " + sku);
-                } else {
-                    System.out.println("DEBUG: No se encontró producto con SKU: " + sku);
-                }
-            }
-
-
-
-        } catch (SQLException e) {
-            System.out.println("ERROR: Error al buscar producto por SKU: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        return productoId;
-    }
-
-    /**
-     * Obtiene o crea una ubicación y retorna su ID
-     */
-    private int obtenerOCrearUbicacion(String nombreUbicacion) {
-        int ubicacionId = 0;
-        
-        // Primero intentamos obtener la ubicación existente
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement pstmt = conn.prepareStatement("SELECT id_ubicacion FROM ubicaciones WHERE nombre = ?")) {
-
-            pstmt.setString(1, nombreUbicacion);
-            
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    ubicacionId = rs.getInt("id_ubicacion");
-                    System.out.println("DEBUG: Ubicación encontrada - ID: " + ubicacionId + ", Nombre: " + nombreUbicacion);
+                    distritoId = rs.getInt("idDistrito");
                 }
             }
         } catch (SQLException e) {
-            System.out.println("ERROR: Error al buscar ubicación: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("ERROR: Error al buscar distrito: " + e.getMessage());
         }
 
-        // Si no existe, la creamos
-        if (ubicacionId == 0) {
+        if (distritoId == 0) {
+            String sqlInsert = "INSERT INTO distritos (nombre) VALUES (?)";
             try (Connection conn = DriverManager.getConnection(url, user, pass);
-                 PreparedStatement pstmt = conn.prepareStatement("INSERT INTO ubicaciones (nombre) VALUES (?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
-
-                pstmt.setString(1, nombreUbicacion);
-                int filasAfectadas = pstmt.executeUpdate();
-                
-                if (filasAfectadas > 0) {
-                    try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                        if (generatedKeys.next()) {
-                            ubicacionId = generatedKeys.getInt(1);
-                            System.out.println("DEBUG: Nueva ubicación creada - ID: " + ubicacionId + ", Nombre: " + nombreUbicacion);
+                 PreparedStatement pstmt = conn.prepareStatement(sqlInsert, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, nombreDistrito);
+                if (pstmt.executeUpdate() > 0) {
+                    try (ResultSet keys = pstmt.getGeneratedKeys()) {
+                        if (keys.next()) {
+                            distritoId = keys.getInt(1);
                         }
                     }
                 }
             } catch (SQLException e) {
-                System.out.println("ERROR: Error al crear ubicación: " + e.getMessage());
-                e.printStackTrace();
+                System.err.println("ERROR: Error al crear distrito: " + e.getMessage());
             }
         }
-        
-        return ubicacionId;
+        return distritoId;
     }
 
     /**
-     * Obtiene el nombre del producto por SKU
+     * Obtiene el ID del producto por su SKU.
+     * (Este método es auxiliar y está correcto)
      */
-    public String obtenerNombreProductoPorSKU(String sku) {
-        String nombreProducto = null;
-        
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement pstmt = conn.prepareStatement("SELECT nombre FROM productos WHERE UPPER(codigo_sku) = UPPER(?)")) {
-
-            // Sanitizamos el parámetro: trim y evitamos nulls
-            String sanitizedSku = (sku == null) ? null : sku.trim();
-            pstmt.setString(1, sanitizedSku);
-            
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    nombreProducto = rs.getString("nombre");
-                    System.out.println("DEBUG: Nombre del producto encontrado: " + nombreProducto);
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println("ERROR: Error al buscar nombre del producto: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        return nombreProducto;
-    }
-
-    /**
-     * Lista todos los lotes de un productor específico
-     */
-    public List<Object[]> listarLotesPorProductor(int productorId) {
-        List<Object[]> lotes = new ArrayList<>();
-        
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            System.out.println("ERROR: No se pudo cargar el driver MySQL: " + e.getMessage());
-            return lotes;
-        }
-
-        String sql = "SELECT l.codigo_lote, p.nombre as producto_nombre, p.codigo_sku, " +
-                    "u.nombre as ubicacion, l.stock_actual, l.fecha_vencimiento " +
-                    "FROM lotes l " +
-                    "INNER JOIN productos p ON l.producto_id = p.id_producto " +
-                    "INNER JOIN ubicaciones u ON l.ubicacion_id = u.id_ubicacion " +
-                    "WHERE p.productor_id = ? " +
-                    "ORDER BY l.codigo_lote DESC";
+    public int obtenerIdProductoPorSKU(String sku) {
+        int productoId = 0;
+        String sql = "SELECT id_producto FROM productos WHERE UPPER(codigo_sku) = UPPER(?) AND activo = 1";
 
         try (Connection conn = DriverManager.getConnection(url, user, pass);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
+            pstmt.setString(1, (sku == null) ? "" : sku.trim());
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    productoId = rs.getInt("id_producto");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Error al buscar producto por SKU: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return productoId;
+    }
+
+    /**
+     * Obtiene o crea una ubicación y retorna su ID.
+     * (Este método es auxiliar y está correcto)
+     */
+    public int obtenerOCrearUbicacion(String nombreUbicacion) {
+        int ubicacionId = 0;
+        String sqlSelect = "SELECT id_ubicacion FROM ubicaciones WHERE nombre = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             PreparedStatement pstmt = conn.prepareStatement(sqlSelect)) {
+            pstmt.setString(1, nombreUbicacion);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    ubicacionId = rs.getInt("id_ubicacion");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Error al buscar ubicación: " + e.getMessage());
+        }
+
+        if (ubicacionId == 0) {
+            String sqlInsert = "INSERT INTO ubicaciones (nombre) VALUES (?)";
+            try (Connection conn = DriverManager.getConnection(url, user, pass);
+                 PreparedStatement pstmt = conn.prepareStatement(sqlInsert, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, nombreUbicacion);
+                if (pstmt.executeUpdate() > 0) {
+                    try (ResultSet keys = pstmt.getGeneratedKeys()) {
+                        if (keys.next()) {
+                            ubicacionId = keys.getInt(1);
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                System.err.println("ERROR: Error al crear ubicación: " + e.getMessage());
+            }
+        }
+        return ubicacionId;
+    }
+
+    // --- EL RESTO DE MÉTODOS NO NECESITAN CAMBIOS ---
+
+    public String obtenerNombreProductoPorSKU(String sku) {
+        String nombreProducto = null;
+        String sql = "SELECT nombre FROM productos WHERE UPPER(codigo_sku) = UPPER(?)";
+
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, (sku == null) ? null : sku.trim());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    nombreProducto = rs.getString("nombre");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Error al buscar nombre del producto: " + e.getMessage());
+        }
+        return nombreProducto;
+    }
+
+    public List<Object[]> listarLotesPorProductor(int productorId) {
+        List<Object[]> lotes = new ArrayList<>();
+        String sql = "SELECT l.codigo_lote, p.nombre as producto_nombre, p.codigo_sku, " +
+                "u.nombre as ubicacion, l.stock_actual, l.fecha_vencimiento " +
+                "FROM lotes l " +
+                "INNER JOIN productos p ON l.producto_id = p.id_producto " +
+                "INNER JOIN ubicaciones u ON l.ubicacion_id = u.id_ubicacion " +
+                "WHERE p.productor_id = ? " +
+                "ORDER BY l.codigo_lote DESC";
+
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productorId);
-            
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Object[] lote = new Object[6];
@@ -214,40 +270,28 @@ public class LoteDao {
                     lote[5] = rs.getDate("fecha_vencimiento");
                     lotes.add(lote);
                 }
-                System.out.println("DEBUG: Lotes encontrados: " + lotes.size());
             }
         } catch (SQLException e) {
-            System.out.println("ERROR: Error al listar lotes: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("ERROR: Error al listar lotes: " + e.getMessage());
         }
-        
         return lotes;
     }
 
-    /**
-     * Obtiene el stock total de un producto específico
-     */
     public int obtenerStockTotalProducto(int productoId) {
         int stockTotal = 0;
-        
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement pstmt = conn.prepareStatement("SELECT SUM(stock_actual) as stock_total FROM lotes WHERE producto_id = ?")) {
+        String sql = "SELECT SUM(stock_actual) as stock_total FROM lotes WHERE producto_id = ?";
 
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productoId);
-            
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     stockTotal = rs.getInt("stock_total");
-                    if (rs.wasNull()) {
-                        stockTotal = 0;
-                    }
                 }
             }
         } catch (SQLException e) {
-            System.out.println("ERROR: Error al obtener stock total: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("ERROR: Error al obtener stock total: " + e.getMessage());
         }
-        
         return stockTotal;
     }
 }
