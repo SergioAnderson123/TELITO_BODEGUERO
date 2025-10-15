@@ -165,7 +165,7 @@ public class ProductoDao {
     }
 
     public Producto obtenerProductoPorSku(String sku) {
-        String sql = "SELECT * FROM productos p JOIN usuarios u ON p.productor_id = u.id_usuario WHERE codigo_sku = ? AND activo = 1";
+        String sql = "SELECT p.* FROM productos p JOIN usuarios u ON p.productor_id = u.id_usuario WHERE p.codigo_sku = ? AND p.activo = 1 AND u.activo = 1";
         try (Connection conn = DriverManager.getConnection(url, user, pass);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, sku);
