@@ -133,7 +133,7 @@
 
     /* Tabla */
     table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+    th, td { padding: 15px; text-align: center; border-bottom: 1px solid var(--border-color); }
     thead th { background-color: var(--seafoam-light); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; }
     tbody tr:hover { background-color: var(--seafoam-light); }
     .table-responsive { border-radius: 8px; overflow: hidden; }
