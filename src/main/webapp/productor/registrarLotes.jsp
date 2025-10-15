@@ -267,60 +267,17 @@
                                                 <label for="distrito" class="form-label">Distrito (Ubicación)</label>
                                                 <select class="form-select" id="distrito" name="distrito" required>
                                                     <option value="" selected disabled>Seleccione un distrito...</option>
-                                                    
-                                                    <optgroup label="Norte">
-                                                        <option value="Ancon" <%= "Ancon".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Ancon</option>
-                                                        <option value="Santa Rosa" <%= "Santa Rosa".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Santa Rosa</option>
-                                                        <option value="Carabayllo" <%= "Carabayllo".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Carabayllo</option>
-                                                        <option value="Puente Piedra" <%= "Puente Piedra".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Puente Piedra</option>
-                                                        <option value="Comas" <%= "Comas".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Comas</option>
-                                                        <option value="Los Olivos" <%= "Los Olivos".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Los Olivos</option>
-                                                        <option value="San Martín de Porres" <%= "San Martín de Porres".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>San Martín de Porres</option>
-                                                        <option value="Independencia" <%= "Independencia".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Independencia</option>
-                                                    </optgroup>
-    
-                                                    <optgroup label="Sur">
-                                                        <option value="San Juan de Miraflores" <%= "San Juan de Miraflores".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>San Juan de Miraflores</option>
-                                                        <option value="Villa María del Triunfo" <%= "Villa María del Triunfo".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Villa María del Triunfo</option>
-                                                        <option value="Villa el Salvador" <%= "Villa el Salvador".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Villa el Salvador</option>
-                                                        <option value="Pachacamac" <%= "Pachacamac".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Pachacamac</option>
-                                                        <option value="Lurin" <%= "Lurin".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Lurin</option>
-                                                        <option value="Punta Hermosa" <%= "Punta Hermosa".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Punta Hermosa</option>
-                                                        <option value="Punta Negra" <%= "Punta Negra".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Punta Negra</option>
-                                                        <option value="San Bartolo" <%= "San Bartolo".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>San Bartolo</option>
-                                                        <option value="Santa María del Mar" <%= "Santa María del Mar".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Santa María del Mar</option>
-                                                        <option value="Pucusana" <%= "Pucusana".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Pucusana</option>
-                                                    </optgroup>
-    
-                                                    <optgroup label="Este">
-                                                        <option value="San Juan de Lurigancho" <%= "San Juan de Lurigancho".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>San Juan de Lurigancho</option>
-                                                        <option value="Lurigancho/Chosica" <%= "Lurigancho/Chosica".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Lurigancho/Chosica</option>
-                                                        <option value="Ate" <%= "Ate".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Ate</option>
-                                                        <option value="El Agustino" <%= "El Agustino".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>El Agustino</option>
-                                                        <option value="Santa Anita" <%= "Santa Anita".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Santa Anita</option>
-                                                        <option value="La Molina" <%= "La Molina".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>La Molina</option>
-                                                        <option value="Cieneguilla" <%= "Cieneguilla".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Cieneguilla</option>
-                                                    </optgroup>
-    
-                                                    <optgroup label="Oeste">
-                                                        <option value="Rimac" <%= "Rimac".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Rimac</option>
-                                                        <option value="Cercado de Lima" <%= "Cercado de Lima".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Cercado de Lima</option>
-                                                        <option value="Breña" <%= "Breña".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Breña</option>
-                                                        <option value="Pueblo Libre" <%= "Pueblo Libre".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Pueblo Libre</option>
-                                                        <option value="Magdalena" <%= "Magdalena".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Magdalena</option>
-                                                        <option value="Jesus María" <%= "Jesus María".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Jesus María</option>
-                                                        <option value="La Victoria" <%= "La Victoria".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>La Victoria</option>
-                                                        <option value="Lince" <%= "Lince".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Lince</option>
-                                                        <option value="San Isidro" <%= "San Isidro".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>San Isidro</option>
-                                                        <option value="San Miguel" <%= "San Miguel".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>San Miguel</option>
-                                                        <option value="Surquillo" <%= "Surquillo".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Surquillo</option>
-                                                        <option value="San Borja" <%= "San Borja".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>San Borja</option>
-                                                        <option value="Santiago de Surco" <%= "Santiago de Surco".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Santiago de Surco</option>
-                                                        <option value="Barranco" <%= "Barranco".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Barranco</option>
-                                                        <option value="Chorrillos" <%= "Chorrillos".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Chorrillos</option>
-                                                        <option value="San Luis" <%= "San Luis".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>San Luis</option>
-                                                        <option value="Miraflores" <%= "Miraflores".equals(request.getAttribute("form_distrito")) ? "selected" : "" %>>Miraflores</option>
-                                                    </optgroup>
+                                                    <%-- Rellena dinámicamente desde la tabla distritos --%>
+                                                    <%
+                                                        java.util.List<String> distritos = java.util.Arrays.asList(
+                                                                "San Isidro","Miraflores","Surco","Villa El Salvador","Comas","San Juan de Lurigancho",
+                                                                "Callao","La Punta","Lince","Cercado"
+                                                        );
+                                                        String sel = (String) request.getAttribute("form_distrito");
+                                                        for (String d : distritos) {
+                                                    %>
+                                                        <option value="<%= d %>" <%= d.equals(sel) ? "selected" : "" %>><%= d %></option>
+                                                    <% } %>
                                                 </select>
                                                 <div class="invalid-feedback">Debes seleccionar una ubicación.</div>
                                             </div>

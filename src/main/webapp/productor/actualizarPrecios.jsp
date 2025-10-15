@@ -234,6 +234,8 @@
             e.target.value = v.toFixed(2);
         });
     }
+
+    // No modal de confirmación: envío directo del formulario
 </script>
 </body>
 </html>

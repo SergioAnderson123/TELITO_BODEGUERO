@@ -266,19 +266,9 @@
                     <div class="col-lg-3 col-md-6">
                         <select id="categoryFilter" class="form-select">
                             <option value="">Todas las categorías</option>
-                            <option value="Bebidas">Bebidas</option>
-                            <option value="Abarrotes">Abarrotes</option>
-                            <option value="Lácteos">Lácteos</option>
-                            <option value="Carnes">Carnes</option>
-                            <option value="Verduras">Verduras</option>
-                            <option value="Snacks">Snacks</option>
-                            <option value="Limpieza">Limpieza</option>
-                            <option value="Higiene">Higiene</option>
-                            <option value="Panadería">Panadería</option>
-                            <option value="Congelados">Congelados</option>
-                            <option value="Enlatados">Enlatados</option>
-                            <option value="Granos y Cereales">Granos y Cereales</option>
-                            <option value="Bebidas Energéticas">Bebidas Energéticas</option>
+                            <% if (todasLasCategorias != null) { for (Categoria categoria : todasLasCategorias) { %>
+                                <option value="<%= categoria.getNombre() %>"><%= categoria.getNombre() %></option>
+                            <% } } %>
                         </select>
                     </div>
                     <div class="col-lg-4 col-md-6">
@@ -448,21 +438,17 @@
     // ===================== Función para confirmar eliminación de producto =====================
     function confirmarEliminacion(idProducto, nombreProducto) {
         if (confirm('¿Estás seguro de que quieres eliminar el producto "' + nombreProducto + '"?\n\nEsta acción no se puede deshacer.')) {
-            // Crear un formulario oculto para enviar la petición POST
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '<%= request.getContextPath() %>/ProductorServlet';
-            
             const actionInput = document.createElement('input');
             actionInput.type = 'hidden';
             actionInput.name = 'action';
             actionInput.value = 'desactivarProducto';
-            
             const idInput = document.createElement('input');
             idInput.type = 'hidden';
             idInput.name = 'idProducto';
             idInput.value = idProducto;
-            
             form.appendChild(actionInput);
             form.appendChild(idInput);
             document.body.appendChild(form);
