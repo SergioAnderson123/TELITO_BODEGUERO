@@ -4,6 +4,19 @@ public class Categoria {
 
     private int idCategoria;
     private String nombre;
+    private String descripcion;
+    private boolean activo;
+
+    // Constructores
+    public Categoria() {
+    }
+
+    public Categoria(int idCategoria, String nombre, String descripcion, boolean activo) {
+        this.idCategoria = idCategoria;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.activo = activo;
+    }
 
     // Getters y Setters
 
@@ -21,5 +34,26 @@ public class Categoria {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    @Override
+    public String toString() {
+        return nombre;
     }
 }

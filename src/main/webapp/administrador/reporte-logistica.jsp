@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%-- Preparación de datos para JavaScript --%>
-<% 
+<%
     String planesLabelsJson = (String) request.getAttribute("planesLabelsJson");
     String planesDataJson = (String) request.getAttribute("planesDataJson");
     String productosSalidaLabelsJson = (String) request.getAttribute("productosSalidaLabelsJson");
@@ -18,7 +18,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reporte de Logística – Telito Bodeguero</title>
-  
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="<%= request.getContextPath() %>/administrador/assets/css/style.css">
@@ -46,7 +46,7 @@
   <header class="header" id="header">
       <div class="header-left"><i class="fas fa-bars" id="sidebar-toggle"></i></div>
   </header>
-    
+
   <main class="content" id="content">
     <h1 class="page-title"><i class="fas fa-chart-line"></i> Reporte de Logística</h1>
     <div class="charts-grid">

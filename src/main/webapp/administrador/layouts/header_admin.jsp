@@ -8,7 +8,7 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=006d77&color=fff" alt="User" class="rounded-circle me-2" width="32" height="32">
+                        <i class="fas fa-user-circle me-2" style="font-size: 32px; color: #006d77;"></i>
                         <span style="color:#006d77;">Administrador</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class UbicacionDao {
 
-    private String url = "jdbc:mysql://localhost:3306/telito4";
+    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
     private String user = "root";
     private String pass = "root";
 

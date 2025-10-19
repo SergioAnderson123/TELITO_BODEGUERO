@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <div class="nav-left-sidebar">
@@ -27,7 +28,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <c:if test='${param.activeMenu == "Configuracion"}'>active</c:if>'" href="${pageContext.request.contextPath}/administrador/configuracion.jsp">
+                    <a class="nav-link <c:if test='${param.activeMenu == "Configuración"}'>active</c:if>'" href="${pageContext.request.contextPath}/administrador/configuracion.jsp">
                         <i class="fas fa-cogs"></i>Configuración
                     </a>
                 </li>

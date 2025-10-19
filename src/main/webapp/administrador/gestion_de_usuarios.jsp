@@ -161,7 +161,7 @@
                                 <td><%= usuario.getIdUsuario() %></td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="https://ui-avatars.com/api/?name=<%= usuario.getNombres() %>+<%= usuario.getApellidos() %>&background=667eea&color=fff" alt="Avatar" class="rounded-circle me-3" width="40" height="40">
+                                        <i class="fas fa-user-circle me-3" style="font-size: 40px; color: #667eea;"></i>
                                         <div><h6 class="mb-0 fw-semibold"><%= usuario.getNombres() %> <%= usuario.getApellidos() %></h6></div>
                                     </div>
                                 </td>

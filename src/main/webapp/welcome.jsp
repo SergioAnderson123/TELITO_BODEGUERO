@@ -14,7 +14,7 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -34,6 +34,23 @@
             text-align: center;
         }
         
+        .brand-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #36a39a 0%, #006d77 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 20px rgba(54, 163, 154, 0.3);
+        }
+        
+        .brand-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+        
         h1 {
             font-size: 2.5rem;
             font-weight: 600;
@@ -49,28 +66,23 @@
             font-weight: 400;
         }
         
-        .role-options {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        
-        .role-options a {
-            display: block;
-            padding: 18px 24px;
-            background: #007aff;
+        .login-button {
+            display: inline-block;
+            padding: 18px 36px;
+            background: linear-gradient(135deg, #36a39a 0%, #006d77 100%);
             color: white;
             text-decoration: none;
             border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 500;
+            font-size: 1.1rem;
+            font-weight: 600;
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             border: none;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(54, 163, 154, 0.3);
         }
         
-        .role-options a::before {
+        .login-button::before {
             content: '';
             position: absolute;
             top: 0;
@@ -81,19 +93,39 @@
             transition: left 0.5s;
         }
         
-        .role-options a:hover {
-            background: #0056d6;
+        .login-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(54, 163, 154, 0.4);
+            color: white;
+            text-decoration: none;
         }
         
-        .role-options a:hover::before {
+        .login-button:hover::before {
             left: 100%;
         }
         
-        .role-options a:active {
+        .login-button:active {
             transform: translateY(0);
-            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(54, 163, 154, 0.2);
+        }
+        
+        .features {
+            margin-top: 40px;
+            text-align: left;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .feature-item i {
+            color: #36a39a;
+            margin-right: 8px;
+            width: 16px;
         }
         
         /* Responsive design */
@@ -122,16 +154,37 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Bienvenido a Telito Bodeguero</h1>
-        <p class="subtitle">Por favor, selecciona tu rol para continuar:</p>
-        <div class="role-options">
-            <a href="${pageContext.request.contextPath}/inicio">Administrador</a>
-            <a href="${pageContext.request.contextPath}/ProductorServlet">Productor</a>
-            <a href="${pageContext.request.contextPath}/InventarioServlet">Logistica</a>
-            <a href="${pageContext.request.contextPath}/almacen/LoteServlet">Almacen</a>
+        <div class="brand-icon">
+            <i class="fas fa-warehouse"></i>
+        </div>
+        <h1>Telito Bodeguero</h1>
+        <p class="subtitle">Sistema de gestión de bodega integrado</p>
+        
+        <a href="${pageContext.request.contextPath}/home" class="login-button">
+            <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+        </a>
+        
+        <div class="features">
+            <div class="feature-item">
+                <i class="fas fa-check"></i>
+                Gestión completa de inventario
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-check"></i>
+                Control de usuarios y roles
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-check"></i>
+                Reportes y estadísticas avanzadas
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-check"></i>
+                Seguridad con sesiones protegidas
+            </div>
         </div>
     </div>
 </body>

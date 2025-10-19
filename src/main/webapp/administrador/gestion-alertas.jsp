@@ -58,7 +58,13 @@
             <p class="pageheader-text">Crea y administra las reglas de notificación del sistema.</p>
         </div>
         <div>
-            <a href="<%= request.getContextPath() %>/AlertaServlet?action=formCrear" class="btn btn-primary"><i class="fas fa-plus"></i> Crear Nueva Regla</a>
+            <a href="<%= request.getContextPath() %>/EvaluarAlertasServlet?action=evaluar" class="btn btn-success me-2" 
+               onclick="return confirm('¿Evaluar todas las reglas de alerta ahora?')">
+                <i class="fas fa-play"></i> Evaluar Alertas
+            </a>
+            <a href="<%= request.getContextPath() %>/AlertaServlet?action=formCrear" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Crear Nueva Regla
+            </a>
         </div>
     </div>
 

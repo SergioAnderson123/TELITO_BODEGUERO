@@ -22,10 +22,10 @@ public class AlertCountFilter implements Filter {
         if (!path.startsWith("/assets")) {
             HttpSession session = httpRequest.getSession();
             AlertaDAO alertaDAO = new AlertaDAO();
-            // Llamo al método que cuenta las reglas activas.
-            int reglasActivas = alertaDAO.contarReglasDeAlertaActivas();
+            // Llamo al método que cuenta las alertas reales (productos/lotes en alerta).
+            int alertasAbiertas = alertaDAO.contarAlertasAbiertas();
             // Guardo el número en la sesión para poder usarlo en cualquier JSP.
-            session.setAttribute("alertasAbiertas", reglasActivas);
+            session.setAttribute("alertasAbiertas", alertasAbiertas);
         }
 
         // Le digo a la petición que continúe su camino normal.

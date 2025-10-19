@@ -10,7 +10,7 @@
 <body>
 <div class="dashboard-main-wrapper">
     <jsp:include page="/administrador/layouts/sidebar_admin.jsp">
-        <jsp:param name="activeMenu" value='Configuracion'/>
+        <jsp:param name="activeMenu" value='Configuración'/>
     </jsp:include>
     <jsp:include page="/administrador/layouts/header_admin.jsp" />
     <div class="dashboard-wrapper">

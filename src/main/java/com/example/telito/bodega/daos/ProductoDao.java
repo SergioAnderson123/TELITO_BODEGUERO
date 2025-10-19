@@ -127,7 +127,7 @@ public class ProductoDao {
     }
 
     public int contarTotalCategorias(int productorId) {
-        String sql = "SELECT COUNT(DISTINCT categoria_id) FROM productos p JOIN usuarios u WHERE p.productor_id = ? AND u.activo = 1 AND p.activo = 1";
+        String sql = "SELECT COUNT(DISTINCT categoria_id) FROM productos p JOIN usuarios u ON p.productor_id = u.id_usuario WHERE p.productor_id = ? AND u.activo = 1 AND p.activo = 1";
         try (Connection conn = DriverManager.getConnection(url, user, pass);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productorId);

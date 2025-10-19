@@ -11,7 +11,8 @@ public class Producto {
     private int stock;
     private int unidadesPorPaquete; // <-- AÑADIDO
     private int productorId;      // <-- AÑADIDO
-    private int categoriaId;      // <-- AÑADIDO
+    private Categoria categoria; // Objeto Categoria para representar la llave foránea
+    private int categoriaId;      // Mantener para compatibilidad con formularios
 
     // Getters y Setters
 
@@ -85,6 +86,14 @@ public class Producto {
 
     public void setProductorId(int productorId) {
         this.productorId = productorId;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 
     public int getCategoriaId() {

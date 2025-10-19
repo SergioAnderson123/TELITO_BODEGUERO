@@ -3,30 +3,18 @@ package com.example.telito.administrador.daos;
 import com.example.telito.administrador.beans.AlertaConfig;
 import com.example.telito.administrador.beans.Categoria;
 import com.example.telito.administrador.beans.Rol;
+import com.example.telito.dao.BaseDao;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class AlertaDAO {
-
-    private String user = "root";
-    private String pass = "root";
-    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-
-    private Connection getConnection() throws SQLException {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return DriverManager.getConnection(url, user, pass);
-    }
+public class AlertaDAO extends BaseDao {
 
     // Cuenta las reglas de alerta que están activas para el contador del menú.
     public int contarReglasDeAlertaActivas() {
         int total = 0;
         String sql = "SELECT COUNT(*) FROM alertas_configuracion WHERE activo = 1";
-        try (Connection conn = getConnection();
+        try (Connection conn = this.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
@@ -47,7 +35,7 @@ public class AlertaDAO {
                      "JOIN roles r ON a.rol_a_notificar_id = r.id_rol " +
                      "ORDER BY a.id_alerta_config";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = this.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -69,7 +57,7 @@ public class AlertaDAO {
                      "JOIN roles r ON a.rol_a_notificar_id = r.id_rol " +
                      "WHERE a.id_alerta_config = ?";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = this.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -87,7 +75,7 @@ public class AlertaDAO {
     public void crearAlerta(AlertaConfig alerta) {
         String sql = "INSERT INTO alertas_configuracion (nombre, tipo_alerta, umbral_dias, categoria_id, rol_a_notificar_id, activo) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = getConnection();
+        try (Connection conn = this.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             setAlertaParams(pstmt, alerta);
             pstmt.executeUpdate();
@@ -100,7 +88,7 @@ public class AlertaDAO {
     public void actualizarAlerta(AlertaConfig alerta) {
         String sql = "UPDATE alertas_configuracion SET nombre = ?, tipo_alerta = ?, umbral_dias = ?, " +
                      "categoria_id = ?, rol_a_notificar_id = ?, activo = ? WHERE id_alerta_config = ?";
-        try (Connection conn = getConnection();
+        try (Connection conn = this.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             setAlertaParams(pstmt, alerta);
             pstmt.setInt(7, alerta.getIdAlertaConfig());
@@ -113,7 +101,7 @@ public class AlertaDAO {
     // Borrado lógico, solo cambia el estado a inactivo.
     public void deshabilitarAlerta(int id) {
         String sql = "UPDATE alertas_configuracion SET activo = 0 WHERE id_alerta_config = ?";
-        try (Connection conn = getConnection();
+        try (Connection conn = this.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
@@ -127,7 +115,7 @@ public class AlertaDAO {
         int totalAlertas = 0;
         String sqlReglas = "SELECT * FROM alertas_configuracion WHERE activo = 1";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = this.getConnection();
              Statement stmtReglas = conn.createStatement();
              ResultSet rsReglas = stmtReglas.executeQuery(sqlReglas)) {
 
