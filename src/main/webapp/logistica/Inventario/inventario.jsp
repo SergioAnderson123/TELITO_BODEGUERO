@@ -16,7 +16,7 @@
 
 <head>
     <jsp:include page="/logistica/layouts/head.jsp">
-        <jsp:param name="pageTitle" value="Gestión de Inventario"/>
+        <jsp:param name="pageTitle" value="Gestion de Inventario"/>
     </jsp:include>
 </head>
 <body>
@@ -29,7 +29,42 @@
         <div class="dashboard-content">
             <div class="row">
                 <div class="col-12">
-                    <div class="page-header"><h2><i class="fas fa-warehouse me-2"></i>Gestión de Inventario</h2></div>
+                    <div class="page-header"><h2><i class="fas fa-warehouse me-2"></i>Gestion de Inventario</h2></div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form class="row g-3" method="GET" action="${pageContext.request.contextPath}/InventarioServlet">
+
+                        <div class="col-md-5">
+                            <label for="busquedaTexto" class="form-label">Buscar por SKU / Producto</label>
+                            <input type="text" class="form-control" id="busquedaTexto" name="busqueda" placeholder="Ej: SKU001, Coca Cola..." value="${param.busqueda}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="filtroEstado" class="form-label">Estado de Stock</label>
+                            <select id="filtroEstado" name="estado" class="form-select">
+                                <option value="" ${param.estado == '' ? 'selected' : ''}>Todos</option>
+                                <option value="En stock" ${param.estado == 'En stock' ? 'selected' : ''}>En stock</option>
+                                <option value="Sin stock" ${param.estado == 'Sin stock' ? 'selected' : ''}>Sin stock</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="filtroLotes" class="form-label">Cantidad de Lotes</label>
+                            <select id="filtroLotes" name="lotes" class="form-select">
+                                <option value="" ${param.lotes == '' ? 'selected' : ''}>Todos</option>
+                                <option value="1" ${param.lotes == '1' ? 'selected' : ''}>1 lote</option>
+                                <option value="2-5" ${param.lotes == '2-5' ? 'selected' : ''}>2-5 lotes</option>
+                                <option value="6+" ${param.lotes == '6+' ? 'selected' : ''}>6+ lotes</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 

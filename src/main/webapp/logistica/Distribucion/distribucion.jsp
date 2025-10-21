@@ -6,7 +6,7 @@
 <html lang="es">
 <head>
     <jsp:include page="/logistica/layouts/head.jsp">
-        <jsp:param name="pageTitle" value="Distribución y Transporte"/>
+        <jsp:param name="pageTitle" value="Distribucion y Transporte"/>
     </jsp:include>
 </head>
 <body>

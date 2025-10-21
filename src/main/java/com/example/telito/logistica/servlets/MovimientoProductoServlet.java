@@ -19,16 +19,21 @@ public class MovimientoProductoServlet extends HttpServlet {
                       HttpServletResponse response) throws IOException, ServletException {
         response.setContentType("text/html");
 
-        // Obtener datos dinámicos de la BD telito_bodeguero
+        // Obtener parámetros de búsqueda y filtros
+        String busqueda = request.getParameter("busqueda");
+        String tipo = request.getParameter("tipo");
+        String periodo = request.getParameter("periodo");
+
+        // Obtener datos filtrados directamente desde el DAO
         MovimientoInventarioDao movimientoDao = new MovimientoInventarioDao();
-        ArrayList<MovimientoInventarioBean> listaMovimientos = movimientoDao.obtenerMovimientos();
+        ArrayList<MovimientoInventarioBean> listaMovimientos = movimientoDao.obtenerMovimientos(busqueda, tipo, periodo);
 
         // Enviar datos a la JSP
         request.setAttribute("listaMovimientos", listaMovimientos);
 
-        // Forward a la JSP que mantiene el diseño
-// LÍNEA CORREGIDA
-        String vista = "/logistica/MovimientoProducto/product-movement.jsp";        RequestDispatcher rd = request.getRequestDispatcher(vista);
+        // Forward a la JSP
+        String vista = "/logistica/MovimientoProducto/product-movement.jsp";
+        RequestDispatcher rd = request.getRequestDispatcher(vista);
         rd.forward(request, response);
     }
 

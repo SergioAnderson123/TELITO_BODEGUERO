@@ -22,6 +22,42 @@
                 </div>
             </div>
 
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form class="row g-3" method="GET" action="${pageContext.request.contextPath}/MovimientoProductoServlet">
+
+                        <div class="col-md-5">
+                            <label for="busquedaTexto" class="form-label">Buscar por Producto / Lote</label>
+                            <input type="text" class="form-control" id="busquedaTexto" name="busqueda" placeholder="Ej: Coca Cola, L001..." value="${param.busqueda}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="filtroTipo" class="form-label">Tipo de Movimiento</label>
+                            <select id="filtroTipo" name="tipo" class="form-select">
+                                <option value="" ${param.tipo == '' ? 'selected' : ''}>Todos</option>
+                                <option value="Entrada" ${param.tipo == 'Entrada' ? 'selected' : ''}>Entrada</option>
+                                <option value="Salida" ${param.tipo == 'Salida' ? 'selected' : ''}>Salida</option>
+                                <option value="Ajuste" ${param.tipo == 'Ajuste' ? 'selected' : ''}>Ajuste</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="filtroFecha" class="form-label">Periodo</label>
+                            <select id="filtroFecha" name="periodo" class="form-select">
+                                <option value="" ${param.periodo == '' ? 'selected' : ''}>Todos</option>
+                                <option value="7" ${param.periodo == '7' ? 'selected' : ''}>Últimos 7 días</option>
+                                <option value="30" ${param.periodo == '30' ? 'selected' : ''}>Últimos 30 días</option>
+                                <option value="90" ${param.periodo == '90' ? 'selected' : ''}>Últimos 90 días</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-12">
                     <div class="card">

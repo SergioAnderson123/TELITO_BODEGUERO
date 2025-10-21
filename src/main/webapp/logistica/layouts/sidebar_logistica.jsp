@@ -16,7 +16,7 @@
                 <li class="nav-item">
                     <a class="nav-link <c:if test='${param.activeMenu == "Inventario"}'>active</c:if>'"
                        href="${pageContext.request.contextPath}/InventarioServlet">
-                        <i class="fas fa-warehouse"></i>Gestión de Inventario
+                        <i class="fas fa-warehouse"></i>Gestion de Inventario
                     </a>
                 </li>
 
@@ -30,7 +30,7 @@
                 <li class="nav-item">
                     <a class="nav-link <c:if test='${param.activeMenu == "Distribucion"}'>active</c:if>'"
                        href="${pageContext.request.contextPath}/planes-transporte">
-                        <i class="fas fa-truck"></i>Distribución y Transporte
+                        <i class="fas fa-truck"></i>Distribucion y Transporte
                     </a>
                 </li>
 

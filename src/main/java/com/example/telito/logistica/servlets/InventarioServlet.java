@@ -19,15 +19,19 @@ public class InventarioServlet extends HttpServlet {
                       HttpServletResponse response) throws IOException, ServletException {
         response.setContentType("text/html");
 
-        // Obtener datos dinámicos de la BD telito_bodeguero - tabla lotes
+        // Obtener parámetros de búsqueda y filtros
+        String busqueda = request.getParameter("busqueda");
+        String estado = request.getParameter("estado");
+        String lotes = request.getParameter("lotes");
+
+        // Obtener datos filtrados directamente desde el DAO
         InventarioDao inventarioDao = new InventarioDao();
-        ArrayList<InventarioBean> listaInventario = inventarioDao.obtenerInventario();
+        ArrayList<InventarioBean> listaInventario = inventarioDao.obtenerInventario(busqueda, estado, lotes);
 
         // Enviar datos a la JSP
         request.setAttribute("listaInventario", listaInventario);
 
-        // Forward a la JSP que mantiene el diseño idéntico
-        // LÍNEA CORREGIDA
+        // Forward a la JSP
         String vista = "/logistica/Inventario/inventario.jsp";
         RequestDispatcher rd = request.getRequestDispatcher(vista);
         rd.forward(request, response);
