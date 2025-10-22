@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    System.out.println("index.jsp ejecutándose - redirigiendo a LoginServlet");
-    // Redirect to login page
-    response.sendRedirect(request.getContextPath() + "/LoginServlet");
+    // Redirige a la página de login correcta
+    response.sendRedirect(request.getContextPath() + "/acceso/login");
 %>

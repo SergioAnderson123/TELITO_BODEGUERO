@@ -183,6 +183,135 @@ public class AlertaDAO {
         return totalAlertas;
     }
 
+    // Retorna mensajes de alertas calculadas dinámicamente para el rol indicado
+    public ArrayList<String> listarAlertasParaRol(String rolNombre) {
+        ArrayList<String> mensajes = new ArrayList<>();
+        String sqlReglas = "SELECT * FROM alertas_configuracion WHERE activo = 1 AND rol_a_notificar = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sqlReglas)) {
+            pstmt.setString(1, rolNombre.toUpperCase());
+            try (ResultSet rsReglas = pstmt.executeQuery()) {
+                while (rsReglas.next()) {
+                    String tipoAlerta = rsReglas.getString("tipo_alerta");
+                    Integer categoriaId = rsReglas.getObject("categoria_id", Integer.class);
+                    Integer umbralDias = rsReglas.getObject("umbral_dias", Integer.class);
+                    String plantilla = rsReglas.getString("mensaje_personalizado");
+
+                    if (("VENCIMIENTO".equals(tipoAlerta) || "CADUCIDAD_PROXIMA".equals(tipoAlerta)) && umbralDias != null) {
+                        String sql = "SELECT l.codigo_lote, p.nombre, DATEDIFF(l.fecha_vencimiento, CURDATE()) AS dias " +
+                                     "FROM lotes l JOIN productos p ON l.producto_id = p.id_producto " +
+                                     "WHERE DATEDIFF(l.fecha_vencimiento, CURDATE()) BETWEEN 0 AND ?" +
+                                     (categoriaId != null ? " AND p.categoria_id = ?" : "") + " ORDER BY dias ASC LIMIT 10";
+                        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                            ps.setInt(1, umbralDias);
+                            if (categoriaId != null) ps.setInt(2, categoriaId);
+                            try (ResultSet rs = ps.executeQuery()) {
+                                while (rs.next()) {
+                                    String lote = rs.getString("codigo_lote");
+                                    String prod = rs.getString("nombre");
+                                    int dias = rs.getInt("dias");
+                                    String msg;
+                                    if (plantilla != null && !plantilla.isEmpty()) {
+                                        msg = plantilla
+                                                .replace("{lote}", lote != null ? lote : "")
+                                                .replace("{producto}", prod != null ? prod : "")
+                                                .replace("{dias_restantes}", String.valueOf(dias));
+                                    } else {
+                                        msg = "Lote " + lote + " (" + prod + ") vence en " + dias + " días";
+                                    }
+                                    mensajes.add(msg);
+                                }
+                            }
+                        }
+                    } else if ("CADUCIDAD_VENCIDA".equals(tipoAlerta)) {
+                        String sql = "SELECT l.codigo_lote, p.nombre, DATEDIFF(l.fecha_vencimiento, CURDATE()) AS dias " +
+                                     "FROM lotes l JOIN productos p ON l.producto_id = p.id_producto " +
+                                     (categoriaId != null ? "WHERE p.categoria_id = ? AND " : "WHERE ") +
+                                     "DATEDIFF(l.fecha_vencimiento, CURDATE()) < 0 ORDER BY dias ASC LIMIT 10";
+                        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                            if (categoriaId != null) ps.setInt(1, categoriaId);
+                            try (ResultSet rs = ps.executeQuery()) {
+                                while (rs.next()) {
+                                    String lote = rs.getString("codigo_lote");
+                                    String prod = rs.getString("nombre");
+                                    int dias = Math.abs(rs.getInt("dias"));
+                                    String msg;
+                                    if (plantilla != null && !plantilla.isEmpty()) {
+                                        msg = plantilla
+                                                .replace("{lote}", lote != null ? lote : "")
+                                                .replace("{producto}", prod != null ? prod : "")
+                                                .replace("{dias_restantes}", String.valueOf(-dias));
+                                    } else {
+                                        msg = "Lote " + lote + " (" + prod + ") vencido hace " + dias + " días";
+                                    }
+                                    mensajes.add(msg);
+                                }
+                            }
+                        }
+                    } else if ("STOCK_MINIMO".equals(tipoAlerta)) {
+                        String sql = "SELECT p.nombre, COALESCE(SUM(l.stock_actual),0) AS stock, smc.stock_minimo " +
+                                     "FROM productos p " +
+                                     "JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1 " +
+                                     "LEFT JOIN lotes l ON p.id_producto = l.producto_id " +
+                                     (categoriaId != null ? "WHERE p.categoria_id = ? " : "") +
+                                     "GROUP BY p.id_producto, smc.stock_minimo HAVING stock <= smc.stock_minimo LIMIT 20";
+                        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                            if (categoriaId != null) ps.setInt(1, categoriaId);
+                            try (ResultSet rs = ps.executeQuery()) {
+                                while (rs.next()) {
+                                    String prod = rs.getString("nombre");
+                                    int stock = rs.getInt("stock");
+                                    int umbral = rs.getInt("stock_minimo");
+                                    String msg;
+                                    if (plantilla != null && !plantilla.isEmpty()) {
+                                        msg = plantilla
+                                                .replace("{producto}", prod != null ? prod : "")
+                                                .replace("{stock_actual}", String.valueOf(stock))
+                                                .replace("{umbral}", String.valueOf(umbral));
+                                    } else {
+                                        msg = "Stock mínimo: Producto " + prod + " con " + stock + " unidades (mínimo " + umbral + ")";
+                                    }
+                                    mensajes.add(msg);
+                                }
+                            }
+                        }
+                    } else if ("STOCK_CRITICO".equals(tipoAlerta)) {
+                        String sql = "SELECT p.nombre, COALESCE(SUM(l.stock_actual),0) AS stock, smc.stock_critico " +
+                                     "FROM productos p " +
+                                     "JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1 " +
+                                     "LEFT JOIN lotes l ON p.id_producto = l.producto_id " +
+                                     (categoriaId != null ? "WHERE p.categoria_id = ? " : "") +
+                                     "GROUP BY p.id_producto, smc.stock_critico HAVING stock <= smc.stock_critico LIMIT 20";
+                        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                            if (categoriaId != null) ps.setInt(1, categoriaId);
+                            try (ResultSet rs = ps.executeQuery()) {
+                                while (rs.next()) {
+                                    String prod = rs.getString("nombre");
+                                    int stock = rs.getInt("stock");
+                                    int umbral = rs.getInt("stock_critico");
+                                    String msg;
+                                    if (plantilla != null && !plantilla.isEmpty()) {
+                                        msg = plantilla
+                                                .replace("{producto}", prod != null ? prod : "")
+                                                .replace("{stock_actual}", String.valueOf(stock))
+                                                .replace("{umbral}", String.valueOf(umbral));
+                                    } else {
+                                        msg = "Stock crítico: Producto " + prod + " con " + stock + " unidades (crítico " + umbral + ")";
+                                    }
+                                    mensajes.add(msg);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return mensajes;
+    }
+
     // Mapea el resultado de la consulta a un objeto AlertaConfig.
     private AlertaConfig mapResultSetToAlertaConfig(ResultSet rs) throws SQLException {
         AlertaConfig alerta = new AlertaConfig();

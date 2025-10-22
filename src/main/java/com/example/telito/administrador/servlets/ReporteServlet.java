@@ -2,6 +2,7 @@ package com.example.telito.administrador.servlets;
 
 import com.example.telito.administrador.daos.ReporteDAO;
 import com.google.gson.Gson;
+import com.example.telito.administrador.beans.Usuario;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -9,6 +10,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,6 +28,26 @@ public class ReporteServlet extends HttpServlet {
         Gson gson = new Gson();
 
         switch (action) {
+            case "globales": {
+                int rutasActivas = reporteDAO.contarRutasActivas();
+                int eficiencia = reporteDAO.calcularEficienciaLogistica();
+                int productores = reporteDAO.contarProductores();
+                int lotes = reporteDAO.contarLotes();
+                int productos = reporteDAO.contarProductos();
+                int ubicaciones = reporteDAO.contarUbicaciones();
+
+                request.setAttribute("rutasActivas", rutasActivas);
+                request.setAttribute("eficiencia", eficiencia);
+                request.setAttribute("productores", productores);
+                request.setAttribute("lotes", lotes);
+                request.setAttribute("productos", productos);
+                request.setAttribute("ubicaciones", ubicaciones);
+
+                RequestDispatcher view = request.getRequestDispatcher("/administrador/reportes-globales.jsp");
+                view.forward(request, response);
+                break;
+            }
+
             case "logistica": {
                 // --- LÓGICA PARA REPORTE LOGÍSTICA ---
                 Map<String, Integer> conteoPlanes = reporteDAO.obtenerConteoPlanesPorEstado();
@@ -50,10 +72,16 @@ public class ReporteServlet extends HttpServlet {
             }
 
             case "almacen": {
-                // 1. Gráfico de Movimientos del Día
-                Map<String, Integer> movimientosHoy = reporteDAO.obtenerMovimientosHoy();
-                request.setAttribute("movimientosLabelsJson", gson.toJson(new ArrayList<>(movimientosHoy.keySet())));
-                request.setAttribute("movimientosDataJson", gson.toJson(new ArrayList<>(movimientosHoy.values())));
+                // 1. Gráfico de Movimientos últimos 7 días (barras apiladas)
+                List<Map<String, Object>> mov7d = reporteDAO.getMovimientosUltimos7Dias();
+                List<String> m7dias = mov7d.stream().map(map -> (String) map.get("dia")).collect(Collectors.toList());
+                List<Integer> m7Entradas = mov7d.stream().map(map -> (Integer) map.get("entradas")).collect(Collectors.toList());
+                List<Integer> m7Salidas = mov7d.stream().map(map -> (Integer) map.get("salidas")).collect(Collectors.toList());
+                List<Integer> m7Ajustes = mov7d.stream().map(map -> (Integer) map.get("ajustes")).collect(Collectors.toList());
+                request.setAttribute("mov7dLabelsJson", gson.toJson(m7dias));
+                request.setAttribute("mov7dEntradasJson", gson.toJson(m7Entradas));
+                request.setAttribute("mov7dSalidasJson", gson.toJson(m7Salidas));
+                request.setAttribute("mov7dAjustesJson", gson.toJson(m7Ajustes));
 
                 // 2. Gráfico de Top 5 Productos con Más Stock
                 Map<String, Integer> topProductos = reporteDAO.getTop5ProductosConStock();
@@ -82,7 +110,17 @@ public class ReporteServlet extends HttpServlet {
 
             case "productor": {
                 // --- LÓGICA PARA REPORTE PRODUCTOR ---
-                int productorId = 3; // ID de Pedro Productor
+                int productorId = 3; // fallback por defecto
+                HttpSession session = request.getSession(false);
+                if (session != null) {
+                    Object u = session.getAttribute("usuario");
+                    if (u instanceof Usuario) {
+                        Usuario usr = (Usuario) u;
+                        if (usr.getRol() != null && usr.getRol().getNombre() != null && usr.getRol().getNombre().equalsIgnoreCase("Productor")) {
+                            productorId = usr.getIdUsuario();
+                        }
+                    }
+                }
 
                 Map<String, Integer> topProductos = reporteDAO.getTop5ProductosPorProductor(productorId);
                 request.setAttribute("topProductosLabelsJson", gson.toJson(new ArrayList<>(topProductos.keySet())));

@@ -44,7 +44,7 @@
 
     <div class="row mt-4">
         <div class="col-12"><h3 class="mb-3 pageheader-title">Accesos rápidos</h3></div>
-        <div class="col-lg-3 col-md-6 mb-4"><a href="<%= request.getContextPath() %>/administrador/reportes-globales.jsp" class="card quick-link-card"><div class="card-body text-center"><i class="fas fa-chart-pie fs-1 mb-3"></i><h5 class="text-dark">Reportes globales</h5><span class="text-muted small">KPIs y tableros</span></div></a></div>
+        <div class="col-lg-3 col-md-6 mb-4"><a href="<%= request.getContextPath() %>/administrador/reportes?action=globales" class="card quick-link-card"><div class="card-body text-center"><i class="fas fa-chart-pie fs-1 mb-3"></i><h5 class="text-dark">Reportes globales</h5><span class="text-muted small">KPIs y tableros</span></div></a></div>
         <div class="col-lg-3 col-md-6 mb-4"><a href="<%= request.getContextPath() %>/administrador/acceso-roles.jsp" class="card quick-link-card"><div class="card-body text-center"><i class="fas fa-user-shield fs-1 mb-3"></i><h5 class="text-dark">Roles y permisos</h5><span class="text-muted small">Asignación y políticas</span></div></a></div>
         <div class="col-lg-3 col-md-6 mb-4"><a href="<%= request.getContextPath() %>/administrador/configuracion.jsp" class="card quick-link-card"><div class="card-body text-center"><i class="fas fa-cogs fs-1 mb-3"></i><h5 class="text-dark">Configuración</h5><span class="text-muted small">Sistema y plantillas</span></div></a></div>
         <div class="col-lg-3 col-md-6 mb-4"><a href="#" class="card quick-link-card"><div class="card-body text-center"><i class="fas fa-chart-line fs-1 mb-3"></i><h5 class="text-dark">Reportes globales</h5><span class="text-muted small">Indicadores y métricas</span></div></a></div>
@@ -53,7 +53,7 @@
     <div class="row mt-3">
         <div class="col-12">
             <button class="btn btn-primary" onclick="location.href='<%= request.getContextPath() %>/UsuarioServlet?action=formCrear'"><i class="fas fa-user-plus me-2"></i> Crear usuario</button>
-            <button class="btn btn-light" onclick="location.href='<%= request.getContextPath() %>/administrador/reportes-globales.jsp'"><i class="fas fa-eye me-2"></i> Ver reportes</button>
+            <button class="btn btn-light" onclick="location.href='<%= request.getContextPath() %>/administrador/reportes?action=globales'"><i class="fas fa-eye me-2"></i> Ver reportes</button>
         </div>
     </div>
         </div>

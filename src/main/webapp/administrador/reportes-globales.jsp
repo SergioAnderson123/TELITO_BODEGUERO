@@ -38,11 +38,11 @@
                                     <p class="report-description">Análisis completo de movimientos, distribución y transporte de productos</p>
                                     <div class="report-stats">
                                         <div class="stat-item">
-                                            <span class="stat-number">15</span>
+                                            <span class="stat-number"><%= request.getAttribute("rutasActivas") != null ? request.getAttribute("rutasActivas") : 0 %></span>
                                             <span class="stat-label">Rutas Activas</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-number">98%</span>
+                                            <span class="stat-number"><%= request.getAttribute("eficiencia") != null ? request.getAttribute("eficiencia") + "%" : "0%" %></span>
                                             <span class="stat-label">Eficiencia</span>
                                         </div>
                                     </div>
@@ -70,11 +70,11 @@
                                     <p class="report-description">Seguimiento de producción, lotes, costos y fechas de caducidad</p>
                                     <div class="report-stats">
                                         <div class="stat-item">
-                                            <span class="stat-number">42</span>
+                                            <span class="stat-number"><%= request.getAttribute("productores") != null ? request.getAttribute("productores") : 0 %></span>
                                             <span class="stat-label">Productores</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-number">156</span>
+                                            <span class="stat-number"><%= request.getAttribute("lotes") != null ? request.getAttribute("lotes") : 0 %></span>
                                             <span class="stat-label">Lotes</span>
                                         </div>
                                     </div>
@@ -102,11 +102,11 @@
                                     <p class="report-description">Control de inventario, entradas, salidas y ajustes de stock</p>
                                     <div class="report-stats">
                                         <div class="stat-item">
-                                            <span class="stat-number">2,847</span>
+                                            <span class="stat-number"><%= request.getAttribute("productos") != null ? request.getAttribute("productos") : 0 %></span>
                                             <span class="stat-label">Productos</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-number">12</span>
+                                            <span class="stat-number"><%= request.getAttribute("ubicaciones") != null ? request.getAttribute("ubicaciones") : 0 %></span>
                                             <span class="stat-label">Ubicaciones</span>
                                         </div>
                                     </div>

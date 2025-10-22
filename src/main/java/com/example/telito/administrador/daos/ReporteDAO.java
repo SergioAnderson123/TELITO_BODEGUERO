@@ -22,6 +22,60 @@ public class ReporteDAO {
         return DriverManager.getConnection(url, user, pass);
     }
 
+    // --- Indicadores agregados para tarjetas dinámicas de Reportes Globales ---
+    public int contarRutasActivas() {
+        String sql = "SELECT COUNT(*) FROM planes_transporte WHERE estado IS NOT NULL AND estado <> 'Entregado'";
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    public int calcularEficienciaLogistica() {
+        String sql = "SELECT SUM(CASE WHEN estado = 'Entregado' THEN 1 ELSE 0 END) AS entregados, COUNT(*) AS total FROM planes_transporte";
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                int total = rs.getInt("total");
+                int entregados = rs.getInt("entregados");
+                if (total == 0) return 0;
+                return (int) Math.round((entregados * 100.0) / total);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    public int contarProductores() {
+        String sql = "SELECT COUNT(DISTINCT productor_id) FROM productos WHERE productor_id IS NOT NULL";
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    public int contarLotes() {
+        String sql = "SELECT COUNT(*) FROM lotes";
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    public int contarProductos() {
+        String sql = "SELECT COUNT(*) FROM productos";
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    public int contarUbicaciones() {
+        String sql = "SELECT COUNT(*) FROM ubicaciones";
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
     // --- Reportes para la gente de Logística ---
     public Map<String, Integer> obtenerConteoPlanesPorEstado() {
         Map<String, Integer> conteo = new LinkedHashMap<>();
@@ -88,10 +142,14 @@ public class ReporteDAO {
 
     public Map<String, Integer> getTop5ProductosConStock() {
         Map<String, Integer> conteo = new LinkedHashMap<>();
-        String sql = "SELECT nombre, stock FROM productos ORDER BY stock DESC LIMIT 5";
+        String sql = "SELECT p.nombre, SUM(l.stock_actual) AS stock_total " +
+                     "FROM productos p " +
+                     "JOIN lotes l ON l.producto_id = p.id_producto " +
+                     "GROUP BY p.id_producto, p.nombre " +
+                     "ORDER BY stock_total DESC LIMIT 5";
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                conteo.put(rs.getString("nombre"), rs.getInt("stock"));
+                conteo.put(rs.getString("nombre"), rs.getInt("stock_total"));
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return conteo;
@@ -128,15 +186,42 @@ public class ReporteDAO {
         return actividad;
     }
 
+    public List<Map<String, Object>> getMovimientosUltimos7Dias() {
+        List<Map<String, Object>> actividad = new ArrayList<>();
+        String sql = "SELECT DATE(fecha) as dia, " +
+                     "SUM(CASE WHEN tipo = 'Entrada' THEN 1 ELSE 0 END) as entradas, " +
+                     "SUM(CASE WHEN tipo = 'Salida' THEN 1 ELSE 0 END) as salidas, " +
+                     "SUM(CASE WHEN tipo = 'Ajuste' THEN 1 ELSE 0 END) as ajustes " +
+                     "FROM movimientos_inventario " +
+                     "WHERE fecha >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) " +
+                     "GROUP BY dia ORDER BY dia ASC";
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Map<String, Object> dia = new LinkedHashMap<>();
+                dia.put("dia", rs.getString("dia"));
+                dia.put("entradas", rs.getInt("entradas"));
+                dia.put("salidas", rs.getInt("salidas"));
+                dia.put("ajustes", rs.getInt("ajustes"));
+                actividad.add(dia);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return actividad;
+    }
+
     // --- Reportes para el Productor ---
     public Map<String, Integer> getTop5ProductosPorProductor(int productorId) {
         Map<String, Integer> conteo = new LinkedHashMap<>();
-        String sql = "SELECT nombre, stock FROM productos WHERE productor_id = ? ORDER BY stock DESC LIMIT 5";
+        String sql = "SELECT p.nombre, SUM(l.stock_actual) AS stock_total " +
+                     "FROM productos p " +
+                     "JOIN lotes l ON l.producto_id = p.id_producto " +
+                     "WHERE p.productor_id = ? " +
+                     "GROUP BY p.id_producto, p.nombre " +
+                     "ORDER BY stock_total DESC LIMIT 5";
         try (Connection conn = getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productorId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    conteo.put(rs.getString("nombre"), rs.getInt("stock"));
+                    conteo.put(rs.getString("nombre"), rs.getInt("stock_total"));
                 }
             }
         } catch (SQLException e) { e.printStackTrace(); }
@@ -145,9 +230,12 @@ public class ReporteDAO {
 
     public Map<String, Double> getValorInventarioPorCategoria(int productorId) {
         Map<String, Double> conteo = new LinkedHashMap<>();
-        String sql = "SELECT c.nombre, SUM(p.stock * p.precio_actual) AS valor_total FROM productos p " +
+        String sql = "SELECT c.nombre, SUM(l.stock_actual * p.precio_actual) AS valor_total " +
+                     "FROM productos p " +
                      "JOIN categorias c ON p.categoria_id = c.id_categoria " +
-                     "WHERE p.productor_id = ? GROUP BY c.nombre";
+                     "JOIN lotes l ON l.producto_id = p.id_producto " +
+                     "WHERE p.productor_id = ? " +
+                     "GROUP BY c.id_categoria, c.nombre";
         try (Connection conn = getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productorId);
             try (ResultSet rs = pstmt.executeQuery()) {

@@ -14,13 +14,13 @@
     
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #34495e;
+            --primary-color: #006d77; /* turquesa oscuro como en módulos */
+            --secondary-color: #83c5be; /* seafoam como en módulos */
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #edf6f9;
+            --dark-color: #2b2d42;
         }
 
         body {
@@ -204,7 +204,7 @@
             </div>
             <% } %>
 
-            <form method="POST" action="<%= request.getContextPath() %>/LoginServlet" novalidate>
+            <form method="POST" action="<%= request.getContextPath() %>/acceso/login" novalidate>
                 <div class="form-floating">
                     <input type="email" class="form-control" id="email" name="email" placeholder="Correo electrónico" required>
                     <label for="email"><i class="fas fa-envelope me-2"></i>Correo electrónico</label>

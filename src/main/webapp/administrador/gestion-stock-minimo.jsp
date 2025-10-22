@@ -65,7 +65,7 @@
                                 <c:forEach var="config" items="${listaStockMinimo}">
                                     <tr>
                                         <td>${config.producto.nombre}</td>
-                                        <td><span class="badge bg-secondary">${config.producto.codigo}</span></td>
+                                        <td><span class="badge bg-secondary">${config.producto.codigoSku}</span></td>
                                         <td>
                                             <span class="badge bg-warning">${config.stockMinimo}</span>
                                         </td>
@@ -85,7 +85,12 @@
                                         <td>${config.fechaActualizacion}</td>
                                         <td>
                                             <button type="button" class="btn btn-sm btn-outline-primary"
-                                                    onclick="editarConfiguracion(${config.idStockMinimo}, '${config.producto.nombre}', ${config.stockMinimo}, ${config.stockCritico}, ${config.activo})">
+                                                    data-id="${config.idStockMinimo}"
+                                                    data-nombre="${config.producto.nombre}"
+                                                    data-stockminimo="${config.stockMinimo}"
+                                                    data-stockcritico="${config.stockCritico}"
+                                                    data-activo="${config.activo}"
+                                                    onclick="editarConfiguracionFromButton(this)">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <button type="button" class="btn btn-sm btn-outline-danger"
@@ -124,7 +129,7 @@
                         <select class="form-select" id="productoId" name="productoId" required>
                             <option value="">Selecciona un producto</option>
                             <c:forEach var="producto" items="${listaProductos}">
-                                <option value="${producto.idProducto}">${producto.nombre} (${producto.codigo})</option>
+                                <option value="${producto.idProducto}">${producto.nombre} (${producto.codigoSku})</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -175,6 +180,15 @@
         // Mostrar el modal
         var modal = new bootstrap.Modal(document.getElementById('modalStockMinimo'));
         modal.show();
+    }
+
+    function editarConfiguracionFromButton(btn) {
+        const id = parseInt(btn.dataset.id);
+        const nombre = btn.dataset.nombre;
+        const stockMinimo = parseInt(btn.dataset.stockminimo);
+        const stockCritico = parseInt(btn.dataset.stockcritico);
+        const activo = String(btn.dataset.activo) === 'true';
+        editarConfiguracion(id, nombre, stockMinimo, stockCritico, activo);
     }
 
     function eliminarConfiguracion(id) {

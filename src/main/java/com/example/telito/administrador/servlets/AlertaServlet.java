@@ -33,9 +33,36 @@ public class AlertaServlet extends HttpServlet {
             case "listar":
                 listarAlertas(request, response);
                 break;
+            case "formCrear": {
+                try {
+                    ArrayList<Categoria> listaCategorias = categoriaDAO.listarCategorias();
+                    request.setAttribute("listaCategorias", listaCategorias);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    request.setAttribute("error", "Error al cargar categorías: " + e.getMessage());
+                }
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/administrador/form-alerta.jsp");
+                dispatcher.forward(request, response);
+                break;
+            }
             case "editar":
                 mostrarFormularioEdicion(request, response);
                 break;
+            case "borrar": {
+                // Soporta borrado lógico vía GET para el enlace de la tabla
+                try {
+                    int id = Integer.parseInt(request.getParameter("id"));
+                    alertaDAO.deshabilitarAlerta(id);
+                    request.getSession().setAttribute("successMsg", "Alerta deshabilitada exitosamente");
+                } catch (NumberFormatException e) {
+                    request.getSession().setAttribute("errorMsg", "ID de alerta inválido");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    request.getSession().setAttribute("errorMsg", "Error al deshabilitar la alerta: " + e.getMessage());
+                }
+                response.sendRedirect(request.getContextPath() + "/AlertaServlet?action=listar");
+                break;
+            }
             default:
                 listarAlertas(request, response);
                 break;
@@ -159,11 +186,11 @@ public class AlertaServlet extends HttpServlet {
             alerta.setRolANotificar(rol);
 
             alertaDAO.crearAlerta(alerta);
-            request.setAttribute("mensaje", "Alerta creada exitosamente");
+            request.getSession().setAttribute("successMsg", "Alerta creada exitosamente");
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Error al crear la alerta: " + e.getMessage());
+            request.getSession().setAttribute("errorMsg", "Error al crear la alerta: " + e.getMessage());
         }
 
         listarAlertas(request, response);
@@ -229,30 +256,27 @@ public class AlertaServlet extends HttpServlet {
             alerta.setRolANotificar(rol);
 
             alertaDAO.actualizarAlerta(alerta);
-            request.setAttribute("mensaje", "Alerta actualizada exitosamente");
+            request.getSession().setAttribute("successMsg", "Alerta actualizada exitosamente");
 
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "ID de alerta inválido");
+            request.getSession().setAttribute("errorMsg", "ID de alerta inválido");
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Error al actualizar la alerta: " + e.getMessage());
+            request.getSession().setAttribute("errorMsg", "Error al actualizar la alerta: " + e.getMessage());
         }
-
         listarAlertas(request, response);
     }
 
     private void eliminarAlerta(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             int idAlertaConfig = Integer.parseInt(request.getParameter("idAlertaConfig"));
-
             alertaDAO.deshabilitarAlerta(idAlertaConfig);
-            request.setAttribute("mensaje", "Alerta eliminada exitosamente");
-
+            request.getSession().setAttribute("successMsg", "Alerta deshabilitada exitosamente");
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "ID de alerta inválido");
+            request.getSession().setAttribute("errorMsg", "ID de alerta inválido");
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Error al eliminar la alerta: " + e.getMessage());
+            request.getSession().setAttribute("errorMsg", "Error al deshabilitar la alerta: " + e.getMessage());
         }
 
         listarAlertas(request, response);

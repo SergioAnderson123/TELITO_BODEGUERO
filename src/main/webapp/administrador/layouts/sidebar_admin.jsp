@@ -18,12 +18,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <c:if test='${param.activeMenu == "Inventario"}'>active</c:if>" href="${pageContext.request.contextPath}/ProductoServlet?action=listarInventario">
+                    <a class="nav-link <c:if test='${param.activeMenu == "Inventario"}'>active</c:if>" href="${pageContext.request.contextPath}/administrador/inventario-general">
                         <i class="fas fa-boxes-stacked"></i>Inventario General
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <c:if test='${param.activeMenu == "Reportes"}'>active</c:if>" href="${pageContext.request.contextPath}/administrador/reportes-globales.jsp">
+                    <a class="nav-link <c:if test='${param.activeMenu == "Reportes"}'>active</c:if>" href="${pageContext.request.contextPath}/administrador/reportes?action=globales">
                         <i class="fas fa-chart-pie"></i>Reportes Globales
                     </a>
                 </li>

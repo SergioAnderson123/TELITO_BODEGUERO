@@ -19,9 +19,9 @@
     <h1 class="page-title"><i class="fas fa-pallet"></i> Reporte de Almacén</h1>
     <div class="charts-grid">
       <div class="card">
-        <h5 class="card-title">Movimientos del Día</h5>
+        <h5 class="card-title">Movimientos últimos 7 días</h5>
         <div class="chart-container">
-            <canvas id="movimientosDiaChart"></canvas>
+            <canvas id="movimientos7dChart"></canvas>
         </div>
       </div>
       <div class="card">
@@ -74,16 +74,37 @@
           grey: 'rgba(201, 203, 207, 0.8)'
       };
 
-      // --- GRÁFICO 1 MEJORADO ---
+      // --- GRÁFICO 1: Últimos 7 días (barras apiladas) ---
       try {
-        const movLabels = JSON.parse('<%= request.getAttribute("movimientosLabelsJson") != null ? request.getAttribute("movimientosLabelsJson") : "[]" %>');
-        const movData = JSON.parse('<%= request.getAttribute("movimientosDataJson") != null ? request.getAttribute("movimientosDataJson") : "[]" %>');
-        new Chart(document.getElementById('movimientosDiaChart'), {
-            type: 'pie',
-            data: { labels: movLabels, datasets: [{ data: movData, backgroundColor: [ TELITO_COLORS.green, TELITO_COLORS.red, TELITO_COLORS.yellow ], borderColor: '#fff', borderWidth: 2, hoverOffset: 8 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 13, family: "\'Segoe UI\', \'Roboto\', \'Helvetica Neue\', \'Arial\', sans-serif" }, padding: 20, usePointStyle: true, pointStyle: 'circle' } }, tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.7)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 }, padding: 12, cornerRadius: 4, callbacks: { label: function(context) { let label = context.label || ''; if (label) { label += ': '; } if (context.parsed !== null) { label += context.parsed + ' Movimientos'; } return label; } } } }, animation: { animateScale: true, animateRotate: true } }
+        const m7Labels = JSON.parse('<%= request.getAttribute("mov7dLabelsJson") != null ? request.getAttribute("mov7dLabelsJson") : "[]" %>');
+        const m7Entradas = JSON.parse('<%= request.getAttribute("mov7dEntradasJson") != null ? request.getAttribute("mov7dEntradasJson") : "[]" %>');
+        const m7Salidas = JSON.parse('<%= request.getAttribute("mov7dSalidasJson") != null ? request.getAttribute("mov7dSalidasJson") : "[]" %>');
+        const m7Ajustes = JSON.parse('<%= request.getAttribute("mov7dAjustesJson") != null ? request.getAttribute("mov7dAjustesJson") : "[]" %>');
+        const ctx1 = document.getElementById('movimientos7dChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: m7Labels,
+                datasets: [
+                    { label: 'Entradas', data: m7Entradas, backgroundColor: TELITO_COLORS.green, stack: 'stack1' },
+                    { label: 'Salidas', data: m7Salidas, backgroundColor: TELITO_COLORS.red, stack: 'stack1' },
+                    { label: 'Ajustes', data: m7Ajustes, backgroundColor: TELITO_COLORS.yellow, stack: 'stack1' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: { stacked: true, beginAtZero: true, grid: { color: '#e9e9e9', drawBorder: false } }
+                }
+            }
         });
-      } catch (e) { console.error("Error al renderizar el Gráfico 1 (Almacén):", e); }
+      } catch (e) { console.error("Error al renderizar el Gráfico 1 (Almacén 7d):", e); }
 
       // --- GRÁFICO 2 MEJORADO ---
       try {

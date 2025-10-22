@@ -38,7 +38,7 @@ public class AuthFilter implements Filter {
         String contextPath = httpRequest.getContextPath();
         
         if (requestURI.equals(contextPath + "/") || 
-            requestURI.equals(contextPath + "/LoginServlet") ||
+            requestURI.equals(contextPath + "/acceso/login") ||
             requestURI.equals(contextPath + "/welcome.jsp") ||
             requestURI.equals(contextPath + "/login.jsp") ||
             requestURI.startsWith(contextPath + "/assets/") ||
@@ -52,8 +52,8 @@ public class AuthFilter implements Filter {
         // Verificar si hay sesión activa
         HttpSession session = httpRequest.getSession(false);
         if (session == null || session.getAttribute("usuario") == null) {
-            // No hay sesión activa, redirigir al login
-            httpResponse.sendRedirect(contextPath + "/LoginServlet");
+            // No hay sesión activa, redirigir al login correcto
+            httpResponse.sendRedirect(contextPath + "/acceso/login");
             return;
         }
         
@@ -62,7 +62,7 @@ public class AuthFilter implements Filter {
         if (!usuario.isActivo()) {
             // Usuario inactivo, invalidar sesión y redirigir al login
             session.invalidate();
-            httpResponse.sendRedirect(contextPath + "/LoginServlet");
+            httpResponse.sendRedirect(contextPath + "/acceso/login");
             return;
         }
         
