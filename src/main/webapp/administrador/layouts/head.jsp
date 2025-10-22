@@ -37,5 +37,24 @@
     .pagination .page-item.active .page-link { background:linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%); border-color:var(--turquoise-dark); }
 
     @media (max-width: 992px) { .nav-left-sidebar { transform:translateX(-100%); transition:transform .3s ease; } .nav-left-sidebar.open { transform:translateX(0); } .dashboard-header { left:0; } .dashboard-wrapper { margin-left:0; width:100%; } .dashboard-content { padding:20px; } }
+
+    /* Chart specific styles */
+    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-top: 30px; }
+    .chart-container { position: relative; height: 300px; width: 100%; }
+    .page-title { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 30px; font-size: 2rem; }
+    .page-title i { margin-right: 15px; color: var(--seafoam); }
+    
+    /* Table styles */
+    .table-card { background: var(--white); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.06); border: none; }
+    .table-card .card-header { background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%); color: #fff; border-radius: 12px 12px 0 0; padding: 20px 30px; margin: 0; }
+    .table-card .card-body { padding: 30px; }
+    .table { margin-bottom: 0; }
+    .table th { border-top: none; font-weight: 600; color: var(--turquoise-dark); padding: 15px; }
+    .table td { padding: 15px; vertical-align: middle; }
+    .badge { font-size: 0.8rem; padding: 6px 12px; }
+    .bg-success-soft { background-color: rgba(40, 167, 69, 0.1) !important; color: #28a745 !important; }
+    .bg-warning-soft { background-color: rgba(255, 193, 7, 0.1) !important; color: #ffc107 !important; }
+    .bg-danger-soft { background-color: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important; }
+    .bg-secondary-soft { background-color: rgba(108, 117, 125, 0.1) !important; color: #6c757d !important; }
 </style>
 

@@ -177,6 +177,39 @@ public class UsuarioDAO {
         }
     }
 
+    // Método para autenticar usuarios en el login
+    public Usuario autenticarUsuario(String email, String password) {
+        Usuario usuario = null;
+        String sql = "SELECT u.*, r.nombre AS nombre_rol FROM usuarios u " +
+                "INNER JOIN roles r ON u.rol_id = r.id_rol " +
+                "WHERE u.email = ? AND u.password = SHA2(?, 256) AND u.activo = 1";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            pstmt.setString(2, password);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    usuario = new Usuario();
+                    usuario.setIdUsuario(rs.getInt("id_usuario"));
+                    usuario.setNombres(rs.getString("nombres"));
+                    usuario.setApellidos(rs.getString("apellidos"));
+                    usuario.setEmail(rs.getString("email"));
+                    usuario.setActivo(rs.getBoolean("activo"));
+
+                    Rol rol = new Rol();
+                    rol.setIdRol(rs.getInt("rol_id"));
+                    rol.setNombre(rs.getString("nombre_rol"));
+                    usuario.setRol(rol);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return usuario;
+    }
+
     // Para la tarjeta de estadísticas del menú principal.
     public int contarTotalUsuarios() {
         int total = 0;
