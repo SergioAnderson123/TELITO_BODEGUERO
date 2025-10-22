@@ -12,6 +12,7 @@ public class Producto {
     private int unidadesPorPaquete; // <-- AÑADIDO
     private int productorId;      // <-- AÑADIDO
     private int categoriaId;      // <-- AÑADIDO
+    private String categoriaNombre; // <-- AÑADIDO
 
     // Getters y Setters
 
@@ -93,5 +94,13 @@ public class Producto {
 
     public void setCategoriaId(int categoriaId) {
         this.categoriaId = categoriaId;
+    }
+
+    public String getCategoriaNombre() {
+        return categoriaNombre;
+    }
+
+    public void setCategoriaNombre(String categoriaNombre) {
+        this.categoriaNombre = categoriaNombre;
     }
 }

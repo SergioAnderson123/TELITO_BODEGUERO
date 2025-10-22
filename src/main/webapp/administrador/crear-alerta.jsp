@@ -16,18 +16,9 @@
     <div class="topbar-actions"><div class="user-avatar">TB</div></div>
 </div>
 
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-menu-title">Menu</div>
-    <nav>
-        <a href="<%= request.getContextPath() %>/inicio"><i class="fas fa-home fa-fw"></i> Pestaña principal</a>
-        <a href="<%= request.getContextPath() %>/UsuarioServlet"><i class="fas fa-users fa-fw"></i> Gestión de Usuarios</a>
-        <a href="<%= request.getContextPath() %>/ProductoServlet?action=listarInventario"><i class="fas fa-boxes-stacked fa-fw"></i> Inventario General</a>
-        <a href="<%= request.getContextPath() %>/administrador/acceso-roles.jsp"><i class="fas fa-user-shield fa-fw"></i> Acceso a Roles</a>
-        <a href="<%= request.getContextPath() %>/administrador/reportes-globales.jsp"><i class="fas fa-chart-pie fa-fw"></i> Reportes Globales</a>
-        <a href="<%= request.getContextPath() %>/administrador/configuracion.jsp" class="active"><i class="fas fa-cogs fa-fw"></i> Configuración</a>
-    </nav>
-    <div class="sidebar-footer"><a href="#"><i class="fas fa-sign-out-alt fa-fw"></i> Cerrar sesión</a></div>
-</aside>
+<jsp:include page="/administrador/layouts/sidebar_admin.jsp">
+    <jsp:param name="activeMenu" value='Configuracion'/>
+</jsp:include>
 
 <header class="header" id="header">
     <div class="header-left"><i class="fas fa-bars" id="sidebar-toggle"></i></div>

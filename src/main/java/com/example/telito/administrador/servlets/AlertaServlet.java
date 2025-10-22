@@ -2,8 +2,8 @@ package com.example.telito.administrador.servlets;
 
 import com.example.telito.administrador.beans.AlertaConfig;
 import com.example.telito.administrador.beans.Categoria;
-import com.example.telito.administrador.beans.Rol;
 import com.example.telito.administrador.daos.AlertaDAO;
+import com.example.telito.administrador.daos.CategoriaDAO;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -11,7 +11,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,134 +18,243 @@ import java.util.ArrayList;
 @WebServlet(name = "AlertaServlet", value = "/AlertaServlet")
 public class AlertaServlet extends HttpServlet {
 
-    // El método doGet se encarga de las acciones que NO modifican datos (o que solo leen).
-    // Por ejemplo, mostrar listas o formularios.
+    private AlertaDAO alertaDAO = new AlertaDAO();
+    private CategoriaDAO categoriaDAO = new CategoriaDAO();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action") == null ? "listar" : request.getParameter("action");
-        AlertaDAO alertaDAO = new AlertaDAO();
-        HttpSession session = request.getSession();
-        RequestDispatcher view;
+        String action = request.getParameter("action");
 
-        // El filtro AlertCountFilter ya se encarga de actualizar el contador de alertas en la sesión,
-        // así que no necesito hacerlo aquí de nuevo.
+        if (action == null) {
+            action = "listar";
+        }
 
         switch (action) {
             case "listar":
-                // Carga la lista de reglas para mostrarla en la tabla de gestion-alertas.jsp
-                ArrayList<AlertaConfig> listaAlertas = alertaDAO.listarAlertas();
-                request.setAttribute("listaAlertas", listaAlertas);
-                view = request.getRequestDispatcher("/administrador/gestion-alertas.jsp");
-                view.forward(request, response);
+                listarAlertas(request, response);
                 break;
-
-            case "formCrear":
-                // Solo muestra el formulario para crear una nueva regla.
-                view = request.getRequestDispatcher("/administrador/crear-alerta.jsp");
-                view.forward(request, response);
-                break;
-
             case "editar":
-                // Carga los datos de una regla existente para ponerlos en el formulario de edición.
-                try {
-                    int idAlerta = Integer.parseInt(request.getParameter("id"));
-                    AlertaConfig alerta = alertaDAO.obtenerAlertaPorId(idAlerta);
-                    if (alerta != null) {
-                        request.setAttribute("alerta", alerta);
-                        view = request.getRequestDispatcher("/administrador/editar-alerta.jsp");
-                        view.forward(request, response);
-                    } else {
-                        session.setAttribute("errorMsg", "La regla de alerta que se intenta editar no existe.");
-                        response.sendRedirect(request.getContextPath() + "/AlertaServlet");
-                    }
-                } catch (NumberFormatException e) {
-                    session.setAttribute("errorMsg", "El ID de la regla no es válido.");
-                    response.sendRedirect(request.getContextPath() + "/AlertaServlet");
-                }
+                mostrarFormularioEdicion(request, response);
                 break;
-
-            case "borrar":
-                // Deshabilita la regla (borrado lógico).
-                try {
-                    int idAlerta = Integer.parseInt(request.getParameter("id"));
-                    alertaDAO.deshabilitarAlerta(idAlerta);
-                    session.setAttribute("successMsg", "Regla de alerta deshabilitada con éxito.");
-                } catch (NumberFormatException e) {
-                    session.setAttribute("errorMsg", "El ID para deshabilitar la regla no es válido.");
-                }
-                response.sendRedirect(request.getContextPath() + "/AlertaServlet");
+            default:
+                listarAlertas(request, response);
                 break;
         }
     }
 
-    // El doPost se usa para las acciones que SÍ modifican datos (crear, actualizar).
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action") == null ? "" : request.getParameter("action");
-        AlertaDAO alertaDAO = new AlertaDAO();
-        HttpSession session = request.getSession();
+        String action = request.getParameter("action");
+
+        if (action == null) {
+            action = "listar";
+        }
 
         switch (action) {
-            case "guardar":
-                // Procesa los datos del formulario de creación.
-                try {
-                    AlertaConfig alerta = mapearAlertaDesdeRequest(request);
-                    alertaDAO.crearAlerta(alerta);
-                    session.setAttribute("successMsg", "Nueva regla de alerta creada con éxito.");
-                } catch (NumberFormatException e) {
-                    session.setAttribute("errorMsg", "Error al procesar los datos de la regla.");
-                }
-                response.sendRedirect(request.getContextPath() + "/AlertaServlet");
+            case "crear":
+                crearAlerta(request, response);
                 break;
-
             case "actualizar":
-                // Procesa los datos del formulario de edición.
-                try {
-                    AlertaConfig alerta = mapearAlertaDesdeRequest(request);
-                    alertaDAO.actualizarAlerta(alerta);
-                    session.setAttribute("successMsg", "Regla de alerta actualizada con éxito.");
-                } catch (NumberFormatException e) {
-                    session.setAttribute("errorMsg", "Error al procesar los datos para actualizar la regla.");
-                }
-                response.sendRedirect(request.getContextPath() + "/AlertaServlet");
+                actualizarAlerta(request, response);
+                break;
+            case "eliminar":
+                eliminarAlerta(request, response);
+                break;
+            default:
+                listarAlertas(request, response);
                 break;
         }
     }
 
-    // Este método ayuda a no repetir código. Lee los datos del formulario
-    // y los convierte en un objeto AlertaConfig.
-    private AlertaConfig mapearAlertaDesdeRequest(HttpServletRequest request) throws NumberFormatException {
-        AlertaConfig alerta = new AlertaConfig();
+    private void listarAlertas(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            // Obtener lista de alertas
+            ArrayList<AlertaConfig> listaAlertas = alertaDAO.listarAlertas();
+            request.setAttribute("listaAlertas", listaAlertas);
 
-        String idStr = request.getParameter("id_alerta_config");
-        if (idStr != null && !idStr.isEmpty()) {
-            alerta.setIdAlertaConfig(Integer.parseInt(idStr));
+            // Obtener lista de categorías para el formulario
+            ArrayList<Categoria> listaCategorias = categoriaDAO.listarCategorias();
+            request.setAttribute("listaCategorias", listaCategorias);
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/administrador/gestion-alertas.jsp");
+            dispatcher.forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Error al cargar las alertas: " + e.getMessage());
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/administrador/gestion-alertas.jsp");
+            dispatcher.forward(request, response);
+        }
+    }
+
+    private void mostrarFormularioEdicion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            int idAlerta = Integer.parseInt(request.getParameter("id"));
+
+            // Obtener la alerta específica
+            AlertaConfig alerta = alertaDAO.obtenerAlertaPorId(idAlerta);
+            request.setAttribute("alerta", alerta);
+
+            // Obtener lista de categorías para el formulario
+            ArrayList<Categoria> listaCategorias = categoriaDAO.listarCategorias();
+            request.setAttribute("listaCategorias", listaCategorias);
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/administrador/editar-alerta.jsp");
+            dispatcher.forward(request, response);
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "ID de alerta inválido");
+            listarAlertas(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Error al cargar la alerta: " + e.getMessage());
+            listarAlertas(request, response);
+        }
+    }
+
+    private void crearAlerta(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            String nombre = request.getParameter("nombre");
+            String tipoAlerta = request.getParameter("tipoAlerta");
+            String umbralDiasStr = request.getParameter("umbralDias");
+            String categoriaIdStr = request.getParameter("categoriaId");
+            String rolANotificar = request.getParameter("rolANotificar");
+            String mensajePersonalizado = request.getParameter("mensajePersonalizado");
+            boolean activo = request.getParameter("activo") != null;
+
+            // Crear objeto de alerta
+            AlertaConfig alerta = new AlertaConfig();
+            alerta.setNombre(nombre);
+            alerta.setTipoAlerta(tipoAlerta);
+            alerta.setActivo(activo);
+            alerta.setMensajePersonalizado(mensajePersonalizado);
+
+            // Configurar umbral de días si se proporciona
+            if (umbralDiasStr != null && !umbralDiasStr.trim().isEmpty()) {
+                try {
+                    alerta.setUmbralDias(Integer.parseInt(umbralDiasStr));
+                } catch (NumberFormatException e) {
+                    request.setAttribute("error", "El umbral de días debe ser un número válido");
+                    listarAlertas(request, response);
+                    return;
+                }
+            }
+
+            // Configurar categoría si se selecciona
+            if (categoriaIdStr != null && !categoriaIdStr.trim().isEmpty()) {
+                try {
+                    Categoria categoria = new Categoria();
+                    categoria.setIdCategoria(Integer.parseInt(categoriaIdStr));
+                    alerta.setCategoria(categoria);
+                } catch (NumberFormatException e) {
+                    request.setAttribute("error", "ID de categoría inválido");
+                    listarAlertas(request, response);
+                    return;
+                }
+            }
+
+            // Configurar rol a notificar
+            com.example.telito.administrador.beans.Rol rol = new com.example.telito.administrador.beans.Rol();
+            rol.setNombre(rolANotificar);
+            alerta.setRolANotificar(rol);
+
+            alertaDAO.crearAlerta(alerta);
+            request.setAttribute("mensaje", "Alerta creada exitosamente");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Error al crear la alerta: " + e.getMessage());
         }
 
-        alerta.setNombre(request.getParameter("nombre"));
-        alerta.setTipoAlerta(request.getParameter("tipo_alerta"));
+        listarAlertas(request, response);
+    }
 
-        String umbralStr = request.getParameter("umbral_dias");
-        if (umbralStr != null && !umbralStr.isEmpty()) {
-            alerta.setUmbralDias(Integer.parseInt(umbralStr));
-        } else {
-            alerta.setUmbralDias(null);
+    private void actualizarAlerta(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            int idAlertaConfig = Integer.parseInt(request.getParameter("idAlertaConfig"));
+            String nombre = request.getParameter("nombre");
+            String tipoAlerta = request.getParameter("tipoAlerta");
+            String umbralDiasStr = request.getParameter("umbralDias");
+            String categoriaIdStr = request.getParameter("categoriaId");
+            String rolANotificar = request.getParameter("rolANotificar");
+            String mensajePersonalizado = request.getParameter("mensajePersonalizado");
+            boolean activo = request.getParameter("activo") != null;
+
+            // Obtener alerta existente
+            AlertaConfig alerta = alertaDAO.obtenerAlertaPorId(idAlertaConfig);
+
+            if (alerta == null) {
+                request.setAttribute("error", "Alerta no encontrada");
+                listarAlertas(request, response);
+                return;
+            }
+
+            // Actualizar campos
+            alerta.setNombre(nombre);
+            alerta.setTipoAlerta(tipoAlerta);
+            alerta.setActivo(activo);
+            alerta.setMensajePersonalizado(mensajePersonalizado);
+
+            // Configurar umbral de días si se proporciona
+            if (umbralDiasStr != null && !umbralDiasStr.trim().isEmpty()) {
+                try {
+                    alerta.setUmbralDias(Integer.parseInt(umbralDiasStr));
+                } catch (NumberFormatException e) {
+                    request.setAttribute("error", "El umbral de días debe ser un número válido");
+                    listarAlertas(request, response);
+                    return;
+                }
+            } else {
+                alerta.setUmbralDias(null);
+            }
+
+            // Configurar categoría si se selecciona
+            if (categoriaIdStr != null && !categoriaIdStr.trim().isEmpty()) {
+                try {
+                    Categoria categoria = new Categoria();
+                    categoria.setIdCategoria(Integer.parseInt(categoriaIdStr));
+                    alerta.setCategoria(categoria);
+                } catch (NumberFormatException e) {
+                    request.setAttribute("error", "ID de categoría inválido");
+                    listarAlertas(request, response);
+                    return;
+                }
+            } else {
+                alerta.setCategoria(null);
+            }
+
+            // Configurar rol a notificar
+            com.example.telito.administrador.beans.Rol rol = new com.example.telito.administrador.beans.Rol();
+            rol.setNombre(rolANotificar);
+            alerta.setRolANotificar(rol);
+
+            alertaDAO.actualizarAlerta(alerta);
+            request.setAttribute("mensaje", "Alerta actualizada exitosamente");
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "ID de alerta inválido");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Error al actualizar la alerta: " + e.getMessage());
         }
 
-        String categoriaIdStr = request.getParameter("categoria_id");
-        if (categoriaIdStr != null && !categoriaIdStr.isEmpty()) {
-            Categoria categoria = new Categoria();
-            categoria.setIdCategoria(Integer.parseInt(categoriaIdStr));
-            alerta.setCategoria(categoria);
+        listarAlertas(request, response);
+    }
+
+    private void eliminarAlerta(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            int idAlertaConfig = Integer.parseInt(request.getParameter("idAlertaConfig"));
+
+            alertaDAO.deshabilitarAlerta(idAlertaConfig);
+            request.setAttribute("mensaje", "Alerta eliminada exitosamente");
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "ID de alerta inválido");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Error al eliminar la alerta: " + e.getMessage());
         }
 
-        Rol rol = new Rol();
-        rol.setIdRol(Integer.parseInt(request.getParameter("rol_a_notificar_id")));
-        alerta.setRolANotificar(rol);
-
-        String activoParam = request.getParameter("activo");
-        alerta.setActivo(activoParam != null && activoParam.equals("true"));
-
-        return alerta;
+        listarAlertas(request, response);
     }
 }

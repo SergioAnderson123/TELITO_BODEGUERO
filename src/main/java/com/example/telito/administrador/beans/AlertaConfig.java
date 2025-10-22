@@ -11,6 +11,7 @@ public class AlertaConfig {
     private Integer umbralDias; // Usamos Integer para permitir valores nulos
     private Categoria categoria; // Reutilizamos el bean Categoria
     private Rol rolANotificar; // Reutilizamos el bean Rol
+    private String mensajePersonalizado;
     private boolean activo;
 
     // Getters y Setters
@@ -61,6 +62,14 @@ public class AlertaConfig {
 
     public void setRolANotificar(Rol rolANotificar) {
         this.rolANotificar = rolANotificar;
+    }
+
+    public String getMensajePersonalizado() {
+        return mensajePersonalizado;
+    }
+
+    public void setMensajePersonalizado(String mensajePersonalizado) {
+        this.mensajePersonalizado = mensajePersonalizado;
     }
 
     public boolean isActivo() {

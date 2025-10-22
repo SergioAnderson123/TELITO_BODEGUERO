@@ -41,11 +41,10 @@ public class AlertaDAO {
     // Carga la lista de alertas para la tabla de gestión.
     public ArrayList<AlertaConfig> listarAlertas() {
         ArrayList<AlertaConfig> listaAlertas = new ArrayList<>();
-        String sql = "SELECT a.*, c.nombre AS nombre_categoria, r.nombre AS nombre_rol " +
-                     "FROM alertas_configuracion a " +
-                     "LEFT JOIN categorias c ON a.categoria_id = c.id_categoria " +
-                     "JOIN roles r ON a.rol_a_notificar_id = r.id_rol " +
-                     "ORDER BY a.id_alerta_config";
+        String sql = "SELECT a.*, c.nombre AS nombre_categoria " +
+                "FROM alertas_configuracion a " +
+                "LEFT JOIN categorias c ON a.categoria_id = c.id_categoria " +
+                "ORDER BY a.id_alerta_config";
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
@@ -63,11 +62,10 @@ public class AlertaDAO {
     // Obtiene una alerta específica para poder editarla.
     public AlertaConfig obtenerAlertaPorId(int id) {
         AlertaConfig alerta = null;
-        String sql = "SELECT a.*, c.nombre AS nombre_categoria, r.nombre AS nombre_rol " +
-                     "FROM alertas_configuracion a " +
-                     "LEFT JOIN categorias c ON a.categoria_id = c.id_categoria " +
-                     "JOIN roles r ON a.rol_a_notificar_id = r.id_rol " +
-                     "WHERE a.id_alerta_config = ?";
+        String sql = "SELECT a.*, c.nombre AS nombre_categoria " +
+                "FROM alertas_configuracion a " +
+                "LEFT JOIN categorias c ON a.categoria_id = c.id_categoria " +
+                "WHERE a.id_alerta_config = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -85,8 +83,8 @@ public class AlertaDAO {
 
     // Guarda una nueva regla de alerta en la base de datos.
     public void crearAlerta(AlertaConfig alerta) {
-        String sql = "INSERT INTO alertas_configuracion (nombre, tipo_alerta, umbral_dias, categoria_id, rol_a_notificar_id, activo) " +
-                     "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO alertas_configuracion (nombre, tipo_alerta, umbral_dias, categoria_id, rol_a_notificar, mensaje_personalizado, activo) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             setAlertaParams(pstmt, alerta);
@@ -99,11 +97,11 @@ public class AlertaDAO {
     // Actualiza una regla de alerta que ya existe.
     public void actualizarAlerta(AlertaConfig alerta) {
         String sql = "UPDATE alertas_configuracion SET nombre = ?, tipo_alerta = ?, umbral_dias = ?, " +
-                     "categoria_id = ?, rol_a_notificar_id = ?, activo = ? WHERE id_alerta_config = ?";
+                "categoria_id = ?, rol_a_notificar = ?, mensaje_personalizado = ?, activo = ? WHERE id_alerta_config = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             setAlertaParams(pstmt, alerta);
-            pstmt.setInt(7, alerta.getIdAlertaConfig());
+            pstmt.setInt(8, alerta.getIdAlertaConfig());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -137,11 +135,26 @@ public class AlertaDAO {
                 String sqlConteo = "";
 
                 if ("STOCK_MINIMO".equals(tipoAlerta)) {
-                    sqlConteo = "SELECT COUNT(*) FROM productos WHERE stock <= stock_minimo";
+                    sqlConteo = "SELECT COUNT(*) FROM productos p " +
+                            "LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id " +
+                            "LEFT JOIN lotes l ON p.id_producto = l.producto_id " +
+                            "WHERE p.activo = 1 AND smc.activo = 1 " +
+                            "AND COALESCE(SUM(l.stock_actual), 0) <= smc.stock_minimo";
                     if (categoriaId != null) {
-                        sqlConteo += " AND categoria_id = " + categoriaId;
+                        sqlConteo += " AND p.categoria_id = " + categoriaId;
                     }
-                } else if ("PROXIMO_A_VENCER".equals(tipoAlerta)) {
+                    sqlConteo += " GROUP BY p.id_producto";
+                } else if ("STOCK_CRITICO".equals(tipoAlerta)) {
+                    sqlConteo = "SELECT COUNT(*) FROM productos p " +
+                            "LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id " +
+                            "LEFT JOIN lotes l ON p.id_producto = l.producto_id " +
+                            "WHERE p.activo = 1 AND smc.activo = 1 " +
+                            "AND COALESCE(SUM(l.stock_actual), 0) <= smc.stock_critico";
+                    if (categoriaId != null) {
+                        sqlConteo += " AND p.categoria_id = " + categoriaId;
+                    }
+                    sqlConteo += " GROUP BY p.id_producto";
+                } else if ("VENCIMIENTO".equals(tipoAlerta)) {
                     Integer umbralDias = rsReglas.getObject("umbral_dias", Integer.class);
                     if (umbralDias != null) {
                         sqlConteo = "SELECT COUNT(*) FROM lotes l ";
@@ -186,10 +199,13 @@ public class AlertaDAO {
             alerta.setCategoria(categoria);
         }
 
-        Rol rol = new Rol();
-        rol.setIdRol(rs.getInt("rol_a_notificar_id"));
-        rol.setNombre(rs.getString("nombre_rol"));
-        alerta.setRolANotificar(rol);
+        // Para la nueva estructura, rol_a_notificar es un ENUM string
+        String rolString = rs.getString("rol_a_notificar");
+        if (rolString != null) {
+            Rol rol = new Rol();
+            rol.setNombre(rolString);
+            alerta.setRolANotificar(rol);
+        }
 
         return alerta;
     }
@@ -211,7 +227,8 @@ public class AlertaDAO {
             pstmt.setNull(4, Types.INTEGER);
         }
 
-        pstmt.setInt(5, alerta.getRolANotificar().getIdRol());
-        pstmt.setBoolean(6, alerta.isActivo());
+        pstmt.setString(5, alerta.getRolANotificar().getNombre());
+        pstmt.setString(6, alerta.getMensajePersonalizado());
+        pstmt.setBoolean(7, alerta.isActivo());
     }
 }

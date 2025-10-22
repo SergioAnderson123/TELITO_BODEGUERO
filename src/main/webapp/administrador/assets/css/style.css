@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* ===== RESET Y GLOBALES ===== */
 :root {
 
@@ -151,4 +152,4 @@ button, .btn, .btn-primary {
     color: var(--color-white);
     border: none;
 }
-/* El canvas se adaptará a su contenedor, Chart.js se encarga del resto */
+/* El canvas se adaptará a su contenedor, Chart.js se encarga del resto */}

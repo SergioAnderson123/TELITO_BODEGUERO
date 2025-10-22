@@ -22,7 +22,14 @@ public class ProductoDAO {
     // Para la tabla de inventario general, carga todos los productos.
     public ArrayList<Producto> listarProductos() {
         ArrayList<Producto> listaProductos = new ArrayList<>();
-        String sql = "SELECT * FROM productos";
+        String sql = "SELECT p.*, c.nombre as categoria_nombre, " +
+                "COALESCE(SUM(l.stock_actual), 0) as stock_total " +
+                "FROM productos p " +
+                "LEFT JOIN categorias c ON p.categoria_id = c.id_categoria " +
+                "LEFT JOIN lotes l ON p.id_producto = l.producto_id " +
+                "WHERE p.activo = 1 " +
+                "GROUP BY p.id_producto " +
+                "ORDER BY p.nombre";
 
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
@@ -35,11 +42,11 @@ public class ProductoDAO {
                 producto.setNombre(rs.getString("nombre"));
                 producto.setDescripcion(rs.getString("descripcion"));
                 producto.setPrecioActual(rs.getDouble("precio_actual"));
-                producto.setStockMinimo(rs.getInt("stock_minimo"));
-                producto.setStock(rs.getInt("stock"));
+                producto.setStock(rs.getInt("stock_total")); // Stock calculado desde lotes
                 producto.setUnidadesPorPaquete(rs.getInt("unidades_por_paquete"));
                 producto.setProductorId(rs.getInt("productor_id"));
                 producto.setCategoriaId(rs.getInt("categoria_id"));
+                producto.setCategoriaNombre(rs.getString("categoria_nombre"));
                 listaProductos.add(producto);
             }
         } catch (SQLException e) {
