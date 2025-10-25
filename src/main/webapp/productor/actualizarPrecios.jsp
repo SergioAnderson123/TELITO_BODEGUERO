@@ -111,15 +111,33 @@
 
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown">
+                    <%
+                        com.example.telito.administrador.beans.Usuario usuarioHeaderPrecios = 
+                            (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
+                        String nombreCompletoPrecios = usuarioHeaderPrecios != null ? 
+                            usuarioHeaderPrecios.getNombres() + " " + usuarioHeaderPrecios.getApellidos() : "Usuario";
+                        String fotoUrlPrecios = "https://ui-avatars.com/api/?name=User&background=006d77&color=fff&size=200";
+                        if (usuarioHeaderPrecios != null) {
+                            String foto = usuarioHeaderPrecios.getFotoPerfil();
+                            if (foto != null && !foto.trim().isEmpty()) {
+                                if (foto.startsWith("http://") || foto.startsWith("https://")) {
+                                    fotoUrlPrecios = foto;
+                                } else {
+                                    fotoUrlPrecios = request.getContextPath() + "/" + foto;
+                                }
+                            } else {
+                                fotoUrlPrecios = usuarioHeaderPrecios.getFotoPerfilUrl();
+                            }
+                        }
+                    %>
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                        <img src="https://ui-avatars.com/api/?name=Eduardo+Rodas&background=006d77&color=fff" alt="User" class="rounded-circle me-2" width="32" height="32">
-                        <span style="color:#006d77;">Eduardo Rodas</span>
+                        <img src="<%= fotoUrlPrecios %>" alt="User" class="rounded-circle me-2" width="32" height="32">
+                        <span style="color:#006d77;"><%= nombreCompletoPrecios %></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Perfil</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuración</a></li>
+                        <li><a class="dropdown-item" href="<%= request.getContextPath() %>/perfil"><i class="fas fa-user me-2"></i>Perfil</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+                        <li><a class="dropdown-item text-danger" href="<%= request.getContextPath() %>/logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesion</a></li>
                     </ul>
                 </li>
             </ul>
@@ -236,6 +254,12 @@
     }
 
     // No modal de confirmación: envío directo del formulario
+
+    // Recargar página si se vuelve desde el perfil
+    if (sessionStorage.getItem('recargarDesdePerfil') === 'true') {
+        sessionStorage.removeItem('recargarDesdePerfil');
+        location.reload();
+    }
 </script>
 </body>
 </html>

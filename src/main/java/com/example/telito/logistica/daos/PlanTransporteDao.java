@@ -1,6 +1,7 @@
 package com.example.telito.logistica.daos;
 
 import com.example.telito.logistica.beans.PlanTransporteBean;
+import com.example.telito.util.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -51,11 +52,7 @@ public class PlanTransporteDao {
             params.add(fechaHasta.trim());
         }
         sql += " ORDER BY pt.id_plan DESC";
-        try { Class.forName("com.mysql.cj.jdbc.Driver"); } catch (ClassNotFoundException e) { throw new RuntimeException(e); }
-        String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-        String username = "root";
-        String password = "root";
-        try (Connection conn = DriverManager.getConnection(url, username, password); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.size(); i++) {
                 pstmt.setObject(i + 1, params.get(i));
             }

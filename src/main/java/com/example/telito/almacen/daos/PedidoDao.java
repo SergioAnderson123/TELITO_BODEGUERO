@@ -5,20 +5,18 @@ import com.example.telito.almacen.beans.Cliente;
 import com.example.telito.almacen.beans.Lote;
 import com.example.telito.almacen.beans.Pedido;
 import com.example.telito.almacen.beans.PedidoItem;
+import com.example.telito.util.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 public class PedidoDao {
-
-    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero"; // Corrected database name
-    private String user = "root";
-    private String pass = "root"; // Reemplaza con tu contraseña
+    // Las credenciales ahora están centralizadas en DatabaseConnection
 
     public int contarPedidos() {
         String sql = "SELECT COUNT(*) FROM pedidos";
         int total = 0;
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
@@ -40,7 +38,7 @@ public class PedidoDao {
             throw new RuntimeException(e);
         }
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, limit);
@@ -78,7 +76,7 @@ public class PedidoDao {
                 "INNER JOIN productos prod ON (pi.producto_id = prod.id_producto) " +
                 "WHERE pi.pedido_id = ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
 
             try (PreparedStatement pstmtPedido = conn.prepareStatement(sqlPedido)) {
                 pstmtPedido.setInt(1, idPedido);
@@ -138,7 +136,7 @@ public class PedidoDao {
             throw new RuntimeException(e);
         }
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, nuevoEstado);

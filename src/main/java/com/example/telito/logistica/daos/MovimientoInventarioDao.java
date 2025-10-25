@@ -1,6 +1,7 @@
 package com.example.telito.logistica.daos;
 
 import com.example.telito.logistica.beans.MovimientoInventarioBean;
+import com.example.telito.util.DatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,15 +10,7 @@ public class MovimientoInventarioDao {
 
     // === MÉTODO MODIFICADO PARA ACEPTAR FILTROS ===
     public ArrayList<MovimientoInventarioBean> obtenerMovimientos(String busqueda, String tipo, String periodo) {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-        String username = "root";
-        String password = "root";
+        // Conexión centralizada
 
         ArrayList<MovimientoInventarioBean> listaMovimientos = new ArrayList<>();
 
@@ -67,7 +60,7 @@ public class MovimientoInventarioDao {
 
         sql += " ORDER BY mi.fecha DESC";
 
-        try (Connection conn = DriverManager.getConnection(url, username, password);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             // Establecer parámetros dinámicos

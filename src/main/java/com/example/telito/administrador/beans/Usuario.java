@@ -11,7 +11,8 @@ public class Usuario {
     private String password;
     private boolean activo;
     private Rol rol; // Objeto Rol para representar la llave foránea
-    private String urlFoto;
+    private String fotoPerfil;
+    
     // Getters y Setters
     public int getIdUsuario() {
         return idUsuario;
@@ -69,11 +70,29 @@ public class Usuario {
         this.rol = rol;
     }
 
-    public String getUrlFoto() {
-        return urlFoto;
+    public String getFotoPerfil() {
+        return fotoPerfil;
     }
 
-    public void setUrlFoto(String urlFoto) {
-        this.urlFoto = urlFoto;
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
+    }
+    
+    /**
+     * Obtiene la URL de la foto de perfil o genera una por defecto
+     */
+    public String getFotoPerfilUrl() {
+        if (fotoPerfil != null && !fotoPerfil.trim().isEmpty()) {
+            return fotoPerfil;
+        }
+        // Generar avatar por defecto con las iniciales
+        String iniciales = "";
+        if (nombres != null && !nombres.isEmpty()) {
+            iniciales += nombres.charAt(0);
+        }
+        if (apellidos != null && !apellidos.isEmpty()) {
+            iniciales += apellidos.charAt(0);
+        }
+        return "https://ui-avatars.com/api/?name=" + iniciales + "&background=006d77&color=fff&size=200";
     }
 }

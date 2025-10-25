@@ -1,19 +1,18 @@
 package com.example.telito.almacen.daos;
 
-import com.example.telito.almacen.beans.Distrito; // Necesitarás crear este bean
+import com.example.telito.almacen.beans.Distrito;
+import com.example.telito.util.DatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 
 public class DistritoDao {
-    private final String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-    private final String user = "root";
-    private final String pass = "root";
+    // Las credenciales ahora están centralizadas en DatabaseConnection
 
     public ArrayList<Distrito> listar() {
         ArrayList<Distrito> lista = new ArrayList<>();
         String sql = "SELECT * FROM distritos";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 

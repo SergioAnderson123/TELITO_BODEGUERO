@@ -2,32 +2,21 @@ package com.example.telito.administrador.daos;
 
 import com.example.telito.administrador.beans.PlantillaConfig;
 import com.example.telito.administrador.beans.PlantillaMapeo;
+import com.example.telito.util.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlantillaDAO {
-
-    private String user = "root";
-    private String pass = "root";
-    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-
-    private Connection getConnection() throws SQLException {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return DriverManager.getConnection(url, user, pass);
-    }
+    // Las credenciales ahora están centralizadas en DatabaseConnection
 
     // Carga la lista de plantillas para la tabla principal, pero sin los detalles de mapeo.
     public ArrayList<PlantillaConfig> listarPlantillas() {
         ArrayList<PlantillaConfig> listaPlantillas = new ArrayList<>();
         String sql = "SELECT * FROM plantillas_config ORDER BY nombre";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -51,7 +40,7 @@ public class PlantillaDAO {
         String sqlPlantilla = "SELECT * FROM plantillas_config WHERE id_plantilla = ?";
         String sqlMapeos = "SELECT * FROM plantillas_mapeo_columnas WHERE plantilla_id = ?";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmtPlantilla = conn.prepareStatement(sqlPlantilla)) {
 
             pstmtPlantilla.setInt(1, id);
@@ -93,7 +82,7 @@ public class PlantillaDAO {
 
         Connection conn = null;
         try {
-            conn = getConnection();
+            conn = DatabaseConnection.getConnection();
             conn.setAutoCommit(false); // Inicio la transacción.
 
             // 1. Inserto la plantilla y recupero el ID que se autogeneró.
@@ -150,7 +139,7 @@ public class PlantillaDAO {
 
         Connection conn = null;
         try {
-            conn = getConnection();
+            conn = DatabaseConnection.getConnection();
             conn.setAutoCommit(false); // Inicio la transacción.
 
             // 1. Actualizo los datos de la plantilla.
@@ -200,7 +189,7 @@ public class PlantillaDAO {
     // Borrado lógico, solo la desactivo.
     public void deshabilitarPlantilla(int id) {
         String sql = "UPDATE plantillas_config SET activo = 0 WHERE id_plantilla = ?";
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();

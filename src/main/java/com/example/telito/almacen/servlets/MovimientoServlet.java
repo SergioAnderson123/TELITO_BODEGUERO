@@ -23,26 +23,21 @@ public class MovimientoServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // --- INICIO: CÓDIGO TEMPORAL PARA SIMULAR LOGIN (BORRAR LUEGO) ---
         HttpSession session = request.getSession();
-
-        // Para probar, creamos un usuario "falso" y lo ponemos en la sesión.
-        // Cambia el ID para probar con diferentes usuarios.
-        Usuario usuarioSimulado = new Usuario();
-        usuarioSimulado.setIdUsuario(1); // <-- CAMBIA ESTE NÚMERO (1, 2, etc.) PARA PROBAR
-        usuarioSimulado.setNombres("Usuario de Prueba"); // Nombre opcional para depuración
-
-        // Lo guardamos en la sesión con la clave que el resto del código espera.
-        session.setAttribute("usuarioLogueado", usuarioSimulado);
-        // --- FIN: CÓDIGO TEMPORAL ---
-
-
-        // El resto de tu código no necesita cambios y ahora funcionará
         String action = request.getParameter("action") == null ? "listar" : request.getParameter("action");
         MovimientoDao movimientoDao = new MovimientoDao();
 
-        // El servlet ahora obtiene el usuario que acabamos de simular
-        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+        // Obtener el usuario de la sesión (establecido por LoginServlet y protegido por AuthFilter)
+        com.example.telito.administrador.beans.Usuario usuarioSesion = 
+            (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
+        
+        // Crear un bean compatible para este módulo si es necesario
+        Usuario usuarioLogueado = null;
+        if (usuarioSesion != null) {
+            usuarioLogueado = new Usuario();
+            usuarioLogueado.setIdUsuario(usuarioSesion.getIdUsuario());
+            usuarioLogueado.setNombres(usuarioSesion.getNombres());
+        }
 
         switch (action) {
             case "listar":

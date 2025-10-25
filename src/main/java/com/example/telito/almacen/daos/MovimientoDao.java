@@ -1,28 +1,18 @@
 package com.example.telito.almacen.daos;
 
 import com.example.telito.almacen.beans.Movimiento;
+import com.example.telito.util.DatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 
 public class MovimientoDao {
-
-    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero"; // Asegúrate que sea el nombre correcto
-    private String user = "root";
-    private String pass = "root";
-
-    static {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Error al cargar el driver de MySQL", e);
-        }
-    }
+    // Las credenciales ahora están centralizadas en DatabaseConnection
 
     public int contarTotalMovimientos() {
         String sql = "SELECT COUNT(*) FROM movimientos_inventario";
         int total = 0;
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -40,7 +30,7 @@ public class MovimientoDao {
         String sql = "INSERT INTO movimientos_inventario (lote_id, usuario_id, pedido_id, orden_compra_id, tipo, cantidad, motivo) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, movimiento.getLoteId());
@@ -60,7 +50,7 @@ public class MovimientoDao {
         String sql = "SELECT COUNT(*) FROM movimientos_inventario WHERE usuario_id = ?";
         int total = 0;
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, usuarioId);
@@ -97,7 +87,7 @@ public class MovimientoDao {
                 "ORDER BY m.fecha DESC " +
                 "LIMIT ? OFFSET ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, usuarioId);
@@ -151,7 +141,7 @@ public class MovimientoDao {
                 "ORDER BY m.fecha DESC " + // Ordenamos por fecha, del más reciente al más antiguo
                 "LIMIT ? OFFSET ?";       // <-- Añadimos límite y offset para paginación
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, limit);

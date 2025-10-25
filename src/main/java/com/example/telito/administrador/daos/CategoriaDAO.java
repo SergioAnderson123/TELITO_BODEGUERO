@@ -1,31 +1,20 @@
 package com.example.telito.administrador.daos;
 
 import com.example.telito.administrador.beans.Categoria;
+import com.example.telito.util.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 public class CategoriaDAO {
-
-    private String user = "root";
-    private String pass = "root";
-    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-
-    private Connection getConnection() throws SQLException {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return DriverManager.getConnection(url, user, pass);
-    }
+    // Las credenciales ahora están centralizadas en DatabaseConnection
 
     // Listar todas las categorías
     public ArrayList<Categoria> listarCategorias() {
         ArrayList<Categoria> lista = new ArrayList<>();
         String sql = "SELECT * FROM categorias ORDER BY nombre";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -45,7 +34,7 @@ public class CategoriaDAO {
     public Categoria obtenerPorId(int id) {
         String sql = "SELECT * FROM categorias WHERE id_categoria = ?";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);

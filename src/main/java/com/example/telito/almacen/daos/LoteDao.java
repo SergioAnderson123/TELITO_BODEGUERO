@@ -1,22 +1,12 @@
 package com.example.telito.almacen.daos;
 
 import com.example.telito.almacen.beans.Lote;
+import com.example.telito.util.DatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 
 public class LoteDao {
-
-    private final String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-    private final String user = "root";
-    private final String pass = "root";
-
-    static {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Error al cargar el driver de MySQL", e);
-        }
-    }
+    // Las credenciales ahora están centralizadas en DatabaseConnection
 
     /**
      * MÉTODO MODIFICADO: Renombrado y filtrado.
@@ -36,7 +26,7 @@ public class LoteDao {
                 "WHERE l.estado = 'Registrado' " + // <-- FILTRO AÑADIDO
                 "LIMIT ? OFFSET ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, registrosPorPagina);
@@ -67,7 +57,7 @@ public class LoteDao {
      */
     public int contarTotalLotesRegistrados() {
         String sql = "SELECT COUNT(*) FROM lotes WHERE estado = 'Registrado'";
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
@@ -85,7 +75,7 @@ public class LoteDao {
      */
     public void actualizarEstado(int idLote, String nuevoEstado) {
         String sql = "UPDATE lotes SET estado = ? WHERE id_lote = ?";
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, nuevoEstado);
             pstmt.setInt(2, idLote);
@@ -107,7 +97,7 @@ public class LoteDao {
                 "WHERE l.producto_id = ? AND l.stock_actual > 0 AND l.estado = 'Registrado' " + // <-- FILTRO AÑADIDO
                 "ORDER BY l.fecha_vencimiento ASC";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, idProducto);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -132,7 +122,7 @@ public class LoteDao {
 
     public void actualizarStock(int idLote, int nuevoStock) {
         String sql = "UPDATE lotes SET stock_actual = ? WHERE id_lote = ?";
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, nuevoStock);
             pstmt.setInt(2, idLote);
@@ -151,7 +141,7 @@ public class LoteDao {
                 " INNER JOIN ubicaciones u ON (l.ubicacion_id = u.id_ubicacion) " +
                 " WHERE l.id_lote = ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, idLote);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -177,7 +167,7 @@ public class LoteDao {
         String sql = "INSERT INTO lotes (codigo_lote, stock_actual, fecha_vencimiento, producto_id, ubicacion_id, distrito_id, estado) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
         int generatedId = 0;
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, lote.getCodigoLote());

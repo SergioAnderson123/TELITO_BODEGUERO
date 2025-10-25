@@ -172,15 +172,33 @@
                 <!-- Right actions -->
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
+                        <%
+                            com.example.telito.administrador.beans.Usuario usuarioHeaderMisProd = 
+                                (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
+                            String nombreCompletoMisProd = usuarioHeaderMisProd != null ? 
+                                usuarioHeaderMisProd.getNombres() + " " + usuarioHeaderMisProd.getApellidos() : "Usuario";
+                            String fotoUrlMisProd = "https://ui-avatars.com/api/?name=User&background=006d77&color=fff&size=200";
+                            if (usuarioHeaderMisProd != null) {
+                                String foto = usuarioHeaderMisProd.getFotoPerfil();
+                                if (foto != null && !foto.trim().isEmpty()) {
+                                    if (foto.startsWith("http://") || foto.startsWith("https://")) {
+                                        fotoUrlMisProd = foto;
+                                    } else {
+                                        fotoUrlMisProd = request.getContextPath() + "/" + foto;
+                                    }
+                                } else {
+                                    fotoUrlMisProd = usuarioHeaderMisProd.getFotoPerfilUrl();
+                                }
+                            }
+                        %>
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                            <img src="https://ui-avatars.com/api/?name=Eduardo+Rodas&background=006d77&color=fff" alt="User" class="rounded-circle me-2" width="32" height="32">
-                            <span style="color:#006d77;">Eduardo Rodas</span>
+                            <img src="<%= fotoUrlMisProd %>" alt="User" class="rounded-circle me-2" width="32" height="32">
+                            <span style="color:#006d77;"><%= nombreCompletoMisProd %></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Perfil</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuración</a></li>
+                            <li><a class="dropdown-item" href="<%= request.getContextPath() %>/perfil"><i class="fas fa-user me-2"></i>Perfil</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+                            <li><a class="dropdown-item text-danger" href="<%= request.getContextPath() %>/logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesion</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -454,6 +472,12 @@
             document.body.appendChild(form);
             form.submit();
         }
+    }
+
+    // Recargar página si se vuelve desde el perfil
+    if (sessionStorage.getItem('recargarDesdePerfil') === 'true') {
+        sessionStorage.removeItem('recargarDesdePerfil');
+        location.reload();
     }
 </script>
 

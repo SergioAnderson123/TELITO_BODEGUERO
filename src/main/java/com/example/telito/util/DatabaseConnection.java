@@ -1,0 +1,85 @@
+package com.example.telito.util;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+/**
+ * Clase centralizada para gestionar las conexiones a la base de datos.
+ * Implementa el patrón Singleton para mantener configuración única.
+ */
+public class DatabaseConnection {
+    
+    // Configuración de la base de datos
+    private static final String URL = "jdbc:mysql://localhost:3306/telito_bodeguero";
+    private static final String USER = "root";
+    private static final String PASSWORD = "root";
+    
+    // Carga del driver MySQL una sola vez
+    static {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("✓ Driver MySQL cargado correctamente");
+        } catch (ClassNotFoundException e) {
+            System.err.println("✗ Error al cargar el driver de MySQL");
+            throw new RuntimeException("Error al cargar el driver de MySQL", e);
+        }
+    }
+    
+    /**
+     * Constructor privado para evitar instanciación
+     */
+    private DatabaseConnection() {
+        // No se permite instanciar esta clase
+    }
+    
+    /**
+     * Obtiene una nueva conexión a la base de datos.
+     * 
+     * @return Connection objeto de conexión a la base de datos
+     * @throws SQLException si hay un error al conectar
+     */
+    public static Connection getConnection() throws SQLException {
+        try {
+            Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+            // Configuración adicional de la conexión
+            conn.setAutoCommit(true);
+            return conn;
+        } catch (SQLException e) {
+            System.err.println("✗ Error al obtener conexión a la base de datos: " + e.getMessage());
+            throw new SQLException("No se pudo establecer conexión con la base de datos", e);
+        }
+    }
+    
+    /**
+     * Cierra una conexión de forma segura.
+     * 
+     * @param conn Conexión a cerrar
+     */
+    public static void closeConnection(Connection conn) {
+        if (conn != null) {
+            try {
+                if (!conn.isClosed()) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.err.println("✗ Error al cerrar la conexión: " + e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Verifica si la conexión a la base de datos está disponible.
+     * 
+     * @return true si la conexión es exitosa, false en caso contrario
+     */
+    public static boolean testConnection() {
+        try (Connection conn = getConnection()) {
+            return conn != null && !conn.isClosed();
+        } catch (SQLException e) {
+            System.err.println("✗ Test de conexión fallido: " + e.getMessage());
+            return false;
+        }
+    }
+}
+

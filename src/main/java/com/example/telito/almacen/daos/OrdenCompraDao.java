@@ -1,27 +1,16 @@
 package com.example.telito.almacen.daos;
 
 import com.example.telito.almacen.beans.OrdenCompra;
+import com.example.telito.util.DatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 
 public class OrdenCompraDao {
-
-    private final String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-    private final String user = "root";
-    private final String pass = "root";
-
-    // Carga del driver una sola vez para mayor eficiencia
-    static {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Error al cargar el driver de MySQL", e);
-        }
-    }
+    // Las credenciales ahora están centralizadas en DatabaseConnection
 
     public int contarOrdenesPendientes() {
         String sql = "SELECT COUNT(*) FROM ordenes_compra WHERE estado = 'Aprobado'";
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
@@ -41,7 +30,7 @@ public class OrdenCompraDao {
                 "INNER JOIN proveedores prov ON (oc.proveedor_id = prov.id_proveedor) " +
                 "WHERE oc.estado = 'Aprobado' LIMIT ? OFFSET ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, limit);
@@ -80,7 +69,7 @@ public class OrdenCompraDao {
                 "WHERE oc.id_orden_compra = ?";
         // --- FIN DE LA CORRECCIÓN ---
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, idOrden);
 
@@ -106,7 +95,7 @@ public class OrdenCompraDao {
 
     public void actualizarEstado(int idOrden, String nuevoEstado) {
         String sql = "UPDATE ordenes_compra SET estado = ? WHERE id_orden_compra = ?";
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, nuevoEstado);
             pstmt.setInt(2, idOrden);

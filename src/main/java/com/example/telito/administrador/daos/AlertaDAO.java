@@ -3,30 +3,19 @@ package com.example.telito.administrador.daos;
 import com.example.telito.administrador.beans.AlertaConfig;
 import com.example.telito.administrador.beans.Categoria;
 import com.example.telito.administrador.beans.Rol;
+import com.example.telito.util.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 public class AlertaDAO {
-
-    private String user = "root";
-    private String pass = "root";
-    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-
-    private Connection getConnection() throws SQLException {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return DriverManager.getConnection(url, user, pass);
-    }
+    // Las credenciales ahora están centralizadas en DatabaseConnection
 
     // Cuenta las reglas de alerta que están activas para el contador del menú.
     public int contarReglasDeAlertaActivas() {
         int total = 0;
         String sql = "SELECT COUNT(*) FROM alertas_configuracion WHERE activo = 1";
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
@@ -46,7 +35,7 @@ public class AlertaDAO {
                 "LEFT JOIN categorias c ON a.categoria_id = c.id_categoria " +
                 "ORDER BY a.id_alerta_config";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -67,7 +56,7 @@ public class AlertaDAO {
                 "LEFT JOIN categorias c ON a.categoria_id = c.id_categoria " +
                 "WHERE a.id_alerta_config = ?";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -85,7 +74,7 @@ public class AlertaDAO {
     public void crearAlerta(AlertaConfig alerta) {
         String sql = "INSERT INTO alertas_configuracion (nombre, tipo_alerta, umbral_dias, categoria_id, rol_a_notificar, mensaje_personalizado, activo) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             setAlertaParams(pstmt, alerta);
             pstmt.executeUpdate();
@@ -98,7 +87,7 @@ public class AlertaDAO {
     public void actualizarAlerta(AlertaConfig alerta) {
         String sql = "UPDATE alertas_configuracion SET nombre = ?, tipo_alerta = ?, umbral_dias = ?, " +
                 "categoria_id = ?, rol_a_notificar = ?, mensaje_personalizado = ?, activo = ? WHERE id_alerta_config = ?";
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             setAlertaParams(pstmt, alerta);
             pstmt.setInt(8, alerta.getIdAlertaConfig());
@@ -111,7 +100,7 @@ public class AlertaDAO {
     // Borrado lógico, solo cambia el estado a inactivo.
     public void deshabilitarAlerta(int id) {
         String sql = "UPDATE alertas_configuracion SET activo = 0 WHERE id_alerta_config = ?";
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
@@ -125,7 +114,7 @@ public class AlertaDAO {
         int totalAlertas = 0;
         String sqlReglas = "SELECT * FROM alertas_configuracion WHERE activo = 1";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmtReglas = conn.createStatement();
              ResultSet rsReglas = stmtReglas.executeQuery(sqlReglas)) {
 
@@ -188,7 +177,7 @@ public class AlertaDAO {
         ArrayList<String> mensajes = new ArrayList<>();
         String sqlReglas = "SELECT * FROM alertas_configuracion WHERE activo = 1 AND rol_a_notificar = ?";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sqlReglas)) {
             pstmt.setString(1, rolNombre.toUpperCase());
             try (ResultSet rsReglas = pstmt.executeQuery()) {

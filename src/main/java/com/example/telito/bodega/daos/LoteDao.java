@@ -1,7 +1,8 @@
 package com.example.telito.bodega.daos;
 
+import com.example.telito.util.DatabaseConnection;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,19 +14,7 @@ import java.util.List;
  * los lotes en la base de datos.
  */
 public class LoteDao {
-
-    // Datos de conexión
-    private String user = "root";
-    private String pass = "root";
-    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-
-    static {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Error al cargar el driver de MySQL", e);
-        }
-    }
+    // Las credenciales ahora están centralizadas en DatabaseConnection
 
     /**
      * MÉTODO CORREGIDO
@@ -40,7 +29,7 @@ public class LoteDao {
         String sql = "INSERT INTO lotes (codigo_lote, producto_id, stock_actual, fecha_vencimiento, ubicacion_id, distrito_id, estado) " +
                 "VALUES (?, ?, ?, ?, ?, ?, 'No Registrado')";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, codigoLote);
@@ -87,7 +76,7 @@ public class LoteDao {
 
         String sql = "INSERT INTO lotes (codigo_lote, producto_id, ubicacion_id, stock_actual, fecha_vencimiento, estado, distrito_id) VALUES (?, ?, ?, ?, ?, 'No Registrado', ?)";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, codigoLote);
@@ -131,7 +120,7 @@ public class LoteDao {
     private int obtenerOCrearDistrito(String nombreDistrito) {
         int distritoId = 0;
         String sqlSelect = "SELECT idDistrito FROM distritos WHERE nombre = ?";
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sqlSelect)) {
             pstmt.setString(1, nombreDistrito);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -145,7 +134,7 @@ public class LoteDao {
 
         if (distritoId == 0) {
             String sqlInsert = "INSERT INTO distritos (nombre) VALUES (?)";
-            try (Connection conn = DriverManager.getConnection(url, user, pass);
+            try (Connection conn = DatabaseConnection.getConnection();
                  PreparedStatement pstmt = conn.prepareStatement(sqlInsert, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, nombreDistrito);
                 if (pstmt.executeUpdate() > 0) {
@@ -170,7 +159,7 @@ public class LoteDao {
         int productoId = 0;
         String sql = "SELECT id_producto FROM productos WHERE UPPER(codigo_sku) = UPPER(?) AND activo = 1";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, (sku == null) ? "" : sku.trim());
@@ -195,7 +184,7 @@ public class LoteDao {
         int ubicacionId = 0;
         String sqlSelect = "SELECT id_ubicacion FROM ubicaciones WHERE nombre = ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sqlSelect)) {
             pstmt.setString(1, nombreUbicacion);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -209,7 +198,7 @@ public class LoteDao {
 
         if (ubicacionId == 0) {
             String sqlInsert = "INSERT INTO ubicaciones (nombre) VALUES (?)";
-            try (Connection conn = DriverManager.getConnection(url, user, pass);
+            try (Connection conn = DatabaseConnection.getConnection();
                  PreparedStatement pstmt = conn.prepareStatement(sqlInsert, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, nombreUbicacion);
                 if (pstmt.executeUpdate() > 0) {
@@ -232,7 +221,7 @@ public class LoteDao {
         String nombreProducto = null;
         String sql = "SELECT nombre FROM productos WHERE UPPER(codigo_sku) = UPPER(?)";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, (sku == null) ? null : sku.trim());
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -256,7 +245,7 @@ public class LoteDao {
                 "WHERE p.productor_id = ? " +
                 "ORDER BY l.codigo_lote DESC";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productorId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -281,7 +270,7 @@ public class LoteDao {
         int stockTotal = 0;
         String sql = "SELECT SUM(stock_actual) as stock_total FROM lotes WHERE producto_id = ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productoId);
             try (ResultSet rs = pstmt.executeQuery()) {

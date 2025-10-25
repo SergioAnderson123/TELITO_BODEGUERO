@@ -3,9 +3,9 @@ package com.example.telito.bodega.daos;
 import com.example.telito.bodega.beans.Categoria;
 import com.example.telito.bodega.beans.Producto;
 import com.example.telito.bodega.beans.Usuario;
+import com.example.telito.util.DatabaseConnection;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,19 +16,7 @@ import java.util.ArrayList;
  * los productos en la base de datos.
  */
 public class ProductoDao {
-
-    private final String user = "root";
-    private final String pass = "root";
-    private final String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-
-    // --- MEJORA: Carga del driver una sola vez para toda la aplicación ---
-    static {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Error al cargar el driver de MySQL", e);
-        }
-    }
+    // Las credenciales ahora están centralizadas en DatabaseConnection
 
     /**
      * Lista todos los productos de un productor específico, incluyendo su categoría,
@@ -51,7 +39,7 @@ public class ProductoDao {
                 "WHERE p.productor_id = ? AND u.activo = 1 AND p.activo = 1 " +
                 "GROUP BY p.id_producto";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, productorId);
@@ -96,7 +84,7 @@ public class ProductoDao {
     public void crearProducto(Producto producto) {
         String sql = "INSERT INTO productos (codigo_sku, nombre, descripcion, precio_actual, productor_id, categoria_id) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, producto.getCodigoSKU());
             pstmt.setString(2, producto.getNombre());
@@ -112,7 +100,7 @@ public class ProductoDao {
 
     public int contarTotalProductos(int productorId) {
         String sql = "SELECT COUNT(*) FROM productos p JOIN usuarios u ON p.productor_id = u.id_usuario WHERE productor_id = ? AND u.activo = 1 AND p.activo = 1";
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productorId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -128,7 +116,7 @@ public class ProductoDao {
 
     public int contarTotalCategorias(int productorId) {
         String sql = "SELECT COUNT(DISTINCT categoria_id) FROM productos p JOIN usuarios u WHERE p.productor_id = ? AND u.activo = 1 AND p.activo = 1";
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productorId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -150,7 +138,7 @@ public class ProductoDao {
                 "ON (p.id_producto = l.producto_id) " +
                 "WHERE p.productor_id = ? AND u.activo = 1 AND p.activo = 1 AND (l.stock_total IS NULL OR l.stock_total = 0)";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productorId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -166,7 +154,7 @@ public class ProductoDao {
 
     public Producto obtenerProductoPorSku(String sku) {
         String sql = "SELECT p.* FROM productos p JOIN usuarios u ON p.productor_id = u.id_usuario WHERE p.codigo_sku = ? AND p.activo = 1 AND u.activo = 1";
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, sku);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -186,7 +174,7 @@ public class ProductoDao {
 
     public void actualizarPrecio(int idProducto, double nuevoPrecio) {
         String sql = "UPDATE productos SET precio_actual = ? WHERE id_producto = ?";
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setDouble(1, nuevoPrecio);
             pstmt.setInt(2, idProducto);
@@ -203,7 +191,7 @@ public class ProductoDao {
      */
     public boolean desactivarProducto(int idProducto) {
         String sql = "UPDATE productos SET activo = 0 WHERE id_producto = ?";
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, idProducto);
             return pstmt.executeUpdate() > 0;
@@ -220,7 +208,7 @@ public class ProductoDao {
     public ArrayList<Categoria> listarTodasLasCategorias() {
         ArrayList<Categoria> categorias = new ArrayList<>();
         String sql = "SELECT id_categoria, nombre FROM categorias ORDER BY nombre ASC";
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {

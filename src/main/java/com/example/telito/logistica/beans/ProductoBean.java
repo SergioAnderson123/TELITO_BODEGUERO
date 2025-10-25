@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class ProductoBean {
     private int id;
+    private String codigo;
     private String nombre;
     private BigDecimal precio;
 
@@ -16,6 +17,14 @@ public class ProductoBean {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
     public String getNombre() {
@@ -32,5 +41,10 @@ public class ProductoBean {
 
     public void setPrecio(BigDecimal precio) {
         this.precio = precio;
+    }
+    
+    // Sobrecarga para aceptar double
+    public void setPrecio(double precio) {
+        this.precio = BigDecimal.valueOf(precio);
     }
 }

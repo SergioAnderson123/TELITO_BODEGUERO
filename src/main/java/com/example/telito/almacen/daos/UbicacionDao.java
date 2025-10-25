@@ -2,20 +2,18 @@ package com.example.telito.almacen.daos;
 
 
 import com.example.telito.almacen.beans.Ubicacion;
+import com.example.telito.util.DatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 
 public class UbicacionDao {
-
-    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-    private String user = "root";
-    private String pass = "root";
+    // Las credenciales ahora están centralizadas en DatabaseConnection
 
     public ArrayList<Ubicacion> listar() {
         ArrayList<Ubicacion> lista = new ArrayList<>();
         String sql = "SELECT * FROM ubicaciones";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 

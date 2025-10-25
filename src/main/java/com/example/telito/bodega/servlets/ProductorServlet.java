@@ -1,5 +1,6 @@
 package com.example.telito.bodega.servlets;
 import com.example.telito.bodega.daos.LoteDao;
+import com.example.telito.bodega.daos.OrdenCompraDao;
 import com.example.telito.bodega.beans.Categoria;
 import com.example.telito.bodega.beans.Producto;
 import com.example.telito.bodega.beans.Usuario;
@@ -13,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Este Servlet actúa como el Controlador para todas las acciones
@@ -91,11 +93,34 @@ public class ProductorServlet extends HttpServlet {
                 break;
 
             case "ordenesCompra":
-                // Mostrar la vista de órdenes de compra
-                // TODO: En el futuro, aquí se cargarían las órdenes reales desde la base de datos
-                // Por ahora, la vista maneja datos de ejemplo
+                // Obtener el ID del productor de la sesión
+                com.example.telito.administrador.beans.Usuario usuarioSesion = 
+                    (com.example.telito.administrador.beans.Usuario) request.getSession().getAttribute("usuario");
+                
+                int productorIdOrdenes = usuarioSesion != null ? usuarioSesion.getIdUsuario() : 2;
+                
+                // Cargar las órdenes de compra del productor
+                OrdenCompraDao ordenCompraDao = new OrdenCompraDao();
+                List<Object[]> listaOrdenes = ordenCompraDao.listarOrdenesPorProductor(productorIdOrdenes);
+                
+                request.setAttribute("listaOrdenes", listaOrdenes);
                 view = request.getRequestDispatcher("productor/ordenesDeCompra.jsp");
                 view.forward(request, response);
+                break;
+                
+            case "verDetalleOrden":
+                // Ver detalle de una orden de compra (JSON o JSP)
+                int idOrden = Integer.parseInt(request.getParameter("idOrden"));
+                OrdenCompraDao ordenDao = new OrdenCompraDao();
+                Object[] detalleOrden = ordenDao.obtenerDetalleOrden(idOrden);
+                
+                if (detalleOrden != null) {
+                    request.setAttribute("detalleOrden", detalleOrden);
+                    view = request.getRequestDispatcher("productor/ordenesDeCompra.jsp");
+                    view.forward(request, response);
+                } else {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Orden no encontrada");
+                }
                 break;
             // Aquí puedes agregar más 'cases' para navegar a otras páginas
             case "buscarProductoPorSkuJson":

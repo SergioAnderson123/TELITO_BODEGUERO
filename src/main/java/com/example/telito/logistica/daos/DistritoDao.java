@@ -1,6 +1,7 @@
 package com.example.telito.logistica.daos;
 
 import com.example.telito.logistica.beans.DistritoBean;
+import com.example.telito.util.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,16 +12,7 @@ public class DistritoDao {
         ArrayList<DistritoBean> lista = new ArrayList<>();
         String sql = "SELECT idDistrito, nombre FROM distritos ORDER BY nombre ASC";
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-        String username = "root";
-        String password = "root";
-
-        try (Connection conn = DriverManager.getConnection(url, username, password);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
@@ -29,6 +21,30 @@ public class DistritoDao {
                 distrito.setId(rs.getInt("idDistrito"));
                 distrito.setNombre(rs.getString("nombre"));
                 lista.add(distrito);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+    
+    // Listar distritos por zona
+    public ArrayList<DistritoBean> listarDistritosPorZona(int zonaId) {
+        ArrayList<DistritoBean> lista = new ArrayList<>();
+        String sql = "SELECT idDistrito, nombre FROM distritos WHERE zona_id = ? ORDER BY nombre ASC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, zonaId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    DistritoBean distrito = new DistritoBean();
+                    distrito.setId(rs.getInt("idDistrito"));
+                    distrito.setNombre(rs.getString("nombre"));
+                    lista.add(distrito);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -1,32 +1,20 @@
 package com.example.telito.administrador.daos;
 import com.example.telito.administrador.beans.Rol;
 import com.example.telito.administrador.beans.Usuario;
+import com.example.telito.util.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 public class UsuarioDAO {
-
-    private String user = "root";
-    private String pass = "root";
-    private String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-
-    private Connection getConnection() throws SQLException {
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return DriverManager.getConnection(url, user, pass);
-    }
+    // Las credenciales ahora están centralizadas en DatabaseConnection
 
     // Este método es para la tabla principal de usuarios, con todos los filtros.
     public ArrayList<Usuario> listarUsuarios(String busqueda, String rolId, String estado, String sortBy, String sortOrder) {
 
         ArrayList<Usuario> listaUsuarios = new ArrayList<>();
         // La consulta base une usuarios con roles para mostrar el nombre del rol.
-        String sql = "SELECT u.*, r.nombre AS nombre_rol FROM usuarios u " +
+        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
                 "INNER JOIN roles r ON u.rol_id = r.id_rol WHERE 1=1";
 
         // Voy añadiendo a la consulta los filtros que el usuario haya usado.
@@ -59,7 +47,7 @@ public class UsuarioDAO {
         }
         sql += " ORDER BY " + columnaOrden + " " + direccionOrden;
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             int parameterIndex = 1;
@@ -104,7 +92,7 @@ public class UsuarioDAO {
     public void crearUsuario(Usuario usuario) {
         // Encripto el password con SHA2 para no guardarlo en texto plano.
         String sql = "INSERT INTO usuarios (nombres, apellidos, email, password, activo, rol_id) VALUES (?, ?, ?, SHA2(?, 256), 1, ?)";
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, usuario.getNombres());
             pstmt.setString(2, usuario.getApellidos());
@@ -120,10 +108,10 @@ public class UsuarioDAO {
     // Para cargar los datos de un usuario en el formulario de edición.
     public Usuario obtenerUsuarioPorId(int id) {
         Usuario usuario = null;
-        String sql = "SELECT u.*, r.nombre AS nombre_rol FROM usuarios u " +
+        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
                 "INNER JOIN roles r ON u.rol_id = r.id_rol WHERE u.id_usuario = ?";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
 
@@ -135,6 +123,7 @@ public class UsuarioDAO {
                     usuario.setApellidos(rs.getString("apellidos"));
                     usuario.setEmail(rs.getString("email"));
                     usuario.setActivo(rs.getBoolean("activo"));
+                    usuario.setFotoPerfil(rs.getString("foto_perfil"));
 
                     Rol rol = new Rol();
                     rol.setIdRol(rs.getInt("rol_id"));
@@ -147,11 +136,39 @@ public class UsuarioDAO {
         }
         return usuario;
     }
+    
+    // Actualiza solo el perfil del usuario (nombres, apellidos, foto)
+    public void actualizarPerfil(int idUsuario, String nombres, String apellidos, String fotoPerfil) {
+        String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, foto_perfil = ? WHERE id_usuario = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, nombres);
+            pstmt.setString(2, apellidos);
+            pstmt.setString(3, fotoPerfil);
+            pstmt.setInt(4, idUsuario);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // Actualiza solo la foto de perfil
+    public void actualizarFotoPerfil(int idUsuario, String fotoPerfil) {
+        String sql = "UPDATE usuarios SET foto_perfil = ? WHERE id_usuario = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, fotoPerfil);
+            pstmt.setInt(2, idUsuario);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     // Actualiza los datos del usuario desde el formulario de edición.
     public void actualizarUsuario(Usuario usuario) {
         String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, rol_id = ?, activo = ? WHERE id_usuario = ?";
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, usuario.getNombres());
             pstmt.setString(2, usuario.getApellidos());
@@ -168,7 +185,7 @@ public class UsuarioDAO {
     // Borrado lógico, para 'banear' al usuario sin borrarlo de la BD.
     public void deshabilitarUsuario(int id) {
         String sql = "UPDATE usuarios SET activo = 0 WHERE id_usuario = ?";
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
@@ -184,7 +201,7 @@ public class UsuarioDAO {
                 "INNER JOIN roles r ON u.rol_id = r.id_rol " +
                 "WHERE u.email = ? AND u.password = SHA2(?, 256) AND u.activo = 1";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
             pstmt.setString(2, password);
@@ -197,6 +214,7 @@ public class UsuarioDAO {
                     usuario.setApellidos(rs.getString("apellidos"));
                     usuario.setEmail(rs.getString("email"));
                     usuario.setActivo(rs.getBoolean("activo"));
+                    usuario.setFotoPerfil(rs.getString("foto_perfil"));
 
                     Rol rol = new Rol();
                     rol.setIdRol(rs.getInt("rol_id"));
@@ -214,7 +232,7 @@ public class UsuarioDAO {
     public int contarTotalUsuarios() {
         int total = 0;
         String sql = "SELECT COUNT(*) FROM usuarios";
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
@@ -230,7 +248,7 @@ public class UsuarioDAO {
     public int contarUsuariosBaneados() {
         int totalBaneados = 0;
         String sql = "SELECT COUNT(*) FROM usuarios WHERE activo = 0";
-        try (Connection conn = getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {

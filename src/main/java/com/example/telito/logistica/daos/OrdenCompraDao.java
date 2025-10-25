@@ -1,6 +1,7 @@
 package com.example.telito.logistica.daos;
 
 import com.example.telito.logistica.beans.OrdenCompraBean;
+import com.example.telito.util.DatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,17 +57,7 @@ public class OrdenCompraDao {
 
         sql += " ORDER BY oc.id_orden_compra DESC";
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-        String username = "root";
-        String password = "root";
-
-        try (Connection conn = DriverManager.getConnection(url, username, password);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             for (int i = 0; i < params.size(); i++) {
@@ -100,23 +91,15 @@ public class OrdenCompraDao {
     }
 
     // === CÓDIGO RESTAURADO ===
-    public void crearOrdenCompra(String numeroOrden, int proveedorId, int productoId, int cantidad, int usuarioId, double montoTotal) {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-        String username = "root";
-        String password = "root";
+    public void crearOrdenCompra(String numeroOrden, int proveedorId, int productoId, int cantidad, int usuarioId, double montoTotal, int distritoId) {
         String sql;
         boolean includeNumero = numeroOrden != null && !numeroOrden.isEmpty();
         if (includeNumero) {
-            sql = "INSERT INTO ordenes_compra (numero, proveedor_id, producto_id, cantidad, usuario_id, estado, monto_total) VALUES (?, ?, ?, ?, ?, 'Pendiente', ?)";
+            sql = "INSERT INTO ordenes_compra (numero_Orden, proveedor_id, producto_id, cantidad, usuario_id, estado, monto_total, distrito_id) VALUES (?, ?, ?, ?, ?, 'Pendiente', ?, ?)";
         } else {
-            sql = "INSERT INTO ordenes_compra (proveedor_id, producto_id, cantidad, usuario_id, estado, monto_total) VALUES (?, ?, ?, ?, 'Pendiente', ?)";
+            sql = "INSERT INTO ordenes_compra (proveedor_id, producto_id, cantidad, usuario_id, estado, monto_total, distrito_id) VALUES (?, ?, ?, ?, 'Pendiente', ?, ?)";
         }
-        try (Connection conn = DriverManager.getConnection(url, username, password);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             int idx = 1;
             if (includeNumero) {
@@ -126,7 +109,8 @@ public class OrdenCompraDao {
             pstmt.setInt(idx++, productoId);
             pstmt.setInt(idx++, cantidad);
             pstmt.setInt(idx++, usuarioId);
-            pstmt.setDouble(idx, montoTotal);
+            pstmt.setDouble(idx++, montoTotal);
+            pstmt.setInt(idx, distritoId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
