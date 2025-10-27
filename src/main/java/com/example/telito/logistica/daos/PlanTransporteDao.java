@@ -74,12 +74,7 @@ public class PlanTransporteDao {
         String sqlProducto = "SELECT producto_id FROM lotes WHERE id_lote = ?";
         String sqlInsert = "INSERT INTO planes_transporte (numero_plan, producto_id, lote_id, estado, conductor_id, vehiculo_id, fecha_entrega, distrito_id) VALUES (?, ?, ?, 'Pendiente', ?, ?, ?, ?)";
 
-        try { Class.forName("com.mysql.cj.jdbc.Driver"); } catch (ClassNotFoundException e) { throw new RuntimeException(e); }
-        String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-        String username = "root";
-        String password = "root";
-
-        try (Connection conn = DriverManager.getConnection(url, username, password)) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
             // 1. Obtener el producto_id
             int productoId = 0;
             try (PreparedStatement pstmtProducto = conn.prepareStatement(sqlProducto)) {
@@ -113,13 +108,7 @@ public class PlanTransporteDao {
     public int obtenerUltimoId() {
         String sql = "SELECT MAX(id_plan) FROM planes_transporte";
         int ultimoId = 0;
-
-        try { Class.forName("com.mysql.cj.jdbc.Driver"); } catch (ClassNotFoundException e) { throw new RuntimeException(e); }
-        String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-        String username = "root";
-        String password = "root";
-
-        try (Connection conn = DriverManager.getConnection(url, username, password);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             if (rs.next()) {

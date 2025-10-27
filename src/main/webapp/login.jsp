@@ -215,6 +215,24 @@
                     <label for="password"><i class="fas fa-lock me-2"></i>Contraseña</label>
                 </div>
 
+                <!-- Honeypot anti-bot (debe quedar vacío) -->
+                <div style="position:absolute; left:-9999px;">
+                    <label for="website">Website</label>
+                    <input type="text" id="website" name="website" autocomplete="off">
+                </div>
+
+                <!-- Desafío matemático simple -->
+                <div class="mb-3">
+                    <label class="form-label">Demuestra que no eres un robot</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-calculator me-2"></i>
+                            <%= request.getAttribute("captchaQuestion") != null ? request.getAttribute("captchaQuestion") : "" %>
+                        </span>
+                        <input type="number" class="form-control" name="captcha_answer" placeholder="Respuesta" required>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-login">
                     <i class="fas fa-sign-in-alt me-2"></i>
                     Iniciar Sesión

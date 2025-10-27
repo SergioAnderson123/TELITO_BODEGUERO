@@ -11,6 +11,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 @WebServlet(name = "LoginServlet", value = "/acceso/login")
 public class LoginServlet extends HttpServlet {
@@ -34,6 +39,13 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
+        // Generar desafío matemático simple y guardarlo en sesión
+        int a = 2 + (int)(Math.random() * 8); // 2..9
+        int b = 2 + (int)(Math.random() * 8);
+        HttpSession captchaSession = request.getSession(true);
+        captchaSession.setAttribute("captchaAnswer", a + b);
+        request.setAttribute("captchaQuestion", a + " + " + b + " = ?");
+
         RequestDispatcher view = request.getRequestDispatcher("/login.jsp");
         view.forward(request, response);
     }
@@ -42,6 +54,42 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+
+        // Anti-bot: validar honeypot y desafío matemático
+        String website = request.getParameter("website");
+        if (website != null && !website.trim().isEmpty()) {
+            request.setAttribute("errorMsg", "Verificación anti-bot fallida.");
+            // Regenerar pregunta
+            int a = 2 + (int)(Math.random() * 8);
+            int b = 2 + (int)(Math.random() * 8);
+            HttpSession s = request.getSession(true);
+            s.setAttribute("captchaAnswer", a + b);
+            request.setAttribute("captchaQuestion", a + " + " + b + " = ?");
+            RequestDispatcher view = request.getRequestDispatcher("/login.jsp");
+            view.forward(request, response);
+            return;
+        }
+
+        String captchaAnswerStr = request.getParameter("captcha_answer");
+        HttpSession s = request.getSession(false);
+        Integer expected = (s != null) ? (Integer) s.getAttribute("captchaAnswer") : null;
+        boolean captchaOk = false;
+        try {
+            int provided = Integer.parseInt(captchaAnswerStr);
+            captchaOk = (expected != null && provided == expected);
+        } catch (Exception ignored) { }
+        if (!captchaOk) {
+            request.setAttribute("errorMsg", "Respuesta del desafío incorrecta. Inténtalo nuevamente.");
+            // Regenerar pregunta
+            int na = 2 + (int)(Math.random() * 8);
+            int nb = 2 + (int)(Math.random() * 8);
+            HttpSession ns = request.getSession(true);
+            ns.setAttribute("captchaAnswer", na + nb);
+            request.setAttribute("captchaQuestion", na + " + " + nb + " = ?");
+            RequestDispatcher view = request.getRequestDispatcher("/login.jsp");
+            view.forward(request, response);
+            return;
+        }
 
         if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             request.setAttribute("errorMsg", "Por favor, complete todos los campos.");

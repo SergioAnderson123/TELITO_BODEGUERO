@@ -21,10 +21,8 @@ public class ProductoServlet extends HttpServlet {
 
         switch (action) {
             case "listarInventario": {
-                ArrayList<Producto> listaProductos = productoDAO.listarProductos();
-                request.setAttribute("lista", listaProductos);
-                RequestDispatcher rd = request.getRequestDispatcher("/administrador/inventario-general.jsp");
-                rd.forward(request, response);
+                // Redirigir al nuevo servlet consolidado que arma todas las secciones
+                response.sendRedirect(request.getContextPath() + "/administrador/inventario-general");
                 break;
             }
             case "listarStock": {

@@ -136,21 +136,11 @@ public class OrdenCompraDao {
         }
     }
 
-    // === CÓDIGO RESTAURADO (Y CAUSA DEL ERROR) ===
+    // === Método unificado: usa DatabaseConnection ===
     public int obtenerUltimoId() {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-        String username = "root";
-        String password = "root";
-
         String sql = "SELECT MAX(id_orden_compra) FROM ordenes_compra";
         int ultimoId = 0;
-
-        try (Connection conn = DriverManager.getConnection(url, username, password);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             if (rs.next()) {
