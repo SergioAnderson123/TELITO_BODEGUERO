@@ -47,9 +47,18 @@
                                                 <label for="tipoAlerta" class="form-label">Tipo de Alerta</label>
                                                 <select class="form-select" id="tipoAlerta" name="tipoAlerta" required>
                                                     <option value="">Selecciona un tipo</option>
-                                                    <option value="STOCK_MINIMO">Stock Mínimo</option>
-                                                    <option value="STOCK_CRITICO">Stock Crítico</option>
-                                                    <option value="VENCIMIENTO">Vencimiento</option>
+                                                    <optgroup label="Alertas por Lote (Almacén)">
+                                                        <option value="STOCK_MINIMO_LOTE">📦 Stock Mínimo por Lote</option>
+                                                        <option value="STOCK_CRITICO_LOTE">📦 Stock Crítico por Lote</option>
+                                                    </optgroup>
+                                                    <optgroup label="Alertas por Producto Total (Logística)">
+                                                        <option value="STOCK_MINIMO_TOTAL">📊 Stock Mínimo Total</option>
+                                                        <option value="STOCK_CRITICO_TOTAL">📊 Stock Crítico Total</option>
+                                                    </optgroup>
+                                                    <optgroup label="Otras Alertas">
+                                                        <option value="VENCIMIENTO">⏰ Próximo a Vencer</option>
+                                                        <option value="MOVIMIENTO">🔄 Movimiento de Inventario</option>
+                                                    </optgroup>
                                                 </select>
                                             </div>
                                         </div>

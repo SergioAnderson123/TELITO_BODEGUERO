@@ -17,6 +17,41 @@ public class LoteDao {
     // Las credenciales ahora están centralizadas en DatabaseConnection
 
     /**
+     * Genera un nuevo código de lote automático en formato L--0001, L--0002, etc.
+     * @return String con el nuevo código generado (ej: "L--0016")
+     */
+    public String generarNuevoCodigoLote() {
+        String sql = "SELECT codigo_lote FROM lotes WHERE codigo_lote LIKE 'L--%' ORDER BY id_lote DESC LIMIT 1";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            
+            if (rs.next()) {
+                String ultimoCodigo = rs.getString("codigo_lote");
+                // Extraer el número del código (ej: "L--0015" -> 15)
+                String numeroStr = ultimoCodigo.replaceAll("[^0-9]", "");
+                
+                if (!numeroStr.isEmpty()) {
+                    int ultimoNumero = Integer.parseInt(numeroStr);
+                    int nuevoNumero = ultimoNumero + 1;
+                    // Formatear con ceros a la izquierda (4 dígitos)
+                    return String.format("L--%04d", nuevoNumero);
+                }
+            }
+            
+            // Si no hay códigos previos, empezar desde L--0001
+            return "L--0001";
+            
+        } catch (SQLException e) {
+            System.err.println("Error al generar nuevo código de lote: " + e.getMessage());
+            e.printStackTrace();
+            // En caso de error, generar código con timestamp
+            return "L--" + System.currentTimeMillis();
+        }
+    }
+
+    /**
      * MÉTODO CORREGIDO
      * Registra un nuevo lote creado por un productor.
      * Asigna el estado 'No Registrado' por defecto.
@@ -61,20 +96,44 @@ public class LoteDao {
      */
     public boolean registrarLote(String codigoLote, String skuProducto, int cantidadStock,
                                  String fechaCaducidad, String distritoNombre) {
+        
+        System.out.println("=== DEBUG DAO - REGISTRAR LOTE ===");
+        System.out.println("Código Lote: " + codigoLote);
+        System.out.println("SKU Producto: " + skuProducto);
+        System.out.println("Cantidad Stock: " + cantidadStock);
+        System.out.println("Fecha Caducidad: " + fechaCaducidad);
+        System.out.println("Distrito Nombre: " + distritoNombre);
+        
         int productoId = obtenerIdProductoPorSKU(skuProducto);
+        System.out.println("Producto ID obtenido: " + productoId);
         if (productoId == 0) {
+            System.err.println("❌ ERROR: No se encontró producto con SKU: " + skuProducto);
             return false;
         }
+        
+        // Obtener unidades por paquete del producto
+        int unidadesPorPaquete = obtenerUnidadesPorPaquete(productoId);
+        
+        // Calcular stock real: paquetes × unidades por paquete
+        int stockReal = cantidadStock * unidadesPorPaquete;
+        System.out.println("📦 CÁLCULO: " + cantidadStock + " paquetes × " + unidadesPorPaquete + " unidades = " + stockReal + " unidades totales");
+        
         int ubicacionId = obtenerOCrearUbicacion(distritoNombre);
+        System.out.println("Ubicación ID obtenido/creado: " + ubicacionId);
         if (ubicacionId == 0) {
+            System.err.println("❌ ERROR: No se pudo obtener/crear ubicación: " + distritoNombre);
             return false;
         }
+        
         int distritoId = obtenerOCrearDistrito(distritoNombre);
+        System.out.println("Distrito ID obtenido/creado: " + distritoId);
         if (distritoId == 0) {
+            System.err.println("❌ ERROR: No se pudo obtener/crear distrito: " + distritoNombre);
             return false;
         }
 
         String sql = "INSERT INTO lotes (codigo_lote, producto_id, ubicacion_id, stock_actual, fecha_vencimiento, estado, distrito_id) VALUES (?, ?, ?, ?, ?, 'No Registrado', ?)";
+        System.out.println("SQL: " + sql);
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -82,12 +141,13 @@ public class LoteDao {
             pstmt.setString(1, codigoLote);
             pstmt.setInt(2, productoId);
             pstmt.setInt(3, ubicacionId);
-            pstmt.setInt(4, cantidadStock);
+            pstmt.setInt(4, stockReal); // Guardamos el stock calculado (no los paquetes)
 
             if (fechaCaducidad != null && !fechaCaducidad.isEmpty()) {
                 try {
                     // Intento formato ISO (yyyy-MM-dd) que envía <input type="date">
                     pstmt.setDate(5, java.sql.Date.valueOf(fechaCaducidad));
+                    System.out.println("Fecha parseada: " + fechaCaducidad);
                 } catch (IllegalArgumentException ex) {
                     // Intento dd/MM/yyyy por si el navegador envía ese formato
                     try {
@@ -95,22 +155,31 @@ public class LoteDao {
                         if (p.length == 3) {
                             String iso = p[2] + "-" + (p[1].length()==1? ("0"+p[1]) : p[1]) + "-" + (p[0].length()==1? ("0"+p[0]) : p[0]);
                             pstmt.setDate(5, java.sql.Date.valueOf(iso));
+                            System.out.println("Fecha parseada (dd/MM/yyyy): " + iso);
                         } else {
                             pstmt.setNull(5, java.sql.Types.DATE);
+                            System.out.println("Fecha inválida, usando NULL");
                         }
                     } catch (Exception e2) {
                         pstmt.setNull(5, java.sql.Types.DATE);
+                        System.out.println("Fecha inválida, usando NULL");
                     }
                 }
             } else {
                 pstmt.setNull(5, java.sql.Types.DATE);
+                System.out.println("Sin fecha de caducidad");
             }
             pstmt.setInt(6, distritoId);
 
-            return pstmt.executeUpdate() > 0;
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("✓ Filas insertadas: " + rowsAffected);
+            return rowsAffected > 0;
 
         } catch (SQLException e) {
-            System.err.println("ERROR: Error al registrar el lote (simple): " + e.getMessage());
+            System.err.println("❌ ERROR SQL al registrar el lote:");
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            System.err.println("Message: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -126,14 +195,17 @@ public class LoteDao {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     distritoId = rs.getInt("idDistrito");
+                    System.out.println("✓ Distrito encontrado: " + nombreDistrito + " (ID: " + distritoId + ")");
                 }
             }
         } catch (SQLException e) {
-            System.err.println("ERROR: Error al buscar distrito: " + e.getMessage());
+            System.err.println("❌ ERROR: Error al buscar distrito: " + e.getMessage());
+            e.printStackTrace();
         }
 
         if (distritoId == 0) {
-            String sqlInsert = "INSERT INTO distritos (nombre) VALUES (?)";
+            // Si no existe, usar zona_id = 5 (Centro) por defecto
+            String sqlInsert = "INSERT INTO distritos (nombre, zona_id) VALUES (?, 5)";
             try (Connection conn = DatabaseConnection.getConnection();
                  PreparedStatement pstmt = conn.prepareStatement(sqlInsert, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, nombreDistrito);
@@ -141,11 +213,13 @@ public class LoteDao {
                     try (ResultSet keys = pstmt.getGeneratedKeys()) {
                         if (keys.next()) {
                             distritoId = keys.getInt(1);
+                            System.out.println("✓ Distrito creado: " + nombreDistrito + " (ID: " + distritoId + ", zona_id: 5)");
                         }
                     }
                 }
             } catch (SQLException e) {
-                System.err.println("ERROR: Error al crear distrito: " + e.getMessage());
+                System.err.println("❌ ERROR: Error al crear distrito: " + e.getMessage());
+                e.printStackTrace();
             }
         }
         return distritoId;
@@ -158,22 +232,56 @@ public class LoteDao {
     public int obtenerIdProductoPorSKU(String sku) {
         int productoId = 0;
         String sql = "SELECT id_producto FROM productos WHERE UPPER(codigo_sku) = UPPER(?) AND activo = 1";
+        
+        String skuTrimmed = (sku == null) ? "" : sku.trim();
+        System.out.println("Buscando producto con SKU: '" + skuTrimmed + "'");
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, (sku == null) ? "" : sku.trim());
+            pstmt.setString(1, skuTrimmed);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     productoId = rs.getInt("id_producto");
+                    System.out.println("✓ Producto encontrado con SKU '" + skuTrimmed + "' (ID: " + productoId + ")");
+                } else {
+                    System.err.println("❌ No se encontró producto con SKU '" + skuTrimmed + "'");
                 }
             }
         } catch (SQLException e) {
-            System.err.println("ERROR: Error al buscar producto por SKU: " + e.getMessage());
+            System.err.println("❌ ERROR SQL al buscar producto por SKU: " + e.getMessage());
             e.printStackTrace();
         }
         return productoId;
+    }
+
+    /**
+     * Obtiene las unidades por paquete de un producto
+     * @param productoId ID del producto
+     * @return Número de unidades por paquete (por defecto 1 si no se encuentra)
+     */
+    public int obtenerUnidadesPorPaquete(int productoId) {
+        int unidadesPorPaquete = 1; // valor por defecto
+        String sql = "SELECT unidades_por_paquete FROM productos WHERE id_producto = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, productoId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    unidadesPorPaquete = rs.getInt("unidades_por_paquete");
+                    System.out.println("✓ Unidades por paquete del producto ID " + productoId + ": " + unidadesPorPaquete);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR al obtener unidades por paquete: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return unidadesPorPaquete;
     }
 
     /**
@@ -282,5 +390,58 @@ public class LoteDao {
             System.err.println("ERROR: Error al obtener stock total: " + e.getMessage());
         }
         return stockTotal;
+    }
+
+    /**
+     * Obtener los lotes disponibles de un productor para un producto específico
+     * @param productoId ID del producto
+     * @return Lista de arrays con los datos de cada lote
+     */
+    public List<Object[]> obtenerLotesDisponiblesParaProducto(int productoId) {
+        List<Object[]> lotes = new ArrayList<>();
+        String sql = "SELECT l.id_lote, l.codigo_lote, p.codigo_sku, p.nombre AS producto_nombre, " +
+                     "l.stock_actual, p.unidades_por_paquete, l.fecha_vencimiento " +
+                     "FROM lotes l " +
+                     "INNER JOIN productos p ON l.producto_id = p.id_producto " +
+                     "WHERE l.producto_id = ? AND l.stock_actual > 0 " +
+                     "AND l.id_lote NOT IN (SELECT lote_id FROM ordenes_compra WHERE lote_id IS NOT NULL) " +
+                     "ORDER BY l.fecha_vencimiento ASC";
+
+        System.out.println("=== DEBUG DAO - OBTENER LOTES PARA PRODUCTO ===");
+        System.out.println("Producto ID: " + productoId);
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, productoId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] lote = new Object[7];
+                    lote[0] = rs.getInt("id_lote");
+                    lote[1] = rs.getString("codigo_lote");
+                    lote[2] = rs.getString("codigo_sku");
+                    lote[3] = rs.getString("producto_nombre");
+                    
+                    int stockActual = rs.getInt("stock_actual");
+                    int unidadesPorPaquete = rs.getInt("unidades_por_paquete");
+                    int paquetes = (unidadesPorPaquete > 0) ? (stockActual / unidadesPorPaquete) : stockActual;
+                    
+                    lote[4] = paquetes; // Cantidad de paquetes
+                    lote[5] = stockActual; // Stock actual (unidades totales)
+                    lote[6] = rs.getDate("fecha_vencimiento"); // Puede ser null
+                    
+                    lotes.add(lote);
+                }
+                System.out.println("✓ Lotes encontrados: " + lotes.size());
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR: Error al obtener lotes para producto:");
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            System.err.println("Message: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return lotes;
     }
 }

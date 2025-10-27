@@ -63,23 +63,25 @@
                                         <tbody id="productTableBody">
                                         <c:forEach var="lote" items="${listaLotes}">
                                             <tr>
-                                                    <%-- CORREGIDO: Ahora muestra el SKU del producto --%>
-                                                <td>${lote.codigoLote}</td>
+                                                <td><span class="badge bg-secondary">${lote.codigoSKU}</span></td>
                                                 <td>${lote.nombreProducto}</td>
-                                                <td>${lote.codigoLote}</td>
-                                                <td>${lote.stockActual}</td>
+                                                <td><strong>${lote.codigoLote}</strong></td>
+                                                <td>${lote.paquetesDisponibles} paquetes</td>
                                                 <td>${lote.nombreUbicacion}</td>
                                                 <td>${lote.fechaVencimiento}</td>
                                                 <td>
                                                     <c:choose>
-                                                        <c:when test="${lote.stockActual == 0}">
+                                                        <c:when test="${lote.estadoStock == 'Sin Stock'}">
                                                             <span class="badge bg-danger">Sin Stock</span>
                                                         </c:when>
-                                                        <c:when test="${lote.stockActual > 0 && lote.stockActual <= 20}">
+                                                        <c:when test="${lote.estadoStock == 'Poco Stock'}">
                                                             <span class="badge bg-warning text-dark">Poco Stock</span>
                                                         </c:when>
-                                                        <c:otherwise>
+                                                        <c:when test="${lote.estadoStock == 'En Stock'}">
                                                             <span class="badge bg-success">En Stock</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="badge bg-secondary">No configurado</span>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>

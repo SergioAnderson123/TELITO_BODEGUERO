@@ -7,6 +7,7 @@ public class ProductoBean {
     private String codigo;
     private String nombre;
     private BigDecimal precio;
+    private int unidadesPorPaquete;
 
     public ProductoBean() {
     }
@@ -46,5 +47,13 @@ public class ProductoBean {
     // Sobrecarga para aceptar double
     public void setPrecio(double precio) {
         this.precio = BigDecimal.valueOf(precio);
+    }
+
+    public int getUnidadesPorPaquete() {
+        return unidadesPorPaquete;
+    }
+
+    public void setUnidadesPorPaquete(int unidadesPorPaquete) {
+        this.unidadesPorPaquete = unidadesPorPaquete;
     }
 }

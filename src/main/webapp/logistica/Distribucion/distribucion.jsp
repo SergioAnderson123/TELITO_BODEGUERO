@@ -51,6 +51,7 @@
                             <select id="filtroEstado" name="estado" class="form-select">
                                 <option value="" ${param.estado == '' ? 'selected' : ''}>Todos</option>
                                 <option value="Pendiente" ${param.estado == 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                                <option value="Salida" ${param.estado == 'Salida' ? 'selected' : ''}>Salida</option>
                                 <option value="En Ruta" ${param.estado == 'En Ruta' ? 'selected' : ''}>En Ruta</option>
                                 <option value="Entregado" ${param.estado == 'Entregado' ? 'selected' : ''}>Entregado</option>
                                 <option value="Cancelado" ${param.estado == 'Cancelado' ? 'selected' : ''}>Cancelado</option>
@@ -106,6 +107,8 @@
                                             <span class="badge bg-primary"><%= plan.getEstado() %></span>
                                             <% } else if ("Pendiente".equals(plan.getEstado())) { %>
                                             <span class="badge bg-warning text-dark"><%= plan.getEstado() %></span>
+                                            <% } else if ("Salida".equals(plan.getEstado())) { %>
+                                            <span class="badge bg-info"><%= plan.getEstado() %></span>
                                             <% } else if ("Cancelado".equals(plan.getEstado())) { %>
                                             <span class="badge bg-danger"><%= plan.getEstado() %></span>
                                             <% } else { %>

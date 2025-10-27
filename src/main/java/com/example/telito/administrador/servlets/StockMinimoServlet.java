@@ -124,13 +124,15 @@ public class StockMinimoServlet extends HttpServlet {
     private void crearConfiguracion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             int productoId = Integer.parseInt(request.getParameter("productoId"));
-            int stockMinimo = Integer.parseInt(request.getParameter("stockMinimo"));
-            int stockCritico = Integer.parseInt(request.getParameter("stockCritico"));
+            int stockMinimoLote = Integer.parseInt(request.getParameter("stockMinimoLote"));
+            int stockCriticoLote = Integer.parseInt(request.getParameter("stockCriticoLote"));
+            int stockMinimoProducto = Integer.parseInt(request.getParameter("stockMinimoProducto"));
+            int stockCriticoProducto = Integer.parseInt(request.getParameter("stockCriticoProducto"));
             boolean activo = request.getParameter("activo") != null;
 
-            // Verificar que el stock crítico sea menor o igual al stock mínimo
-            if (stockCritico > stockMinimo) {
-                request.setAttribute("error", "El stock crítico no puede ser mayor al stock mínimo");
+            // Verificar que los stocks críticos sean menores o iguales a los stocks mínimos
+            if (stockCriticoLote > stockMinimoLote || stockCriticoProducto > stockMinimoProducto) {
+                request.setAttribute("error", "Los stocks críticos no pueden ser mayores a los stocks mínimos");
                 listarConfiguraciones(request, response);
                 return;
             }
@@ -141,8 +143,10 @@ public class StockMinimoServlet extends HttpServlet {
 
             StockMinimoConfig config = new StockMinimoConfig();
             config.setProducto(producto);
-            config.setStockMinimo(stockMinimo);
-            config.setStockCritico(stockCritico);
+            config.setStockMinimoLote(stockMinimoLote);
+            config.setStockCriticoLote(stockCriticoLote);
+            config.setStockMinimoProducto(stockMinimoProducto);
+            config.setStockCriticoProducto(stockCriticoProducto);
             config.setActivo(activo);
 
             // Verificar si ya existe una configuración para este producto
@@ -174,30 +178,26 @@ public class StockMinimoServlet extends HttpServlet {
     private void actualizarConfiguracion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             int idStockMinimo = Integer.parseInt(request.getParameter("idStockMinimo"));
-            int stockMinimo = Integer.parseInt(request.getParameter("stockMinimo"));
-            int stockCritico = Integer.parseInt(request.getParameter("stockCritico"));
+            int stockMinimoLote = Integer.parseInt(request.getParameter("stockMinimoLote"));
+            int stockCriticoLote = Integer.parseInt(request.getParameter("stockCriticoLote"));
+            int stockMinimoProducto = Integer.parseInt(request.getParameter("stockMinimoProducto"));
+            int stockCriticoProducto = Integer.parseInt(request.getParameter("stockCriticoProducto"));
             boolean activo = request.getParameter("activo") != null;
 
-            // Verificar que el stock crítico sea menor o igual al stock mínimo
-            if (stockCritico > stockMinimo) {
-                request.setAttribute("error", "El stock crítico no puede ser mayor al stock mínimo");
+            // Verificar que los stocks críticos sean menores o iguales a los stocks mínimos
+            if (stockCriticoLote > stockMinimoLote || stockCriticoProducto > stockMinimoProducto) {
+                request.setAttribute("error", "Los stocks críticos no pueden ser mayores a los stocks mínimos");
                 listarConfiguraciones(request, response);
                 return;
             }
 
-            // Obtener configuración existente
-            StockMinimoConfig config = stockMinimoDAO.obtenerPorProducto(
-                    Integer.parseInt(request.getParameter("productoId"))
-            );
-
-            if (config == null) {
-                request.setAttribute("error", "Configuración no encontrada");
-                listarConfiguraciones(request, response);
-                return;
-            }
-
-            config.setStockMinimo(stockMinimo);
-            config.setStockCritico(stockCritico);
+            // Crear configuración con el ID existente
+            StockMinimoConfig config = new StockMinimoConfig();
+            config.setIdStockMinimo(idStockMinimo);
+            config.setStockMinimoLote(stockMinimoLote);
+            config.setStockCriticoLote(stockCriticoLote);
+            config.setStockMinimoProducto(stockMinimoProducto);
+            config.setStockCriticoProducto(stockCriticoProducto);
             config.setActivo(activo);
 
             boolean exito = stockMinimoDAO.actualizarConfiguracion(config);
@@ -242,8 +242,18 @@ public class StockMinimoServlet extends HttpServlet {
 
     private void aplicarConfiguracionGlobal(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            int stockMinimoGlobal = stockMinimoDAO.obtenerStockMinimoGlobal();
-            int stockCriticoGlobal = stockMinimoDAO.obtenerStockCriticoGlobal();
+            // Obtener valores del formulario enviado por el admin
+            int stockMinimoLote = Integer.parseInt(request.getParameter("stockMinimoLote"));
+            int stockCriticoLote = Integer.parseInt(request.getParameter("stockCriticoLote"));
+            int stockMinimoProducto = Integer.parseInt(request.getParameter("stockMinimoProducto"));
+            int stockCriticoProducto = Integer.parseInt(request.getParameter("stockCriticoProducto"));
+
+            // Validar que los stocks críticos sean menores o iguales a los stocks mínimos
+            if (stockCriticoLote > stockMinimoLote || stockCriticoProducto > stockMinimoProducto) {
+                request.setAttribute("error", "Los stocks críticos no pueden ser mayores a los stocks mínimos");
+                listarConfiguraciones(request, response);
+                return;
+            }
 
             // Obtener todos los productos
             ArrayList<Producto> listaProductos = productoDAO.listarProductos();
@@ -254,11 +264,13 @@ public class StockMinimoServlet extends HttpServlet {
                 StockMinimoConfig configExistente = stockMinimoDAO.obtenerPorProducto(producto.getIdProducto());
 
                 if (configExistente == null) {
-                    // Crear nueva configuración con valores globales
+                    // Crear nueva configuración con los valores elegidos por el admin
                     StockMinimoConfig config = new StockMinimoConfig();
                     config.setProducto(producto);
-                    config.setStockMinimo(stockMinimoGlobal);
-                    config.setStockCritico(stockCriticoGlobal);
+                    config.setStockMinimoLote(stockMinimoLote);
+                    config.setStockCriticoLote(stockCriticoLote);
+                    config.setStockMinimoProducto(stockMinimoProducto);
+                    config.setStockCriticoProducto(stockCriticoProducto);
                     config.setActivo(true);
 
                     if (stockMinimoDAO.crearConfiguracion(config)) {

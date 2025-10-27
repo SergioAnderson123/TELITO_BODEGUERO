@@ -6,15 +6,18 @@ public class Lote {
     private int idLote;
     private String codigoLote;
     private int stockActual;
+    private int paquetesDisponibles;
     private Date fechaVencimiento;
 
     // Campos de las tablas relacionadas para mostrar en la vista
     private String nombreProducto;
+    private String codigoSKU; // SKU del producto
     private String nombreUbicacion;
     private int productoId;
     private int ubicacionId;
     private int distritoId; // <-- AÑADIR ESTE CAMPO
     private String estado;
+    private String estadoStock; // Estado del stock: "En Stock", "Poco Stock", "Sin Stock", "No configurado"
 
     // --- AÑADIR GETTERS Y SETTERS PARA 'estado' ---
     public String getEstado() {
@@ -38,10 +41,14 @@ public class Lote {
     public void setCodigoLote(String codigoLote) { this.codigoLote = codigoLote; }
     public int getStockActual() { return stockActual; }
     public void setStockActual(int stockActual) { this.stockActual = stockActual; }
+    public int getPaquetesDisponibles() { return paquetesDisponibles; }
+    public void setPaquetesDisponibles(int paquetesDisponibles) { this.paquetesDisponibles = paquetesDisponibles; }
     public Date getFechaVencimiento() { return fechaVencimiento; }
     public void setFechaVencimiento(Date fechaVencimiento) { this.fechaVencimiento = fechaVencimiento; }
     public String getNombreProducto() { return nombreProducto; }
     public void setNombreProducto(String nombreProducto) { this.nombreProducto = nombreProducto; }
+    public String getCodigoSKU() { return codigoSKU; }
+    public void setCodigoSKU(String codigoSKU) { this.codigoSKU = codigoSKU; }
     public String getNombreUbicacion() { return nombreUbicacion; }
     public void setNombreUbicacion(String nombreUbicacion) { this.nombreUbicacion = nombreUbicacion; }
     public int getProductoId() { return productoId; }
@@ -50,5 +57,13 @@ public class Lote {
 
     public void setUbicacionId(int ubicacionId) {
         this.ubicacionId = ubicacionId;
+    }
+    
+    public String getEstadoStock() {
+        return estadoStock;
+    }
+    
+    public void setEstadoStock(String estadoStock) {
+        this.estadoStock = estadoStock;
     }
 }

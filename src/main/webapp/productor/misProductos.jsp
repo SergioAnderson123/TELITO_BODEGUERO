@@ -357,11 +357,11 @@
             <h2>Agregar Nuevo Producto</h2>
             <span class="modal-close">&times;</span>
         </div>
-        <form method="POST" action="ProductorServlet?action=crearProducto">
+        <form method="POST" action="<%= request.getContextPath() %>/ProductorServlet?action=crearProducto" id="formAgregarProducto">
             <div style="display: flex; gap: 20px;">
-                <div style="flex: 1;"><label for="productName">Nombre del producto</label><input type="text" name="productName" required></div>
+                <div style="flex: 1;"><label for="productName">Nombre del producto</label><input type="text" name="productName" id="productName" required></div>
                 <div style="flex: 1;"><label for="productCategory">Categoría</label>
-                    <select name="productCategory" required>
+                    <select name="productCategory" id="productCategory" required>
                         <option value="">Seleccionar...</option>
                         <% if (todasLasCategorias != null) { %>
                             <% for (Categoria categoria : todasLasCategorias) { %>
@@ -372,13 +372,29 @@
                 </div>
             </div>
             <div style="display: flex; gap: 20px; margin-top: 15px;">
-                <div style="flex: 1;"><label for="productSKU">SKU</label><input type="text" name="productSKU" required></div>
-                <div style="flex: 1;"><label for="productPrice">Precio (S/)</label><input type="number" name="productPrice" step="0.01" required></div>
+                <div style="flex: 1;">
+                    <label for="productSKUDisplay">SKU (generado automáticamente)</label>
+                    <input type="text" id="productSKUDisplay" readonly style="background-color: #f0f0f0; cursor: not-allowed;" placeholder="Cargando...">
+                    <small style="color: var(--text-muted); display: block; margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> El SKU se genera automáticamente
+                    </small>
+                </div>
+                <div style="flex: 1;"><label for="productPrice">Precio por Paquete (S/)</label><input type="number" name="productPrice" id="productPrice" step="0.01" required></div>
             </div>
-            <div style="margin-top: 15px;"><label for="productDescription">Descripción</label><textarea name="productDescription" rows="3"></textarea></div>
+            <div style="display: flex; gap: 20px; margin-top: 15px;">
+                <div style="flex: 1;">
+                    <label for="productUnits">Unidades por Paquete</label>
+                    <input type="number" name="productUnits" id="productUnits" min="1" value="1" required>
+                    <small style="color: var(--text-muted); display: block; margin-top: 5px;">
+                        <i class="fas fa-box"></i> Ej: Si vende cerveza en cajas de 12, ingrese 12
+                    </small>
+                </div>
+                <div style="flex: 1;"></div>
+            </div>
+            <div style="margin-top: 15px;"><label for="productDescription">Descripción</label><textarea name="productDescription" id="productDescription" rows="3"></textarea></div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary modal-cancel">Cancelar</button>
-                <button type="submit">Guardar Producto</button>
+                <button type="submit" id="btnGuardarProducto">Guardar Producto</button>
             </div>
         </form>
     </div>
@@ -392,8 +408,45 @@
     const openBtn = document.getElementById('openModalBtn');
     const closeBtn = document.querySelector('.modal-close');
     const cancelBtn = document.querySelector('.modal-cancel');
+    const skuDisplay = document.getElementById('productSKUDisplay');
 
-    openBtn.onclick = function() { modal.style.display = "block"; }
+    // Función para cargar el siguiente SKU disponible
+    function cargarNuevoSKU() {
+        skuDisplay.value = 'Cargando...';
+        skuDisplay.style.color = '#999';
+        
+        const contextPath = '<%= request.getContextPath() %>';
+        fetch(contextPath + '/ProductorServlet?action=obtenerNuevoSKU')
+            .then(response => response.json())
+            .then(data => {
+                if (data.sku) {
+                    skuDisplay.value = data.sku;
+                    skuDisplay.style.color = '#28a745'; // Color verde para indicar éxito
+                    skuDisplay.style.fontWeight = 'bold';
+                } else {
+                    skuDisplay.value = 'Error al generar SKU';
+                    skuDisplay.style.color = '#dc3545';
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener SKU:', error);
+                skuDisplay.value = 'Error de conexión';
+                skuDisplay.style.color = '#dc3545';
+            });
+    }
+
+    // Al abrir el modal, cargar el nuevo SKU
+    openBtn.onclick = function() { 
+        modal.style.display = "block";
+        cargarNuevoSKU(); // Cargar el SKU automáticamente
+        // Limpiar solo los campos editables (no borrar las opciones del select)
+        document.getElementById('productName').value = '';
+        document.getElementById('productCategory').selectedIndex = 0; // Volver a "Seleccionar..."
+        document.getElementById('productDescription').value = '';
+        document.getElementById('productPrice').value = '';
+        document.getElementById('productUnits').value = '1';
+    }
+    
     closeBtn.onclick = function() { modal.style.display = "none"; }
     cancelBtn.onclick = function() { modal.style.display = "none"; }
     window.onclick = function(event) { if (event.target == modal) { modal.style.display = "none"; } }

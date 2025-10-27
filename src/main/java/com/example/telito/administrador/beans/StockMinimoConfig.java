@@ -6,8 +6,10 @@ public class StockMinimoConfig {
 
     private int idStockMinimo;
     private Producto producto;
-    private int stockMinimo;
-    private int stockCritico;
+    private int stockMinimoProducto;  // Stock mínimo para evaluación por producto (Logística)
+    private int stockCriticoProducto; // Stock crítico para evaluación por producto (Logística)
+    private int stockMinimoLote;      // Stock mínimo para evaluación por lote (Almacén)
+    private int stockCriticoLote;     // Stock crítico para evaluación por lote (Almacén)
     private boolean activo;
     private Timestamp fechaCreacion;
     private Timestamp fechaActualizacion;
@@ -15,10 +17,13 @@ public class StockMinimoConfig {
     // Constructores
     public StockMinimoConfig() {}
 
-    public StockMinimoConfig(Producto producto, int stockMinimo, int stockCritico) {
+    public StockMinimoConfig(Producto producto, int stockMinimoProducto, int stockCriticoProducto, 
+                            int stockMinimoLote, int stockCriticoLote) {
         this.producto = producto;
-        this.stockMinimo = stockMinimo;
-        this.stockCritico = stockCritico;
+        this.stockMinimoProducto = stockMinimoProducto;
+        this.stockCriticoProducto = stockCriticoProducto;
+        this.stockMinimoLote = stockMinimoLote;
+        this.stockCriticoLote = stockCriticoLote;
         this.activo = true;
     }
 
@@ -39,20 +44,36 @@ public class StockMinimoConfig {
         this.producto = producto;
     }
 
-    public int getStockMinimo() {
-        return stockMinimo;
+    public int getStockMinimoProducto() {
+        return stockMinimoProducto;
     }
 
-    public void setStockMinimo(int stockMinimo) {
-        this.stockMinimo = stockMinimo;
+    public void setStockMinimoProducto(int stockMinimoProducto) {
+        this.stockMinimoProducto = stockMinimoProducto;
     }
 
-    public int getStockCritico() {
-        return stockCritico;
+    public int getStockCriticoProducto() {
+        return stockCriticoProducto;
     }
 
-    public void setStockCritico(int stockCritico) {
-        this.stockCritico = stockCritico;
+    public void setStockCriticoProducto(int stockCriticoProducto) {
+        this.stockCriticoProducto = stockCriticoProducto;
+    }
+
+    public int getStockMinimoLote() {
+        return stockMinimoLote;
+    }
+
+    public void setStockMinimoLote(int stockMinimoLote) {
+        this.stockMinimoLote = stockMinimoLote;
+    }
+
+    public int getStockCriticoLote() {
+        return stockCriticoLote;
+    }
+
+    public void setStockCriticoLote(int stockCriticoLote) {
+        this.stockCriticoLote = stockCriticoLote;
     }
 
     public boolean isActivo() {
@@ -84,8 +105,10 @@ public class StockMinimoConfig {
         return "StockMinimoConfig{" +
                 "idStockMinimo=" + idStockMinimo +
                 ", producto=" + (producto != null ? producto.getNombre() : "null") +
-                ", stockMinimo=" + stockMinimo +
-                ", stockCritico=" + stockCritico +
+                ", stockMinimoProducto=" + stockMinimoProducto +
+                ", stockCriticoProducto=" + stockCriticoProducto +
+                ", stockMinimoLote=" + stockMinimoLote +
+                ", stockCriticoLote=" + stockCriticoLote +
                 ", activo=" + activo +
                 '}';
     }

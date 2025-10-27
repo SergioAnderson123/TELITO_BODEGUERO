@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.*" %>
 <%--
     JSP: Órdenes de Compra
     Propósito: Mostrar las órdenes de compra del productor con detalles de productos, lotes y destinos.
@@ -13,21 +14,26 @@
 --%>
 
 <%
-    // Datos de ejemplo para la vista (en producción vendrían del servlet)
-    List<Object> listaOrdenes = (List<Object>) request.getAttribute("listaOrdenes");
+    // Obtener datos del servlet
+    List<Object[]> listaOrdenes = (List<Object[]>) request.getAttribute("listaOrdenes");
     if (listaOrdenes == null) {
         listaOrdenes = new ArrayList<>();
-        // Datos de ejemplo para demostración
-        listaOrdenes.add(new Object[]{"ORD-2025-001", "Coca Cola 500ml", 15, 2.50, "Miraflores", "Pendiente"});
-        listaOrdenes.add(new Object[]{"ORD-2025-002", "Pan Bimbo Integral", 8, 4.20, "San Isidro", "Completada"});
-        listaOrdenes.add(new Object[]{"ORD-2025-003", "Leche Gloria 1L", 12, 3.80, "La Molina", "Pendiente"});
-        listaOrdenes.add(new Object[]{"ORD-2025-004", "Arroz Superior 5kg", 6, 8.50, "Surco", "Completada"});
-        listaOrdenes.add(new Object[]{"ORD-2025-005", "Aceite Primor 900ml", 10, 6.20, "Barranco", "Pendiente"});
     }
     
-    int totalOrdenes = (request.getAttribute("totalOrdenes") != null) ? (int) request.getAttribute("totalOrdenes") : listaOrdenes.size();
-    int ordenesPendientes = (request.getAttribute("ordenesPendientes") != null) ? (int) request.getAttribute("ordenesPendientes") : 3;
-    int ordenesCompletadas = (request.getAttribute("ordenesCompletadas") != null) ? (int) request.getAttribute("ordenesCompletadas") : 2;
+    // Calcular estadísticas desde la lista real
+    int totalOrdenes = listaOrdenes.size();
+    int ordenesPendientes = 0;
+    int ordenesCompletadas = 0;
+    
+    for (Object[] orden : listaOrdenes) {
+        String estado = (String) orden[6]; // índice 6 = estado
+        if ("Pendiente".equals(estado) || "Aprobado".equals(estado)) {
+            ordenesPendientes++;
+        } else if ("Recibido".equals(estado)) {
+            ordenesCompletadas++;
+        }
+        // Rechazado no se cuenta en ninguna categoría
+    }
 %>
 
 <!DOCTYPE html>
@@ -357,9 +363,9 @@
                             <th>#</th>
                             <th>Código de Orden</th>
                             <th>Nombre del Producto</th>
-                            <th>Cantidad de Lotes</th>
+                            <th>Cantidad de Paquetes</th>
                             <th>Precio</th>
-                            <th>Destino</th>
+                            <th>Solicitante de compra</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -368,40 +374,115 @@
                         <% int i = 1; %>
                         <% for (Object orden : listaOrdenes) { %>
                             <% Object[] ordenData = (Object[]) orden; %>
-                            <tr data-codigo="<%= ordenData[0] %>" 
-                                data-producto="<%= ordenData[1] %>" 
-                                data-estado="<%= ordenData[5] %>" 
-                                data-destino="<%= ordenData[4] %>">
+                            <tr data-codigo="<%= ordenData[1] %>" 
+                                data-producto="<%= ordenData[2] %>" 
+                                data-estado="<%= ordenData[6] %>" 
+                                data-destino="<%= ordenData[5] %>">
                                 <td><%= i++ %></td>
-                                <td><strong><%= ordenData[0] %></strong></td>
-                                <td><%= ordenData[1] %></td>
+                                <td><strong><%= ordenData[1] %></strong></td>
+                                <td><%= ordenData[2] %></td>
+                                <td><%= ordenData[3] %> paquetes</td>
+                                <td><strong>S/ <%= String.format("%.2f", (Double) ordenData[4]) %></strong></td>
+                                <td><%= ordenData[5] %></td>
                                 <td>
-                                    <span class="badge bg-primary">
-                                        <%= ordenData[2] %> lotes
-                                    </span>
-                                </td>
-                                <td><strong>S/ <%= String.format("%.2f", (Double) ordenData[3]) %></strong></td>
-                                <td><%= ordenData[4] %></td>
-                                <td>
-                                    <% if ("Pendiente".equals(ordenData[5])) { %>
+                                    <% 
+                                        String estadoOrden = (String) ordenData[6];
+                                        if ("Pendiente".equals(estadoOrden)) { 
+                                    %>
                                         <span class="badge-pendiente">
                                             <i class="fas fa-clock me-1"></i>Pendiente
                                         </span>
+                                    <% } else if ("Aprobado".equals(estadoOrden)) { %>
+                                        <span class="badge" style="background: linear-gradient(160deg, #007bff 0%, #0056b3 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                                            <i class="fas fa-thumbs-up me-1"></i>Aprobado
+                                        </span>
+                                    <% } else if ("Recibido".equals(estadoOrden)) { %>
+                                        <span class="badge-completada" style="cursor: pointer;" onclick="cambiarEstado(<%= ordenData[0] %>, 'En Proceso', this)" title="Click para cambiar a 'En Proceso'">
+                                            <i class="fas fa-check me-1"></i>Recibido
+                                        </span>
+                                    <% } else if ("En Proceso".equals(estadoOrden)) { %>
+                                        <span class="badge" style="background: linear-gradient(160deg, #ffc107 0%, #ff9800 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                                            <i class="fas fa-spinner me-1"></i>En Proceso
+                                        </span>
+                                    <% } else if ("Rechazado".equals(estadoOrden)) { %>
+                                        <span class="badge" style="background: linear-gradient(160deg, #dc3545 0%, #c82333 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                                            <i class="fas fa-times me-1"></i>Rechazado
+                                        </span>
                                     <% } else { %>
                                         <span class="badge-completada">
-                                            <i class="fas fa-check me-1"></i>Completada
+                                            <i class="fas fa-check me-1"></i><%= estadoOrden %>
                                         </span>
                                     <% } %>
                                 </td>
                                 <td>
-                                    <a href="#" class="btn-view" onclick="verOrden('<%= ordenData[0] %>')">
-                                        <i class="fas fa-eye"></i>Ver Orden
+                                    <% if ("En Proceso".equals(estadoOrden)) { %>
+                                        <a href="#" class="btn-view" onclick="editarOrden('<%= ordenData[0] %>')">
+                                            <i class="fas fa-edit"></i>Editar
                                     </a>
+                                    <% } %>
                                 </td>
                             </tr>
                         <% } %>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Asignar Lote a Orden -->
+<div class="modal fade" id="asignarLoteModal" tabindex="-1" aria-labelledby="asignarLoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="modal-title" id="asignarLoteModalLabel">
+                    <i class="fas fa-boxes me-2"></i>Asignar Lote a Orden
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="loadingLotes" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Cargando lotes disponibles...</p>
+                </div>
+                <div id="tableLotesContainer" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Orden:</strong> <span id="modalOrdenNumero"></span> | 
+                        <strong>Producto:</strong> <span id="modalProductoNombre"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 50px;">Seleccionar</th>
+                                    <th>Código Lote</th>
+                                    <th>SKU</th>
+                                    <th>Producto</th>
+                                    <th>Paquetes</th>
+                                    <th>Fecha de Vencimiento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableLotesBody">
+                                <!-- Los lotes se cargarán dinámicamente aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="noLotesMessage" class="alert alert-warning" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        No hay lotes disponibles para este producto.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 2px solid #e9ecef;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-arrow-left me-2"></i>Volver
+                </button>
+                <button type="button" class="btn btn-primary" id="btnEnviarLote" onclick="asignarLoteAOrden()">
+                    <i class="fas fa-paper-plane me-2"></i>Enviar
+                </button>
             </div>
         </div>
     </div>
@@ -425,7 +506,7 @@
     function applyFilters() {
         const searchTerm = normalize(searchInput.value);
         const status = statusFilter.value;
-        const destino = destinoFilter.value;
+        const solicitante = destinoFilter.value;
 
         const rows = Array.from(tbody.querySelectorAll('tr'));
 
@@ -433,15 +514,15 @@
             const codigo = normalize(row.dataset.codigo);
             const producto = normalize(row.dataset.producto);
             const rowStatus = row.dataset.estado;
-            const rowDestino = row.dataset.destino;
+            const rowSolicitante = normalize(row.dataset.solicitante);
 
             const matchesSearch = !searchTerm || 
                 codigo.includes(searchTerm) || 
                 producto.includes(searchTerm);
             const matchesStatus = !status || rowStatus === status;
-            const matchesDestino = !destino || rowDestino === destino;
+            const matchesSolicitante = !solicitante || rowSolicitante.includes(normalize(solicitante));
 
-            row.style.display = (matchesSearch && matchesStatus && matchesDestino) ? '' : 'none';
+            row.style.display = (matchesSearch && matchesStatus && matchesSolicitante) ? '' : 'none';
         });
     }
 
@@ -457,10 +538,248 @@
     statusFilter.addEventListener('change', applyFilters);
     destinoFilter.addEventListener('change', applyFilters);
 
-    // Función para ver orden (placeholder)
-    function verOrden(codigoOrden) {
-        alert('Ver detalles de la orden: ' + codigoOrden + '\n\nEsta funcionalidad se implementará próximamente.');
-        // Aquí se podría abrir un modal o redirigir a una página de detalles
+    // Variables globales para el modal
+    let ordenActualId = null;
+    let ordenActualNumero = null;
+    let productoActualNombre = null;
+    let productoActualId = null;
+    let loteSeleccionadoId = null;
+
+    // Función para editar orden (asignar lote)
+    function editarOrden(idOrden) {
+        // Buscar los datos de la orden en la tabla
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        let ordenData = null;
+        
+        for (let row of rows) {
+            const cells = row.querySelectorAll('td');
+            if (cells.length > 0) {
+                // Buscar por el ID de la orden (necesitamos agregarlo como data-attribute)
+                // Por ahora usamos el índice de la fila
+                ordenData = {
+                    numero: cells[1].textContent.trim(),
+                    producto: cells[2].textContent.trim()
+                };
+                break;
+            }
+        }
+        
+        // Guardar datos globales
+        ordenActualId = idOrden;
+        ordenActualNumero = ordenData ? ordenData.numero : idOrden;
+        productoActualNombre = ordenData ? ordenData.producto : 'Producto';
+        loteSeleccionadoId = null;
+        
+        // Actualizar información en el modal
+        document.getElementById('modalOrdenNumero').textContent = ordenActualNumero;
+        document.getElementById('modalProductoNombre').textContent = productoActualNombre;
+        
+        // Mostrar loading
+        document.getElementById('loadingLotes').style.display = 'block';
+        document.getElementById('tableLotesContainer').style.display = 'none';
+        
+        // Abrir el modal
+        const modal = new bootstrap.Modal(document.getElementById('asignarLoteModal'));
+        modal.show();
+        
+        // Cargar los lotes disponibles
+        cargarLotesDisponibles(idOrden);
+    }
+    
+    // Función para cargar lotes disponibles
+    function cargarLotesDisponibles(idOrden) {
+        console.log('=== CARGANDO LOTES ===');
+        console.log('ID Orden:', idOrden);
+        
+        const url = '<%= request.getContextPath() %>/ProductorServlet?action=obtenerLotesParaOrden&idOrden=' + idOrden;
+        console.log('URL:', url);
+        
+        fetch(url)
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                return response.text();
+            })
+            .then(text => {
+                console.log('Response text:', text);
+                const data = JSON.parse(text);
+                console.log('Data parsed:', data);
+                console.log('data.success:', data.success);
+                console.log('data.lotes:', data.lotes);
+                console.log('data.lotes.length:', data.lotes ? data.lotes.length : 'undefined');
+                
+                document.getElementById('loadingLotes').style.display = 'none';
+                document.getElementById('tableLotesContainer').style.display = 'block';
+                
+                if (data.success && data.lotes && data.lotes.length > 0) {
+                    console.log('✓ Mostrando lotes en tabla...');
+                    productoActualId = data.productoId;
+                    mostrarLotesEnTabla(data.lotes);
+                    document.getElementById('noLotesMessage').style.display = 'none';
+                } else {
+                    console.log('❌ No hay lotes disponibles o error');
+                    document.getElementById('tableLotesBody').innerHTML = '';
+                    document.getElementById('noLotesMessage').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('❌ ERROR al cargar lotes:', error);
+                document.getElementById('loadingLotes').style.display = 'none';
+                alert('Error al cargar los lotes disponibles: ' + error.message);
+            });
+    }
+    
+    // Función para mostrar lotes en la tabla
+    function mostrarLotesEnTabla(lotes) {
+        const tbody = document.getElementById('tableLotesBody');
+        tbody.innerHTML = '';
+        
+        console.log('=== MOSTRAR LOTES EN TABLA ===');
+        console.log('Total lotes:', lotes.length);
+        
+        lotes.forEach((lote, index) => {
+            console.log('Lote ' + index + ':', lote);
+            console.log('  ID:', lote.id);
+            console.log('  codigoLote:', lote.codigoLote);
+            console.log('  sku:', lote.sku);
+            console.log('  producto:', lote.producto);
+            console.log('  paquetes:', lote.paquetes);
+            console.log('  fechaVencimiento:', lote.fechaVencimiento);
+            
+            const row = document.createElement('tr');
+            row.style.cursor = 'pointer';
+            row.onclick = function() {
+                seleccionarLote(lote.id, row);
+            };
+            
+            const codigoLoteVal = lote.codigoLote || 'N/A';
+            const skuVal = lote.sku || 'N/A';
+            const productoVal = lote.producto || 'N/A';
+            const paquetesVal = lote.paquetes || 0;
+            const fechaVal = lote.fechaVencimiento || '<span class="text-muted">Sin fecha</span>';
+            
+            console.log('Valores antes de generar HTML:');
+            console.log('  codigoLoteVal:', codigoLoteVal);
+            console.log('  skuVal:', skuVal);
+            console.log('  productoVal:', productoVal);
+            console.log('  paquetesVal:', paquetesVal);
+            console.log('  fechaVal:', fechaVal);
+            
+            // Usar concatenación en lugar de template literals
+            row.innerHTML = 
+                '<td class="text-center">' +
+                    '<input type="radio" name="loteSeleccionado" value="' + lote.id + '" class="form-check-input" style="width: 20px; height: 20px;">' +
+                '</td>' +
+                '<td><strong>' + codigoLoteVal + '</strong></td>' +
+                '<td><span class="badge bg-secondary">' + skuVal + '</span></td>' +
+                '<td>' + productoVal + '</td>' +
+                '<td><span class="badge bg-primary">' + paquetesVal + ' paquetes</span></td>' +
+                '<td>' + fechaVal + '</td>';
+            
+            console.log('HTML generado:', row.innerHTML);
+            
+            tbody.appendChild(row);
+        });
+        
+        console.log('✓ Tabla renderizada');
+    }
+    
+    // Función para seleccionar un lote
+    function seleccionarLote(idLote, row) {
+        // Desmarcar todas las filas
+        const rows = document.querySelectorAll('#tableLotesBody tr');
+        rows.forEach(r => r.classList.remove('table-active'));
+        
+        // Marcar la fila seleccionada
+        row.classList.add('table-active');
+        
+        // Seleccionar el radio button
+        const radio = row.querySelector('input[type="radio"]');
+        radio.checked = true;
+        
+        // Guardar el ID del lote seleccionado
+        loteSeleccionadoId = idLote;
+    }
+    
+    // Función para asignar el lote a la orden
+    function asignarLoteAOrden() {
+        if (!loteSeleccionadoId) {
+            alert('Por favor, selecciona un lote antes de enviar.');
+            return;
+        }
+        
+        // Deshabilitar el botón
+        const btnEnviar = document.getElementById('btnEnviarLote');
+        btnEnviar.disabled = true;
+        btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
+        
+        // Enviar la asignación al servidor
+        fetch('<%= request.getContextPath() %>/ProductorServlet?action=asignarLoteAOrden', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'idOrden=' + ordenActualId + '&idLote=' + loteSeleccionadoId
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✓ Lote asignado correctamente a la orden');
+                // Cerrar el modal
+                bootstrap.Modal.getInstance(document.getElementById('asignarLoteModal')).hide();
+                // Recargar la página para ver los cambios
+                location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'No se pudo asignar el lote'));
+                btnEnviar.disabled = false;
+                btnEnviar.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Enviar';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error de conexión al asignar el lote');
+            btnEnviar.disabled = false;
+            btnEnviar.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Enviar';
+        });
+    }
+
+    // Función para cambiar estado de una orden
+    function cambiarEstado(idOrden, nuevoEstado, elemento) {
+        if (!confirm('¿Deseas cambiar el estado de esta orden a "' + nuevoEstado + '"?')) {
+            return;
+        }
+
+        // Mostrar indicador de carga
+        elemento.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Procesando...';
+        elemento.style.pointerEvents = 'none';
+
+        // Hacer petición AJAX
+        fetch('<%= request.getContextPath() %>/ProductorServlet?action=cambiarEstadoOrden', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'idOrden=' + idOrden + '&nuevoEstado=' + encodeURIComponent(nuevoEstado)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Actualizar el badge con el nuevo estado
+                elemento.outerHTML = '<span class="badge" style="background: linear-gradient(160deg, #ffc107 0%, #ff9800 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;"><i class="fas fa-spinner me-1"></i>En Proceso</span>';
+            } else {
+                alert('Error al cambiar el estado: ' + (data.message || 'Error desconocido'));
+                // Restaurar el badge original
+                elemento.innerHTML = '<i class="fas fa-check me-1"></i>Recibido';
+                elemento.style.pointerEvents = 'auto';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error de conexión al cambiar el estado');
+            // Restaurar el badge original
+            elemento.innerHTML = '<i class="fas fa-check me-1"></i>Recibido';
+            elemento.style.pointerEvents = 'auto';
+        });
     }
 
     // Inicializar filtros

@@ -26,8 +26,10 @@ public class StockMinimoDAO {
             while (rs.next()) {
                 StockMinimoConfig config = new StockMinimoConfig();
                 config.setIdStockMinimo(rs.getInt("id_stock_minimo"));
-                config.setStockMinimo(rs.getInt("stock_minimo"));
-                config.setStockCritico(rs.getInt("stock_critico"));
+                config.setStockMinimoProducto(rs.getInt("stock_minimo_producto"));
+                config.setStockCriticoProducto(rs.getInt("stock_critico_producto"));
+                config.setStockMinimoLote(rs.getInt("stock_minimo_lote"));
+                config.setStockCriticoLote(rs.getInt("stock_critico_lote"));
                 config.setActivo(rs.getBoolean("activo"));
                 config.setFechaCreacion(rs.getTimestamp("fecha_creacion"));
                 config.setFechaActualizacion(rs.getTimestamp("fecha_actualizacion"));
@@ -60,8 +62,10 @@ public class StockMinimoDAO {
             if (rs.next()) {
                 StockMinimoConfig config = new StockMinimoConfig();
                 config.setIdStockMinimo(rs.getInt("id_stock_minimo"));
-                config.setStockMinimo(rs.getInt("stock_minimo"));
-                config.setStockCritico(rs.getInt("stock_critico"));
+                config.setStockMinimoProducto(rs.getInt("stock_minimo_producto"));
+                config.setStockCriticoProducto(rs.getInt("stock_critico_producto"));
+                config.setStockMinimoLote(rs.getInt("stock_minimo_lote"));
+                config.setStockCriticoLote(rs.getInt("stock_critico_lote"));
                 config.setActivo(rs.getBoolean("activo"));
                 config.setFechaCreacion(rs.getTimestamp("fecha_creacion"));
                 config.setFechaActualizacion(rs.getTimestamp("fecha_actualizacion"));
@@ -80,15 +84,17 @@ public class StockMinimoDAO {
 
     // Crear nueva configuración
     public boolean crearConfiguracion(StockMinimoConfig config) {
-        String sql = "INSERT INTO stock_minimo_config (producto_id, stock_minimo, stock_critico, activo) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO stock_minimo_config (producto_id, stock_minimo_producto, stock_critico_producto, stock_minimo_lote, stock_critico_lote, activo) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, config.getProducto().getIdProducto());
-            pstmt.setInt(2, config.getStockMinimo());
-            pstmt.setInt(3, config.getStockCritico());
-            pstmt.setBoolean(4, config.isActivo());
+            pstmt.setInt(2, config.getStockMinimoProducto());
+            pstmt.setInt(3, config.getStockCriticoProducto());
+            pstmt.setInt(4, config.getStockMinimoLote());
+            pstmt.setInt(5, config.getStockCriticoLote());
+            pstmt.setBoolean(6, config.isActivo());
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -99,15 +105,17 @@ public class StockMinimoDAO {
 
     // Actualizar configuración existente
     public boolean actualizarConfiguracion(StockMinimoConfig config) {
-        String sql = "UPDATE stock_minimo_config SET stock_minimo = ?, stock_critico = ?, activo = ? WHERE id_stock_minimo = ?";
+        String sql = "UPDATE stock_minimo_config SET stock_minimo_producto = ?, stock_critico_producto = ?, stock_minimo_lote = ?, stock_critico_lote = ?, activo = ? WHERE id_stock_minimo = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, config.getStockMinimo());
-            pstmt.setInt(2, config.getStockCritico());
-            pstmt.setBoolean(3, config.isActivo());
-            pstmt.setInt(4, config.getIdStockMinimo());
+            pstmt.setInt(1, config.getStockMinimoProducto());
+            pstmt.setInt(2, config.getStockCriticoProducto());
+            pstmt.setInt(3, config.getStockMinimoLote());
+            pstmt.setInt(4, config.getStockCriticoLote());
+            pstmt.setBoolean(5, config.isActivo());
+            pstmt.setInt(6, config.getIdStockMinimo());
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {

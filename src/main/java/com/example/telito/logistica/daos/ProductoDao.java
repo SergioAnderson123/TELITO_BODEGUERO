@@ -33,7 +33,7 @@ public class ProductoDao {
     // Listar productos de un productor específico
     public ArrayList<ProductoBean> listarProductosPorProductor(int productorId) {
         ArrayList<ProductoBean> listaProductos = new ArrayList<>();
-        String sql = "SELECT id_producto, codigo_sku, nombre, precio_actual " +
+        String sql = "SELECT id_producto, codigo_sku, nombre, precio_actual, unidades_por_paquete " +
                      "FROM productos " +
                      "WHERE productor_id = ? AND activo = 1 " +
                      "ORDER BY nombre ASC";
@@ -50,6 +50,7 @@ public class ProductoDao {
                     producto.setCodigo(rs.getString("codigo_sku"));
                     producto.setNombre(rs.getString("nombre"));
                     producto.setPrecio(rs.getDouble("precio_actual"));
+                    producto.setUnidadesPorPaquete(rs.getInt("unidades_por_paquete"));
                     listaProductos.add(producto);
                 }
             }

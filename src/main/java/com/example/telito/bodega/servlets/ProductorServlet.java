@@ -13,6 +13,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,40 +38,38 @@ public class ProductorServlet extends HttpServlet {
         // Si no se especifica una acción, la acción por defecto será 'listarProductos'
         String action = request.getParameter("action") == null ? "listarProductos" : request.getParameter("action");
 
-        // ID del productor logueado (fijo para pruebas, luego se obtendrá de la sesión)
-        final int idProductor = 2;
+        // Obtener el ID del productor desde la sesión
+        com.example.telito.administrador.beans.Usuario usuarioSesion = 
+            (com.example.telito.administrador.beans.Usuario) request.getSession().getAttribute("usuario");
+        
+        if (usuarioSesion == null) {
+            response.sendRedirect(request.getContextPath() + "/acceso/login");
+            return;
+        }
+        
+        final int idProductor = usuarioSesion.getIdUsuario();
         
         ProductoDao productoDao = new ProductoDao();
         LoteDao loteDao = new LoteDao();
 
         switch (action) {
             case "listarProductos":
-// Reemplaza la lógica en tu ProductorServlet con esto:
+                // Obtener la lista de productos del productor logueado
+                ArrayList<Producto> listaProductos = productoDao.listarProductosPorProductor(idProductor);
 
-// Asumiendo que esta lógica está en un case "listar" de tu método doGet
-
-// 1. Instancias el DAO
-
-// 2. Obtienes el ID del productor (ej. desde la sesión)
-                int productorId = 2; // Reemplaza esto con la lógica para obtener el ID real
-
-// 3. Obtienes la lista de productos (que ya incluye el conteo de lotes)
-                ArrayList<Producto> listaProductos = productoDao.listarProductosPorProductor(productorId);
-
-// 4. Obtienes las estadísticas y otras listas necesarias
-                int totalProductos = productoDao.contarTotalProductos(productorId);
-                int fueraDeStock = productoDao.contarProductosFueraDeStock(productorId);
-                int totalCategorias = productoDao.contarTotalCategorias(productorId);
+                // Obtener estadísticas del productor
+                int totalProductos = productoDao.contarTotalProductos(idProductor);
+                int fueraDeStock = productoDao.contarProductosFueraDeStock(idProductor);
+                int totalCategorias = productoDao.contarTotalCategorias(idProductor);
                 ArrayList<Categoria> todasLasCategorias = productoDao.listarTodasLasCategorias();
 
-// 5. Envías todos los datos a la vista (JSP)
+                // Enviar datos a la vista
                 request.setAttribute("listaProductos", listaProductos);
                 request.setAttribute("totalProductos", totalProductos);
                 request.setAttribute("fueraDeStock", fueraDeStock);
                 request.setAttribute("totalCategorias", totalCategorias);
                 request.setAttribute("todasLasCategorias", todasLasCategorias);
 
-// 6. Rediriges la petición al JSP para que muestre los datos
                 RequestDispatcher view = request.getRequestDispatcher("productor/misProductos.jsp");
                 view.forward(request, response);
                 break;
@@ -93,15 +95,9 @@ public class ProductorServlet extends HttpServlet {
                 break;
 
             case "ordenesCompra":
-                // Obtener el ID del productor de la sesión
-                com.example.telito.administrador.beans.Usuario usuarioSesion = 
-                    (com.example.telito.administrador.beans.Usuario) request.getSession().getAttribute("usuario");
-                
-                int productorIdOrdenes = usuarioSesion != null ? usuarioSesion.getIdUsuario() : 2;
-                
-                // Cargar las órdenes de compra del productor
+                // Cargar las órdenes de compra del productor logueado
                 OrdenCompraDao ordenCompraDao = new OrdenCompraDao();
-                List<Object[]> listaOrdenes = ordenCompraDao.listarOrdenesPorProductor(productorIdOrdenes);
+                List<Object[]> listaOrdenes = ordenCompraDao.listarOrdenesPorProductor(idProductor);
                 
                 request.setAttribute("listaOrdenes", listaOrdenes);
                 view = request.getRequestDispatcher("productor/ordenesDeCompra.jsp");
@@ -143,7 +139,134 @@ public class ProductorServlet extends HttpServlet {
                 response.getWriter().write(json);
                 return; // Usamos 'return' para terminar aquí, ya que no es una página completa
 
+            case "obtenerNuevoSKU":
+                // Endpoint para obtener el siguiente SKU disponible
+                ProductoDao productoDAO = new ProductoDao();
+                String nuevoSKU = productoDAO.generarNuevoSKU();
+                
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"sku\": \"" + nuevoSKU + "\"}");
+                return;
+
+            case "obtenerNuevoCodigoLote":
+                // Endpoint para obtener el siguiente código de lote disponible
+                LoteDao loteDaoGet = new LoteDao();
+                String nuevoCodigo = loteDaoGet.generarNuevoCodigoLote();
+                
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"codigo\": \"" + nuevoCodigo + "\"}");
+                return;
+
+            case "obtenerLotesParaOrden":
+                // Endpoint para obtener los lotes disponibles para asignar a una orden
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                
+                try {
+                    int idOrdenLotes = Integer.parseInt(request.getParameter("idOrden"));
+                    
+                    System.out.println("=== DEBUG SERVLET - OBTENER LOTES PARA ORDEN ===");
+                    System.out.println("ID Orden: " + idOrdenLotes);
+                    
+                    // Obtener el producto_id de la orden
+                    OrdenCompraDao ordenCompraDao2 = new OrdenCompraDao();
+                    Object[] detalleOrden2 = ordenCompraDao2.obtenerDetalleOrden(idOrdenLotes);
+                    
+                    if (detalleOrden2 == null) {
+                        response.getWriter().write("{\"success\": false, \"message\": \"Orden no encontrada\"}");
+                        return;
+                    }
+                    
+                    // Necesitamos obtener el producto_id de la orden
+                    // Para esto, necesitamos modificar el método obtenerDetalleOrden o crear uno nuevo
+                    // Por ahora, vamos a hacer una consulta directa
+                    int productoId = obtenerProductoIdDeOrden(idOrdenLotes);
+                    
+                    if (productoId == 0) {
+                        response.getWriter().write("{\"success\": false, \"message\": \"No se pudo obtener el producto de la orden\"}");
+                        return;
+                    }
+                    
+                    // Obtener los lotes disponibles para este producto
+                    LoteDao loteDao2 = new LoteDao();
+                    List<Object[]> lotes = loteDao2.obtenerLotesDisponiblesParaProducto(productoId);
+                    
+                    System.out.println("✓ Producto ID: " + productoId);
+                    System.out.println("✓ Lotes encontrados: " + lotes.size());
+                    
+                    // Construir JSON de respuesta
+                    StringBuilder jsonLotes = new StringBuilder();
+                    jsonLotes.append("{\"success\":true,\"productoId\":").append(productoId).append(",\"lotes\":[");
+                    
+                    for (int i = 0; i < lotes.size(); i++) {
+                        Object[] lote = lotes.get(i);
+                        if (i > 0) jsonLotes.append(",");
+                        
+                        // Debug: Imprimir cada campo del lote
+                        System.out.println("  Lote " + i + ":");
+                        System.out.println("    [0] ID: " + lote[0]);
+                        System.out.println("    [1] Código: " + lote[1]);
+                        System.out.println("    [2] SKU: " + lote[2]);
+                        System.out.println("    [3] Producto: " + lote[3]);
+                        System.out.println("    [4] Paquetes: " + lote[4]);
+                        System.out.println("    [5] Stock Actual: " + lote[5]);
+                        System.out.println("    [6] Fecha Venc: " + lote[6]);
+                        
+                        String codigoLote = (lote[1] != null) ? lote[1].toString() : "";
+                        String skuLote = (lote[2] != null) ? lote[2].toString() : "";
+                        String productoNombre = (lote[3] != null) ? lote[3].toString().replace("\"", "\\\"") : "";
+                        String fechaVenc = (lote[6] != null) ? lote[6].toString() : "";
+                        
+                        jsonLotes.append("{")
+                            .append("\"id\":").append(lote[0]).append(",")
+                            .append("\"codigoLote\":\"").append(codigoLote).append("\",")
+                            .append("\"sku\":\"").append(skuLote).append("\",")
+                            .append("\"producto\":\"").append(productoNombre).append("\",")
+                            .append("\"paquetes\":").append(lote[4]).append(",")
+                            .append("\"stockActual\":").append(lote[5]).append(",")
+                            .append("\"fechaVencimiento\":\"").append(fechaVenc).append("\"")
+                            .append("}");
+                    }
+                    
+                    jsonLotes.append("]}");
+                    
+                    String jsonResponse = jsonLotes.toString();
+                    System.out.println("✓ JSON completo: " + jsonResponse);
+                    response.getWriter().write(jsonResponse);
+                    
+                } catch (NumberFormatException e) {
+                    System.err.println("❌ ERROR: ID de orden inválido");
+                    response.getWriter().write("{\"success\": false, \"message\": \"ID de orden inválido\"}");
+                } catch (Exception e) {
+                    System.err.println("❌ ERROR: " + e.getMessage());
+                    e.printStackTrace();
+                    response.getWriter().write("{\"success\": false, \"message\": \"Error interno del servidor\"}");
+                }
+                return;
+
         }
+    }
+    
+    /**
+     * Método auxiliar para obtener el producto_id de una orden
+     */
+    private int obtenerProductoIdDeOrden(int idOrden) {
+        String sql = "SELECT producto_id FROM ordenes_compra WHERE id_orden_compra = ?";
+        try (Connection conn = com.example.telito.util.DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, idOrden);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("producto_id");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Error al obtener producto_id de orden: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     /**
@@ -156,25 +279,36 @@ public class ProductorServlet extends HttpServlet {
         String action = request.getParameter("action") == null ? "" : request.getParameter("action");
         ProductoDao productoDao = new ProductoDao();
         
-        // ID del productor logueado (fijo para pruebas, luego se obtendrá de la sesión)
-        final int idProductor = 2;
-
+        // Obtener el ID del productor desde la sesión
+        com.example.telito.administrador.beans.Usuario usuarioSesion = 
+            (com.example.telito.administrador.beans.Usuario) request.getSession().getAttribute("usuario");
+        
+        if (usuarioSesion == null) {
+            response.sendRedirect(request.getContextPath() + "/acceso/login");
+            return;
+        }
+        
+        final int idProductor = usuarioSesion.getIdUsuario();
 
         switch(action) {
             case "crearProducto":
                 // 1. Leemos los datos enviados desde el formulario
-                String sku = request.getParameter("productSKU");
                 String nombre = request.getParameter("productName");
                 String desc = request.getParameter("productDescription");
                 double precio = Double.parseDouble(request.getParameter("productPrice"));
                 int categoriaId = Integer.parseInt(request.getParameter("productCategory"));
+                int unidadesPorPaquete = Integer.parseInt(request.getParameter("productUnits"));
 
-                // 2. Creamos un objeto Producto con los datos recibidos
+                // 2. GENERAR SKU AUTOMÁTICAMENTE
+                String skuGenerado = productoDao.generarNuevoSKU();
+
+                // 3. Creamos un objeto Producto con los datos recibidos
                 Producto producto = new Producto();
-                producto.setCodigoSKU(sku);
+                producto.setCodigoSKU(skuGenerado); // Usar SKU generado automáticamente
                 producto.setNombre(nombre);
                 producto.setDescripcion(desc);
                 producto.setPrecioActual(precio);
+                producto.setUnidadesPorPaquete(unidadesPorPaquete); // Campo nuevo
 
                 Usuario productor = new Usuario();
                 productor.setIdUsuario(idProductor);
@@ -184,10 +318,10 @@ public class ProductorServlet extends HttpServlet {
                 categoria.setIdCategoria(categoriaId);
                 producto.setCategoria(categoria);
 
-                // 3. Llamamos al DAO para que guarde el objeto en la base de datos
+                // 4. Llamamos al DAO para que guarde el objeto en la base de datos
                 productoDao.crearProducto(producto);
 
-                // 4. Redirigimos al usuario a la lista principal para que vea el nuevo producto
+                // 5. Redirigimos al usuario a la lista principal para que vea el nuevo producto
                 response.sendRedirect(request.getContextPath() + "/ProductorServlet");
                 break;
 
@@ -213,11 +347,13 @@ public class ProductorServlet extends HttpServlet {
                 int totalProductos = productoDao.contarTotalProductos(idProductor);
                 int fueraDeStock = productoDao.contarProductosFueraDeStock(idProductor);
                 int totalCategorias = productoDao.contarTotalCategorias(idProductor);
+                ArrayList<Categoria> todasLasCategoriasDesactivar = productoDao.listarTodasLasCategorias();
                 
                 request.setAttribute("listaProductos", listaProductosActualizada);
                 request.setAttribute("totalProductos", totalProductos);
                 request.setAttribute("fueraDeStock", fueraDeStock);
                 request.setAttribute("totalCategorias", totalCategorias);
+                request.setAttribute("todasLasCategorias", todasLasCategoriasDesactivar);
                 
                 if (desactivado) {
                     request.setAttribute("alertType", "success");
@@ -235,11 +371,15 @@ public class ProductorServlet extends HttpServlet {
             case "registrarLote":
                 // Procesar el formulario de registro de lotes y permanecer en la misma página con mensaje
                 LoteDao loteDaoPost = new LoteDao();
-                String codigoLote = request.getParameter("codigoLote");
                 String skuProducto = request.getParameter("skuProducto");
                 String cantidadStockStr = request.getParameter("cantidadStock");
                 String fechaCaducidad = request.getParameter("fechaCaducidad"); // opcional
-                String distrito = request.getParameter("distrito");
+
+                // GENERAR CÓDIGO DE LOTE AUTOMÁTICAMENTE
+                String codigoLote = loteDaoPost.generarNuevoCodigoLote();
+                
+                // Usar distrito por defecto
+                String distrito = "Cercado";
 
                 int cantidadStock = 0;
                 try {
@@ -249,7 +389,7 @@ public class ProductorServlet extends HttpServlet {
                 }
 
                 boolean ok = false;
-                if (codigoLote != null && skuProducto != null && cantidadStock > 0 && distrito != null && !distrito.isEmpty()) {
+                if (codigoLote != null && skuProducto != null && cantidadStock > 0) {
                     ok = loteDaoPost.registrarLote(codigoLote.trim(), skuProducto.trim(), cantidadStock,
                             (fechaCaducidad != null ? fechaCaducidad.trim() : null), distrito.trim());
                 }
@@ -263,11 +403,78 @@ public class ProductorServlet extends HttpServlet {
                     request.setAttribute("form_skuProducto", skuProducto);
                     request.setAttribute("form_cantidadStock", cantidadStockStr);
                     request.setAttribute("form_fechaCaducidad", fechaCaducidad);
-                    request.setAttribute("form_distrito", distrito);
                 }
 
                 RequestDispatcher rd = request.getRequestDispatcher("productor/registrarLotes.jsp");
                 rd.forward(request, response);
+                return;
+
+            case "cambiarEstadoOrden":
+                // Cambiar el estado de una orden de compra
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                
+                try {
+                    int idOrden = Integer.parseInt(request.getParameter("idOrden"));
+                    String nuevoEstado = request.getParameter("nuevoEstado");
+                    
+                    System.out.println("=== DEBUG SERVLET - CAMBIAR ESTADO ORDEN ===");
+                    System.out.println("ID Orden: " + idOrden);
+                    System.out.println("Nuevo Estado: " + nuevoEstado);
+                    
+                    OrdenCompraDao ordenCompraDao = new OrdenCompraDao();
+                    boolean actualizado = ordenCompraDao.actualizarEstadoOrden(idOrden, nuevoEstado);
+                    
+                    if (actualizado) {
+                        response.getWriter().write("{\"success\": true, \"message\": \"Estado actualizado correctamente\"}");
+                        System.out.println("✓ Estado actualizado correctamente");
+                    } else {
+                        response.getWriter().write("{\"success\": false, \"message\": \"No se pudo actualizar el estado\"}");
+                        System.err.println("❌ No se pudo actualizar el estado");
+                    }
+                } catch (NumberFormatException e) {
+                    response.getWriter().write("{\"success\": false, \"message\": \"ID de orden inválido\"}");
+                    System.err.println("❌ ERROR: ID de orden inválido - " + e.getMessage());
+                } catch (Exception e) {
+                    response.getWriter().write("{\"success\": false, \"message\": \"Error interno del servidor\"}");
+                    System.err.println("❌ ERROR: Error al cambiar estado - " + e.getMessage());
+                    e.printStackTrace();
+                }
+                return;
+
+            case "asignarLoteAOrden":
+                // Asignar un lote específico a una orden de compra
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                
+                try {
+                    int idOrden2 = Integer.parseInt(request.getParameter("idOrden"));
+                    int idLote = Integer.parseInt(request.getParameter("idLote"));
+                    
+                    System.out.println("=== DEBUG SERVLET - ASIGNAR LOTE A ORDEN ===");
+                    System.out.println("ID Orden: " + idOrden2);
+                    System.out.println("ID Lote: " + idLote);
+                    
+                    // Actualizar la orden con el lote asignado
+                    OrdenCompraDao ordenCompraDao3 = new OrdenCompraDao();
+                    boolean asignado = ordenCompraDao3.completarOrden(idOrden2, idLote);
+                    
+                    if (asignado) {
+                        System.out.println("✓ Lote asignado correctamente a la orden");
+                        response.getWriter().write("{\"success\": true, \"message\": \"Lote asignado correctamente\"}");
+                    } else {
+                        System.err.println("❌ No se pudo asignar el lote");
+                        response.getWriter().write("{\"success\": false, \"message\": \"No se pudo asignar el lote\"}");
+                    }
+                    
+                } catch (NumberFormatException e) {
+                    System.err.println("❌ ERROR: Parámetros inválidos - " + e.getMessage());
+                    response.getWriter().write("{\"success\": false, \"message\": \"Parámetros inválidos\"}");
+                } catch (Exception e) {
+                    System.err.println("❌ ERROR: Error al asignar lote - " + e.getMessage());
+                    e.printStackTrace();
+                    response.getWriter().write("{\"success\": false, \"message\": \"Error interno del servidor\"}");
+                }
                 return;
 
             // Aquí irían otros 'cases' para guardar otros formularios

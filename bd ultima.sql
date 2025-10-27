@@ -74,20 +74,21 @@
 		UNIQUE KEY nombre (nombre)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-	-- TABLA: usuarios
-	CREATE TABLE usuarios (
-		id_usuario INT UNSIGNED NOT NULL AUTO_INCREMENT,
-		nombres VARCHAR(255) NOT NULL,
-		apellidos VARCHAR(255) NOT NULL,
-		email VARCHAR(255) NOT NULL,
-		password VARCHAR(255) NOT NULL,
-		activo TINYINT(1) NOT NULL DEFAULT '1',
-		rol_id INT UNSIGNED NOT NULL,
-		PRIMARY KEY (id_usuario),
-		UNIQUE KEY email (email),
-		KEY fk_usuario_rol (rol_id),
-		CONSTRAINT fk_usuario_rol FOREIGN KEY (rol_id) REFERENCES roles (id_rol)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- TABLA: usuarios
+CREATE TABLE usuarios (
+	id_usuario INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	nombres VARCHAR(255) NOT NULL,
+	apellidos VARCHAR(255) NOT NULL,
+	email VARCHAR(255) NOT NULL,
+	password VARCHAR(255) NOT NULL,
+	activo TINYINT(1) NOT NULL DEFAULT '1',
+	foto_perfil VARCHAR(500) NULL,
+	rol_id INT UNSIGNED NOT NULL,
+	PRIMARY KEY (id_usuario),
+	UNIQUE KEY email (email),
+	KEY fk_usuario_rol (rol_id),
+	CONSTRAINT fk_usuario_rol FOREIGN KEY (rol_id) REFERENCES roles (id_rol)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 	-- TABLA: productos
 	CREATE TABLE productos (
@@ -182,22 +183,25 @@
 	CREATE TABLE ordenes_compra (
 		id_orden_compra INT UNSIGNED NOT NULL AUTO_INCREMENT,
 		numero_Orden VARCHAR(50) NOT NULL,
-		proveedor_id INT UNSIGNED NOT NULL,
+		productor_id INT UNSIGNED NOT NULL,
 		producto_id INT UNSIGNED NOT NULL,
 		cantidad INT UNSIGNED NOT NULL,
 		usuario_id INT UNSIGNED NOT NULL,
-		estado ENUM('Pendiente','Aprobado','Rechazado','Recibido') NOT NULL,
+		estado ENUM('Pendiente','Aprobado','Rechazado','Recibido','En Proceso') NOT NULL,
 		monto_total DECIMAL(10,2) NOT NULL,
 		lote_id INT UNSIGNED DEFAULT NULL,
+		distrito_id INT UNSIGNED NOT NULL,
 		PRIMARY KEY (id_orden_compra),
 		UNIQUE KEY numero_Orden (numero_Orden),
-		KEY fk_oc_proveedor (proveedor_id),
+		KEY fk_oc_productor (productor_id),
 		KEY fk_oc_producto (producto_id),
 		KEY fk_oc_usuario (usuario_id),
+		KEY fk_oc_distrito (distrito_id),
 		KEY lote_id (lote_id),
 		CONSTRAINT fk_oc_producto FOREIGN KEY (producto_id) REFERENCES productos (id_producto),
-		CONSTRAINT fk_oc_proveedor FOREIGN KEY (proveedor_id) REFERENCES proveedores (id_proveedor),
+		CONSTRAINT fk_oc_productor FOREIGN KEY (productor_id) REFERENCES usuarios (id_usuario),
 		CONSTRAINT fk_oc_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios (id_usuario),
+		CONSTRAINT fk_oc_distrito FOREIGN KEY (distrito_id) REFERENCES distritos (idDistrito),
 		CONSTRAINT ordenes_compra_ibfk_1 FOREIGN KEY (lote_id) REFERENCES lotes (id_lote)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

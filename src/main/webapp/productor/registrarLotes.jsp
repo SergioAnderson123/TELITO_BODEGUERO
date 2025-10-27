@@ -3,13 +3,12 @@
 <%@ page import="java.util.ArrayList" %>
 <%--
     JSP: Registrar Lotes
-    Propósito: Permite registrar nuevos lotes asociados a un producto y ubicación.
+    Propósito: Permite registrar nuevos lotes asociados a un producto.
     Atributos esperados (request):
       - alertType (String: success/danger) y alertMessage (String) para mensajes de resultado
-      - form_* (opcionales) para repoblar campos cuando hay error: form_codigoLote, form_skuProducto,
-        form_cantidadStock, form_fechaCaducidad, form_distrito
+      - form_* (opcionales) para repoblar campos cuando hay error: form_skuProducto, form_cantidadStock, form_fechaCaducidad
     Navegación: Sidebar con sección "Registrar Lotes" activa.
-    Notas: La validación de fecha exige una fecha estrictamente futura. El submit se bloquea si no se cumple.
+    Notas: El código de lote se genera automáticamente en formato L--0001, L--0002, etc. El distrito se asigna por defecto.
 --%>
 
 <!doctype html>
@@ -252,11 +251,13 @@
                                                 <input type="text" class="form-control" id="nombreProducto" placeholder="Se completará automáticamente" readonly>
                                             </div>
                                             
-                                            <!-- Código de lote (se autogenera al enfocar si está vacío) -->
+                                            <!-- Código de lote (generado automáticamente) -->
                                             <div class="mb-3">
-                                                <label for="codigoLote" class="form-label">Código de Lote</label>
-                                                <input type="text" class="form-control" id="codigoLote" name="codigoLote" placeholder="Ej: L-2025-026" required value="<%= request.getAttribute("form_codigoLote") != null ? request.getAttribute("form_codigoLote") : "" %>">
-                                                <div class="invalid-feedback">El código de lote es obligatorio.</div>
+                                                <label for="codigoLote" class="form-label">Código de Lote (generado automáticamente)</label>
+                                                <input type="text" class="form-control" id="codigoLote" name="codigoLote" readonly style="background-color: #f0f0f0; cursor: not-allowed; font-weight: bold; color: #28a745;" placeholder="Cargando...">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-info-circle"></i> El código de lote se genera automáticamente (ej: L--0031)
+                                                </small>
                                             </div>
                                         </div>
                                         
@@ -265,10 +266,13 @@
                                                 <i class="fas fa-warehouse me-2"></i>Detalles de Stock y Ubicación
                                             </h6>
                                             
-                                            <!-- Cantidad y fecha de caducidad (opcional). Fecha debe ser estrictamente futura -->
+                                            <!-- Cantidad de paquetes. El stock real se calcula automáticamente multiplicando por unidades_por_paquete -->
                                             <div class="mb-3">
-                                                <label for="cantidadStock" class="form-label">Cantidad de Stock</label>
-                                                <input type="number" class="form-control" id="cantidadStock" name="cantidadStock" min="1" placeholder="Ej: 100" required value="<%= request.getAttribute("form_cantidadStock") != null ? request.getAttribute("form_cantidadStock") : "" %>">
+                                                <label for="cantidadStock" class="form-label">Cantidad de Paquetes/Cajas</label>
+                                                <input type="number" class="form-control" id="cantidadStock" name="cantidadStock" min="1" placeholder="Ej: 10 (cajas)" required value="<%= request.getAttribute("form_cantidadStock") != null ? request.getAttribute("form_cantidadStock") : "" %>">
+                                                <small class="form-text text-muted">
+                                                    <i class="fas fa-info-circle"></i> El stock total se calculará automáticamente multiplicando por las unidades por paquete del producto
+                                                </small>
                                                 <div class="invalid-feedback">Ingresa una cantidad válida.</div>
                                             </div>
                                             
@@ -279,25 +283,6 @@
                                                 <div class="form-text">
                                                     <i class="fas fa-calendar me-1"></i>Deja vacío si el producto no tiene fecha de caducidad.
                                                 </div>
-                                            </div>
-                                            
-                                            <div class="mb-3">
-                                                <label for="distrito" class="form-label">Distrito (Ubicación)</label>
-                                                <select class="form-select" id="distrito" name="distrito" required>
-                                                    <option value="" selected disabled>Seleccione un distrito...</option>
-                                                    <%-- Rellena dinámicamente desde la tabla distritos --%>
-                                                    <%
-                                                        java.util.List<String> distritos = java.util.Arrays.asList(
-                                                                "San Isidro","Miraflores","Surco","Villa El Salvador","Comas","San Juan de Lurigancho",
-                                                                "Callao","La Punta","Lince","Cercado"
-                                                        );
-                                                        String sel = (String) request.getAttribute("form_distrito");
-                                                        for (String d : distritos) {
-                                                    %>
-                                                        <option value="<%= d %>" <%= d.equals(sel) ? "selected" : "" %>><%= d %></option>
-                                                    <% } %>
-                                                </select>
-                                                <div class="invalid-feedback">Debes seleccionar una ubicación.</div>
                                             </div>
                                         </div>
                                     </div>
@@ -389,23 +374,47 @@
                 });
         }
 
-        // Función para limpiar el formulario (se mantiene igual)
+        // Función para limpiar el formulario
         function limpiarFormulario() {
             document.getElementById('registrarLoteForm').reset();
             document.getElementById('registrarLoteForm').classList.remove('was-validated');
+            cargarCodigoLote(); // Cargar un nuevo código de lote
         }
 
-        // Generar código de lote automático (se mantiene igual)
-        document.getElementById('codigoLote').addEventListener('focus', function() {
-            if (!this.value) {
-                const fecha = new Date();
-                const año = fecha.getFullYear();
-                const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-                const dia = String(fecha.getDate()).padStart(2, '0');
-                const numero = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-                this.value = `L-${año}-${mes}${dia}-${numero}`;
-            }
-        });
+        // Cargar código de lote automático al cargar la página
+        function cargarCodigoLote() {
+            const codigoLoteInput = document.getElementById('codigoLote');
+            codigoLoteInput.value = 'Cargando...';
+            codigoLoteInput.style.color = '#999';
+            
+            const contextPath = '<%= request.getContextPath() %>';
+            fetch(contextPath + '/ProductorServlet?action=obtenerNuevoCodigoLote')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.codigo) {
+                        codigoLoteInput.value = data.codigo;
+                        codigoLoteInput.style.color = '#28a745';
+                    } else {
+                        codigoLoteInput.value = 'Error al generar código';
+                        codigoLoteInput.style.color = '#dc3545';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al obtener código de lote:', error);
+                    codigoLoteInput.value = 'Error de conexión';
+                    codigoLoteInput.style.color = '#dc3545';
+                });
+        }
+        
+        // Cargar código al iniciar la página
+        cargarCodigoLote();
+
+        // Si hay mensaje de éxito, recargar nuevo código de lote
+        <% if ("success".equals(alertType)) { %>
+        setTimeout(function() {
+            cargarCodigoLote();
+        }, 500);
+        <% } %>
 
         // Validación de fecha de caducidad (se mantiene igual)
         const fechaCaducidadInput = document.getElementById('fechaCaducidad');

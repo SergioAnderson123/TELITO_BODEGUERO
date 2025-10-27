@@ -123,26 +123,38 @@ public class AlertaDAO {
                 Integer categoriaId = rsReglas.getObject("categoria_id", Integer.class);
                 String sqlConteo = "";
 
-                if ("STOCK_MINIMO".equals(tipoAlerta)) {
-                    sqlConteo = "SELECT COUNT(*) FROM productos p " +
+                if ("STOCK_MINIMO_LOTE".equals(tipoAlerta)) {
+                    sqlConteo = "SELECT COUNT(*) FROM lotes l " +
+                            "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                             "LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id " +
-                            "LEFT JOIN lotes l ON p.id_producto = l.producto_id " +
-                            "WHERE p.activo = 1 AND smc.activo = 1 " +
-                            "AND COALESCE(SUM(l.stock_actual), 0) <= smc.stock_minimo";
+                            "WHERE l.estado = 'Registrado' AND p.activo = 1 AND smc.activo = 1 " +
+                            "AND FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_minimo_lote";
                     if (categoriaId != null) {
                         sqlConteo += " AND p.categoria_id = " + categoriaId;
                     }
-                    sqlConteo += " GROUP BY p.id_producto";
-                } else if ("STOCK_CRITICO".equals(tipoAlerta)) {
-                    sqlConteo = "SELECT COUNT(*) FROM productos p " +
+                } else if ("STOCK_CRITICO_LOTE".equals(tipoAlerta)) {
+                    sqlConteo = "SELECT COUNT(*) FROM lotes l " +
+                            "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                             "LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id " +
-                            "LEFT JOIN lotes l ON p.id_producto = l.producto_id " +
-                            "WHERE p.activo = 1 AND smc.activo = 1 " +
-                            "AND COALESCE(SUM(l.stock_actual), 0) <= smc.stock_critico";
+                            "WHERE l.estado = 'Registrado' AND p.activo = 1 AND smc.activo = 1 " +
+                            "AND FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_critico_lote";
                     if (categoriaId != null) {
                         sqlConteo += " AND p.categoria_id = " + categoriaId;
                     }
-                    sqlConteo += " GROUP BY p.id_producto";
+                } else if ("STOCK_MINIMO_TOTAL".equals(tipoAlerta)) {
+                    sqlConteo = "SELECT COUNT(DISTINCT p.id_producto) FROM productos p " +
+                            "INNER JOIN lotes l ON p.id_producto = l.producto_id AND l.estado = 'Registrado' " +
+                            "LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id " +
+                            "WHERE p.activo = 1 AND smc.activo = 1 " +
+                            (categoriaId != null ? "AND p.categoria_id = " + categoriaId + " " : "") +
+                            "GROUP BY p.id_producto HAVING SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) <= MAX(smc.stock_minimo_producto)";
+                } else if ("STOCK_CRITICO_TOTAL".equals(tipoAlerta)) {
+                    sqlConteo = "SELECT COUNT(DISTINCT p.id_producto) FROM productos p " +
+                            "INNER JOIN lotes l ON p.id_producto = l.producto_id AND l.estado = 'Registrado' " +
+                            "LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id " +
+                            "WHERE p.activo = 1 AND smc.activo = 1 " +
+                            (categoriaId != null ? "AND p.categoria_id = " + categoriaId + " " : "") +
+                            "GROUP BY p.id_producto HAVING SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) <= MAX(smc.stock_critico_producto)";
                 } else if ("VENCIMIENTO".equals(tipoAlerta)) {
                     Integer umbralDias = rsReglas.getObject("umbral_dias", Integer.class);
                     if (umbralDias != null) {
@@ -238,55 +250,115 @@ public class AlertaDAO {
                                 }
                             }
                         }
-                    } else if ("STOCK_MINIMO".equals(tipoAlerta)) {
-                        String sql = "SELECT p.nombre, COALESCE(SUM(l.stock_actual),0) AS stock, smc.stock_minimo " +
-                                     "FROM productos p " +
+                    } else if ("STOCK_MINIMO_LOTE".equals(tipoAlerta)) {
+                        String sql = "SELECT l.codigo_lote, p.nombre, FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes, smc.stock_minimo_lote " +
+                                     "FROM lotes l " +
+                                     "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                                      "JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1 " +
-                                     "LEFT JOIN lotes l ON p.id_producto = l.producto_id " +
-                                     (categoriaId != null ? "WHERE p.categoria_id = ? " : "") +
-                                     "GROUP BY p.id_producto, smc.stock_minimo HAVING stock <= smc.stock_minimo LIMIT 20";
+                                     "WHERE l.estado = 'Registrado' " +
+                                     (categoriaId != null ? "AND p.categoria_id = ? " : "") +
+                                     "HAVING paquetes <= smc.stock_minimo_lote LIMIT 20";
                         try (PreparedStatement ps = conn.prepareStatement(sql)) {
                             if (categoriaId != null) ps.setInt(1, categoriaId);
                             try (ResultSet rs = ps.executeQuery()) {
                                 while (rs.next()) {
+                                    String lote = rs.getString("codigo_lote");
                                     String prod = rs.getString("nombre");
-                                    int stock = rs.getInt("stock");
-                                    int umbral = rs.getInt("stock_minimo");
+                                    int paquetes = rs.getInt("paquetes");
+                                    int umbral = rs.getInt("stock_minimo_lote");
                                     String msg;
                                     if (plantilla != null && !plantilla.isEmpty()) {
                                         msg = plantilla
+                                                .replace("{lote}", lote != null ? lote : "")
                                                 .replace("{producto}", prod != null ? prod : "")
-                                                .replace("{stock_actual}", String.valueOf(stock))
-                                                .replace("{umbral}", String.valueOf(umbral));
+                                                .replace("{stock_actual}", paquetes + " paquetes")
+                                                .replace("{umbral}", umbral + " paquetes");
                                     } else {
-                                        msg = "Stock mínimo: Producto " + prod + " con " + stock + " unidades (mínimo " + umbral + ")";
+                                        msg = "Stock mínimo en lote: " + lote + " (" + prod + ") con " + paquetes + " paquetes (mínimo " + umbral + ")";
                                     }
                                     mensajes.add(msg);
                                 }
                             }
                         }
-                    } else if ("STOCK_CRITICO".equals(tipoAlerta)) {
-                        String sql = "SELECT p.nombre, COALESCE(SUM(l.stock_actual),0) AS stock, smc.stock_critico " +
-                                     "FROM productos p " +
+                    } else if ("STOCK_CRITICO_LOTE".equals(tipoAlerta)) {
+                        String sql = "SELECT l.codigo_lote, p.nombre, FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes, smc.stock_critico_lote " +
+                                     "FROM lotes l " +
+                                     "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                                      "JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1 " +
-                                     "LEFT JOIN lotes l ON p.id_producto = l.producto_id " +
+                                     "WHERE l.estado = 'Registrado' " +
+                                     (categoriaId != null ? "AND p.categoria_id = ? " : "") +
+                                     "HAVING paquetes <= smc.stock_critico_lote LIMIT 20";
+                        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                            if (categoriaId != null) ps.setInt(1, categoriaId);
+                            try (ResultSet rs = ps.executeQuery()) {
+                                while (rs.next()) {
+                                    String lote = rs.getString("codigo_lote");
+                                    String prod = rs.getString("nombre");
+                                    int paquetes = rs.getInt("paquetes");
+                                    int umbral = rs.getInt("stock_critico_lote");
+                                    String msg;
+                                    if (plantilla != null && !plantilla.isEmpty()) {
+                                        msg = plantilla
+                                                .replace("{lote}", lote != null ? lote : "")
+                                                .replace("{producto}", prod != null ? prod : "")
+                                                .replace("{stock_actual}", paquetes + " paquetes")
+                                                .replace("{umbral}", umbral + " paquetes");
+                                    } else {
+                                        msg = "¡Stock crítico en lote!: " + lote + " (" + prod + ") con " + paquetes + " paquetes (crítico " + umbral + ")";
+                                    }
+                                    mensajes.add(msg);
+                                }
+                            }
+                        }
+                    } else if ("STOCK_MINIMO_TOTAL".equals(tipoAlerta)) {
+                        String sql = "SELECT p.nombre, SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) AS paquetes_total, smc.stock_minimo_producto " +
+                                     "FROM productos p " +
+                                     "INNER JOIN lotes l ON p.id_producto = l.producto_id AND l.estado = 'Registrado' " +
+                                     "JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1 " +
                                      (categoriaId != null ? "WHERE p.categoria_id = ? " : "") +
-                                     "GROUP BY p.id_producto, smc.stock_critico HAVING stock <= smc.stock_critico LIMIT 20";
+                                     "GROUP BY p.id_producto, smc.stock_minimo_producto HAVING paquetes_total <= smc.stock_minimo_producto LIMIT 20";
                         try (PreparedStatement ps = conn.prepareStatement(sql)) {
                             if (categoriaId != null) ps.setInt(1, categoriaId);
                             try (ResultSet rs = ps.executeQuery()) {
                                 while (rs.next()) {
                                     String prod = rs.getString("nombre");
-                                    int stock = rs.getInt("stock");
-                                    int umbral = rs.getInt("stock_critico");
+                                    int paquetes = rs.getInt("paquetes_total");
+                                    int umbral = rs.getInt("stock_minimo_producto");
                                     String msg;
                                     if (plantilla != null && !plantilla.isEmpty()) {
                                         msg = plantilla
                                                 .replace("{producto}", prod != null ? prod : "")
-                                                .replace("{stock_actual}", String.valueOf(stock))
-                                                .replace("{umbral}", String.valueOf(umbral));
+                                                .replace("{stock_actual}", paquetes + " paquetes")
+                                                .replace("{umbral}", umbral + " paquetes");
                                     } else {
-                                        msg = "Stock crítico: Producto " + prod + " con " + stock + " unidades (crítico " + umbral + ")";
+                                        msg = "Stock mínimo total: Producto " + prod + " con " + paquetes + " paquetes (mínimo " + umbral + ")";
+                                    }
+                                    mensajes.add(msg);
+                                }
+                            }
+                        }
+                    } else if ("STOCK_CRITICO_TOTAL".equals(tipoAlerta)) {
+                        String sql = "SELECT p.nombre, SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) AS paquetes_total, smc.stock_critico_producto " +
+                                     "FROM productos p " +
+                                     "INNER JOIN lotes l ON p.id_producto = l.producto_id AND l.estado = 'Registrado' " +
+                                     "JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1 " +
+                                     (categoriaId != null ? "WHERE p.categoria_id = ? " : "") +
+                                     "GROUP BY p.id_producto, smc.stock_critico_producto HAVING paquetes_total <= smc.stock_critico_producto LIMIT 20";
+                        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                            if (categoriaId != null) ps.setInt(1, categoriaId);
+                            try (ResultSet rs = ps.executeQuery()) {
+                                while (rs.next()) {
+                                    String prod = rs.getString("nombre");
+                                    int paquetes = rs.getInt("paquetes_total");
+                                    int umbral = rs.getInt("stock_critico_producto");
+                                    String msg;
+                                    if (plantilla != null && !plantilla.isEmpty()) {
+                                        msg = plantilla
+                                                .replace("{producto}", prod != null ? prod : "")
+                                                .replace("{stock_actual}", paquetes + " paquetes")
+                                                .replace("{umbral}", umbral + " paquetes");
+                                    } else {
+                                        msg = "¡Stock crítico total!: Producto " + prod + " con " + paquetes + " paquetes (crítico " + umbral + ")";
                                     }
                                     mensajes.add(msg);
                                 }

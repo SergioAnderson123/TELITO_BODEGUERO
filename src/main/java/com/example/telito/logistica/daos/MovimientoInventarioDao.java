@@ -29,6 +29,7 @@ public class MovimientoInventarioDao {
             INNER JOIN usuarios u ON mi.usuario_id = u.id_usuario
             LEFT JOIN ubicaciones ubi ON l.ubicacion_id = ubi.id_ubicacion
             WHERE 1=1
+            AND (mi.motivo IS NULL OR mi.motivo NOT LIKE 'Ajuste de inventario%')
             """;
 
         List<Object> params = new ArrayList<>();

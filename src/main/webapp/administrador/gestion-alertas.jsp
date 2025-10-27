@@ -68,20 +68,33 @@
                                 <tr>
                                     <td class="fw-medium"><%= alerta.getNombre() %></td>
                                     <td>
-                                        <% if ("STOCK_MINIMO".equals(alerta.getTipoAlerta())) { %>
-                                            <span class="badge bg-warning-soft text-warning">Stock Mínimo</span>
+                                        <% String tipoAlerta = alerta.getTipoAlerta(); %>
+                                        <% if ("STOCK_MINIMO_LOTE".equals(tipoAlerta)) { %>
+                                            <span class="badge bg-warning text-dark">📦 Stock Mín. Lote</span>
+                                        <% } else if ("STOCK_CRITICO_LOTE".equals(tipoAlerta)) { %>
+                                            <span class="badge bg-danger">📦 Stock Crít. Lote</span>
+                                        <% } else if ("STOCK_MINIMO_TOTAL".equals(tipoAlerta)) { %>
+                                            <span class="badge bg-info text-dark">📊 Stock Mín. Total</span>
+                                        <% } else if ("STOCK_CRITICO_TOTAL".equals(tipoAlerta)) { %>
+                                            <span class="badge bg-danger">📊 Stock Crít. Total</span>
+                                        <% } else if ("VENCIMIENTO".equals(tipoAlerta)) { %>
+                                            <span class="badge bg-warning text-dark">⏰ Vencimiento</span>
+                                        <% } else if ("MOVIMIENTO".equals(tipoAlerta)) { %>
+                                            <span class="badge bg-secondary">🔄 Movimiento</span>
                                         <% } else { %>
-                                            <span class="badge bg-danger-soft text-danger">Próximo a Vencer</span>
+                                            <span class="badge bg-secondary"><%= tipoAlerta %></span>
                                         <% } %>
                                     </td>
                                     <td>
-                                        <% if ("PROXIMO_A_VENCER".equals(alerta.getTipoAlerta())) { %>
+                                        <% if ("VENCIMIENTO".equals(tipoAlerta) && alerta.getUmbralDias() != null) { %>
                                             Vence en <strong><%= alerta.getUmbralDias() %></strong> días
+                                        <% } else if (tipoAlerta.startsWith("STOCK_")) { %>
+                                            <span class="text-muted">Según configuración</span>
                                         <% } else { %>
                                             --
                                         <% } %>
                                         <% if (alerta.getCategoria() != null) { %>
-                                            <br><small class="text-muted">Categoría: <%= alerta.getCategoria().getNombre() %></small>
+                                            <br><small class="text-muted">📁 Categoría: <%= alerta.getCategoria().getNombre() %></small>
                                         <% } %>
                                     </td>
                                     <td><%= alerta.getRolANotificar().getNombre() %></td>

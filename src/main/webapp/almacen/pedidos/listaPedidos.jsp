@@ -23,78 +23,77 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="page-header">
-                            <h2><i class="fas fa-truck me-2"></i>Pedidos Pendientes de Despacho</h2>
-                            <p class="text-muted">Gestiona los pedidos pendientes de preparación y despacho.</p>
+                            <h2><i class="fas fa-truck-loading me-2"></i>Registro de Salidas - Planes de Transporte</h2>
+                            <p class="text-muted">Gestiona los planes de transporte pendientes de preparación.</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="mx-auto d-none d-md-block mb-4">
-                    <div class="top-search-bar">
-                        <i class="fas fa-search search-icon"></i>
-                        <input class="form-control" type="search" placeholder="Buscar por número de pedido o destino..." aria-label="Search" id="searchInput">
-                    </div>
-                </div>
                 <div class="row mt-4">
                     <div class="col-12">
+                        <!-- TABLA DE PLANES DE TRANSPORTE -->
                         <div class="card">
-                            <div class="card-header">
-                                <h5>Tabla de Pedidos</h5>
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-truck-loading me-2"></i>Planes de Transporte</h5>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
                                     <table class="table table-hover">
                                         <thead class="bg-light">
                                         <tr>
-                                            <th scope="col">Numero de Pedido</th>
+                                            <th scope="col">N° Plan</th>
+                                            <th scope="col">Producto</th>
+                                            <th scope="col">Lote</th>
+                                            <th scope="col">Paquetes</th>
+                                            <th scope="col">Conductor</th>
                                             <th scope="col">Destino</th>
-                                            <th scope="col">Estado de preparación</th>
-                                            <th scope="col">Preparar pedido</th>
+                                            <th scope="col">Fecha Entrega</th>
+                                            <th scope="col">Estado</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <c:forEach var="pedido" items="${listaPedidos}">
-                                            <tr>
-                                                <td>${pedido.numeroPedido}</td>
-                                                <td>${pedido.destino}</td>
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${pedido.estadoPreparacion == 'Pendiente'}">
-                                                            <span class="badge bg-danger">Pendiente</span>
-                                                        </c:when>
-                                                        <c:when test="${pedido.estadoPreparacion == 'En preparación'}">
-                                                            <span class="badge bg-warning text-dark">En preparación</span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="badge bg-success">Despachado</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                                <td>
-                                                    <c:if test="${pedido.estadoPreparacion == 'Pendiente'}">
-                                                    <a href="PedidoServlet?action=preparar&id=${pedido.idPedido}" class="btn btn-primary btn-sm">Preparar</a>
-                                                    </c:if>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
+                                        <c:choose>
+                                            <c:when test="${not empty listaPlanes}">
+                                                <c:forEach var="plan" items="${listaPlanes}">
+                                                    <tr>
+                                                        <td><span class="badge bg-secondary">${plan.numeroPlan}</span></td>
+                                                        <td>${plan.nombreProducto}</td>
+                                                        <td><strong>${plan.codigoLote}</strong></td>
+                                                        <td>${plan.paquetesDisponibles} paquetes</td>
+                                                        <td>${plan.nombreConductor}</td>
+                                                        <td>${plan.nombreDestino}</td>
+                                                        <td>${plan.fechaEntrega}</td>
+                                                        <td>
+                                                            <c:choose>
+                                                                <c:when test="${plan.estado == 'Pendiente'}">
+                                                                    <a href="PedidoServlet?action=prepararPlan&id=${plan.idPlan}" class="btn btn-info btn-sm text-white">
+                                                                        <i class="fas fa-box-open me-1"></i>Preparar
+                                                                    </a>
+                                                                </c:when>
+                                                                <c:when test="${plan.estado == 'Salida'}">
+                                                                    <span class="badge bg-success fs-6">
+                                                                        <i class="fas fa-check-circle me-1"></i>Despachado
+                                                                    </span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="badge bg-secondary">${plan.estado}</span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <tr>
+                                                    <td colspan="8" class="text-center text-muted">
+                                                        <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                                                        No hay planes de transporte.
+                                                    </td>
+                                                </tr>
+                                            </c:otherwise>
+                                        </c:choose>
                                         </tbody>
                                     </table>
-
-                                    <nav class="mt-4" aria-label="Page navigation">
-                                        <ul class="pagination justify-content-center">
-                                            <li class="page-item <c:if test='${paginaActual == 1}'>disabled</c:if>">
-                                                <a class="page-link" href="PedidoServlet?page=${paginaActual - 1}">Anterior</a>
-                                            </li>
-
-                                            <li class="page-item active" aria-current="page">
-                                                <span class="page-link">Página ${paginaActual} de ${totalPaginas}</span>
-                                            </li>
-
-                                            <li class="page-item <c:if test='${paginaActual == totalPaginas}'>disabled</c:if>">
-                                                <a class="page-link" href="PedidoServlet?page=${paginaActual + 1}">Siguiente</a>
-                                            </li>
-                                        </ul>
-                                    </nav>
                                 </div>
                             </div>
                         </div>
@@ -106,28 +105,6 @@
     </div>
 </div>
 
-<script>
-    // Tu script de búsqueda no necesita cambios.
-    // Nota: Ahora solo filtrará los resultados de la página actual.
-    document.addEventListener('DOMContentLoaded', function () {
-        const searchInput = document.getElementById('searchInput');
-        const table = document.querySelector('.table');
-        const tableRows = table.querySelectorAll('tbody tr');
-
-        searchInput.addEventListener('keyup', function (event) {
-            const searchTerm = event.target.value.toLowerCase();
-            tableRows.forEach(row => {
-                const numeroPedidoText = row.cells[0].textContent.toLowerCase();
-                const destinoText = row.cells[1].textContent.toLowerCase();
-                if (numeroPedidoText.includes(searchTerm) || destinoText.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    });
-</script>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

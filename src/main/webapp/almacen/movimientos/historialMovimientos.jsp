@@ -89,7 +89,7 @@
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
-                                        <td><c:out value="${mov.cantidad}"/></td>
+                                        <td><c:out value="${mov.cantidad}"/> paquetes</td>
                                         <td><c:out value="${mov.nombreUsuario}"/></td>
                                         <td>
                                             <c:choose>

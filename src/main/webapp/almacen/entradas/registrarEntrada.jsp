@@ -33,39 +33,104 @@
                                 <h5>Formulario de Recepción</h5>
                             </div>
                             <div class="card-body">
+                                <!-- Mensaje de error si existe -->
+                                <c:if test="${not empty error}">
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <strong>Error:</strong> ${error}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                </c:if>
+                                
                                 <form method="POST" action="${pageContext.request.contextPath}/almacen/EntradaServlet">
                                     <input type="hidden" name="id_orden_compra" value="${ordenCompra.idOrdenCompra}">
+                                    <input type="hidden" name="producto_esperado" value="${ordenCompra.nombreProducto}">
+                                    <c:if test="${not empty loteAsignado}">
+                                        <input type="hidden" name="codigo_lote_esperado" value="${loteAsignado.codigoLote}">
+                                        <input type="hidden" name="fecha_vencimiento_esperada" value="${loteAsignado.fechaVencimiento}">
+                                    </c:if>
+                                    
                                     <div class="mb-4 p-3 rounded" style="background-color: #eef7f6;">
-                                        <h5 class="mb-3">Recepción de Orden de Compra: ${ordenCompra.numeroOrden}</h5>
-                                        <p class="mb-1"><strong>Producto:</strong> <c:out value="${ordenCompra.nombreProducto}"/></p>
-                                        <p class="mb-1"><strong>Proveedor:</strong> <c:out value="${ordenCompra.nombreProveedor}"/></p>
-                                        <p class="mb-0"><strong>Cantidad Esperada:</strong> <c:out value="${ordenCompra.cantidad}"/></p>
+                                        <h5 class="mb-3">
+                                            <i class="fas fa-clipboard-check me-2"></i>Recepción de Orden de Compra: ${ordenCompra.numeroOrden}
+                                        </h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p class="mb-2"><strong><i class="fas fa-box text-primary me-1"></i>Producto:</strong> <c:out value="${ordenCompra.nombreProducto}"/></p>
+                                                <p class="mb-2"><strong><i class="fas fa-user text-success me-1"></i>Proveedor:</strong> <c:out value="${ordenCompra.nombreProveedor}"/></p>
+                                                <p class="mb-0"><strong><i class="fas fa-cubes text-info me-1"></i>Cantidad Esperada:</strong> <c:out value="${ordenCompra.cantidad}"/> paquetes</p>
+                                            </div>
+                                            <c:if test="${not empty loteAsignado}">
+                                                <div class="col-md-6 border-start">
+                                                    <p class="mb-2 text-success"><strong><i class="fas fa-check-circle me-1"></i>Lote Asignado por el Productor:</strong></p>
+                                                    <p class="mb-2"><strong>Código:</strong> <span class="badge bg-success">${loteAsignado.codigoLote}</span></p>
+                                                    <p class="mb-0"><strong>Fecha Venc.:</strong> <span class="badge bg-warning text-dark">${loteAsignado.fechaVencimiento}</span></p>
+                                                </div>
+                                            </c:if>
+                                        </div>
                                     </div>
-                                    <h5 class="mt-4">Datos del Nuevo Lote</h5>
+                                    <h5 class="mt-4">
+                                        <i class="fas fa-check-double me-2 text-warning"></i>Verificación de Producto Recibido Físicamente
+                                    </h5>
+                                    <p class="text-muted small">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Por favor, escriba los datos del producto físico que está recibiendo para confirmar que coincide con el lote asignado por el productor.
+                                    </p>
                                     <hr>
-                                    <div class="mb-3">
-                                        <label for="codigo_lote" class="form-label">Código del Nuevo Lote</label>
-                                        <input type="text" class="form-control" id="codigo_lote" name="codigo_lote" required>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-12 mb-3">
+                                            <label for="producto_verificacion" class="form-label">
+                                                <i class="fas fa-box me-1"></i>1. Nombre del Producto Recibido
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" class="form-control" id="producto_verificacion" name="producto_verificacion" 
+                                                   placeholder="Escriba el nombre exacto del producto" required>
+                                            <small class="text-muted">Debe coincidir con: <strong><c:out value="${ordenCompra.nombreProducto}"/></strong></small>
+                                        </div>
+                                        
+                                        <c:if test="${not empty loteAsignado}">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="codigo_lote_verificacion" class="form-label">
+                                                    <i class="fas fa-barcode me-1"></i>2. Código del Lote Recibido
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="text" class="form-control" id="codigo_lote_verificacion" name="codigo_lote_verificacion" 
+                                                       placeholder="Escriba el código del lote" required>
+                                                <small class="text-muted">Debe coincidir con: <strong class="text-success">${loteAsignado.codigoLote}</strong></small>
+                                            </div>
+                                            
+                                            <div class="col-md-6 mb-3">
+                                                <label for="fecha_vencimiento_verificacion" class="form-label">
+                                                    <i class="fas fa-calendar-alt me-1"></i>3. Fecha de Vencimiento del Lote
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="date" class="form-control" id="fecha_vencimiento_verificacion" name="fecha_vencimiento_verificacion" required>
+                                                <small class="text-muted">Debe coincidir con: <strong class="text-warning">${loteAsignado.fechaVencimiento}</strong></small>
+                                            </div>
+                                        </c:if>
+                                        
+                                        <c:if test="${empty loteAsignado}">
+                                            <div class="col-12">
+                                                <div class="alert alert-warning">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    <strong>Atención:</strong> Esta orden no tiene un lote asignado por el productor. 
+                                                    Solo se validará el nombre del producto.
+                                                </div>
+                                            </div>
+                                        </c:if>
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento</label>
-                                        <input type="date" class="form-control" id="fechaVencimientoInput" name="fecha_vencimiento" required>
-                                    </div>
+                                    
+                                    <h5 class="mt-4">
+                                        <i class="fas fa-warehouse me-2"></i>Ubicación en Almacén
+                                    </h5>
+                                    <hr>
                                     <div class="mb-3">
                                         <label for="ubicacion_id" class="form-label">Ubicación de Destino</label>
                                         <select class="form-select" id="ubicacion_id" name="ubicacion_id" required>
                                             <option value="" disabled selected>-- Elija una ubicación --</option>
                                             <c:forEach var="ubicacion" items="${listaUbicaciones}">
                                                 <option value="${ubicacion.idUbicacion}"><c:out value="${ubicacion.nombre}"/></option>
-                                            </c:forEach>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="distrito_id" class="form-label">Distrito de Destino</label>
-                                        <select class="form-select" id="distrito_id" name="distrito_id" required>
-                                            <option value="" disabled selected>-- Elija un distrito --</option>
-                                            <c:forEach var="distrito" items="${listaDistritos}">
-                                                <option value="${distrito.idDistrito}"><c:out value="${distrito.nombre}"/></option>
                                             </c:forEach>
                                         </select>
                                     </div>

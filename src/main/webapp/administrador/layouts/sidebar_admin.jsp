@@ -28,6 +28,16 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link <c:if test='${param.activeMenu == "Conductores"}'>active</c:if>" href="${pageContext.request.contextPath}/administrador/ConductorServlet">
+                        <i class="fas fa-user-tie"></i>Gestión de Conductores
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <c:if test='${param.activeMenu == "Vehiculos"}'>active</c:if>" href="${pageContext.request.contextPath}/administrador/VehiculoServlet">
+                        <i class="fas fa-truck"></i>Gestión de Vehículos
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link <c:if test='${param.activeMenu == "Configuracion"}'>active</c:if>" href="${pageContext.request.contextPath}/administrador/configuracion.jsp">
                         <i class="fas fa-cogs"></i>Configuración
                     </a>

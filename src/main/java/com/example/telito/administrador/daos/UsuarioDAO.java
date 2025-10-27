@@ -108,7 +108,7 @@ public class UsuarioDAO {
     // Para cargar los datos de un usuario en el formulario de edición.
     public Usuario obtenerUsuarioPorId(int id) {
         Usuario usuario = null;
-        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
+        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.activo, u.rol_id, r.nombre AS nombre_rol FROM usuarios u " +
                 "INNER JOIN roles r ON u.rol_id = r.id_rol WHERE u.id_usuario = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -123,7 +123,14 @@ public class UsuarioDAO {
                     usuario.setApellidos(rs.getString("apellidos"));
                     usuario.setEmail(rs.getString("email"));
                     usuario.setActivo(rs.getBoolean("activo"));
-                    usuario.setFotoPerfil(rs.getString("foto_perfil"));
+                    
+                    // Intentar obtener foto_perfil si existe la columna
+                    try {
+                        usuario.setFotoPerfil(rs.getString("foto_perfil"));
+                    } catch (SQLException e) {
+                        // Columna foto_perfil no existe, usar valor por defecto
+                        usuario.setFotoPerfil(null);
+                    }
 
                     Rol rol = new Rol();
                     rol.setIdRol(rs.getInt("rol_id"));
@@ -132,6 +139,7 @@ public class UsuarioDAO {
                 }
             }
         } catch (SQLException e) {
+            System.err.println("Error al obtener usuario por ID: " + e.getMessage());
             e.printStackTrace();
         }
         return usuario;
@@ -214,7 +222,14 @@ public class UsuarioDAO {
                     usuario.setApellidos(rs.getString("apellidos"));
                     usuario.setEmail(rs.getString("email"));
                     usuario.setActivo(rs.getBoolean("activo"));
-                    usuario.setFotoPerfil(rs.getString("foto_perfil"));
+                    
+                    // Intentar obtener foto_perfil si existe la columna
+                    try {
+                        usuario.setFotoPerfil(rs.getString("foto_perfil"));
+                    } catch (SQLException e) {
+                        // Columna foto_perfil no existe, usar valor por defecto
+                        usuario.setFotoPerfil(null);
+                    }
 
                     Rol rol = new Rol();
                     rol.setIdRol(rs.getInt("rol_id"));
@@ -223,6 +238,7 @@ public class UsuarioDAO {
                 }
             }
         } catch (SQLException e) {
+            System.err.println("Error al autenticar usuario: " + e.getMessage());
             e.printStackTrace();
         }
         return usuario;

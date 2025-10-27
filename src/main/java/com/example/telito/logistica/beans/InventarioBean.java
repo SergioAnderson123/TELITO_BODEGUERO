@@ -1,41 +1,54 @@
 package com.example.telito.logistica.beans;
 
+import java.sql.Date;
+
 public class InventarioBean {
 
-    // CAMPOS CORREGIDOS para que coincidan 100% con los alias de la consulta SQL
-    private String sku;
+    // Propiedades como Almacenero (por lote individual)
+    private int idLote;
+    private String codigoLote;
+    private String codigoSKU;
     private String nombreProducto;
-    private int cantidadLotes;
-    private String codigosDeLote;             // CAMBIADO: de codigoLote a codigosDeLote (plural)
-    private String proximoVencimiento;        // CAMBIADO: de fechaVencimientoFormateada a proximoVencimiento
-    private String estadoStock;
-    private int stockTotal;                   // AÑADIDO: para el nuevo campo SUM(stock_actual)
+    private int stockActual;
+    private int paquetesDisponibles;
+    private String nombreUbicacion;
+    private Date fechaVencimiento;
+    private String estado;
+    
+    // Propiedades adicionales para vista agrupada de Logística
+    private int idProducto;
+    private double precioPorPaquete;
+    private double costoPorUnidad;
+    private String estadoStock; // "En Stock", "Poco Stock", "Sin Stock", "No configurado"
 
     // Constructor vacío
     public InventarioBean() {
     }
 
-    // CONSTRUCTOR CORREGIDO: Eliminado "ubicacion" y ajustados los nombres de los parámetros
-    public InventarioBean(String sku, String nombreProducto, int cantidadLotes, String codigosDeLote, String proximoVencimiento, String estadoStock, int stockTotal) {
-        this.sku = sku;
-        this.nombreProducto = nombreProducto;
-        this.cantidadLotes = cantidadLotes;
-        this.codigosDeLote = codigosDeLote;
-        this.proximoVencimiento = proximoVencimiento;
-        this.estadoStock = estadoStock;
-        this.stockTotal = stockTotal;
+    // Getters y Setters
+    public int getIdLote() {
+        return idLote;
     }
 
-    // GETTERS Y SETTERS CORREGIDOS Y AÑADIDOS
-    public String getSku() {
-        return sku;
+    public void setIdLote(int idLote) {
+        this.idLote = idLote;
     }
 
-    public void setSku(String sku) {
-        this.sku = sku;
+    public String getCodigoLote() {
+        return codigoLote;
     }
 
+    public void setCodigoLote(String codigoLote) {
+        this.codigoLote = codigoLote;
+    }
 
+    public String getCodigoSKU() {
+        return codigoSKU;
+    }
+
+    public void setCodigoSKU(String codigoSKU) {
+        this.codigoSKU = codigoSKU;
+    }
 
     public String getNombreProducto() {
         return nombreProducto;
@@ -45,28 +58,68 @@ public class InventarioBean {
         this.nombreProducto = nombreProducto;
     }
 
-    public int getCantidadLotes() {
-        return cantidadLotes;
+    public int getStockActual() {
+        return stockActual;
     }
 
-    public void setCantidadLotes(int cantidadLotes) {
-        this.cantidadLotes = cantidadLotes;
+    public void setStockActual(int stockActual) {
+        this.stockActual = stockActual;
     }
 
-    public String getCodigosDeLote() {
-        return codigosDeLote;
+    public int getPaquetesDisponibles() {
+        return paquetesDisponibles;
     }
 
-    public void setCodigosDeLote(String codigosDeLote) {
-        this.codigosDeLote = codigosDeLote;
+    public void setPaquetesDisponibles(int paquetesDisponibles) {
+        this.paquetesDisponibles = paquetesDisponibles;
     }
 
-    public String getProximoVencimiento() {
-        return proximoVencimiento;
+    public String getNombreUbicacion() {
+        return nombreUbicacion;
     }
 
-    public void setProximoVencimiento(String proximoVencimiento) {
-        this.proximoVencimiento = proximoVencimiento;
+    public void setNombreUbicacion(String nombreUbicacion) {
+        this.nombreUbicacion = nombreUbicacion;
+    }
+
+    public Date getFechaVencimiento() {
+        return fechaVencimiento;
+    }
+
+    public void setFechaVencimiento(Date fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public int getIdProducto() {
+        return idProducto;
+    }
+
+    public void setIdProducto(int idProducto) {
+        this.idProducto = idProducto;
+    }
+
+    public double getPrecioPorPaquete() {
+        return precioPorPaquete;
+    }
+
+    public void setPrecioPorPaquete(double precioPorPaquete) {
+        this.precioPorPaquete = precioPorPaquete;
+    }
+
+    public double getCostoPorUnidad() {
+        return costoPorUnidad;
+    }
+
+    public void setCostoPorUnidad(double costoPorUnidad) {
+        this.costoPorUnidad = costoPorUnidad;
     }
 
     public String getEstadoStock() {
@@ -75,13 +128,5 @@ public class InventarioBean {
 
     public void setEstadoStock(String estadoStock) {
         this.estadoStock = estadoStock;
-    }
-
-    public int getStockTotal() {
-        return stockTotal;
-    }
-
-    public void setStockTotal(int stockTotal) {
-        this.stockTotal = stockTotal;
     }
 }

@@ -16,17 +16,18 @@ public class OrdenCompraDao {
         String sql = """
             SELECT
                 oc.id_orden_compra AS id_orden,
-                p.nombre AS nombre_proveedor,
+                CONCAT(productor.nombres, ' ', productor.apellidos) AS nombre_proveedor,
                 pr.nombre AS nombre_producto,
                 oc.cantidad AS cantidad_paquetes,
-                CASE
-                    WHEN oc.estado = 'Pendiente' THEN 'Por Confirmar'
-                    ELSE CONCAT(u.nombres, ' ', u.apellidos)
-                END AS personal_responsable,
-                oc.estado,
+                CONCAT(u.nombres, ' ', u.apellidos) AS personal_responsable,
+                CASE 
+                    WHEN oc.estado = 'Pendiente' AND oc.lote_id IS NOT NULL THEN 'Recibido'
+                    WHEN oc.estado IN ('Recibido', 'En Proceso') THEN 'Pendiente'
+                    ELSE oc.estado
+                END AS estado,
                 oc.monto_total
             FROM ordenes_compra oc
-            INNER JOIN proveedores p ON oc.proveedor_id = p.id_proveedor
+            INNER JOIN usuarios productor ON oc.productor_id = productor.id_usuario
             INNER JOIN productos pr ON oc.producto_id = pr.id_producto
             INNER JOIN usuarios u ON oc.usuario_id = u.id_usuario
             WHERE 1=1
@@ -47,7 +48,7 @@ public class OrdenCompraDao {
             sql += ")";
         }
         if (proveedorId != null && !proveedorId.trim().isEmpty()) {
-            sql += " AND p.id_proveedor = ?";
+            sql += " AND productor.id_usuario = ?";
             params.add(Integer.parseInt(proveedorId));
         }
         if (estado != null && !estado.trim().isEmpty()) {
@@ -90,30 +91,48 @@ public class OrdenCompraDao {
         return listaOrdenes;
     }
 
-    // === CÓDIGO RESTAURADO ===
-    public void crearOrdenCompra(String numeroOrden, int proveedorId, int productoId, int cantidad, int usuarioId, double montoTotal, int distritoId) {
+    public boolean crearOrdenCompra(String numeroOrden, int productorId, int productoId, int cantidad, int usuarioId, double montoTotal, int distritoId) {
         String sql;
         boolean includeNumero = numeroOrden != null && !numeroOrden.isEmpty();
         if (includeNumero) {
-            sql = "INSERT INTO ordenes_compra (numero_Orden, proveedor_id, producto_id, cantidad, usuario_id, estado, monto_total, distrito_id) VALUES (?, ?, ?, ?, ?, 'Pendiente', ?, ?)";
+            sql = "INSERT INTO ordenes_compra (numero_Orden, productor_id, producto_id, cantidad, usuario_id, estado, monto_total, distrito_id) VALUES (?, ?, ?, ?, ?, 'Pendiente', ?, ?)";
         } else {
-            sql = "INSERT INTO ordenes_compra (proveedor_id, producto_id, cantidad, usuario_id, estado, monto_total, distrito_id) VALUES (?, ?, ?, ?, 'Pendiente', ?, ?)";
+            sql = "INSERT INTO ordenes_compra (productor_id, producto_id, cantidad, usuario_id, estado, monto_total, distrito_id) VALUES (?, ?, ?, ?, 'Pendiente', ?, ?)";
         }
+        
+        System.out.println("=== DEBUG DAO - CREAR ORDEN DE COMPRA ===");
+        System.out.println("SQL: " + sql);
+        
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             int idx = 1;
             if (includeNumero) {
                 pstmt.setString(idx++, numeroOrden);
+                System.out.println("Param " + (idx-1) + ": " + numeroOrden);
             }
-            pstmt.setInt(idx++, proveedorId);
+            pstmt.setInt(idx++, productorId);
+            System.out.println("Param " + (idx-1) + " (productor_id): " + productorId);
             pstmt.setInt(idx++, productoId);
+            System.out.println("Param " + (idx-1) + " (producto_id): " + productoId);
             pstmt.setInt(idx++, cantidad);
+            System.out.println("Param " + (idx-1) + " (cantidad): " + cantidad);
             pstmt.setInt(idx++, usuarioId);
+            System.out.println("Param " + (idx-1) + " (usuario_id): " + usuarioId);
             pstmt.setDouble(idx++, montoTotal);
+            System.out.println("Param " + (idx-1) + " (monto_total): " + montoTotal);
             pstmt.setInt(idx, distritoId);
-            pstmt.executeUpdate();
+            System.out.println("Param " + idx + " (distrito_id): " + distritoId);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("✓ DAO: Filas insertadas = " + rowsAffected);
+            return rowsAffected > 0;
         } catch (SQLException e) {
+            System.err.println("❌ ERROR SQL al crear orden de compra:");
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            System.err.println("Message: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -141,5 +160,92 @@ public class OrdenCompraDao {
             e.printStackTrace();
         }
         return ultimoId;
+    }
+
+    /**
+     * Obtener detalles completos de una orden incluyendo el lote asignado
+     * @param idOrden ID de la orden de compra
+     * @return Array con todos los detalles de la orden y el lote
+     */
+    public Object[] obtenerDetalleConLote(int idOrden) {
+        String sql = "SELECT " +
+                     "CONCAT(productor.nombres, ' ', productor.apellidos) AS productor, " +
+                     "CONCAT(u.nombres, ' ', u.apellidos) AS personal_responsable, " +
+                     "pr.nombre AS producto, " +
+                     "pr.codigo_sku AS sku, " +
+                     "oc.cantidad AS cantidad_paquetes, " +
+                     "oc.monto_total, " +
+                     "oc.estado, " +
+                     "l.codigo_lote, " +
+                     "l.fecha_vencimiento, " +
+                     "l.stock_actual, " +
+                     "ub.nombre AS ubicacion " +
+                     "FROM ordenes_compra oc " +
+                     "INNER JOIN usuarios productor ON oc.productor_id = productor.id_usuario " +
+                     "INNER JOIN productos pr ON oc.producto_id = pr.id_producto " +
+                     "INNER JOIN usuarios u ON oc.usuario_id = u.id_usuario " +
+                     "LEFT JOIN lotes l ON oc.lote_id = l.id_lote " +
+                     "LEFT JOIN ubicaciones ub ON l.ubicacion_id = ub.id_ubicacion " +
+                     "WHERE oc.id_orden_compra = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idOrden);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Object[] detalle = new Object[11];
+                    detalle[0] = rs.getString("productor");
+                    detalle[1] = rs.getString("personal_responsable");
+                    detalle[2] = rs.getString("producto");
+                    detalle[3] = rs.getString("sku");
+                    detalle[4] = rs.getInt("cantidad_paquetes");
+                    detalle[5] = String.format("S/. %.2f", rs.getDouble("monto_total"));
+                    detalle[6] = rs.getString("estado");
+                    detalle[7] = rs.getString("codigo_lote");
+                    detalle[8] = rs.getDate("fecha_vencimiento");
+                    detalle[9] = rs.getInt("stock_actual");
+                    detalle[10] = rs.getString("ubicacion");
+                    return detalle;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Error al obtener detalle de orden: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Actualizar el estado de una orden de compra
+     * @param idOrden ID de la orden de compra
+     * @param nuevoEstado Nuevo estado ('Aprobado' o 'Rechazado')
+     * @return true si se actualizó correctamente
+     */
+    public boolean actualizarEstadoOrden(int idOrden, String nuevoEstado) {
+        String sql = "UPDATE ordenes_compra SET estado = ? WHERE id_orden_compra = ?";
+        
+        System.out.println("=== DEBUG DAO - ACTUALIZAR ESTADO ===");
+        System.out.println("ID Orden: " + idOrden);
+        System.out.println("Nuevo Estado: " + nuevoEstado);
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, nuevoEstado);
+            pstmt.setInt(2, idOrden);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("✓ Filas actualizadas: " + rowsAffected);
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR: Error al actualizar estado:");
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            System.err.println("Message: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 }

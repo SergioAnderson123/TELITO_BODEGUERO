@@ -22,11 +22,10 @@ public class InventarioServlet extends HttpServlet {
         // Obtener parámetros de búsqueda y filtros
         String busqueda = request.getParameter("busqueda");
         String estado = request.getParameter("estado");
-        String lotes = request.getParameter("lotes");
 
-        // Obtener datos filtrados directamente desde el DAO
+        // Obtener datos agrupados por producto desde el DAO
         InventarioDao inventarioDao = new InventarioDao();
-        ArrayList<InventarioBean> listaInventario = inventarioDao.obtenerInventario(busqueda, estado, lotes);
+        ArrayList<InventarioBean> listaInventario = inventarioDao.obtenerInventarioAgrupado(busqueda, estado);
 
         // Enviar datos a la JSP
         request.setAttribute("listaInventario", listaInventario);

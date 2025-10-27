@@ -59,10 +59,18 @@
                                             <label for="tipoAlerta" class="form-label">Tipo de Alerta</label>
                                             <select class="form-select" id="tipoAlerta" name="tipoAlerta" required>
                                                 <option value="">Seleccionar tipo</option>
-                                                <option value="STOCK_MINIMO" ${alerta.tipoAlerta == 'STOCK_MINIMO' ? 'selected' : ''}>Stock Mínimo</option>
-                                                <option value="STOCK_CRITICO" ${alerta.tipoAlerta == 'STOCK_CRITICO' ? 'selected' : ''}>Stock Crítico</option>
-                                                <option value="VENCIMIENTO" ${alerta.tipoAlerta == 'VENCIMIENTO' ? 'selected' : ''}>Vencimiento</option>
-                                                <option value="MOVIMIENTO" ${alerta.tipoAlerta == 'MOVIMIENTO' ? 'selected' : ''}>Movimiento</option>
+                                                <optgroup label="Alertas por Lote (Almacén)">
+                                                    <option value="STOCK_MINIMO_LOTE" ${alerta.tipoAlerta == 'STOCK_MINIMO_LOTE' ? 'selected' : ''}>📦 Stock Mínimo por Lote</option>
+                                                    <option value="STOCK_CRITICO_LOTE" ${alerta.tipoAlerta == 'STOCK_CRITICO_LOTE' ? 'selected' : ''}>📦 Stock Crítico por Lote</option>
+                                                </optgroup>
+                                                <optgroup label="Alertas por Producto Total (Logística)">
+                                                    <option value="STOCK_MINIMO_TOTAL" ${alerta.tipoAlerta == 'STOCK_MINIMO_TOTAL' ? 'selected' : ''}>📊 Stock Mínimo Total</option>
+                                                    <option value="STOCK_CRITICO_TOTAL" ${alerta.tipoAlerta == 'STOCK_CRITICO_TOTAL' ? 'selected' : ''}>📊 Stock Crítico Total</option>
+                                                </optgroup>
+                                                <optgroup label="Otras Alertas">
+                                                    <option value="VENCIMIENTO" ${alerta.tipoAlerta == 'VENCIMIENTO' ? 'selected' : ''}>⏰ Próximo a Vencer</option>
+                                                    <option value="MOVIMIENTO" ${alerta.tipoAlerta == 'MOVIMIENTO' ? 'selected' : ''}>🔄 Movimiento de Inventario</option>
+                                                </optgroup>
                                             </select>
                                         </div>
                                     </div>

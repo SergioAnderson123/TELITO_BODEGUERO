@@ -63,15 +63,29 @@
                                         <td><c:out value="${orden.numeroOrden}"/></td>
                                         <td><c:out value="${orden.nombreProducto}"/></td>
                                         <td><c:out value="${orden.nombreProveedor}"/></td>
-                                        <td><c:out value="${orden.cantidad}"/></td>
+                                        <td><c:out value="${orden.cantidad}"/> paquetes</td>
                                         <td>
-                                            <span class="badge bg-info text-dark"><c:out value="${orden.estado}"/></span>
+                                            <c:choose>
+                                                <c:when test="${orden.estado == 'Registrado'}">
+                                                    <span class="badge bg-success"><c:out value="${orden.estado}"/></span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="badge bg-info text-dark"><c:out value="${orden.estado}"/></span>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </td>
                                         <td>
-                                            <a class="btn btn-primary btn-sm"
-                                               href="${pageContext.request.contextPath}/almacen/EntradaServlet?action=recibir&id=${orden.idOrdenCompra}">
-                                                Registrar Entrada
-                                            </a>
+                                            <c:choose>
+                                                <c:when test="${orden.estado == 'Registrado'}">
+                                                    <span class="text-muted"><i class="fas fa-check-circle me-1"></i>Ya registrado</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <a class="btn btn-primary btn-sm"
+                                                       href="${pageContext.request.contextPath}/almacen/EntradaServlet?action=recibir&id=${orden.idOrdenCompra}">
+                                                        <i class="fas fa-clipboard-check me-1"></i>Registrar Entrada
+                                                    </a>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </td>
                                     </tr>
                                 </c:forEach>

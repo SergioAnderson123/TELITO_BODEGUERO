@@ -7,6 +7,7 @@ public class Producto {
     private String nombre;
     private String descripcion;
     private double precioActual;
+    private int unidadesPorPaquete;
     private Usuario productor;
     private Categoria categoria;
     private int numeroLotes;
@@ -68,6 +69,14 @@ public class Producto {
 
     public void setPrecioActual(double precioActual) {
         this.precioActual = precioActual;
+    }
+
+    public int getUnidadesPorPaquete() {
+        return unidadesPorPaquete;
+    }
+
+    public void setUnidadesPorPaquete(int unidadesPorPaquete) {
+        this.unidadesPorPaquete = unidadesPorPaquete;
     }
 
     public Usuario getProductor() {

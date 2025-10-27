@@ -4,6 +4,7 @@ import com.example.telito.almacen.beans.*; // Importa todos tus beans
 import com.example.telito.almacen.daos.LoteDao;
 import com.example.telito.almacen.daos.MovimientoDao;
 import com.example.telito.almacen.daos.PedidoDao;
+import com.example.telito.almacen.daos.PlanTransporteDao;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -37,7 +38,12 @@ public class PedidoServlet extends HttpServlet {
                 int offset = (paginaActual - 1) * registrosPorPagina;
                 ArrayList<Pedido> listaPaginada = pedidoDao.listarPedidosPaginados(offset, registrosPorPagina);
 
+                // También traemos los planes de transporte pendientes
+                PlanTransporteDao planTransporteDao = new PlanTransporteDao();
+                ArrayList<PlanTransporte> listaPlanes = planTransporteDao.listarPlanesPendientes();
+
                 request.setAttribute("listaPedidos", listaPaginada);
+                request.setAttribute("listaPlanes", listaPlanes);
                 request.setAttribute("paginaActual", paginaActual);
                 request.setAttribute("totalPaginas", totalPaginas);
 
@@ -57,6 +63,20 @@ public class PedidoServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/almacen/PedidoServlet");
                 }
                 break;
+
+            case "prepararPlan":
+                int idPlan = Integer.parseInt(request.getParameter("id"));
+                PlanTransporteDao planDao = new PlanTransporteDao();
+                PlanTransporte plan = planDao.buscarPlanPorId(idPlan);
+
+                if (plan != null) {
+                    request.setAttribute("plan", plan);
+                    view = request.getRequestDispatcher("/almacen/pedidos/prepararPlanTransporte.jsp");
+                    view.forward(request, response);
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/almacen/PedidoServlet");
+                }
+                break;
         }
     }
 
@@ -70,9 +90,19 @@ public class PedidoServlet extends HttpServlet {
 
         // Obtenemos el usuario de la sesión para registrar quién hizo el movimiento
         HttpSession session = request.getSession();
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        int usuarioId = (usuario != null) ? usuario.getIdUsuario() : 1; // Usamos 1 como fallback si no hay sesión
+        com.example.telito.administrador.beans.Usuario usuarioSesion = 
+            (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
+        int usuarioId = (usuarioSesion != null) ? usuarioSesion.getIdUsuario() : 1; // Usamos 1 como fallback si no hay sesión
 
+        String action = request.getParameter("action");
+
+        // Si es preparación de Plan de Transporte
+        if ("prepararPlanTransporte".equals(action)) {
+            procesarPlanTransporte(request, response, usuarioId);
+            return;
+        }
+
+        // Si no, es preparación de pedido normal (lógica existente)
         // Instanciamos los DAOs
         PedidoDao pedidoDao = new PedidoDao();
         LoteDao loteDao = new LoteDao();
@@ -144,6 +174,61 @@ public class PedidoServlet extends HttpServlet {
             }
         } else {
             // Si por alguna razón el pedido no se encuentra, volvemos a la lista
+            response.sendRedirect(request.getContextPath() + "/almacen/PedidoServlet");
+        }
+    }
+
+    /**
+     * MÉTODO PARA PROCESAR LA PREPARACIÓN DE UN PLAN DE TRANSPORTE
+     */
+    private void procesarPlanTransporte(HttpServletRequest request, HttpServletResponse response, int usuarioId)
+            throws ServletException, IOException {
+
+        PlanTransporteDao planDao = new PlanTransporteDao();
+        LoteDao loteDao = new LoteDao();
+        MovimientoDao movimientoDao = new MovimientoDao();
+
+        int idPlan = Integer.parseInt(request.getParameter("id_plan"));
+        
+        // Buscar el plan de transporte
+        PlanTransporte plan = planDao.buscarPlanPorId(idPlan);
+
+        if (plan != null && "Pendiente".equals(plan.getEstado())) {
+            // Obtener el lote
+            Lote lote = loteDao.buscarLotePorId(plan.getIdLote());
+
+            if (lote != null && lote.getStockActual() > 0) {
+                // Todo el stock del lote se considera para el plan de transporte
+                int cantidadADespachar = lote.getStockActual();
+
+                // 1. Descontar todo el stock del lote (dejar en 0)
+                loteDao.actualizarStock(plan.getIdLote(), 0);
+
+                // 2. Registrar el movimiento de salida
+                Movimiento movimiento = new Movimiento();
+                movimiento.setLoteId(plan.getIdLote());
+                movimiento.setPedidoId(null); // No es un pedido
+                movimiento.setOrdenCompraId(null); // No es una orden de compra
+                movimiento.setUsuarioId(usuarioId);
+                movimiento.setTipoMovimiento("Salida");
+                movimiento.setCantidad(cantidadADespachar);
+                movimiento.setMotivo("Plan de transporte: " + plan.getNumeroPlan());
+                movimientoDao.registrarMovimiento(movimiento);
+
+                // 3. Cambiar el estado del plan de transporte a "Salida"
+                planDao.actualizarEstado(idPlan, "Salida");
+
+                // 4. Redirigir a la lista
+                response.sendRedirect(request.getContextPath() + "/almacen/PedidoServlet");
+            } else {
+                // Stock insuficiente
+                request.setAttribute("error", "El lote no tiene stock disponible.");
+                request.setAttribute("plan", plan);
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/almacen/pedidos/prepararPlanTransporte.jsp");
+                dispatcher.forward(request, response);
+            }
+        } else {
+            // Plan no encontrado o ya procesado
             response.sendRedirect(request.getContextPath() + "/almacen/PedidoServlet");
         }
     }

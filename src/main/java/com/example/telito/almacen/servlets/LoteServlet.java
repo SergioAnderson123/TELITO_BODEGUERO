@@ -81,8 +81,9 @@ public class LoteServlet extends HttpServlet {
                 String motivoAjuste = request.getParameter("motivo");
 
                 HttpSession session = request.getSession();
-                Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-                int usuarioId = (usuario != null) ? usuario.getIdUsuario() : 1;
+                com.example.telito.administrador.beans.Usuario usuarioSesion = 
+                    (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
+                int usuarioId = (usuarioSesion != null) ? usuarioSesion.getIdUsuario() : 1;
 
                 int diferencia = cantidadContada - stockOriginal;
 

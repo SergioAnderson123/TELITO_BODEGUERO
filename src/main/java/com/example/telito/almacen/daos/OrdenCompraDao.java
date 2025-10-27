@@ -24,10 +24,19 @@ public class OrdenCompraDao {
 
     public ArrayList<OrdenCompra> listarOrdenesPaginadas(int offset, int limit) {
         ArrayList<OrdenCompra> lista = new ArrayList<>();
-        String sql = "SELECT oc.id_orden_compra, oc.numero_orden, prod.nombre, prov.nombre, oc.cantidad, oc.estado " +
+        String sql = "SELECT oc.id_orden_compra, " +
+                "IFNULL(oc.numero_Orden, CONCAT('OC', LPAD(oc.id_orden_compra, 3, '0'))) AS numero_orden, " +
+                "prod.nombre, " +
+                "CONCAT(productor.nombres, ' ', productor.apellidos) AS nombre_productor, " +
+                "oc.cantidad, " +
+                "CASE " +
+                "    WHEN EXISTS (SELECT 1 FROM movimientos_inventario mi WHERE mi.orden_compra_id = oc.id_orden_compra AND mi.tipo = 'Entrada') " +
+                "    THEN 'Registrado' " +
+                "    ELSE oc.estado " +
+                "END AS estado " +
                 "FROM ordenes_compra oc " +
                 "INNER JOIN productos prod ON (oc.producto_id = prod.id_producto) " +
-                "INNER JOIN proveedores prov ON (oc.proveedor_id = prov.id_proveedor) " +
+                "INNER JOIN usuarios productor ON (oc.productor_id = productor.id_usuario) " +
                 "WHERE oc.estado = 'Aprobado' LIMIT ? OFFSET ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -42,7 +51,7 @@ public class OrdenCompraDao {
                     oc.setIdOrdenCompra(rs.getInt("id_orden_compra"));
                     oc.setNumeroOrden(rs.getString("numero_orden"));
                     oc.setNombreProducto(rs.getString("prod.nombre"));
-                    oc.setNombreProveedor(rs.getString("prov.nombre"));
+                    oc.setNombreProveedor(rs.getString("nombre_productor"));
                     oc.setCantidad(rs.getInt("cantidad"));
                     oc.setEstado(rs.getString("estado"));
                     lista.add(oc);
@@ -60,14 +69,19 @@ public class OrdenCompraDao {
      */
     public OrdenCompra buscarOrdenPorId(int idOrden) {
         OrdenCompra oc = null;
-        // --- INICIO DE LA CORRECCIÓN ---
-        // Se añade oc.lote_id a la consulta SQL
-        String sql = "SELECT oc.id_orden_compra, oc.numero_orden, oc.producto_id, oc.proveedor_id, oc.lote_id, oc.cantidad, oc.estado, prod.nombre, prov.nombre " +
+        String sql = "SELECT oc.id_orden_compra, " +
+                "IFNULL(oc.numero_Orden, CONCAT('OC', LPAD(oc.id_orden_compra, 3, '0'))) AS numero_orden, " +
+                "oc.producto_id, " +
+                "oc.productor_id, " +
+                "oc.lote_id, " +
+                "oc.cantidad, " +
+                "oc.estado, " +
+                "prod.nombre, " +
+                "CONCAT(productor.nombres, ' ', productor.apellidos) AS nombre_productor " +
                 "FROM ordenes_compra oc " +
                 "INNER JOIN productos prod ON (oc.producto_id = prod.id_producto) " +
-                "INNER JOIN proveedores prov ON (oc.proveedor_id = prov.id_proveedor) " +
+                "INNER JOIN usuarios productor ON (oc.productor_id = productor.id_usuario) " +
                 "WHERE oc.id_orden_compra = ?";
-        // --- FIN DE LA CORRECCIÓN ---
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -79,12 +93,12 @@ public class OrdenCompraDao {
                     oc.setIdOrdenCompra(rs.getInt("id_orden_compra"));
                     oc.setNumeroOrden(rs.getString("numero_orden"));
                     oc.setProductoId(rs.getInt("producto_id"));
-                    oc.setProveedorId(rs.getInt("proveedor_id"));
-                    oc.setLoteId(rs.getInt("lote_id")); // <-- SE LEE EL NUEVO CAMPO
+                    oc.setProveedorId(rs.getInt("productor_id"));
+                    oc.setLoteId(rs.getInt("lote_id"));
                     oc.setCantidad(rs.getInt("cantidad"));
                     oc.setEstado(rs.getString("estado"));
                     oc.setNombreProducto(rs.getString("prod.nombre"));
-                    oc.setNombreProveedor(rs.getString("prov.nombre"));
+                    oc.setNombreProveedor(rs.getString("nombre_productor"));
                 }
             }
         } catch (SQLException e) {

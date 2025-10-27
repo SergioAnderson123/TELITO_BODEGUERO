@@ -57,9 +57,9 @@
                                             </select>
                                         </div>
 
-                                        <!-- Cantidad de Lotes -->
+                                        <!-- Cantidad de Paquetes -->
                                         <div class="mb-3">
-                                            <label for="cantidad" class="form-label">Cantidad de Lotes <span class="text-danger">*</span></label>
+                                            <label for="cantidad" class="form-label">Cantidad de Paquetes <span class="text-danger">*</span></label>
                                             <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" required>
                                         </div>
 
@@ -103,8 +103,16 @@
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label class="form-label text-muted">Cantidad de Lotes:</label>
+                                                    <label class="form-label text-muted">Cantidad de Paquetes:</label>
                                                     <p class="fw-bold" id="resumenCantidad">0</p>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label text-muted">Unidades Totales:</label>
+                                                    <p class="fw-bold text-success" id="resumenUnidadesTotales">0 unidades</p>
+                                                    <small class="text-muted" style="font-size: 0.85em;">
+                                                        <i class="fas fa-info-circle"></i> Paquetes × Unidades por paquete
+                                                    </small>
                                                 </div>
 
                                                 <div class="mb-3">
@@ -148,6 +156,7 @@
     // Variables globales
     let precioProducto = 0;
     let nombreProducto = '';
+    let unidadesPorPaquete = 0;
     let nombreZona = '';
     let nombreDistrito = '';
 
@@ -185,6 +194,7 @@
                     option.textContent = producto.nombre;
                     option.dataset.precio = producto.precio;
                     option.dataset.nombre = producto.nombre;
+                    option.dataset.unidades = producto.unidades_por_paquete || 1;
                     productoSelect.appendChild(option);
                 });
                 productoSelect.disabled = false;
@@ -200,6 +210,7 @@
         const selectedOption = this.options[this.selectedIndex];
         precioProducto = parseFloat(selectedOption.dataset.precio) || 0;
         nombreProducto = selectedOption.dataset.nombre || '-';
+        unidadesPorPaquete = parseInt(selectedOption.dataset.unidades) || 1;
         
         document.getElementById('resumenProducto').textContent = nombreProducto;
         document.getElementById('resumenPrecio').textContent = 'S/. ' + precioProducto.toFixed(2);
@@ -257,13 +268,15 @@
         validarFormulario();
     });
 
-    // Calcular monto total
+    // Calcular monto total y unidades totales
     function calcularTotal() {
         const cantidad = parseInt(cantidadInput.value) || 0;
         const total = precioProducto * cantidad;
+        const unidadesTotales = cantidad * unidadesPorPaquete;
         
         document.getElementById('montoTotalDisplay').textContent = 'S/. ' + total.toFixed(2);
         document.getElementById('montoTotal').value = total.toFixed(2);
+        document.getElementById('resumenUnidadesTotales').textContent = unidadesTotales + ' unidades';
         
         validarFormulario();
     }
@@ -272,9 +285,11 @@
     function resetearResumen() {
         precioProducto = 0;
         nombreProducto = '';
+        unidadesPorPaquete = 0;
         document.getElementById('resumenProducto').textContent = '-';
         document.getElementById('resumenPrecio').textContent = 'S/. 0.00';
         document.getElementById('resumenCantidad').textContent = '0';
+        document.getElementById('resumenUnidadesTotales').textContent = '0 unidades';
         document.getElementById('montoTotalDisplay').textContent = 'S/. 0.00';
         document.getElementById('montoTotal').value = '';
         btnGuardar.disabled = true;
