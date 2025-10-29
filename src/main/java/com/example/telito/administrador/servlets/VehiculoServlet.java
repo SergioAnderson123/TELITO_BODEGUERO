@@ -28,8 +28,25 @@ public class VehiculoServlet extends HttpServlet {
 
         switch (action) {
             case "listar":
-                ArrayList<Vehiculo> listaVehiculos = vehiculoDAO.listarVehiculos();
+                int page = 1;
+                int size = 10;
+                try { page = Integer.parseInt(request.getParameter("page")); } catch (Exception ignored) {}
+                try { size = Integer.parseInt(request.getParameter("size")); } catch (Exception ignored) {}
+                if (page < 1) page = 1;
+                if (size < 1) size = 10;
+
+                int totalRows = vehiculoDAO.contarVehiculos();
+                int totalPages = (int) Math.ceil(totalRows / (double) size);
+                if (totalPages == 0) totalPages = 1;
+                if (page > totalPages) page = totalPages;
+
+                ArrayList<Vehiculo> listaVehiculos = vehiculoDAO.listarVehiculos(page, size);
                 request.setAttribute("listaVehiculos", listaVehiculos);
+                request.setAttribute("currentPage", page);
+                request.setAttribute("size", size);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("totalRows", totalRows);
+
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/administrador/gestion-vehiculos.jsp");
                 dispatcher.forward(request, response);
                 break;

@@ -29,23 +29,46 @@ public class AlertaDAO {
 
     // Carga la lista de alertas para la tabla de gestión.
     public ArrayList<AlertaConfig> listarAlertas() {
+        return listarAlertas(1, 10);
+    }
+
+    public ArrayList<AlertaConfig> listarAlertas(int page, int size) {
         ArrayList<AlertaConfig> listaAlertas = new ArrayList<>();
         String sql = "SELECT a.*, c.nombre AS nombre_categoria " +
                 "FROM alertas_configuracion a " +
                 "LEFT JOIN categorias c ON a.categoria_id = c.id_categoria " +
-                "ORDER BY a.id_alerta_config";
+                "ORDER BY a.id_alerta_config LIMIT ? OFFSET ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                listaAlertas.add(mapResultSetToAlertaConfig(rs));
+            int limit = Math.max(1, size);
+            int offset = Math.max(0, (Math.max(1, page) - 1) * size);
+            pstmt.setInt(1, limit);
+            pstmt.setInt(2, offset);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    listaAlertas.add(mapResultSetToAlertaConfig(rs));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return listaAlertas;
+    }
+
+    public int contarAlertas() {
+        String sql = "SELECT COUNT(*) FROM alertas_configuracion";
+        int total = 0;
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) total = rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return total;
     }
 
     // Obtiene una alerta específica para poder editarla.

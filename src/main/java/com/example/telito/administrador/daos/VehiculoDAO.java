@@ -8,28 +8,53 @@ import java.util.ArrayList;
 
 public class VehiculoDAO {
 
-    // Listar todos los vehículos
+    // Listar todos los vehículos (compat) -> por defecto página 1, tamaño 10
     public ArrayList<Vehiculo> listarVehiculos() {
+        return listarVehiculos(1, 10);
+    }
+
+    // Listar vehículos con paginación
+    public ArrayList<Vehiculo> listarVehiculos(int page, int size) {
         ArrayList<Vehiculo> lista = new ArrayList<>();
-        String sql = "SELECT id_vehiculo, placa, marca, modelo, capacidad_kg FROM vehiculos ORDER BY placa ASC";
+        String sql = "SELECT id_vehiculo, placa, marca, modelo, capacidad_kg FROM vehiculos ORDER BY placa ASC LIMIT ? OFFSET ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                Vehiculo vehiculo = new Vehiculo();
-                vehiculo.setIdVehiculo(rs.getInt("id_vehiculo"));
-                vehiculo.setPlaca(rs.getString("placa"));
-                vehiculo.setMarca(rs.getString("marca"));
-                vehiculo.setModelo(rs.getString("modelo"));
-                vehiculo.setCapacidadKg(rs.getInt("capacidad_kg"));
-                lista.add(vehiculo);
+            int limit = Math.max(1, size);
+            int offset = Math.max(0, (Math.max(1, page) - 1) * size);
+            pstmt.setInt(1, limit);
+            pstmt.setInt(2, offset);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Vehiculo vehiculo = new Vehiculo();
+                    vehiculo.setIdVehiculo(rs.getInt("id_vehiculo"));
+                    vehiculo.setPlaca(rs.getString("placa"));
+                    vehiculo.setMarca(rs.getString("marca"));
+                    vehiculo.setModelo(rs.getString("modelo"));
+                    vehiculo.setCapacidadKg(rs.getInt("capacidad_kg"));
+                    lista.add(vehiculo);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return lista;
+    }
+
+    // Contar vehículos para paginación
+    public int contarVehiculos() {
+        String sql = "SELECT COUNT(*) FROM vehiculos";
+        int total = 0;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) total = rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return total;
     }
 
     // Buscar vehículo por ID

@@ -8,26 +8,51 @@ import java.util.ArrayList;
 
 public class ConductorDAO {
 
-    // Listar todos los conductores
+    // Listar todos los conductores (compat) -> por defecto página 1, tamaño 10
     public ArrayList<Conductor> listarConductores() {
+        return listarConductores(1, 10);
+    }
+
+    // Listar conductores con paginación
+    public ArrayList<Conductor> listarConductores(int page, int size) {
         ArrayList<Conductor> lista = new ArrayList<>();
-        String sql = "SELECT id_conductor, nombre_completo, licencia FROM conductores ORDER BY nombre_completo ASC";
+        String sql = "SELECT id_conductor, nombre_completo, licencia FROM conductores ORDER BY nombre_completo ASC LIMIT ? OFFSET ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                Conductor conductor = new Conductor();
-                conductor.setIdConductor(rs.getInt("id_conductor"));
-                conductor.setNombreCompleto(rs.getString("nombre_completo"));
-                conductor.setLicencia(rs.getString("licencia"));
-                lista.add(conductor);
+            int limit = Math.max(1, size);
+            int offset = Math.max(0, (Math.max(1, page) - 1) * size);
+            pstmt.setInt(1, limit);
+            pstmt.setInt(2, offset);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Conductor conductor = new Conductor();
+                    conductor.setIdConductor(rs.getInt("id_conductor"));
+                    conductor.setNombreCompleto(rs.getString("nombre_completo"));
+                    conductor.setLicencia(rs.getString("licencia"));
+                    lista.add(conductor);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return lista;
+    }
+
+    // Contar conductores para paginación
+    public int contarConductores() {
+        String sql = "SELECT COUNT(*) FROM conductores";
+        int total = 0;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) total = rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return total;
     }
 
     // Buscar conductor por ID

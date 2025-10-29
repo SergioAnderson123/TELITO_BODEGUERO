@@ -38,7 +38,17 @@
             <h2 class="pageheader-title" style="font-weight: 700;">Configuración de Alertas</h2>
             <p class="pageheader-text">Crea y administra las reglas de notificación del sistema.</p>
         </div>
-        <div>
+        <div class="d-flex align-items-center gap-2">
+            <form method="get" action="<%= request.getContextPath() %>/AlertaServlet" class="d-flex align-items-center me-2">
+                <input type="hidden" name="action" value="listar">
+                <input type="hidden" name="page" value="1">
+                <label class="me-2 text-muted small">Mostrar</label>
+                <select name="size" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="10" <%= (request.getAttribute("size")!=null && (Integer)request.getAttribute("size")==10) ? "selected" : "" %>>10</option>
+                    <option value="25" <%= (request.getAttribute("size")!=null && (Integer)request.getAttribute("size")==25) ? "selected" : "" %>>25</option>
+                    <option value="50" <%= (request.getAttribute("size")!=null && (Integer)request.getAttribute("size")==50) ? "selected" : "" %>>50</option>
+                </select>
+            </form>
             <a href="<%= request.getContextPath() %>/AlertaServlet?action=formCrear" class="btn btn-primary"><i class="fas fa-plus"></i> Crear Nueva Regla</a>
         </div>
     </div>
@@ -127,6 +137,30 @@
         <jsp:include page="/administrador/layouts/footer.jsp" />
     </div>
 </div>
+
+<%
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
+    Integer totalPages = (Integer) request.getAttribute("totalPages");
+    Integer size = (Integer) request.getAttribute("size");
+    if (currentPage == null) currentPage = 1;
+    if (totalPages == null) totalPages = 1;
+    if (size == null) size = 10;
+    String base = request.getContextPath() + "/AlertaServlet?action=listar";
+%>
+<nav aria-label="Paginación de alertas" class="d-flex justify-content-between align-items-center mt-3 px-4">
+    <div class="text-muted small">Página <%= currentPage %> de <%= totalPages %></div>
+    <ul class="pagination mb-0">
+        <li class="page-item <%= currentPage <= 1 ? "disabled" : "" %>">
+            <a class="page-link" href="<%= base %>&page=<%= currentPage - 1 %>&size=<%= size %>">Anterior</a>
+        </li>
+        <% for (int p = 1; p <= totalPages; p++) { %>
+        <li class="page-item <%= p == currentPage ? "active" : "" %>"><a class="page-link" href="<%= base %>&page=<%= p %>&size=<%= size %>"><%= p %></a></li>
+        <% } %>
+        <li class="page-item <%= currentPage >= totalPages ? "disabled" : "" %>">
+            <a class="page-link" href="<%= base %>&page=<%= currentPage + 1 %>&size=<%= size %>">Siguiente</a>
+        </li>
+    </ul>
+</nav>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>

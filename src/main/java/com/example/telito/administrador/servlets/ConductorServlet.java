@@ -28,8 +28,25 @@ public class ConductorServlet extends HttpServlet {
 
         switch (action) {
             case "listar":
-                ArrayList<Conductor> listaConductores = conductorDAO.listarConductores();
+                int page = 1;
+                int size = 10;
+                try { page = Integer.parseInt(request.getParameter("page")); } catch (Exception ignored) {}
+                try { size = Integer.parseInt(request.getParameter("size")); } catch (Exception ignored) {}
+                if (page < 1) page = 1;
+                if (size < 1) size = 10;
+
+                int totalRows = conductorDAO.contarConductores();
+                int totalPages = (int) Math.ceil(totalRows / (double) size);
+                if (totalPages == 0) totalPages = 1;
+                if (page > totalPages) page = totalPages;
+
+                ArrayList<Conductor> listaConductores = conductorDAO.listarConductores(page, size);
                 request.setAttribute("listaConductores", listaConductores);
+                request.setAttribute("currentPage", page);
+                request.setAttribute("size", size);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("totalRows", totalRows);
+
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/administrador/gestion-conductores.jsp");
                 dispatcher.forward(request, response);
                 break;

@@ -10,7 +10,7 @@ public class UsuarioDAO {
     // Las credenciales ahora están centralizadas en DatabaseConnection
 
     // Este método es para la tabla principal de usuarios, con todos los filtros.
-    public ArrayList<Usuario> listarUsuarios(String busqueda, String rolId, String estado, String sortBy, String sortOrder) {
+    public ArrayList<Usuario> listarUsuarios(String busqueda, String rolId, String estado, String sortBy, String sortOrder, int page, int size) {
 
         ArrayList<Usuario> listaUsuarios = new ArrayList<>();
         // La consulta base une usuarios con roles para mostrar el nombre del rol.
@@ -45,7 +45,7 @@ public class UsuarioDAO {
         if (sortOrder != null && (sortOrder.equalsIgnoreCase("asc") || sortOrder.equalsIgnoreCase("desc"))) {
             direccionOrden = sortOrder.toUpperCase();
         }
-        sql += " ORDER BY " + columnaOrden + " " + direccionOrden;
+        sql += " ORDER BY " + columnaOrden + " " + direccionOrden + " LIMIT ? OFFSET ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -65,6 +65,12 @@ public class UsuarioDAO {
                 pstmt.setInt(parameterIndex++, Integer.parseInt(estado));
             }
 
+            // Pagination parameters
+            int limit = Math.max(1, size);
+            int offset = Math.max(0, (Math.max(1, page) - 1) * size);
+            pstmt.setInt(parameterIndex++, limit);
+            pstmt.setInt(parameterIndex, offset);
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Usuario usuario = new Usuario();
@@ -73,6 +79,14 @@ public class UsuarioDAO {
                     usuario.setApellidos(rs.getString("apellidos"));
                     usuario.setEmail(rs.getString("email"));
                     usuario.setActivo(rs.getBoolean("activo"));
+
+                    // Intentar obtener foto_perfil si existe la columna
+                    try {
+                        usuario.setFotoPerfil(rs.getString("foto_perfil"));
+                    } catch (SQLException e) {
+                        // Columna foto_perfil no existe, usar valor por defecto
+                        usuario.setFotoPerfil(null);
+                    }
 
                     Rol rol = new Rol();
                     rol.setIdRol(rs.getInt("rol_id"));
@@ -86,6 +100,49 @@ public class UsuarioDAO {
             e.printStackTrace();
         }
         return listaUsuarios;
+    }
+
+    // Count total users matching filters for pagination
+    public int contarUsuarios(String busqueda, String rolId, String estado) {
+        int total = 0;
+        String sql = "SELECT COUNT(*) FROM usuarios u WHERE 1=1";
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (u.nombres LIKE ? OR u.apellidos LIKE ? OR u.email LIKE ?)";
+        }
+        if (rolId != null && !rolId.trim().isEmpty()) {
+            sql += " AND u.rol_id = ?";
+        }
+        if (estado != null && !estado.trim().isEmpty()) {
+            sql += " AND u.activo = ?";
+        } else if (estado == null) {
+            sql += " AND u.activo = 1";
+        }
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int parameterIndex = 1;
+            if (busqueda != null && !busqueda.trim().isEmpty()) {
+                String busquedaConWildcards = "%" + busqueda + "%";
+                pstmt.setString(parameterIndex++, busquedaConWildcards);
+                pstmt.setString(parameterIndex++, busquedaConWildcards);
+                pstmt.setString(parameterIndex++, busquedaConWildcards);
+            }
+            if (rolId != null && !rolId.trim().isEmpty()) {
+                pstmt.setInt(parameterIndex++, Integer.parseInt(rolId));
+            }
+            if (estado != null && !estado.trim().isEmpty()) {
+                pstmt.setInt(parameterIndex++, Integer.parseInt(estado));
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return total;
     }
 
     // Para el formulario de crear un usuario nuevo.

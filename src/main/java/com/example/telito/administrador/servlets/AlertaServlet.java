@@ -95,9 +95,25 @@ public class AlertaServlet extends HttpServlet {
 
     private void listarAlertas(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
+            int page = 1;
+            int size = 10;
+            try { page = Integer.parseInt(request.getParameter("page")); } catch (Exception ignored) {}
+            try { size = Integer.parseInt(request.getParameter("size")); } catch (Exception ignored) {}
+            if (page < 1) page = 1;
+            if (size < 1) size = 10;
+
+            int totalRows = alertaDAO.contarAlertas();
+            int totalPages = (int) Math.ceil(totalRows / (double) size);
+            if (totalPages == 0) totalPages = 1;
+            if (page > totalPages) page = totalPages;
+
             // Obtener lista de alertas
-            ArrayList<AlertaConfig> listaAlertas = alertaDAO.listarAlertas();
+            ArrayList<AlertaConfig> listaAlertas = alertaDAO.listarAlertas(page, size);
             request.setAttribute("listaAlertas", listaAlertas);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("size", size);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalRows", totalRows);
 
             // Obtener lista de categorías para el formulario
             ArrayList<Categoria> listaCategorias = categoriaDAO.listarCategorias();

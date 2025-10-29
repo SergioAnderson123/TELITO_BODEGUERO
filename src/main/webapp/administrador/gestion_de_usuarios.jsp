@@ -19,7 +19,7 @@
 
 <%! // BLOQUE DE DECLARACIÓN JSP PARA MÉTODOS AUXILIARES
     // Función auxiliar para generar URLs de ordenamiento
-    public String getSortUrl(jakarta.servlet.http.HttpServletRequest request, String sortByColumn, String currentSortBy, String currentSortOrder, String busqueda, String rolFiltro, String estadoFiltro) {
+    public String getSortUrl(jakarta.servlet.http.HttpServletRequest request, String sortByColumn, String currentSortBy, String currentSortOrder, String busqueda, String rolFiltro, String estadoFiltro, int size) {
         String newSortOrder = "asc";
         if (sortByColumn.equals(currentSortBy)) {
             newSortOrder = (currentSortOrder != null && currentSortOrder.equalsIgnoreCase("asc")) ? "desc" : "asc";
@@ -28,7 +28,7 @@
         if (busqueda != null && !busqueda.isEmpty()) baseUrl += "&busqueda=" + busqueda;
         if (rolFiltro != null && !rolFiltro.isEmpty()) baseUrl += "&rol=" + rolFiltro;
         if (estadoFiltro != null && !estadoFiltro.isEmpty()) baseUrl += "&estado=" + estadoFiltro;
-        baseUrl += "&sortBy=" + sortByColumn + "&sortOrder=" + newSortOrder;
+        baseUrl += "&sortBy=" + sortByColumn + "&sortOrder=" + newSortOrder + "&page=1&size=" + size;
         return baseUrl;
     }
 
@@ -84,6 +84,7 @@
                 <div class="card-body">
                     <form action="<%= request.getContextPath() %>/UsuarioServlet" method="GET">
                         <input type="hidden" name="action" value="listar">
+                        <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 10 %>">
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <input type="text" class="form-control form-control-sm" name="busqueda" placeholder="Buscar por nombre, correo..." value="<%= busqueda != null ? busqueda : "" %>">
@@ -115,22 +116,22 @@
                             <tr>
                                 <th>#</th>
                                 <th>
-                                    <a href="<%= getSortUrl(request, "usuario", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro) %>" class="text-decoration-none text-dark">
+                                    <a href="<%= getSortUrl(request, "usuario", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 10)) %>" class="text-decoration-none text-dark">
                                         Usuario<%= getSortIcon("usuario", currentSortBy, currentSortOrder) %>
                                     </a>
                                 </th>
                                 <th>
-                                    <a href="<%= getSortUrl(request, "correo", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro) %>" class="text-decoration-none text-dark">
+                                    <a href="<%= getSortUrl(request, "correo", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 10)) %>" class="text-decoration-none text-dark">
                                         Correo<%= getSortIcon("correo", currentSortBy, currentSortOrder) %>
                                     </a>
                                 </th>
                                 <th>
-                                    <a href="<%= getSortUrl(request, "rol", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro) %>" class="text-decoration-none text-dark">
+                                    <a href="<%= getSortUrl(request, "rol", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 10)) %>" class="text-decoration-none text-dark">
                                         Rol<%= getSortIcon("rol", currentSortBy, currentSortOrder) %>
                                     </a>
                                 </th>
                                 <th>
-                                    <a href="<%= getSortUrl(request, "estado", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro) %>" class="text-decoration-none text-dark">
+                                    <a href="<%= getSortUrl(request, "estado", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 10)) %>" class="text-decoration-none text-dark">
                                         Estado<%= getSortIcon("estado", currentSortBy, currentSortOrder) %>
                                     </a>
                                 </th>
@@ -186,6 +187,37 @@
                             <% } %>
                             </tbody>
                         </table>
+                        <%-- Paginación --%>
+                        <%
+                            Integer currentPage = (Integer) request.getAttribute("currentPage");
+                            Integer totalPages = (Integer) request.getAttribute("totalPages");
+                            Integer size = (Integer) request.getAttribute("size");
+                            if (currentPage == null) currentPage = 1;
+                            if (totalPages == null) totalPages = 1;
+                            if (size == null) size = 10;
+                            String base = request.getContextPath() + "/UsuarioServlet?action=listar";
+                            if (busqueda != null && !busqueda.isEmpty()) base += "&busqueda=" + busqueda;
+                            if (rolFiltro != null && !rolFiltro.isEmpty()) base += "&rol=" + rolFiltro;
+                            if (estadoFiltro != null && !estadoFiltro.isEmpty()) base += "&estado=" + estadoFiltro;
+                            if (currentSortBy != null && !currentSortBy.isEmpty()) base += "&sortBy=" + currentSortBy;
+                            if (currentSortOrder != null && !currentSortOrder.isEmpty()) base += "&sortOrder=" + currentSortOrder;
+                        %>
+                        <nav aria-label="Paginación de usuarios" class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="text-muted small">
+                                Página <%= currentPage %> de <%= totalPages %>
+                            </div>
+                            <ul class="pagination mb-0">
+                                <li class="page-item <%= currentPage <= 1 ? "disabled" : "" %>">
+                                    <a class="page-link" href="<%= base %>&page=<%= currentPage - 1 %>&size=<%= size %>" tabindex="-1">Anterior</a>
+                                </li>
+                                <% for (int p = 1; p <= totalPages; p++) { %>
+                                <li class="page-item <%= p == currentPage ? "active" : "" %>"><a class="page-link" href="<%= base %>&page=<%= p %>&size=<%= size %>"><%= p %></a></li>
+                                <% } %>
+                                <li class="page-item <%= currentPage >= totalPages ? "disabled" : "" %>">
+                                    <a class="page-link" href="<%= base %>&page=<%= currentPage + 1 %>&size=<%= size %>">Siguiente</a>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>

@@ -39,12 +39,24 @@
                     <c:remove var="tipoMensaje" scope="session"/>
                 </c:if>
 
-                <!-- Botón crear vehículo -->
+                <!-- Botón crear vehículo y tamaño de página -->
                 <div class="row mb-3">
-                    <div class="col-12">
+                    <div class="col-6">
                         <a href="${pageContext.request.contextPath}/administrador/VehiculoServlet?action=crear" class="btn btn-primary">
                             <i class="fas fa-plus me-2"></i>Nuevo Vehículo
                         </a>
+                    </div>
+                    <div class="col-6 d-flex justify-content-end align-items-center">
+                        <form method="get" action="${pageContext.request.contextPath}/administrador/VehiculoServlet">
+                            <input type="hidden" name="action" value="listar">
+                            <input type="hidden" name="page" value="1">
+                            <label class="me-2 text-muted small">Mostrar</label>
+                            <select name="size" class="form-select form-select-sm" onchange="this.form.submit()">
+                                <option value="10" ${size == 10 ? 'selected' : ''}>10</option>
+                                <option value="25" ${size == 25 ? 'selected' : ''}>25</option>
+                                <option value="50" ${size == 50 ? 'selected' : ''}>50</option>
+                            </select>
+                        </form>
                     </div>
                 </div>
 
@@ -82,7 +94,8 @@
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     <a href="#" 
-                                                       onclick="confirmarEliminacion(${vehiculo.idVehiculo}, '${vehiculo.placa}')" 
+                                                       data-placa="${vehiculo.placa}"
+                                                       onclick="confirmarEliminacion(${vehiculo.idVehiculo}, this.dataset.placa)" 
                                                        class="btn btn-sm btn-danger" title="Eliminar">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
@@ -92,6 +105,30 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                <%-- Paginación --%>
+                                <%
+                                    Integer currentPage = (Integer) request.getAttribute("currentPage");
+                                    Integer totalPages = (Integer) request.getAttribute("totalPages");
+                                    Integer size = (Integer) request.getAttribute("size");
+                                    if (currentPage == null) currentPage = 1;
+                                    if (totalPages == null) totalPages = 1;
+                                    if (size == null) size = 10;
+                                    String base = request.getContextPath() + "/administrador/VehiculoServlet?action=listar";
+                                %>
+                                <nav aria-label="Paginación de vehículos" class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="text-muted small">Página <%= currentPage %> de <%= totalPages %></div>
+                                    <ul class="pagination mb-0">
+                                        <li class="page-item <%= currentPage <= 1 ? "disabled" : "" %>">
+                                            <a class="page-link" href="<%= base %>&page=<%= currentPage - 1 %>&size=<%= size %>">Anterior</a>
+                                        </li>
+                                        <% for (int p = 1; p <= totalPages; p++) { %>
+                                        <li class="page-item <%= p == currentPage ? "active" : "" %>"><a class="page-link" href="<%= base %>&page=<%= p %>&size=<%= size %>"><%= p %></a></li>
+                                        <% } %>
+                                        <li class="page-item <%= currentPage >= totalPages ? "disabled" : "" %>">
+                                            <a class="page-link" href="<%= base %>&page=<%= currentPage + 1 %>&size=<%= size %>">Siguiente</a>
+                                        </li>
+                                    </ul>
+                                </nav>
                             </div>
                         </div>
                     </div>
