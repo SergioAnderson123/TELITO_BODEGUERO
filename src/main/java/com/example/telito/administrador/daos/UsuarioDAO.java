@@ -146,7 +146,7 @@ public class UsuarioDAO {
     }
 
     // Para el formulario de crear un usuario nuevo.
-    public void crearUsuario(Usuario usuario) {
+    public boolean crearUsuario(Usuario usuario) {
         // Encripto el password con SHA2 para no guardarlo en texto plano.
         String sql = "INSERT INTO usuarios (nombres, apellidos, email, password, activo, rol_id) VALUES (?, ?, ?, SHA2(?, 256), 1, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -156,9 +156,11 @@ public class UsuarioDAO {
             pstmt.setString(3, usuario.getEmail());
             pstmt.setString(4, usuario.getPassword());
             pstmt.setInt(5, usuario.getRol().getIdRol());
-            pstmt.executeUpdate();
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -331,5 +333,30 @@ public class UsuarioDAO {
             e.printStackTrace();
         }
         return totalBaneados;
+    }
+    
+    // ========== MÉTODOS DE VALIDACIÓN ==========
+    
+    /**
+     * Verifica si ya existe un usuario registrado con el email especificado
+     */
+    public boolean existeEmail(String email) {
+        String sql = "SELECT COUNT(*) as total FROM usuarios WHERE email = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, email);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al verificar existencia de email: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 }

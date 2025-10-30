@@ -38,12 +38,30 @@ public class PlanTransporteServlet extends HttpServlet {
                 String fechaDesde = request.getParameter("fecha_desde");
                 String fechaHasta = request.getParameter("fecha_hasta");
 
-                ConductorDao conductorDao = new ConductorDao();
+                // Paginación
+                int page = 1;
+                int size = 10;
+                try { page = Integer.parseInt(request.getParameter("page")); } catch (Exception ignored) {}
+                try { size = Integer.parseInt(request.getParameter("size")); } catch (Exception ignored) {}
+                if (page < 1) page = 1;
+                if (size < 1) size = 10;
 
-                ArrayList<PlanTransporteBean> listaPlanes = planTransporteDao.listarPlanesDeTransporte(busqueda, conductorId, estado, fechaDesde, fechaHasta);
+                int totalRows = planTransporteDao.contarPlanes(busqueda, conductorId, estado, fechaDesde, fechaHasta);
+                int totalPages = (int) Math.ceil(totalRows / (double) size);
+                if (totalPages == 0) totalPages = 1;
+                if (page > totalPages) page = totalPages;
+
+                ConductorDao conductorDao = new ConductorDao();
+                ArrayList<PlanTransporteBean> listaPlanes = planTransporteDao.listarPlanesDeTransporte(busqueda, conductorId, estado, fechaDesde, fechaHasta, page, size);
 
                 request.setAttribute("listaConductores", conductorDao.listarConductores());
                 request.setAttribute("listaPlanes", listaPlanes);
+                request.setAttribute("currentPage", page);
+                request.setAttribute("size", size);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("totalRows", totalRows);
+                request.setAttribute("baseUrl", request.getContextPath() + "/planes-transporte");
+                request.setAttribute("itemName", "planes de transporte");
 
                 rd = request.getRequestDispatcher("/logistica/Distribucion/distribucion.jsp");
                 rd.forward(request, response);

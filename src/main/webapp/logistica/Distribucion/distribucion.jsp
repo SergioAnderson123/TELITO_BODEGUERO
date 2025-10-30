@@ -137,14 +137,16 @@
                                 </table>
                             </div>
 
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <div class="pagination-info">
-                                    <span id="paginationInfo" class="text-muted"></span>
-                                </div>
-                                <nav aria-label="Paginación de planes">
-                                    <ul class="pagination pagination-sm mb-0" id="paginationControls"></ul>
-                                </nav>
-                            </div>
+                            <%-- Incluir componente de paginación --%>
+                            <%
+                                request.setAttribute("param1Name", "busqueda");
+                                request.setAttribute("param1Value", request.getParameter("busqueda"));
+                                request.setAttribute("param2Name", "conductor");
+                                request.setAttribute("param2Value", request.getParameter("conductor"));
+                                request.setAttribute("param3Name", "estado");
+                                request.setAttribute("param3Value", request.getParameter("estado"));
+                            %>
+                            <jsp:include page="/WEB-INF/includes/pagination.jsp" />
 
                             <div class="mt-3">
                                 <a href="${pageContext.request.contextPath}/planes-transporte?action=crear" class="btn btn-primary">

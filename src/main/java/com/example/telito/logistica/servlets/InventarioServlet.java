@@ -23,12 +23,35 @@ public class InventarioServlet extends HttpServlet {
         String busqueda = request.getParameter("busqueda");
         String estado = request.getParameter("estado");
 
+        // Parámetros de paginación
+        int page = 1;
+        int size = 10;
+        try { 
+            page = Integer.parseInt(request.getParameter("page")); 
+        } catch (Exception ignored) {}
+        try { 
+            size = Integer.parseInt(request.getParameter("size")); 
+        } catch (Exception ignored) {}
+        if (page < 1) page = 1;
+        if (size < 1) size = 10;
+
         // Obtener datos agrupados por producto desde el DAO
         InventarioDao inventarioDao = new InventarioDao();
-        ArrayList<InventarioBean> listaInventario = inventarioDao.obtenerInventarioAgrupado(busqueda, estado);
+        int totalRows = inventarioDao.contarInventarioAgrupado(busqueda, estado);
+        int totalPages = (int) Math.ceil(totalRows / (double) size);
+        if (totalPages == 0) totalPages = 1;
+        if (page > totalPages) page = totalPages;
+        
+        ArrayList<InventarioBean> listaInventario = inventarioDao.obtenerInventarioAgrupado(busqueda, estado, page, size);
 
         // Enviar datos a la JSP
         request.setAttribute("listaInventario", listaInventario);
+        request.setAttribute("busqueda", busqueda);
+        request.setAttribute("estadoFiltro", estado);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("size", size);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRows", totalRows);
 
         // Forward a la JSP
         String vista = "/logistica/Inventario/inventario.jsp";

@@ -365,9 +365,11 @@
     }
 
     function eliminarConfiguracion(id) {
-        if (confirm('¿Estás seguro de que deseas eliminar esta configuración?')) {
-            var form = document.createElement('form');
-            form.method = 'POST';
+        showConfirm(
+            '¿Estás seguro de que deseas eliminar esta configuración?',
+            function() {
+                var form = document.createElement('form');
+                form.method = 'POST';
             form.action = '${pageContext.request.contextPath}/StockMinimoServlet';
 
             var actionInput = document.createElement('input');
@@ -384,7 +386,9 @@
             form.appendChild(idInput);
             document.body.appendChild(form);
             form.submit();
-        }
+            },
+            'Confirmar eliminación'
+        );
     }
 
     function aplicarConfiguracionGlobal() {

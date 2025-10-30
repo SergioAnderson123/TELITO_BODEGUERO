@@ -43,36 +43,66 @@
                 <div class="col-xl-8 col-lg-10 col-md-12 col-sm-12 col-12 mx-auto">
                     <div class="card">
                         <div class="card-body">
+                            <%-- Mostrar errores de validación --%>
+                            <%
+                                java.util.ArrayList<String> errores = (java.util.ArrayList<String>) request.getAttribute("errores");
+                                if (errores != null && !errores.isEmpty()) {
+                            %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <h5 class="alert-heading">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Se encontraron los siguientes errores:
+                                </h5>
+                                <ul class="mb-0">
+                                    <% for (String error : errores) { %>
+                                        <li><%= error %></li>
+                                    <% } %>
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            <% } %>
+                            
+                            <%-- Recuperar valores previos del formulario --%>
+                            <%
+                                String nombresPrevio = request.getAttribute("nombres") != null ? request.getAttribute("nombres").toString() : "";
+                                String apellidosPrevio = request.getAttribute("apellidos") != null ? request.getAttribute("apellidos").toString() : "";
+                                String emailPrevio = request.getAttribute("email") != null ? request.getAttribute("email").toString() : "";
+                                String rolIdPrevio = request.getAttribute("rol_id") != null ? request.getAttribute("rol_id").toString() : "";
+                            %>
+                            
                             <form action="<%= request.getContextPath() %>/UsuarioServlet?action=guardar" method="POST" autocomplete="off">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="nombres" class="form-label">Nombres</label>
-                                        <input type="text" class="form-control" id="nombres" name="nombres" placeholder="Ej: Juan" required>
+                                        <label for="nombres" class="form-label">Nombres <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="nombres" name="nombres" 
+                                               value="<%= nombresPrevio %>" placeholder="Ej: Juan" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="apellidos" class="form-label">Apellidos</label>
-                                        <input type="text" class="form-control" id="apellidos" name="apellidos" placeholder="Ej: Pérez" required>
+                                        <label for="apellidos" class="form-label">Apellidos <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="apellidos" name="apellidos" 
+                                               value="<%= apellidosPrevio %>" placeholder="Ej: Pérez" required>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="email" class="form-label">Correo electrónico</label>
-                                    <input type="email" class="form-control" id="email" name="email" placeholder="Ej: juan.perez@example.com" required>
+                                    <label for="email" class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="<%= emailPrevio %>" placeholder="Ej: juan.perez@example.com" required>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="password" class="form-label">Contraseña</label>
+                                    <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
                                     <input type="password" class="form-control" id="password" name="password" placeholder="********" required>
+                                    <small class="text-muted">Mínimo 4 caracteres</small>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="rol" class="form-label">Rol</label>
+                                    <label for="rol" class="form-label">Rol <span class="text-danger">*</span></label>
                                     <select id="rol" name="rol_id" class="form-select" required>
-                                        <option value="" disabled selected>Selecciona un rol</option>
-                                        <option value="1">Administrador</option>
-                                        <option value="2">Logística</option>
-                                        <option value="3">Productor</option>
-                                        <option value="4">Almacén</option>
+                                        <option value="" <%= rolIdPrevio.isEmpty() ? "selected" : "" %> disabled>Selecciona un rol</option>
+                                        <option value="1" <%= "1".equals(rolIdPrevio) ? "selected" : "" %>>Administrador</option>
+                                        <option value="2" <%= "2".equals(rolIdPrevio) ? "selected" : "" %>>Logística</option>
+                                        <option value="3" <%= "3".equals(rolIdPrevio) ? "selected" : "" %>>Productor</option>
+                                        <option value="4" <%= "4".equals(rolIdPrevio) ? "selected" : "" %>>Almacén</option>
                                     </select>
                                 </div>
 

@@ -51,4 +51,31 @@ public class ProveedorDao {
         }
         return listaProductores;
     }
+    
+    // ========== MÉTODOS DE VALIDACIÓN ==========
+    
+    /**
+     * Verifica si existe un productor (usuario con rol Productor) con el ID especificado
+     */
+    public boolean existeProductor(int productorId) {
+        String sql = "SELECT COUNT(*) as total FROM usuarios u " +
+                     "INNER JOIN roles r ON u.rol_id = r.id_rol " +
+                     "WHERE u.id_usuario = ? AND r.nombre = 'Productor' AND u.activo = 1";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, productorId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al verificar existencia de productor: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

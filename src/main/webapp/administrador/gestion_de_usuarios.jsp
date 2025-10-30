@@ -176,7 +176,7 @@
                                         <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-h"></i></button>
                                         <ul class="dropdown-menu dropdown-menu-end">
                                             <li><a class="dropdown-item" href="<%= request.getContextPath() %>/UsuarioServlet?action=editar&id=<%= usuario.getIdUsuario() %>"><i class="fas fa-edit me-2"></i>Editar</a></li>
-                                            <li><a class="dropdown-item text-danger" href="<%= request.getContextPath() %>/UsuarioServlet?action=borrar&id=<%= usuario.getIdUsuario() %>" onclick="return confirm('¿Estás seguro?');"><i class="fas fa-trash me-2"></i>Eliminar</a></li>
+                                            <li><a class="dropdown-item text-danger" href="#" onclick="confirmarEliminar('<%= request.getContextPath() %>/UsuarioServlet?action=borrar&id=<%= usuario.getIdUsuario() %>'); return false;"><i class="fas fa-trash me-2"></i>Eliminar</a></li>
                                         </ul>
                                     </div>
                                 </td>
@@ -229,5 +229,17 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Función para confirmar eliminación con modal personalizado
+    function confirmarEliminar(url) {
+        showConfirm(
+            '¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.',
+            function() {
+                window.location.href = url;
+            },
+            'Confirmar eliminación'
+        );
+    }
+</script>
 </body>
 </html>

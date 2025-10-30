@@ -58,3 +58,5 @@
     .bg-secondary-soft { background-color: rgba(108, 117, 125, 0.1) !important; color: #6c757d !important; }
 </style>
 
+<!-- Incluir modales personalizados -->
+<jsp:include page="/WEB-INF/includes/modal-alerts.jsp" />

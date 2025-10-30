@@ -29,6 +29,33 @@
                 <div class="col-lg-10 col-md-12 mx-auto">
                     <div class="card">
                         <div class="card-body">
+                            <%-- Mostrar errores de validación --%>
+                            <%
+                                ArrayList<String> errores = (ArrayList<String>) request.getAttribute("errores");
+                                if (errores != null && !errores.isEmpty()) {
+                            %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <h5 class="alert-heading">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Se encontraron los siguientes errores:
+                                </h5>
+                                <ul class="mb-0">
+                                    <% for (String error : errores) { %>
+                                        <li><%= error %></li>
+                                    <% } %>
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            <% } %>
+                            
+                            <%-- Recuperar valores previos del formulario --%>
+                            <%
+                                String productorIdPrevio = request.getAttribute("productor_id") != null ? request.getAttribute("productor_id").toString() : "";
+                                String productoIdPrevio = request.getAttribute("producto_id") != null ? request.getAttribute("producto_id").toString() : "";
+                                String cantidadPrevia = request.getAttribute("cantidad") != null ? request.getAttribute("cantidad").toString() : "";
+                                String distritoIdPrevio = request.getAttribute("distrito_id") != null ? request.getAttribute("distrito_id").toString() : "";
+                                String montoTotalPrevio = request.getAttribute("monto_total") != null ? request.getAttribute("monto_total").toString() : "";
+                            %>
+                            
                             <form method="POST" action="${pageContext.request.contextPath}/orden-compra" id="formOrdenCompra">
                                 <input type="hidden" name="action" value="guardar">
 
@@ -39,11 +66,13 @@
                                         <div class="mb-3">
                                             <label for="productor" class="form-label">Productor <span class="text-danger">*</span></label>
                                             <select class="form-select" id="productor" name="productor_id" required>
-                                                <option value="" selected disabled>Seleccione un productor...</option>
+                                                <option value="" <%= productorIdPrevio.isEmpty() ? "selected" : "" %> disabled>Seleccione un productor...</option>
                                                 <% ArrayList<ProveedorBean> listaProductores = (ArrayList<ProveedorBean>) request.getAttribute("listaProductores");
                                                     if (listaProductores != null) {
-                                                        for (ProveedorBean productor : listaProductores) { %>
-                                                <option value="<%= productor.getId() %>"><%= productor.getNombre() %></option>
+                                                        for (ProveedorBean productor : listaProductores) { 
+                                                            boolean selected = String.valueOf(productor.getId()).equals(productorIdPrevio);
+                                                %>
+                                                <option value="<%= productor.getId() %>" <%= selected ? "selected" : "" %>><%= productor.getNombre() %></option>
                                                 <%     }
                                                 } %>
                                             </select>
@@ -52,15 +81,17 @@
                                         <!-- Producto -->
                                         <div class="mb-3">
                                             <label for="producto" class="form-label">Producto <span class="text-danger">*</span></label>
-                                            <select class="form-select" id="producto" name="producto_id" required disabled>
+                                            <select class="form-select" id="producto" name="producto_id" required <%= productorIdPrevio.isEmpty() ? "disabled" : "" %>>
                                                 <option value="" selected disabled>Primero seleccione un productor...</option>
                                             </select>
+                                            <input type="hidden" id="productoIdPrevio" value="<%= productoIdPrevio %>">
                                         </div>
 
                                         <!-- Cantidad de Paquetes -->
                                         <div class="mb-3">
                                             <label for="cantidad" class="form-label">Cantidad de Paquetes <span class="text-danger">*</span></label>
-                                            <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" required>
+                                            <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" 
+                                                   value="<%= cantidadPrevia %>" required>
                                         </div>
 
                                         <!-- Zona -->

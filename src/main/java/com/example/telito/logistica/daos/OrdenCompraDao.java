@@ -8,8 +8,13 @@ import java.util.List;
 
 public class OrdenCompraDao {
 
-    // === MÉTODO MODIFICADO PARA ACEPTAR FILTROS ===
+    // === MÉTODO MODIFICADO PARA ACEPTAR FILTROS (sin paginación, para compatibilidad) ===
     public ArrayList<OrdenCompraBean> obtenerOrdenes(String busqueda, String proveedorId, String estado) {
+        return obtenerOrdenes(busqueda, proveedorId, estado, 1, Integer.MAX_VALUE);
+    }
+
+    // === MÉTODO CON PAGINACIÓN PARA OBTENER ÓRDENES DE COMPRA ===
+    public ArrayList<OrdenCompraBean> obtenerOrdenes(String busqueda, String proveedorId, String estado, int page, int size) {
 
         ArrayList<OrdenCompraBean> listaOrdenes = new ArrayList<>();
 
@@ -56,14 +61,21 @@ public class OrdenCompraDao {
             params.add(estado.trim());
         }
 
-        sql += " ORDER BY oc.id_orden_compra DESC";
+        sql += " ORDER BY oc.id_orden_compra DESC LIMIT ? OFFSET ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            for (int i = 0; i < params.size(); i++) {
-                pstmt.setObject(i + 1, params.get(i));
+            int paramIndex = 1;
+            for (Object param : params) {
+                pstmt.setObject(paramIndex++, param);
             }
+
+            // Parámetros de paginación
+            int limit = Math.max(1, size);
+            int offset = Math.max(0, (Math.max(1, page) - 1) * size);
+            pstmt.setInt(paramIndex++, limit);
+            pstmt.setInt(paramIndex, offset);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -89,6 +101,57 @@ public class OrdenCompraDao {
             throw new RuntimeException(e);
         }
         return listaOrdenes;
+    }
+
+    // === MÉTODO PARA CONTAR TOTAL DE ÓRDENES CON FILTROS ===
+    public int contarOrdenes(String busqueda, String proveedorId, String estado) {
+        String sql = """
+            SELECT COUNT(*) as total
+            FROM ordenes_compra oc
+            INNER JOIN usuarios productor ON oc.productor_id = productor.id_usuario
+            INNER JOIN productos pr ON oc.producto_id = pr.id_producto
+            INNER JOIN usuarios u ON oc.usuario_id = u.id_usuario
+            WHERE 1=1
+            """;
+
+        List<Object> params = new ArrayList<>();
+
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (pr.nombre LIKE ?";
+            params.add("%" + busqueda.trim() + "%");
+
+            String digits = busqueda.replaceAll("\\D", "");
+            if (!digits.isEmpty()) {
+                sql += " OR oc.id_orden_compra = ?";
+                params.add(Integer.parseInt(digits));
+            }
+            sql += ")";
+        }
+        if (proveedorId != null && !proveedorId.trim().isEmpty()) {
+            sql += " AND productor.id_usuario = ?";
+            params.add(Integer.parseInt(proveedorId));
+        }
+        if (estado != null && !estado.trim().isEmpty()) {
+            sql += " AND oc.estado = ?";
+            params.add(estado.trim());
+        }
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public boolean crearOrdenCompra(String numeroOrden, int productorId, int productoId, int cantidad, int usuarioId, double montoTotal, int distritoId) {

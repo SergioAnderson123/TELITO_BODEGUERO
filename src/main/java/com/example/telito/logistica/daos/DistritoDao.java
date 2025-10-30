@@ -51,4 +51,29 @@ public class DistritoDao {
         }
         return lista;
     }
+    
+    // ========== MÉTODOS DE VALIDACIÓN ==========
+    
+    /**
+     * Verifica si existe un distrito con el ID especificado
+     */
+    public boolean existeDistrito(int distritoId) {
+        String sql = "SELECT COUNT(*) as total FROM distritos WHERE idDistrito = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, distritoId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al verificar existencia de distrito: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

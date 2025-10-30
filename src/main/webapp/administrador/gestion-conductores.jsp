@@ -138,9 +138,13 @@
 
 <script>
     function confirmarEliminacion(id, nombre) {
-        if (confirm('¿Estás seguro de eliminar al conductor "' + nombre + '"? Esta acción no se puede deshacer.')) {
-            window.location.href = '${pageContext.request.contextPath}/administrador/ConductorServlet?action=eliminar&id=' + id;
-        }
+        showConfirm(
+            '¿Estás seguro de eliminar al conductor "' + nombre + '"? Esta acción no se puede deshacer.',
+            function() {
+                window.location.href = '${pageContext.request.contextPath}/administrador/ConductorServlet?action=eliminar&id=' + id;
+            },
+            'Confirmar eliminación'
+        );
     }
 </script>
 

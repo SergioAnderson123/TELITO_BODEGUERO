@@ -8,6 +8,8 @@
     <jsp:include page="/logistica/layouts/head.jsp">
         <jsp:param name="pageTitle" value="Orden de Compra"/>
     </jsp:include>
+    <!-- Incluir modales personalizados -->
+    <jsp:include page="/WEB-INF/includes/modal-alerts.jsp" />
 </head>
 <body>
 <div class="dashboard-main-wrapper">
@@ -135,14 +137,16 @@
                                 </table>
                             </div>
 
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <div class="pagination-info">
-                                    <span id="paginationInfo" class="text-muted"></span>
-                                </div>
-                                <nav aria-label="Paginación de órdenes">
-                                    <ul class="pagination pagination-sm mb-0" id="paginationControls"></ul>
-                                </nav>
-                            </div>
+                            <%-- Incluir componente de paginación --%>
+                            <%
+                                request.setAttribute("param1Name", "busqueda");
+                                request.setAttribute("param1Value", request.getAttribute("busqueda"));
+                                request.setAttribute("param2Name", "proveedor");
+                                request.setAttribute("param2Value", request.getAttribute("proveedorFiltro"));
+                                request.setAttribute("param3Name", "estado");
+                                request.setAttribute("param3Value", request.getAttribute("estadoFiltro"));
+                            %>
+                            <jsp:include page="/WEB-INF/includes/pagination.jsp" />
 
                             <div class="mt-3">
                                 <a href="${pageContext.request.contextPath}/orden-compra?action=crear" class="btn btn-dark">
@@ -268,16 +272,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    let currentPage = 1, rowsPerPage = 9, allRows = [], filteredRows = [], sortDirections = Array(7).fill(true);
-    document.addEventListener('DOMContentLoaded', function(){initializePagination();});
-    function initializePagination(){const table=document.getElementById('purchaseTable');const tbody=table.getElementsByTagName('tbody')[0];allRows=Array.from(tbody.rows);filteredRows=allRows.filter(row=>{return !row.cells[0].hasAttribute('colspan');});totalRows=filteredRows.length;currentPage=1;displayPage(currentPage);updatePaginationControls();}
-    function displayPage(page){const table=document.getElementById('purchaseTable');const tbody=table.getElementsByTagName('tbody')[0];tbody.innerHTML='';if(filteredRows.length===0){const noDataRow=document.createElement('tr');noDataRow.innerHTML=`<td colspan="8" class="text-center text-muted"><i class="fas fa-file-invoice fa-2x mb-2"></i><br>No hay órdenes de compra para mostrar.</td>`;tbody.appendChild(noDataRow);updatePaginationInfo(0,0,0);return;}const startIndex=(page-1)*rowsPerPage;const endIndex=Math.min(startIndex+rowsPerPage,filteredRows.length);for(let i=startIndex;i<endIndex;i++){tbody.appendChild(filteredRows[i].cloneNode(true));}updatePaginationInfo(startIndex+1,endIndex,filteredRows.length);}
-    function updatePaginationInfo(start,end,total){const paginationInfo=document.getElementById('paginationInfo');if(total===0){paginationInfo.textContent='No hay registros para mostrar';}else{paginationInfo.textContent=`Mostrando ${start}-${end} de ${total} registros`;}}
-    function updatePaginationControls(){const totalPages=Math.ceil(filteredRows.length/rowsPerPage);const paginationControls=document.getElementById('paginationControls');if(totalPages<=1){paginationControls.style.display='none';return;}paginationControls.style.display='flex';paginationControls.innerHTML='';const prevLi=document.createElement('li');prevLi.className=currentPage===1?'page-item disabled':'page-item';prevLi.innerHTML=`<a class="page-link" href="#" onclick="event.preventDefault(); changePage('prev')" tabindex="-1"><i class="fas fa-chevron-left"></i></a>`;paginationControls.appendChild(prevLi);const startPage=Math.max(1,currentPage-2);const endPage=Math.min(totalPages,currentPage+2);if(startPage>1){const firstLi=document.createElement('li');firstLi.className='page-item';firstLi.innerHTML=`<a class="page-link" href="#" onclick="event.preventDefault(); goToPage(1)">1</a>`;paginationControls.appendChild(firstLi);if(startPage>2){const dotsLi=document.createElement('li');dotsLi.className='page-item disabled';dotsLi.innerHTML=`<span class="page-link">...</span>`;paginationControls.appendChild(dotsLi);}}for(let i=startPage;i<=endPage;i++){const pageLi=document.createElement('li');pageLi.className=i===currentPage?'page-item active':'page-item';pageLi.innerHTML=`<a class="page-link" href="#" onclick="event.preventDefault(); goToPage(${i})">${i}</a>`;paginationControls.appendChild(pageLi);}if(endPage<totalPages){if(endPage<totalPages-1){const dotsLi=document.createElement('li');dotsLi.className='page-item disabled';dotsLi.innerHTML=`<span class="page-link">...</span>`;paginationControls.appendChild(dotsLi);}const lastLi=document.createElement('li');lastLi.className='page-item';lastLi.innerHTML=`<a class="page-link" href="#" onclick="event.preventDefault(); goToPage(${totalPages})">${totalPages}</a>`;paginationControls.appendChild(lastLi);}const nextLi=document.createElement('li');nextLi.className=currentPage===totalPages?'page-item disabled':'page-item';nextLi.innerHTML=`<a class="page-link" href="#" onclick="event.preventDefault(); changePage('next')"><i class="fas fa-chevron-right"></i></a>`;paginationControls.appendChild(nextLi);}
-    function goToPage(page){const totalPages=Math.ceil(filteredRows.length/rowsPerPage);if(page<1||page>totalPages)return;currentPage=page;displayPage(currentPage);updatePaginationControls();}
-    function changePage(direction){const totalPages=Math.ceil(filteredRows.length/rowsPerPage);if(direction==='prev'&&currentPage>1){goToPage(currentPage-1);}else if(direction==='next'&&currentPage<totalPages){goToPage(currentPage+1);}}
-    function sortTable(n,tableId){if(filteredRows.length===0)return;const dir=sortDirections[n]?'asc':'desc';sortDirections[n]=!sortDirections[n];filteredRows.sort(function(a,b){let x=a.getElementsByTagName("TD")[n].textContent||a.getElementsByTagName("TD")[n].innerText;let y=b.getElementsByTagName("TD")[n].textContent||b.getElementsByTagName("TD")[n].innerText;if(n===6){x=x.replace(/S\/\.\s?|,/g,"");y=y.replace(/S\/\.\s?|,/g,"");x=parseFloat(x)||0;y=parseFloat(y)||0;}else{x=x.toLowerCase();y=y.toLowerCase();}if(dir==="asc"){if(x<y)return -1;if(x>y)return 1;return 0;}else{if(x>y)return -1;if(x<y)return 1;return 0;}});currentPage=1;displayPage(currentPage);updatePaginationControls();const table=document.getElementById(tableId);let ths=table.getElementsByTagName('th');for(let j=0;j<ths.length;j++){ths[j].classList.remove('active');}ths[n].classList.add('active');}
-    
     // Función para ver detalles de orden recibida
     function editarOrden(numeroOrden) {
         console.log('Abriendo detalles de orden:', numeroOrden);
@@ -346,7 +340,7 @@
     // Función para cambiar el estado de la orden (Aprobar o Rechazar)
     function cambiarEstadoOrden(nuevoEstado) {
         if (!ordenActualId) {
-            alert('Error: No se ha seleccionado ninguna orden');
+            showError('No se ha seleccionado ninguna orden');
             return;
         }
         
@@ -354,44 +348,50 @@
             ? '¿Está seguro de APROBAR esta orden?' 
             : '¿Está seguro de RECHAZAR esta orden?';
         
-        if (!confirm(mensajeConfirm)) {
-            return;
-        }
+        const tituloConfirm = nuevoEstado === 'Aprobado' 
+            ? 'Aprobar Orden' 
+            : 'Rechazar Orden';
         
-        console.log('Cambiando estado a:', nuevoEstado, 'para orden:', ordenActualId);
-        
-        // Deshabilitar botones
-        document.getElementById('btnAprobar').disabled = true;
-        document.getElementById('btnRechazar').disabled = true;
-        
-        // Hacer petición para cambiar el estado
-        fetch('${pageContext.request.contextPath}/orden-compra', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+        showConfirm(
+            mensajeConfirm,
+            function() {
+                console.log('Cambiando estado a:', nuevoEstado, 'para orden:', ordenActualId);
+                
+                // Deshabilitar botones
+                document.getElementById('btnAprobar').disabled = true;
+                document.getElementById('btnRechazar').disabled = true;
+                
+                // Hacer petición para cambiar el estado
+                fetch('${pageContext.request.contextPath}/orden-compra', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=cambiarEstado&idOrden=' + ordenActualId + '&nuevoEstado=' + encodeURIComponent(nuevoEstado)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showSuccess('Orden ' + (nuevoEstado === 'Aprobado' ? 'aprobada' : 'rechazada') + ' exitosamente');
+                        // Cerrar el modal
+                        bootstrap.Modal.getInstance(document.getElementById('detalleOrdenModal')).hide();
+                        // Recargar la página después de 1 segundo
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showError('Error: ' + (data.message || 'No se pudo cambiar el estado'));
+                        document.getElementById('btnAprobar').disabled = false;
+                        document.getElementById('btnRechazar').disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('Error de conexión al cambiar el estado. Por favor, intenta de nuevo.');
+                    document.getElementById('btnAprobar').disabled = false;
+                    document.getElementById('btnRechazar').disabled = false;
+                });
             },
-            body: 'action=cambiarEstado&idOrden=' + ordenActualId + '&nuevoEstado=' + encodeURIComponent(nuevoEstado)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('✓ Orden ' + (nuevoEstado === 'Aprobado' ? 'aprobada' : 'rechazada') + ' exitosamente');
-                // Cerrar el modal
-                bootstrap.Modal.getInstance(document.getElementById('detalleOrdenModal')).hide();
-                // Recargar la página para ver los cambios
-                location.reload();
-            } else {
-                alert('Error: ' + (data.message || 'No se pudo cambiar el estado'));
-                document.getElementById('btnAprobar').disabled = false;
-                document.getElementById('btnRechazar').disabled = false;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error de conexión al cambiar el estado');
-            document.getElementById('btnAprobar').disabled = false;
-            document.getElementById('btnRechazar').disabled = false;
-        });
+            tituloConfirm
+        );
     }
 </script>
 </body>

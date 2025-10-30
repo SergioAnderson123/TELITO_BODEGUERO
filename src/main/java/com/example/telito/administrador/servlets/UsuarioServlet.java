@@ -116,15 +116,125 @@ public class UsuarioServlet extends HttpServlet {
 
         switch (action) {
             case "guardar":
-                // Lee los datos del form, los guarda en la BD y redirige.
+                // ========== VALIDACIONES DE USUARIO ==========
+                ArrayList<String> errores = new ArrayList<>();
+                
+                // 1. Validar que los parámetros obligatorios existan
+                String nombres = request.getParameter("nombres");
+                String apellidos = request.getParameter("apellidos");
+                String email = request.getParameter("email");
+                String password = request.getParameter("password");
+                String rolIdStr = request.getParameter("rol_id");
+                
+                if (nombres == null || nombres.trim().isEmpty()) {
+                    errores.add("El nombre es obligatorio");
+                }
+                if (apellidos == null || apellidos.trim().isEmpty()) {
+                    errores.add("Los apellidos son obligatorios");
+                }
+                if (email == null || email.trim().isEmpty()) {
+                    errores.add("El email es obligatorio");
+                }
+                if (password == null || password.trim().isEmpty()) {
+                    errores.add("La contraseña es obligatoria");
+                }
+                if (rolIdStr == null || rolIdStr.trim().isEmpty()) {
+                    errores.add("Debe seleccionar un rol");
+                }
+                
+                // 2. Validar longitudes máximas
+                if (nombres != null && nombres.length() > 100) {
+                    errores.add("El nombre no puede exceder 100 caracteres");
+                }
+                if (apellidos != null && apellidos.length() > 100) {
+                    errores.add("Los apellidos no pueden exceder 100 caracteres");
+                }
+                if (email != null && email.length() > 100) {
+                    errores.add("El email no puede exceder 100 caracteres");
+                }
+                if (password != null && password.length() > 100) {
+                    errores.add("La contraseña no puede exceder 100 caracteres");
+                }
+                
+                // 3. Validar formato de email
+                if (email != null && !email.trim().isEmpty()) {
+                    String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+                    if (!email.matches(emailRegex)) {
+                        errores.add("El formato del email no es válido");
+                    }
+                }
+                
+                // 4. Validar complejidad de contraseña
+                if (password != null && !password.trim().isEmpty()) {
+                    if (password.length() < 4) {
+                        errores.add("La contraseña debe tener al menos 4 caracteres");
+                    }
+                }
+                
+                // 5. Validar que el rol_id sea un número válido
+                int rolId = 0;
+                try {
+                    rolId = Integer.parseInt(rolIdStr);
+                    if (rolId <= 0) {
+                        errores.add("El ID del rol no es válido");
+                    }
+                } catch (NumberFormatException e) {
+                    errores.add("El ID del rol debe ser un número válido");
+                }
+                
+                // 6. Validar que el email no esté registrado
+                if (email != null && !email.trim().isEmpty()) {
+                    if (usuarioDAO.existeEmail(email)) {
+                        errores.add("El email '" + email + "' ya está registrado");
+                    }
+                }
+                
+                // Si hay errores, volver al formulario
+                if (!errores.isEmpty()) {
+                    request.setAttribute("errores", errores);
+                    request.setAttribute("nombres", nombres);
+                    request.setAttribute("apellidos", apellidos);
+                    request.setAttribute("email", email);
+                    request.setAttribute("rol_id", rolIdStr);
+                    
+                    RequestDispatcher view = request.getRequestDispatcher("/administrador/crear-usuario.jsp");
+                    view.forward(request, response);
+                    return;
+                }
+                
+                // ========== TODO VÁLIDO - CREAR USUARIO ==========
                 try {
                     Usuario usuarioNuevo = mapearUsuarioDesdeRequest(request);
-                    usuarioDAO.crearUsuario(usuarioNuevo);
-                    session.setAttribute("successMsg", "Usuario creado con éxito.");
-                } catch (NumberFormatException e) {
-                    session.setAttribute("errorMsg", "Error al procesar el rol del usuario.");
+                    boolean creado = usuarioDAO.crearUsuario(usuarioNuevo);
+                    
+                    if (creado) {
+                        session.setAttribute("successMsg", "Usuario creado con éxito.");
+                        response.sendRedirect(request.getContextPath() + "/UsuarioServlet");
+                    } else {
+                        errores.add("Error al guardar el usuario en la base de datos");
+                        request.setAttribute("errores", errores);
+                        request.setAttribute("nombres", nombres);
+                        request.setAttribute("apellidos", apellidos);
+                        request.setAttribute("email", email);
+                        request.setAttribute("rol_id", rolIdStr);
+                        
+                        RequestDispatcher view = request.getRequestDispatcher("/administrador/crear-usuario.jsp");
+                        view.forward(request, response);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error al crear usuario: " + e.getMessage());
+                    e.printStackTrace();
+                    
+                    errores.add("Error inesperado al crear el usuario. Por favor, contacte al administrador.");
+                    request.setAttribute("errores", errores);
+                    request.setAttribute("nombres", nombres);
+                    request.setAttribute("apellidos", apellidos);
+                    request.setAttribute("email", email);
+                    request.setAttribute("rol_id", rolIdStr);
+                    
+                    RequestDispatcher view = request.getRequestDispatcher("/administrador/crear-usuario.jsp");
+                    view.forward(request, response);
                 }
-                response.sendRedirect(request.getContextPath() + "/UsuarioServlet");
                 break;
 
             case "actualizar":

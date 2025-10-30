@@ -37,22 +37,48 @@ public class OrdenCompraServlet extends HttpServlet {
 
         switch (action) {
             case "listar":
-                // === SECCIÓN MODIFICADA PARA MANEJAR FILTROS ===
+                // === SECCIÓN MODIFICADA PARA MANEJAR FILTROS Y PAGINACIÓN ===
 
                 // 1. Leemos los parámetros del formulario de búsqueda
                 String busqueda = request.getParameter("busqueda");
                 String proveedorId = request.getParameter("proveedor");
                 String estado = request.getParameter("estado");
 
-                // 2. Obtenemos la lista de órdenes (ahora filtrada)
-                //    Pasamos los filtros al método del DAO
-                ArrayList<OrdenCompraBean> listaOrdenes = ordenCompraDao.obtenerOrdenes(busqueda, proveedorId, estado);
+                // 2. Parámetros de paginación
+                int page = 1;
+                int size = 10;
+                try { 
+                    page = Integer.parseInt(request.getParameter("page")); 
+                } catch (Exception ignored) {}
+                try { 
+                    size = Integer.parseInt(request.getParameter("size")); 
+                } catch (Exception ignored) {}
+                if (page < 1) page = 1;
+                if (size < 1) size = 10;
 
-                // 3. Obtenemos la lista de proveedores para el menú del filtro
+                // 3. Obtenemos el total y calculamos páginas
+                int totalRows = ordenCompraDao.contarOrdenes(busqueda, proveedorId, estado);
+                int totalPages = (int) Math.ceil(totalRows / (double) size);
+                if (totalPages == 0) totalPages = 1;
+                if (page > totalPages) page = totalPages;
+
+                // 4. Obtenemos la lista de órdenes (ahora paginada)
+                ArrayList<OrdenCompraBean> listaOrdenes = ordenCompraDao.obtenerOrdenes(busqueda, proveedorId, estado, page, size);
+
+                // 5. Obtenemos la lista de proveedores para el menú del filtro
                 request.setAttribute("listaProveedores", proveedorDao.listarProveedores());
 
-                // 4. Enviamos la lista de órdenes filtrada a la vista
+                // 6. Enviamos datos a la vista
                 request.setAttribute("listaOrdenes", listaOrdenes);
+                request.setAttribute("busqueda", busqueda);
+                request.setAttribute("proveedorFiltro", proveedorId);
+                request.setAttribute("estadoFiltro", estado);
+                request.setAttribute("currentPage", page);
+                request.setAttribute("size", size);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("totalRows", totalRows);
+                request.setAttribute("baseUrl", request.getContextPath() + "/orden-compra");
+                request.setAttribute("itemName", "órdenes");
 
                 rd = request.getRequestDispatcher("/logistica/OrdenLista/purchase-order.jsp");
                 rd.forward(request, response);
@@ -173,7 +199,8 @@ public class OrdenCompraServlet extends HttpServlet {
         OrdenCompraDao ordenCompraDao = new OrdenCompraDao();
 
         if ("guardar".equals(action)) {
-            try {
+            ArrayList<String> errores = new ArrayList<>();
+            
                 // Obtener el ID del usuario de logística que está logueado
                 com.example.telito.administrador.beans.Usuario usuario = 
                     (com.example.telito.administrador.beans.Usuario) request.getSession().getAttribute("usuario");
@@ -185,13 +212,167 @@ public class OrdenCompraServlet extends HttpServlet {
                 
                 int usuarioId = usuario.getIdUsuario();
                 
-                // Parsear parámetros del formulario
-                int productorId = Integer.parseInt(request.getParameter("productor_id"));
-                int productoId = Integer.parseInt(request.getParameter("producto_id"));
-                int cantidad = Integer.parseInt(request.getParameter("cantidad"));
-                int distritoId = Integer.parseInt(request.getParameter("distrito_id"));
-                double montoTotal = Double.parseDouble(request.getParameter("monto_total"));
+            // ========== VALIDACIONES DE PARÁMETROS ==========
+            
+            // 1. Validar que los parámetros existan
+            String productorIdStr = request.getParameter("productor_id");
+            String productoIdStr = request.getParameter("producto_id");
+            String cantidadStr = request.getParameter("cantidad");
+            String distritoIdStr = request.getParameter("distrito_id");
+            String montoTotalStr = request.getParameter("monto_total");
+            
+            if (productorIdStr == null || productorIdStr.trim().isEmpty()) {
+                errores.add("El productor es obligatorio");
+            }
+            if (productoIdStr == null || productoIdStr.trim().isEmpty()) {
+                errores.add("El producto es obligatorio");
+            }
+            if (cantidadStr == null || cantidadStr.trim().isEmpty()) {
+                errores.add("La cantidad es obligatoria");
+            }
+            if (distritoIdStr == null || distritoIdStr.trim().isEmpty()) {
+                errores.add("El distrito de destino es obligatorio");
+            }
+            if (montoTotalStr == null || montoTotalStr.trim().isEmpty()) {
+                errores.add("El monto total es obligatorio");
+            }
+            
+            // Si ya hay errores, no continuar
+            if (!errores.isEmpty()) {
+                request.setAttribute("errores", errores);
+                request.setAttribute("productor_id", productorIdStr);
+                request.setAttribute("producto_id", productoIdStr);
+                request.setAttribute("cantidad", cantidadStr);
+                request.setAttribute("distrito_id", distritoIdStr);
+                request.setAttribute("monto_total", montoTotalStr);
                 
+                // Recargar listas para el formulario
+                request.setAttribute("listaProductos", new ProductoDao().listarProductos());
+                request.setAttribute("listaProductores", new ProveedorDao().listarProductores());
+                request.setAttribute("listaZonas", new ZonaDao().listarZonas());
+                
+                RequestDispatcher rd = request.getRequestDispatcher("/logistica/OrdenLista/form_orden_compra.jsp");
+                rd.forward(request, response);
+                return;
+            }
+            
+            // 2. Validar que sean números válidos
+            int productorId = 0;
+            int productoId = 0;
+            int cantidad = 0;
+            int distritoId = 0;
+            double montoTotal = 0.0;
+            
+            try {
+                productorId = Integer.parseInt(productorIdStr);
+                productoId = Integer.parseInt(productoIdStr);
+                cantidad = Integer.parseInt(cantidadStr);
+                distritoId = Integer.parseInt(distritoIdStr);
+                montoTotal = Double.parseDouble(montoTotalStr);
+            } catch (NumberFormatException e) {
+                errores.add("Los valores numéricos no son válidos. Verifique los datos ingresados.");
+                request.setAttribute("errores", errores);
+                request.setAttribute("productor_id", productorIdStr);
+                request.setAttribute("producto_id", productoIdStr);
+                request.setAttribute("cantidad", cantidadStr);
+                request.setAttribute("distrito_id", distritoIdStr);
+                request.setAttribute("monto_total", montoTotalStr);
+                
+                request.setAttribute("listaProductos", new ProductoDao().listarProductos());
+                request.setAttribute("listaProductores", new ProveedorDao().listarProductores());
+                request.setAttribute("listaZonas", new ZonaDao().listarZonas());
+                
+                RequestDispatcher rd = request.getRequestDispatcher("/logistica/OrdenLista/form_orden_compra.jsp");
+                rd.forward(request, response);
+                return;
+            }
+            
+            // 3. Validar rangos y lógica de negocio
+            if (productorId <= 0) {
+                errores.add("El ID del productor no es válido");
+            }
+            if (productoId <= 0) {
+                errores.add("El ID del producto no es válido");
+            }
+            if (cantidad <= 0) {
+                errores.add("La cantidad debe ser mayor a 0");
+            }
+            if (cantidad > 100000) {
+                errores.add("La cantidad no puede exceder 100,000 paquetes");
+            }
+            if (distritoId <= 0) {
+                errores.add("El ID del distrito no es válido");
+            }
+            if (montoTotal <= 0) {
+                errores.add("El monto total debe ser mayor a S/ 0.00");
+            }
+            if (montoTotal > 10000000) {
+                errores.add("El monto total no puede exceder S/ 10,000,000");
+            }
+            
+            // 4. Validar existencia de entidades relacionadas
+            ProductoDao productoDao = new ProductoDao();
+            ProveedorDao proveedorDao = new ProveedorDao();
+            DistritoDao distritoDao = new DistritoDao();
+            
+            if (!proveedorDao.existeProductor(productorId)) {
+                errores.add("El productor seleccionado no existe");
+            }
+            if (!productoDao.existeProducto(productoId)) {
+                errores.add("El producto seleccionado no existe");
+            }
+            if (!distritoDao.existeDistrito(distritoId)) {
+                errores.add("El distrito seleccionado no existe");
+            }
+            
+            // 5. Validar que el producto pertenezca al productor
+            if (productorId > 0 && productoId > 0) {
+                if (!productoDao.productoPerteneceAProductor(productoId, productorId)) {
+                    errores.add("El producto seleccionado no pertenece al productor");
+                }
+            }
+            
+            // 6. Validar coherencia del monto (cantidad × precio unitario)
+            if (productoId > 0 && cantidad > 0) {
+                ProductoBean producto = productoDao.obtenerProductoPorId(productoId);
+                if (producto != null && producto.getPrecio() != null) {
+                    double precioUnitario = producto.getPrecio().doubleValue();
+                    double precioEsperado = cantidad * precioUnitario;
+                    double margenError = precioEsperado * 0.01; // 1% de margen
+                    
+                    if (Math.abs(montoTotal - precioEsperado) > margenError) {
+                        errores.add(String.format("El monto total (S/ %.2f) no coincide con el cálculo esperado (S/ %.2f). Verifique los datos.", 
+                            montoTotal, precioEsperado));
+                    }
+                }
+            }
+            
+            // Si hay errores de validación, volver al formulario
+            if (!errores.isEmpty()) {
+                System.err.println("❌ VALIDACIÓN: Se encontraron " + errores.size() + " errores");
+                for (String error : errores) {
+                    System.err.println("  - " + error);
+                }
+                
+                request.setAttribute("errores", errores);
+                request.setAttribute("productor_id", productorIdStr);
+                request.setAttribute("producto_id", productoIdStr);
+                request.setAttribute("cantidad", cantidadStr);
+                request.setAttribute("distrito_id", distritoIdStr);
+                request.setAttribute("monto_total", montoTotalStr);
+                
+                request.setAttribute("listaProductos", productoDao.listarProductos());
+                request.setAttribute("listaProductores", proveedorDao.listarProductores());
+                request.setAttribute("listaZonas", new ZonaDao().listarZonas());
+                
+                RequestDispatcher rd = request.getRequestDispatcher("/logistica/OrdenLista/form_orden_compra.jsp");
+                rd.forward(request, response);
+                return;
+            }
+            
+            // ========== TODO VÁLIDO - GUARDAR ORDEN ==========
+            
+            try {
                 System.out.println("=== DEBUG SERVLET - ORDEN DE COMPRA ===");
                 System.out.println("Productor ID: " + productorId);
                 System.out.println("Producto ID: " + productoId);
@@ -205,20 +386,44 @@ public class OrdenCompraServlet extends HttpServlet {
                 
                 if (guardado) {
                     System.out.println("✓ SERVLET: Orden guardada exitosamente");
-                    response.sendRedirect(request.getContextPath() + "/orden-compra");
+                    response.sendRedirect(request.getContextPath() + "/orden-compra?successMsg=Orden de compra creada exitosamente");
                 } else {
                     System.err.println("❌ SERVLET: Fallo al guardar la orden");
-                    response.sendRedirect(request.getContextPath() + "/orden-compra?error=database");
+                    errores.add("Error al guardar la orden en la base de datos. Por favor, intente nuevamente.");
+                    
+                    request.setAttribute("errores", errores);
+                    request.setAttribute("productor_id", productorIdStr);
+                    request.setAttribute("producto_id", productoIdStr);
+                    request.setAttribute("cantidad", cantidadStr);
+                    request.setAttribute("distrito_id", distritoIdStr);
+                    request.setAttribute("monto_total", montoTotalStr);
+                    
+                    request.setAttribute("listaProductos", productoDao.listarProductos());
+                    request.setAttribute("listaProductores", proveedorDao.listarProductores());
+                    request.setAttribute("listaZonas", new ZonaDao().listarZonas());
+                    
+                    RequestDispatcher rd = request.getRequestDispatcher("/logistica/OrdenLista/form_orden_compra.jsp");
+                    rd.forward(request, response);
                 }
                 
-            } catch (NumberFormatException e) {
-                System.err.println("ERROR: Formato de número inválido - " + e.getMessage());
-                e.printStackTrace();
-                response.sendRedirect(request.getContextPath() + "/orden-compra?error=formato");
             } catch (Exception e) {
-                System.err.println("ERROR: Error al guardar orden de compra - " + e.getMessage());
+                System.err.println("❌ ERROR INESPERADO: " + e.getMessage());
                 e.printStackTrace();
-                response.sendRedirect(request.getContextPath() + "/orden-compra?error=sql");
+                
+                errores.add("Error inesperado al procesar la orden. Por favor, contacte al administrador.");
+                request.setAttribute("errores", errores);
+                request.setAttribute("productor_id", productorIdStr);
+                request.setAttribute("producto_id", productoIdStr);
+                request.setAttribute("cantidad", cantidadStr);
+                request.setAttribute("distrito_id", distritoIdStr);
+                request.setAttribute("monto_total", montoTotalStr);
+                
+                request.setAttribute("listaProductos", productoDao.listarProductos());
+                request.setAttribute("listaProductores", proveedorDao.listarProductores());
+                request.setAttribute("listaZonas", new ZonaDao().listarZonas());
+                
+                RequestDispatcher rd = request.getRequestDispatcher("/logistica/OrdenLista/form_orden_compra.jsp");
+                rd.forward(request, response);
             }
         } else if ("cambiarEstado".equals(action)) {
             // Cambiar el estado de una orden (Aprobar o Rechazar)

@@ -42,6 +42,24 @@
                                     </div>
                                 </c:if>
                                 
+                                <!-- Lista de errores de validación -->
+                                <%
+                                    java.util.ArrayList<String> errores = (java.util.ArrayList<String>) request.getAttribute("errores");
+                                    if (errores != null && !errores.isEmpty()) {
+                                %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <h5 class="alert-heading">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Se encontraron los siguientes errores:
+                                    </h5>
+                                    <ul class="mb-0">
+                                        <% for (String errorMsg : errores) { %>
+                                            <li><%= errorMsg %></li>
+                                        <% } %>
+                                    </ul>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                <% } %>
+                                
                                 <form method="POST" action="${pageContext.request.contextPath}/almacen/EntradaServlet">
                                     <input type="hidden" name="id_orden_compra" value="${ordenCompra.idOrdenCompra}">
                                     <input type="hidden" name="producto_esperado" value="${ordenCompra.nombreProducto}">

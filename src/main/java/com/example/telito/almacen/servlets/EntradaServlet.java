@@ -76,6 +76,8 @@ public class EntradaServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        ArrayList<String> errores = new ArrayList<>();
+        
         HttpSession session = request.getSession();
         com.example.telito.administrador.beans.Usuario usuario = 
             (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
@@ -91,22 +93,145 @@ public class EntradaServlet extends HttpServlet {
         LoteDao loteDao = new LoteDao();
         MovimientoDao movimientoDao = new MovimientoDao();
 
-        int idOrden = Integer.parseInt(request.getParameter("id_orden_compra"));
+        // ========== VALIDACIONES DE PARÁMETROS ==========
+        
+        String idOrdenStr = request.getParameter("id_orden_compra");
+        String idUbicacionStr = request.getParameter("ubicacion_id");
+        String productoVerificacion = request.getParameter("producto_verificacion");
+        String codigoLoteVerificacion = request.getParameter("codigo_lote_verificacion");
+        String fechaVencimientoVerificacion = request.getParameter("fecha_vencimiento_verificacion");
+        
+        // 1. Validar que los parámetros obligatorios existan
+        if (idOrdenStr == null || idOrdenStr.trim().isEmpty()) {
+            errores.add("El ID de la orden de compra es obligatorio");
+        }
+        if (idUbicacionStr == null || idUbicacionStr.trim().isEmpty()) {
+            errores.add("Debe seleccionar una ubicación para el lote");
+        }
+        if (productoVerificacion == null || productoVerificacion.trim().isEmpty()) {
+            errores.add("El nombre del producto es obligatorio");
+        }
+        if (codigoLoteVerificacion == null || codigoLoteVerificacion.trim().isEmpty()) {
+            errores.add("El código del lote es obligatorio");
+        }
+        if (fechaVencimientoVerificacion == null || fechaVencimientoVerificacion.trim().isEmpty()) {
+            errores.add("La fecha de vencimiento es obligatoria");
+        }
+        
+        // Si hay errores, volver al formulario
+        if (!errores.isEmpty()) {
+            try {
+                int idOrden = Integer.parseInt(idOrdenStr);
+                OrdenCompra oc = ordenCompraDao.buscarOrdenPorId(idOrden);
+                request.setAttribute("errores", errores);
+                request.setAttribute("ordenCompra", oc);
+                
+                if (oc != null && oc.getLoteId() != 0) {
+                    request.setAttribute("loteAsignado", loteDao.buscarLotePorId(oc.getLoteId()));
+                }
+                
+                UbicacionDao ubicacionDao = new UbicacionDao();
+                request.setAttribute("listaUbicaciones", ubicacionDao.listar());
+                
+                RequestDispatcher view = request.getRequestDispatcher("/almacen/entradas/registrarEntrada.jsp");
+                view.forward(request, response);
+            } catch (Exception e) {
+                response.sendRedirect(request.getContextPath() + "/almacen/EntradaServlet");
+            }
+            return;
+        }
+        
+        // 2. Validar que sean números válidos
+        int idOrden = 0;
+        int idUbicacion = 0;
+        
+        try {
+            idOrden = Integer.parseInt(idOrdenStr);
+            idUbicacion = Integer.parseInt(idUbicacionStr);
+        } catch (NumberFormatException e) {
+            errores.add("Los valores numéricos no son válidos");
+            request.setAttribute("errores", errores);
+            request.setAttribute("producto_verificacion", productoVerificacion);
+            request.setAttribute("codigo_lote_verificacion", codigoLoteVerificacion);
+            request.setAttribute("fecha_vencimiento_verificacion", fechaVencimientoVerificacion);
+            
+            UbicacionDao ubicacionDao = new UbicacionDao();
+            request.setAttribute("listaUbicaciones", ubicacionDao.listar());
+            
+            RequestDispatcher view = request.getRequestDispatcher("/almacen/entradas/registrarEntrada.jsp");
+            view.forward(request, response);
+            return;
+        }
+        
+        // 3. Validar rangos
+        if (idOrden <= 0) {
+            errores.add("El ID de la orden no es válido");
+        }
+        if (idUbicacion <= 0) {
+            errores.add("Debe seleccionar una ubicación válida");
+        }
+        if (codigoLoteVerificacion.length() > 50) {
+            errores.add("El código del lote no puede exceder 50 caracteres");
+        }
+        
+        // 4. Validar formato de fecha
+        java.sql.Date fechaVencimientoSQL = null;
+        try {
+            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+            formato.setLenient(false);
+            java.util.Date utilDate = formato.parse(fechaVencimientoVerificacion);
+            fechaVencimientoSQL = new java.sql.Date(utilDate.getTime());
+            
+            // Validar que la fecha sea futura
+            java.sql.Date hoy = new java.sql.Date(System.currentTimeMillis());
+            if (fechaVencimientoSQL.before(hoy)) {
+                errores.add("La fecha de vencimiento debe ser futura");
+            }
+            
+            // Validar que no sea muy lejana (más de 10 años)
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.add(java.util.Calendar.YEAR, 10);
+            java.sql.Date fechaMaxima = new java.sql.Date(cal.getTimeInMillis());
+            if (fechaVencimientoSQL.after(fechaMaxima)) {
+                errores.add("La fecha de vencimiento no puede ser mayor a 10 años");
+            }
+            
+        } catch (Exception e) {
+            errores.add("Formato de fecha inválido. Use YYYY-MM-DD");
+        }
+        
+        // Si hay errores de formato, volver al formulario
+        if (!errores.isEmpty()) {
+            try {
+                OrdenCompra oc = ordenCompraDao.buscarOrdenPorId(idOrden);
+                request.setAttribute("errores", errores);
+                request.setAttribute("ordenCompra", oc);
+                request.setAttribute("producto_verificacion", productoVerificacion);
+                request.setAttribute("codigo_lote_verificacion", codigoLoteVerificacion);
+                request.setAttribute("fecha_vencimiento_verificacion", fechaVencimientoVerificacion);
+                
+                if (oc != null && oc.getLoteId() != 0) {
+                    request.setAttribute("loteAsignado", loteDao.buscarLotePorId(oc.getLoteId()));
+                }
+                
+                UbicacionDao ubicacionDao = new UbicacionDao();
+                request.setAttribute("listaUbicaciones", ubicacionDao.listar());
+                
+                RequestDispatcher view = request.getRequestDispatcher("/almacen/entradas/registrarEntrada.jsp");
+                view.forward(request, response);
+            } catch (Exception ex) {
+                response.sendRedirect(request.getContextPath() + "/almacen/EntradaServlet");
+            }
+            return;
+        }
 
         try {
-            // 1. Leemos los datos del formulario
-            int idUbicacion = Integer.parseInt(request.getParameter("ubicacion_id"));
-            int idDistrito = 13; // Distrito por defecto: "Cercado de Lima" (ID 13)
-            
-            // Datos de verificación del almacenero
-            String productoVerificacion = request.getParameter("producto_verificacion");
-            String codigoLoteVerificacion = request.getParameter("codigo_lote_verificacion");
-            String fechaVencimientoVerificacion = request.getParameter("fecha_vencimiento_verificacion");
-            
             // Datos esperados de la orden
             String productoEsperado = request.getParameter("producto_esperado");
             String codigoLoteEsperado = request.getParameter("codigo_lote_esperado");
             String fechaVencimientoEsperada = request.getParameter("fecha_vencimiento_esperada");
+            
+            int idDistrito = 13; // Distrito por defecto: "Cercado de Lima" (ID 13)
 
             // 2. Buscamos la orden de compra para obtener la cantidad y el ID del producto
             OrdenCompra oc = ordenCompraDao.buscarOrdenPorId(idOrden);
@@ -189,7 +314,8 @@ public class EntradaServlet extends HttpServlet {
                 // Si por alguna razón no hay lote asignado, creamos uno nuevo
                 SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
                 java.util.Date utilDate = formato.parse(fechaVencimientoVerificacion);
-                java.sql.Date fechaVencimientoSQL = new java.sql.Date(utilDate.getTime());
+                // Reutilizamos la variable ya declarada previamente
+                fechaVencimientoSQL = new java.sql.Date(utilDate.getTime());
                 
                 Lote nuevoLote = new Lote();
                 nuevoLote.setCodigoLote(codigoLoteVerificacion);

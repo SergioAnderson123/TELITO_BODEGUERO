@@ -92,7 +92,7 @@
                                         <td class="text-end">
                                             <a href="<%= request.getContextPath() %>/PlantillaServlet?action=editar&id=<%= plantilla.getIdPlantilla() %>" class="btn btn-sm btn-outline-primary">Editar</a>
                                             <% if (plantilla.isActivo()) { %>
-                                            <a href="<%= request.getContextPath() %>/PlantillaServlet?action=deshabilitar&id=<%= plantilla.getIdPlantilla() %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Estás seguro de que quieres deshabilitar esta plantilla?')">Deshabilitar</a>
+                                            <a href="#" class="btn btn-sm btn-outline-danger" onclick="showConfirm('¿Estás seguro de que quieres deshabilitar esta plantilla?', function() { window.location.href='<%= request.getContextPath() %>/PlantillaServlet?action=deshabilitar&id=<%= plantilla.getIdPlantilla() %>'; }, 'Confirmar acción'); return false;">Deshabilitar</a>
                                             <% } %>
                                         </td>
                                     </tr>

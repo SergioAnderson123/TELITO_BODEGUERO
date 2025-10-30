@@ -142,9 +142,13 @@
 
 <script>
     function confirmarEliminacion(id, placa) {
-        if (confirm('¿Estás seguro de eliminar el vehículo con placa "' + placa + '"? Esta acción no se puede deshacer.')) {
-            window.location.href = '${pageContext.request.contextPath}/administrador/VehiculoServlet?action=eliminar&id=' + id;
-        }
+        showConfirm(
+            '¿Estás seguro de eliminar el vehículo con placa "' + placa + '"? Esta acción no se puede deshacer.',
+            function() {
+                window.location.href = '${pageContext.request.contextPath}/administrador/VehiculoServlet?action=eliminar&id=' + id;
+            },
+            'Confirmar eliminación'
+        );
     }
 </script>
 

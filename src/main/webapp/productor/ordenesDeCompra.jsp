@@ -47,6 +47,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Incluir modales personalizados -->
+    <jsp:include page="/WEB-INF/includes/modal-alerts.jsp" />
 
     <!-- Custom CSS (turquesa/verde agua) -->
     <style>
@@ -625,7 +628,7 @@
             .catch(error => {
                 console.error('❌ ERROR al cargar lotes:', error);
                 document.getElementById('loadingLotes').style.display = 'none';
-                alert('Error al cargar los lotes disponibles: ' + error.message);
+                showError('Error al cargar los lotes disponibles. Por favor, intenta de nuevo.');
             });
     }
     
@@ -704,7 +707,7 @@
     // Función para asignar el lote a la orden
     function asignarLoteAOrden() {
         if (!loteSeleccionadoId) {
-            alert('Por favor, selecciona un lote antes de enviar.');
+            showAlert('Por favor, selecciona un lote antes de enviar.', 'Selecciona un lote', 'warning');
             return;
         }
         
@@ -724,20 +727,20 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('✓ Lote asignado correctamente a la orden');
+                showSuccess('Lote asignado correctamente a la orden');
                 // Cerrar el modal
                 bootstrap.Modal.getInstance(document.getElementById('asignarLoteModal')).hide();
-                // Recargar la página para ver los cambios
-                location.reload();
+                // Recargar la página después de 1 segundo
+                setTimeout(() => location.reload(), 1500);
             } else {
-                alert('Error: ' + (data.message || 'No se pudo asignar el lote'));
+                showError('Error: ' + (data.message || 'No se pudo asignar el lote'));
                 btnEnviar.disabled = false;
                 btnEnviar.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Enviar';
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error de conexión al asignar el lote');
+            showError('Error de conexión al asignar el lote. Por favor, intenta de nuevo.');
             btnEnviar.disabled = false;
             btnEnviar.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Enviar';
         });
@@ -745,41 +748,55 @@
 
     // Función para cambiar estado de una orden
     function cambiarEstado(idOrden, nuevoEstado, elemento) {
-        if (!confirm('¿Deseas cambiar el estado de esta orden a "' + nuevoEstado + '"?')) {
-            return;
-        }
+        // Usar modal personalizado en lugar de confirm
+        showConfirm(
+            '¿Deseas cambiar el estado de esta orden a "' + nuevoEstado + '"?',
+            function() {
+                // Mostrar indicador de carga
+                elemento.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Procesando...';
+                elemento.style.pointerEvents = 'none';
 
-        // Mostrar indicador de carga
-        elemento.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Procesando...';
-        elemento.style.pointerEvents = 'none';
-
-        // Hacer petición AJAX
-        fetch('<%= request.getContextPath() %>/ProductorServlet?action=cambiarEstadoOrden', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                // Hacer petición AJAX
+                fetch('<%= request.getContextPath() %>/ProductorServlet?action=cambiarEstadoOrden', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'idOrden=' + idOrden + '&nuevoEstado=' + encodeURIComponent(nuevoEstado)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Obtener la fila de la tabla
+                        const row = elemento.closest('tr');
+                        
+                        // Actualizar el badge con el nuevo estado
+                        const estadoCell = row.cells[6]; // Columna de estado
+                        estadoCell.innerHTML = '<span class="badge" style="background: linear-gradient(160deg, #ffc107 0%, #ff9800 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;"><i class="fas fa-spinner me-1"></i>En Proceso</span>';
+                        
+                        // IMPORTANTE: Mostrar el botón de editar en la columna de acciones
+                        const accionesCell = row.cells[7]; // Columna de acciones
+                        accionesCell.innerHTML = '<a href="#" class="btn-view" onclick="editarOrden(\'' + idOrden + '\'); return false;"><i class="fas fa-edit"></i> Editar</a>';
+                        
+                        // Mostrar mensaje de éxito
+                        showSuccess('Estado cambiado a "' + nuevoEstado + '" correctamente');
+                    } else {
+                        showError('Error al cambiar el estado: ' + (data.message || 'Error desconocido'));
+                        // Restaurar el badge original
+                        elemento.innerHTML = '<i class="fas fa-check me-1"></i>Recibido';
+                        elemento.style.pointerEvents = 'auto';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('Error de conexión al cambiar el estado. Por favor, intenta de nuevo.');
+                    // Restaurar el badge original
+                    elemento.innerHTML = '<i class="fas fa-check me-1"></i>Recibido';
+                    elemento.style.pointerEvents = 'auto';
+                });
             },
-            body: 'idOrden=' + idOrden + '&nuevoEstado=' + encodeURIComponent(nuevoEstado)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Actualizar el badge con el nuevo estado
-                elemento.outerHTML = '<span class="badge" style="background: linear-gradient(160deg, #ffc107 0%, #ff9800 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;"><i class="fas fa-spinner me-1"></i>En Proceso</span>';
-            } else {
-                alert('Error al cambiar el estado: ' + (data.message || 'Error desconocido'));
-                // Restaurar el badge original
-                elemento.innerHTML = '<i class="fas fa-check me-1"></i>Recibido';
-                elemento.style.pointerEvents = 'auto';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error de conexión al cambiar el estado');
-            // Restaurar el badge original
-            elemento.innerHTML = '<i class="fas fa-check me-1"></i>Recibido';
-            elemento.style.pointerEvents = 'auto';
-        });
+            'Cambiar estado de orden'
+        );
     }
 
     // Inicializar filtros

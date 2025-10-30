@@ -9,9 +9,13 @@ import java.util.List;
 
 public class PlanTransporteDao {
 
-    // (El método listarPlanesDeTransporte se queda igual)
+    // Método sin paginación para compatibilidad
     public ArrayList<PlanTransporteBean> listarPlanesDeTransporte(String busqueda, String conductorId, String estado, String fechaDesde, String fechaHasta) {
-        // ... (código sin cambios)
+        return listarPlanesDeTransporte(busqueda, conductorId, estado, fechaDesde, fechaHasta, 1, Integer.MAX_VALUE);
+    }
+
+    // Método con paginación
+    public ArrayList<PlanTransporteBean> listarPlanesDeTransporte(String busqueda, String conductorId, String estado, String fechaDesde, String fechaHasta, int page, int size) {
         ArrayList<PlanTransporteBean> listaPlanes = new ArrayList<>();
         String sql = """
             SELECT
@@ -51,11 +55,20 @@ public class PlanTransporteDao {
             sql += " AND pt.fecha_entrega <= ?";
             params.add(fechaHasta.trim());
         }
-        sql += " ORDER BY pt.id_plan DESC";
+        sql += " ORDER BY pt.id_plan DESC LIMIT ? OFFSET ?";
+        
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            for (int i = 0; i < params.size(); i++) {
-                pstmt.setObject(i + 1, params.get(i));
+            int paramIndex = 1;
+            for (Object param : params) {
+                pstmt.setObject(paramIndex++, param);
             }
+            
+            // Parámetros de paginación
+            int limit = Math.max(1, size);
+            int offset = Math.max(0, (Math.max(1, page) - 1) * size);
+            pstmt.setInt(paramIndex++, limit);
+            pstmt.setInt(paramIndex, offset);
+            
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     PlanTransporteBean plan = new PlanTransporteBean(rs.getString("numeroViaje"), rs.getString("nombreProducto"), rs.getString("codigoLote"), rs.getString("estado"), rs.getString("nombreConductor"), rs.getString("placaVehiculo"), rs.getString("fechaEntrega"), rs.getString("nombreDestino"));
@@ -66,6 +79,60 @@ public class PlanTransporteDao {
             e.printStackTrace();
         }
         return listaPlanes;
+    }
+
+    // Método para contar total de planes
+    public int contarPlanes(String busqueda, String conductorId, String estado, String fechaDesde, String fechaHasta) {
+        String sql = """
+            SELECT COUNT(*) as total
+            FROM planes_transporte pt
+            INNER JOIN lotes l ON pt.lote_id = l.id_lote
+            INNER JOIN productos p ON l.producto_id = p.id_producto
+            INNER JOIN conductores c ON pt.conductor_id = c.id_conductor
+            INNER JOIN vehiculos v ON pt.vehiculo_id = v.id_vehiculo
+            INNER JOIN distritos d ON pt.distrito_id = d.idDistrito
+            WHERE 1=1
+            """;
+        List<Object> params = new ArrayList<>();
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (pt.numero_plan LIKE ? OR v.placa LIKE ? OR l.codigo_lote LIKE ? OR p.nombre LIKE ?)";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+        if (conductorId != null && !conductorId.trim().isEmpty()) {
+            sql += " AND pt.conductor_id = ?";
+            params.add(Integer.parseInt(conductorId));
+        }
+        if (estado != null && !estado.trim().isEmpty()) {
+            sql += " AND pt.estado = ?";
+            params.add(estado.trim());
+        }
+        if (fechaDesde != null && !fechaDesde.trim().isEmpty()) {
+            sql += " AND pt.fecha_entrega >= ?";
+            params.add(fechaDesde.trim());
+        }
+        if (fechaHasta != null && !fechaHasta.trim().isEmpty()) {
+            sql += " AND pt.fecha_entrega <= ?";
+            params.add(fechaHasta.trim());
+        }
+        
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     // === NUEVO MÉTODO PARA GUARDAR UN PLAN ===

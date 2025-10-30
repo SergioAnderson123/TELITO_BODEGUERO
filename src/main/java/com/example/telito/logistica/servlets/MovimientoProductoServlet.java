@@ -24,12 +24,38 @@ public class MovimientoProductoServlet extends HttpServlet {
         String tipo = request.getParameter("tipo");
         String periodo = request.getParameter("periodo");
 
-        // Obtener datos filtrados directamente desde el DAO
+        // Parámetros de paginación
+        int page = 1;
+        int size = 15;
+        try { 
+            page = Integer.parseInt(request.getParameter("page")); 
+        } catch (Exception ignored) {}
+        try { 
+            size = Integer.parseInt(request.getParameter("size")); 
+        } catch (Exception ignored) {}
+        if (page < 1) page = 1;
+        if (size < 1) size = 15;
+
+        // Obtener datos filtrados desde el DAO
         MovimientoInventarioDao movimientoDao = new MovimientoInventarioDao();
-        ArrayList<MovimientoInventarioBean> listaMovimientos = movimientoDao.obtenerMovimientos(busqueda, tipo, periodo);
+        int totalRows = movimientoDao.contarMovimientos(busqueda, tipo, periodo);
+        int totalPages = (int) Math.ceil(totalRows / (double) size);
+        if (totalPages == 0) totalPages = 1;
+        if (page > totalPages) page = totalPages;
+
+        ArrayList<MovimientoInventarioBean> listaMovimientos = movimientoDao.obtenerMovimientos(busqueda, tipo, periodo, page, size);
 
         // Enviar datos a la JSP
         request.setAttribute("listaMovimientos", listaMovimientos);
+        request.setAttribute("busqueda", busqueda);
+        request.setAttribute("tipoFiltro", tipo);
+        request.setAttribute("periodoFiltro", periodo);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("size", size);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRows", totalRows);
+        request.setAttribute("baseUrl", request.getContextPath() + "/MovimientoProductoServlet");
+        request.setAttribute("itemName", "movimientos");
 
         // Forward a la JSP
         String vista = "/logistica/MovimientoProducto/product-movement.jsp";

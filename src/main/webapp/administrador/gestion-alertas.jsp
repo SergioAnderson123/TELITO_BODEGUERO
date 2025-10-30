@@ -118,7 +118,7 @@
                                     <td class="text-end">
                                         <a href="<%= request.getContextPath() %>/AlertaServlet?action=editar&id=<%= alerta.getIdAlertaConfig() %>" class="btn btn-sm btn-outline-primary">Editar</a>
                                         <% if (alerta.isActivo()) { %>
-                                            <a href="<%= request.getContextPath() %>/AlertaServlet?action=borrar&id=<%= alerta.getIdAlertaConfig() %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Estás seguro de que quieres deshabilitar esta regla?')">Deshabilitar</a>
+                                            <a href="#" class="btn btn-sm btn-outline-danger" onclick="showConfirm('¿Estás seguro de que quieres deshabilitar esta regla?', function() { window.location.href='<%= request.getContextPath() %>/AlertaServlet?action=borrar&id=<%= alerta.getIdAlertaConfig() %>'; }, 'Confirmar acción'); return false;">Deshabilitar</a>
                                         <% } %>
                                     </td>
                                 </tr>

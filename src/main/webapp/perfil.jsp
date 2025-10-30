@@ -49,6 +49,9 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
+    <!-- Incluir modales personalizados -->
+    <jsp:include page="/WEB-INF/includes/modal-alerts.jsp" />
+    
     <style>
         :root {
             --turquoise-dark: #006d77;
@@ -329,7 +332,7 @@
         if (file) {
             // Validar el tamaño (5MB máximo)
             if (file.size > 5 * 1024 * 1024) {
-                alert('El archivo es demasiado grande. El tamaño máximo es 5MB.');
+                showAlert('El archivo es demasiado grande. El tamaño máximo es 5MB.', 'Archivo muy grande', 'warning');
                 this.value = '';
                 return;
             }
@@ -337,7 +340,7 @@
             // Validar el tipo
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
             if (!validTypes.includes(file.type)) {
-                alert('Formato de archivo no válido. Use JPG, PNG, GIF o WEBP.');
+                showAlert('Formato de archivo no válido. Use JPG, PNG, GIF o WEBP.', 'Formato no válido', 'warning');
                 this.value = '';
                 return;
             }

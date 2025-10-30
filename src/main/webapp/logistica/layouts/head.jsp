@@ -94,4 +94,5 @@
     }
 </style>
 
-
+<!-- Incluir modales personalizados -->
+<jsp:include page="/WEB-INF/includes/modal-alerts.jsp" />
