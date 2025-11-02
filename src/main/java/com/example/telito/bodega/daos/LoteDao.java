@@ -404,7 +404,6 @@ public class LoteDao {
                      "FROM lotes l " +
                      "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                      "WHERE l.producto_id = ? AND l.stock_actual > 0 " +
-                     "AND l.id_lote NOT IN (SELECT lote_id FROM ordenes_compra WHERE lote_id IS NOT NULL) " +
                      "ORDER BY l.fecha_vencimiento ASC";
 
         System.out.println("=== DEBUG DAO - OBTENER LOTES PARA PRODUCTO ===");
@@ -440,6 +439,235 @@ public class LoteDao {
             System.err.println("SQL State: " + e.getSQLState());
             System.err.println("Error Code: " + e.getErrorCode());
             System.err.println("Message: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return lotes;
+    }
+    
+    /**
+     * Busca un lote por su ID y retorna su información
+     * @param idLote ID del lote
+     * @return Array con [id_lote, codigo_lote, producto_id, stock_actual, unidades_por_paquete] o null si no existe
+     */
+    public Object[] buscarLotePorId(int idLote) {
+        String sql = "SELECT l.id_lote, l.codigo_lote, l.producto_id, l.stock_actual, p.unidades_por_paquete " +
+                     "FROM lotes l " +
+                     "INNER JOIN productos p ON l.producto_id = p.id_producto " +
+                     "WHERE l.id_lote = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idLote);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Object[] lote = new Object[5];
+                    lote[0] = rs.getInt("id_lote");
+                    lote[1] = rs.getString("codigo_lote");
+                    lote[2] = rs.getInt("producto_id");
+                    lote[3] = rs.getInt("stock_actual");
+                    lote[4] = rs.getInt("unidades_por_paquete");
+                    return lote;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR: Error al buscar lote por ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    /**
+     * Actualiza el stock de un lote
+     * @param idLote ID del lote
+     * @param nuevoStock Nuevo stock (en unidades)
+     * @return true si se actualizó correctamente
+     */
+    public boolean actualizarStock(int idLote, int nuevoStock) {
+        String sql = "UPDATE lotes SET stock_actual = ? WHERE id_lote = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, nuevoStock);
+            pstmt.setInt(2, idLote);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("✓ Stock del lote " + idLote + " actualizado a " + nuevoStock + " unidades");
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR: Error al actualizar stock del lote: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Obtiene el resumen de lotes por producto (todos los lotes con stock > 0)
+     * @param productoId ID del producto
+     * @return Lista de arrays con [id_lote, codigo_lote, stock_actual, fecha_vencimiento]
+     */
+    public List<Object[]> obtenerResumenLotesPorProducto(int productoId) {
+        List<Object[]> lotes = new ArrayList<>();
+        String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento " +
+                     "FROM lotes l " +
+                     "WHERE l.producto_id = ? AND l.stock_actual > 0 " +
+                     "ORDER BY l.fecha_vencimiento ASC, l.codigo_lote ASC";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, productoId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] lote = new Object[4];
+                    lote[0] = rs.getInt("id_lote");
+                    lote[1] = rs.getString("codigo_lote");
+                    lote[2] = rs.getInt("stock_actual");
+                    lote[3] = rs.getDate("fecha_vencimiento");
+                    lotes.add(lote);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR: Error al obtener resumen de lotes: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return lotes;
+    }
+    
+    /**
+     * Obtiene el stock inicial de un lote calculando: stock_actual + todas las salidas registradas
+     * Si no hay movimientos, retorna el stock_actual como stock inicial
+     * @param idLote ID del lote
+     * @return Stock inicial en unidades
+     */
+    public int obtenerStockInicialLote(int idLote) {
+        // Primero obtener el stock actual
+        int stockActual = 0;
+        String sqlStockActual = "SELECT stock_actual FROM lotes WHERE id_lote = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sqlStockActual)) {
+            pstmt.setInt(1, idLote);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    stockActual = rs.getInt("stock_actual");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR: Error al obtener stock actual del lote: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
+        }
+        
+        // Sumar todas las salidas registradas
+        String sqlSalidas = "SELECT COALESCE(SUM(cantidad), 0) as total_salidas " +
+                            "FROM movimientos_inventario " +
+                            "WHERE lote_id = ? AND tipo = 'Salida'";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sqlSalidas)) {
+            
+            pstmt.setInt(1, idLote);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    int totalSalidas = rs.getInt("total_salidas");
+                    // Stock inicial = stock actual + salidas registradas
+                    int stockInicial = stockActual + totalSalidas;
+                    return stockInicial > 0 ? stockInicial : stockActual; // Si es 0 o negativo, usar stock actual
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR: Error al calcular stock inicial del lote: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        // Si no hay salidas registradas, el stock inicial es el stock actual
+        return stockActual;
+    }
+    
+    /**
+     * Obtiene el total de salidas registradas de un lote
+     * @param idLote ID del lote
+     * @return Total de unidades que han salido del lote
+     */
+    private int obtenerSalidasLote(int idLote) {
+        String sql = "SELECT COALESCE(SUM(cantidad), 0) as total_salidas " +
+                     "FROM movimientos_inventario " +
+                     "WHERE lote_id = ? AND tipo = 'Salida'";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idLote);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total_salidas");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR: Error al obtener salidas del lote: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    /**
+     * Obtiene el resumen completo de todos los lotes de un producto con stock inicial y restante
+     * @param productoId ID del producto
+     * @return Lista de arrays con [id_lote, codigo_lote, stock_inicial, stock_actual, paquetes_inicial, paquetes_restante, fecha_vencimiento, unidades_por_paquete]
+     */
+    public List<Object[]> obtenerResumenCompletoLotesPorProducto(int productoId) {
+        List<Object[]> lotes = new ArrayList<>();
+        String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, p.unidades_por_paquete " +
+                     "FROM lotes l " +
+                     "INNER JOIN productos p ON l.producto_id = p.id_producto " +
+                     "WHERE l.producto_id = ? " +
+                     "ORDER BY l.fecha_vencimiento ASC, l.codigo_lote ASC";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, productoId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    int idLote = rs.getInt("id_lote");
+                    int stockActual = rs.getInt("stock_actual");
+                    int unidadesPorPaquete = rs.getInt("unidades_por_paquete");
+                    
+                    // Obtener salidas registradas
+                    int salidasRegistradas = obtenerSalidasLote(idLote);
+                    
+                    // Calcular stock inicial: stock actual + salidas registradas
+                    // Si no hay salidas, el stock inicial es el stock actual (lote completo)
+                    int stockInicial = stockActual + salidasRegistradas;
+                    
+                    // Si el stock inicial es 0 o menor al actual, usar el actual (para lotes nuevos sin movimientos)
+                    if (stockInicial < stockActual) {
+                        stockInicial = stockActual;
+                    }
+                    
+                    int paquetesInicial = (unidadesPorPaquete > 0) ? (stockInicial / unidadesPorPaquete) : stockInicial;
+                    int paquetesRestante = (unidadesPorPaquete > 0) ? (stockActual / unidadesPorPaquete) : stockActual;
+                    
+                    Object[] lote = new Object[8];
+                    lote[0] = idLote;
+                    lote[1] = rs.getString("codigo_lote");
+                    lote[2] = stockInicial; // Stock inicial en unidades
+                    lote[3] = stockActual; // Stock actual (restante) en unidades
+                    lote[4] = paquetesInicial; // Paquetes iniciales
+                    lote[5] = paquetesRestante; // Paquetes restantes
+                    lote[6] = rs.getDate("fecha_vencimiento");
+                    lote[7] = unidadesPorPaquete;
+                    lotes.add(lote);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR: Error al obtener resumen completo de lotes: " + e.getMessage());
             e.printStackTrace();
         }
         return lotes;

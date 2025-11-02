@@ -28,9 +28,13 @@
     // Construir la URL correcta de la foto
     String fotoUrl = usuarioPerfil.getFotoPerfil();
     if (fotoUrl != null && !fotoUrl.trim().isEmpty()) {
-        // Si es una ruta local (no una URL externa), agregar el contextPath
+        // Si es una ruta local (no una URL externa), usar el ImageServlet
         if (!fotoUrl.startsWith("http://") && !fotoUrl.startsWith("https://")) {
-            fotoUrl = request.getContextPath() + "/" + fotoUrl;
+            // La ruta viene como "uploads/perfiles/xxx.jpg", necesitamos "/uploads/perfiles/xxx.jpg"
+            if (!fotoUrl.startsWith("/")) {
+                fotoUrl = "/" + fotoUrl;
+            }
+            fotoUrl = request.getContextPath() + fotoUrl;
         }
     } else {
         // Si no hay foto, generar avatar con iniciales

@@ -66,7 +66,14 @@
                                                 <td><span class="badge bg-secondary">${lote.codigoSKU}</span></td>
                                                 <td>${lote.nombreProducto}</td>
                                                 <td><strong>${lote.codigoLote}</strong></td>
-                                                <td>${lote.paquetesDisponibles} paquetes</td>
+                                                <td>
+                                                    <button type="button" 
+                                                            class="btn btn-link p-0 text-decoration-none text-primary fw-bold" 
+                                                            onclick="mostrarResumenLotes(${lote.productoId}, '${lote.nombreProducto}')"
+                                                            style="cursor: pointer;">
+                                                        ${lote.paquetesDisponibles} paquetes
+                                                    </button>
+                                                </td>
                                                 <td>${lote.nombreUbicacion}</td>
                                                 <td>${lote.fechaVencimiento}</td>
                                                 <td>
@@ -161,8 +168,107 @@
     });
 </script>
 
+<!-- Modal para mostrar resumen de lotes -->
+<div class="modal fade" id="resumenLotesModal" tabindex="-1" aria-labelledby="resumenLotesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="resumenLotesModalLabel">
+                    <i class="fas fa-boxes me-2"></i>Resumen de Lotes
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="mb-3" id="modalProductoNombre"></h6>
+                <div id="loadingResumen" class="text-center py-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+                <div id="contenidoResumen" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Código Lote</th>
+                                    <th>Stock (Unidades)</th>
+                                    <th>Paquetes</th>
+                                    <th>Fecha Vencimiento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaResumenLotes">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="sinLotes" class="alert alert-info" style="display: none;">
+                        No hay lotes disponibles para este producto.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function mostrarResumenLotes(productoId, nombreProducto) {
+        // Actualizar título del modal
+        document.getElementById('modalProductoNombre').textContent = 'Producto: ' + nombreProducto;
+        
+        // Mostrar loading y ocultar contenido
+        document.getElementById('loadingResumen').style.display = 'block';
+        document.getElementById('contenidoResumen').style.display = 'none';
+        
+        // Limpiar tabla
+        document.getElementById('tablaResumenLotes').innerHTML = '';
+        
+        // Abrir modal
+        const modal = new bootstrap.Modal(document.getElementById('resumenLotesModal'));
+        modal.show();
+        
+        // Cargar datos via AJAX
+        fetch('${pageContext.request.contextPath}/almacen/LoteServlet?action=obtenerResumenLotes&productoId=' + productoId)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingResumen').style.display = 'none';
+                
+                if (data.success && data.lotes && data.lotes.length > 0) {
+                    document.getElementById('contenidoResumen').style.display = 'block';
+                    document.getElementById('sinLotes').style.display = 'none';
+                    
+                    const tbody = document.getElementById('tablaResumenLotes');
+                    tbody.innerHTML = '';
+                    
+                    data.lotes.forEach(lote => {
+                        const row = document.createElement('tr');
+                        const fechaVencimiento = lote.fechaVencimiento || 'Sin fecha';
+                        
+                        row.innerHTML = 
+                            '<td><strong>' + lote.codigoLote + '</strong></td>' +
+                            '<td>' + lote.stockActual + ' unidades</td>' +
+                            '<td><span class="badge bg-primary">' + lote.paquetes + ' paquetes</span></td>' +
+                            '<td>' + fechaVencimiento + '</td>';
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    document.getElementById('contenidoResumen').style.display = 'block';
+                    document.getElementById('sinLotes').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar resumen de lotes:', error);
+                document.getElementById('loadingResumen').style.display = 'none';
+                document.getElementById('contenidoResumen').style.display = 'block';
+                document.getElementById('sinLotes').innerHTML = 
+                    '<div class="alert alert-danger">Error al cargar el resumen de lotes. Por favor, intenta de nuevo.</div>';
+            });
+    }
+</script>
 
 </body>
 </html>

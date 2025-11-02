@@ -132,15 +132,20 @@
         tbody tr:hover { background-color: var(--seafoam-light); }
 
         /* =====================
-           Modal
+           Modal personalizado (solo para addProductModal)
         ====================== */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: var(--white); margin: 8% auto; padding: 30px; border: none; width: 60%; max-width: 700px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: slide-down 0.3s ease-out; }
+        #addProductModal.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        #addProductModal .modal-content { background-color: var(--white); margin: 8% auto; padding: 30px; border: none; width: 60%; max-width: 700px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: slide-down 0.3s ease-out; }
         @keyframes slide-down { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 25px; }
-        .modal-header h2 { margin: 0; color: var(--turquoise-dark); }
-        .modal-close { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .modal-footer { display: flex; justify-content: flex-end; gap: 15px; padding-top: 15px; margin-top: 25px; border-top: 1px solid var(--border-color); }
+        #addProductModal .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 25px; }
+        #addProductModal .modal-header h2 { margin: 0; color: var(--turquoise-dark); }
+        #addProductModal .modal-close { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
+        #addProductModal .modal-footer { display: flex; justify-content: flex-end; gap: 15px; padding-top: 15px; margin-top: 25px; border-top: 1px solid var(--border-color); }
+        
+        /* Asegurar que los modales Bootstrap tengan z-index correcto */
+        #resumenLotesProductoModal {
+            z-index: 1055;
+        }
 
         /* =====================
            Responsive
@@ -236,13 +241,6 @@
                             <i class="fas fa-tags"></i>Actualizar Precios
                         </a>
                     </li>
-
-                    <!-- Ir a Roles -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="<%= request.getContextPath() %>/">
-                            <i class="fas fa-th-large"></i>Ir a Roles
-                        </a>
-                    </li>
                 </ul>
             </nav>
         </div>
@@ -327,7 +325,15 @@
                 <td>S/ <%= String.format("%.2f", p.getPrecioActual()) %></td>
                 <td>
                     <% int lotes = p.getNumeroLotes(); %>
-                    <span class="badge <%= (lotes > 0) ? "bg-success" : "bg-danger" %>"><%= lotes %></span>
+                    <span class="badge <%= (lotes > 0) ? "bg-success" : "bg-danger" %> me-2"><%= lotes %></span>
+                    <% if (lotes > 0) { %>
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-primary" 
+                                onclick="mostrarResumenLotesProducto(<%= p.getIdProducto() %>, '<%= p.getNombre() %>')"
+                                title="Ver detalles de lotes">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                    <% } %>
                 </td>
                 <td>
                     <button type="button" class="btn btn-sm"
@@ -532,7 +538,194 @@
         sessionStorage.removeItem('recargarDesdePerfil');
         location.reload();
     }
+    
+    // Instancia global del modal para reutilizar
+    let resumenLotesModalInstance = null;
+    
+    function getResumenLotesModal() {
+        const modalElement = document.getElementById('resumenLotesProductoModal');
+        
+        // Siempre crear nueva instancia o obtener la existente
+        resumenLotesModalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+        
+        // Limpiar backdrops cuando se cierre el modal (una sola vez)
+        if (!modalElement.hasAttribute('data-backdrop-listener')) {
+            modalElement.setAttribute('data-backdrop-listener', 'true');
+            modalElement.addEventListener('hidden.bs.modal', function() {
+                limpiarBackdropsResumen();
+            });
+        }
+        
+        return resumenLotesModalInstance;
+    }
+    
+    function limpiarBackdropsResumen() {
+        // Esperar un poco para que Bootstrap termine de procesar
+        setTimeout(function() {
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            // Eliminar todos los backdrops excepto si hay un modal abierto
+            if (backdrops.length > 0) {
+                const modalsAbiertos = document.querySelectorAll('.modal.show');
+                if (modalsAbiertos.length === 0) {
+                    // No hay modales abiertos, eliminar todos los backdrops
+                    backdrops.forEach(backdrop => backdrop.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                } else if (backdrops.length > 1) {
+                    // Hay múltiples backdrops pero solo un modal, eliminar extras
+                    for (let i = 1; i < backdrops.length; i++) {
+                        backdrops[i].remove();
+                    }
+                }
+            }
+        }, 150);
+    }
+    
+    // Función para mostrar resumen de lotes de un producto
+    function mostrarResumenLotesProducto(productoId, nombreProducto) {
+        // Limpiar cualquier estado previo del modal
+        const modalElement = document.getElementById('resumenLotesProductoModal');
+        
+        // Cerrar modal si está abierto
+        const existingModal = bootstrap.Modal.getInstance(modalElement);
+        if (existingModal) {
+            existingModal.hide();
+        }
+        
+        // Limpiar backdrops previos
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        
+        // Actualizar título del modal
+        document.getElementById('modalProductoNombreResumen').textContent = 'Producto: ' + nombreProducto;
+        
+        // Mostrar loading y ocultar contenido
+        document.getElementById('loadingResumenProducto').style.display = 'block';
+        document.getElementById('contenidoResumenProducto').style.display = 'none';
+        document.getElementById('sinLotesProducto').style.display = 'none';
+        
+        // Limpiar tabla
+        document.getElementById('tablaResumenLotesProducto').innerHTML = '';
+        
+        // Abrir modal usando instancia reutilizable después de un pequeño delay
+        setTimeout(function() {
+            const modal = getResumenLotesModal();
+            modal.show();
+        }, 50);
+        
+        // Cargar datos via AJAX
+        fetch('<%= request.getContextPath() %>/ProductorServlet?action=obtenerResumenLotesProducto&productoId=' + productoId)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingResumenProducto').style.display = 'none';
+                
+                if (data.success && data.lotes && data.lotes.length > 0) {
+                    document.getElementById('contenidoResumenProducto').style.display = 'block';
+                    document.getElementById('sinLotesProducto').style.display = 'none';
+                    
+                    const tbody = document.getElementById('tablaResumenLotesProducto');
+                    tbody.innerHTML = '';
+                    
+                    data.lotes.forEach(lote => {
+                        const row = document.createElement('tr');
+                        const fechaVencimiento = lote.fechaVencimiento || 'Sin fecha';
+                        
+                        // Convertir a números explícitamente
+                        const paquetesInicial = parseInt(lote.paquetesInicial) || 0;
+                        const paquetesRestante = parseInt(lote.paquetesRestante) || 0;
+                        const stockInicial = parseInt(lote.stockInicial) || 0;
+                        const stockRestante = parseInt(lote.stockRestante) || 0;
+                        
+                        // Calcular porcentaje usado basado en unidades (más preciso)
+                        let porcentajeUsado = 0;
+                        if (stockInicial > 0) {
+                            const unidadesUsadas = stockInicial - stockRestante;
+                            porcentajeUsado = (unidadesUsadas / stockInicial * 100).toFixed(1);
+                        }
+                        
+                        // Determinar el color del badge según el porcentaje
+                        let badgeClass = 'badge bg-secondary';
+                        if (parseFloat(porcentajeUsado) === 0) {
+                            badgeClass = 'badge bg-success';
+                        } else if (parseFloat(porcentajeUsado) < 50) {
+                            badgeClass = 'badge bg-info';
+                        } else if (parseFloat(porcentajeUsado) < 90) {
+                            badgeClass = 'badge bg-warning text-dark';
+                        } else {
+                            badgeClass = 'badge bg-danger';
+                        }
+                        
+                        row.innerHTML = 
+                            '<td><strong>' + lote.codigoLote + '</strong></td>' +
+                            '<td>' + paquetesInicial + ' paquetes<br><small class="text-muted">(' + stockInicial.toLocaleString() + ' unidades)</small></td>' +
+                            '<td>' + paquetesRestante + ' paquetes<br><small class="text-muted">(' + stockRestante.toLocaleString() + ' unidades)</small></td>' +
+                            '<td><span class="' + badgeClass + '">' + porcentajeUsado + '% usado</span></td>' +
+                            '<td>' + fechaVencimiento + '</td>';
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    document.getElementById('contenidoResumenProducto').style.display = 'block';
+                    document.getElementById('sinLotesProducto').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar resumen de lotes:', error);
+                document.getElementById('loadingResumenProducto').style.display = 'none';
+                document.getElementById('contenidoResumenProducto').style.display = 'block';
+                document.getElementById('sinLotesProducto').innerHTML = 
+                    '<div class="alert alert-danger">Error al cargar el resumen de lotes. Por favor, intenta de nuevo.</div>';
+            });
+    }
 </script>
+
+<!-- Modal para mostrar resumen de lotes de un producto -->
+<div class="modal fade" id="resumenLotesProductoModal" tabindex="-1" aria-labelledby="resumenLotesProductoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="resumenLotesProductoModalLabel">
+                    <i class="fas fa-boxes me-2"></i>Resumen de Lotes del Producto
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="mb-3" id="modalProductoNombreResumen"></h6>
+                <div id="loadingResumenProducto" class="text-center py-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+                <div id="contenidoResumenProducto" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Código Lote</th>
+                                    <th>Cantidad Inicial</th>
+                                    <th>Cantidad Restante</th>
+                                    <th>% Usado</th>
+                                    <th>Fecha Vencimiento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaResumenLotesProducto">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="sinLotesProducto" class="alert alert-info" style="display: none;">
+                        No hay lotes registrados para este producto.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

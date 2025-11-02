@@ -40,33 +40,32 @@
                                 <tr>
                                     <th>SKU</th>
                                     <th>Producto</th>
-                                    <th>Lotes</th>
-                                    <th>Códigos de Lote</th>
-                                    <th>Próx. Venc.</th>
+                                    <th>Paquetes</th>
+                                    <th>Precio por Paquete</th>
+                                    <th>Costo por Unidad</th>
                                     <th>Estado</th>
-                                    <th>Stock Total</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <c:choose>
                                     <c:when test="${empty listaLogistica}">
-                                        <tr><td colspan="7" class="text-center py-4">Sin datos</td></tr>
+                                        <tr><td colspan="6" class="text-center py-4">Sin datos</td></tr>
                                     </c:when>
                                     <c:otherwise>
                                         <c:forEach var="it" items="${listaLogistica}">
                                             <tr>
-                                                <td><span class="badge bg-secondary">${it.sku}</span></td>
+                                                <td><span class="badge bg-secondary">${it.codigoSKU}</span></td>
                                                 <td>${it.nombreProducto}</td>
-                                                <td>${it.cantidadLotes}</td>
-                                                <td><small>${it.codigosDeLote}</small></td>
-                                                <td>${it.proximoVencimiento}</td>
+                                                <td>${it.paquetesDisponibles}</td>
+                                                <td>S/. <fmt:formatNumber value="${it.precioPorPaquete}" minFractionDigits="2"/></td>
+                                                <td>S/. <fmt:formatNumber value="${it.costoPorUnidad}" minFractionDigits="2"/></td>
                                                 <td>
                                                     <c:choose>
-                                                        <c:when test="${it.estadoStock == 'En stock'}"><span class="badge bg-success">En stock</span></c:when>
+                                                        <c:when test="${it.estadoStock == 'En Stock'}"><span class="badge bg-success">En stock</span></c:when>
+                                                        <c:when test="${it.estadoStock == 'Poco Stock'}"><span class="badge bg-warning text-dark">Poco</span></c:when>
                                                         <c:otherwise><span class="badge bg-secondary">Sin stock</span></c:otherwise>
                                                     </c:choose>
                                                 </td>
-                                                <td>${it.stockTotal}</td>
                                             </tr>
                                         </c:forEach>
                                     </c:otherwise>

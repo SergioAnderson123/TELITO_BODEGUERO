@@ -272,6 +272,39 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Función para limpiar backdrops múltiples (overlays oscuros)
+    function limpiarBackdrops() {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        if (backdrops.length > 1) {
+            // Si hay más de un backdrop, eliminar los extras
+            for (let i = 1; i < backdrops.length; i++) {
+                backdrops[i].remove();
+            }
+        }
+        // Asegurarse de que el body no tenga múltiples clases
+        document.body.classList.remove('modal-open');
+        if (backdrops.length > 0) {
+            document.body.classList.add('modal-open');
+        }
+    }
+    
+    // Variable global para la instancia del modal de detalles
+    let detalleOrdenModalInstance = null;
+    
+    // Función para obtener o crear la instancia del modal
+    function getDetalleOrdenModal() {
+        if (!detalleOrdenModalInstance) {
+            const modalElement = document.getElementById('detalleOrdenModal');
+            detalleOrdenModalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+            
+            // Limpiar backdrops cuando se cierre el modal
+            modalElement.addEventListener('hidden.bs.modal', function() {
+                limpiarBackdrops();
+            });
+        }
+        return detalleOrdenModalInstance;
+    }
+    
     // Función para ver detalles de orden recibida
     function editarOrden(numeroOrden) {
         console.log('Abriendo detalles de orden:', numeroOrden);
@@ -281,8 +314,8 @@
         document.getElementById('detalleOrdenContainer').style.display = 'none';
         document.getElementById('errorDetalle').style.display = 'none';
         
-        // Abrir el modal
-        const modal = new bootstrap.Modal(document.getElementById('detalleOrdenModal'));
+        // Obtener o crear la instancia del modal (reutilizar si ya existe)
+        const modal = getDetalleOrdenModal();
         modal.show();
         
         // Extraer el número de orden (ej: "OC005" -> 5)
@@ -352,46 +385,55 @@
             ? 'Aprobar Orden' 
             : 'Rechazar Orden';
         
-        showConfirm(
-            mensajeConfirm,
-            function() {
-                console.log('Cambiando estado a:', nuevoEstado, 'para orden:', ordenActualId);
-                
-                // Deshabilitar botones
-                document.getElementById('btnAprobar').disabled = true;
-                document.getElementById('btnRechazar').disabled = true;
-                
-                // Hacer petición para cambiar el estado
-                fetch('${pageContext.request.contextPath}/orden-compra', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'action=cambiarEstado&idOrden=' + ordenActualId + '&nuevoEstado=' + encodeURIComponent(nuevoEstado)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showSuccess('Orden ' + (nuevoEstado === 'Aprobado' ? 'aprobada' : 'rechazada') + ' exitosamente');
-                        // Cerrar el modal
-                        bootstrap.Modal.getInstance(document.getElementById('detalleOrdenModal')).hide();
-                        // Recargar la página después de 1 segundo
-                        setTimeout(() => location.reload(), 1500);
-                    } else {
-                        showError('Error: ' + (data.message || 'No se pudo cambiar el estado'));
+        // Cerrar el modal de detalles primero para evitar overlays múltiples
+        const detalleModal = getDetalleOrdenModal();
+        detalleModal.hide();
+        
+        // Esperar a que el modal se cierre completamente antes de mostrar el de confirmación
+        const detalleModalElement = document.getElementById('detalleOrdenModal');
+        detalleModalElement.addEventListener('hidden.bs.modal', function onHidden() {
+            detalleModalElement.removeEventListener('hidden.bs.modal', onHidden);
+            
+            // Ahora mostrar el modal de confirmación
+            showConfirm(
+                mensajeConfirm,
+                function() {
+                    console.log('Cambiando estado a:', nuevoEstado, 'para orden:', ordenActualId);
+                    
+                    // Deshabilitar botones
+                    document.getElementById('btnAprobar').disabled = true;
+                    document.getElementById('btnRechazar').disabled = true;
+                    
+                    // Hacer petición para cambiar el estado
+                    fetch('${pageContext.request.contextPath}/orden-compra', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'action=cambiarEstado&idOrden=' + ordenActualId + '&nuevoEstado=' + encodeURIComponent(nuevoEstado)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showSuccess('Orden ' + (nuevoEstado === 'Aprobado' ? 'aprobada' : 'rechazada') + ' exitosamente');
+                            // Recargar la página después de 1 segundo
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            showError('Error: ' + (data.message || 'No se pudo cambiar el estado'));
+                            document.getElementById('btnAprobar').disabled = false;
+                            document.getElementById('btnRechazar').disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showError('Error de conexión al cambiar el estado. Por favor, intenta de nuevo.');
                         document.getElementById('btnAprobar').disabled = false;
                         document.getElementById('btnRechazar').disabled = false;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showError('Error de conexión al cambiar el estado. Por favor, intenta de nuevo.');
-                    document.getElementById('btnAprobar').disabled = false;
-                    document.getElementById('btnRechazar').disabled = false;
-                });
-            },
-            tituloConfirm
-        );
+                    });
+                },
+                tituloConfirm
+            );
+        }, { once: true });
     }
 </script>
 </body>

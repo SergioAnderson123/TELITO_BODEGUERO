@@ -61,6 +61,42 @@ public class LoteServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/almacen/LoteServlet");
                 }
                 break;
+                
+            case "obtenerResumenLotes":
+                // Endpoint para obtener resumen de lotes por producto (AJAX)
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                
+                try {
+                    int productoId = Integer.parseInt(request.getParameter("productoId"));
+                    ArrayList<Object[]> resumenLotes = loteDao.obtenerResumenLotesPorProducto(productoId);
+                    
+                    // Construir JSON
+                    StringBuilder json = new StringBuilder();
+                    json.append("{\"success\": true, \"lotes\": [");
+                    
+                    for (int i = 0; i < resumenLotes.size(); i++) {
+                        Object[] loteData = resumenLotes.get(i);
+                        if (i > 0) json.append(",");
+                        json.append("{");
+                        json.append("\"idLote\": ").append(loteData[0]).append(",");
+                        json.append("\"codigoLote\": \"").append(loteData[1]).append("\",");
+                        json.append("\"stockActual\": ").append(loteData[2]).append(",");
+                        String fecha = loteData[3] != null ? loteData[3].toString() : "";
+                        json.append("\"fechaVencimiento\": ").append(fecha.isEmpty() ? "null" : "\"" + fecha + "\"").append(",");
+                        json.append("\"unidadesPorPaquete\": ").append(loteData[4]).append(",");
+                        json.append("\"paquetes\": ").append(loteData[5]);
+                        json.append("}");
+                    }
+                    
+                    json.append("]}");
+                    response.getWriter().write(json.toString());
+                    
+                } catch (Exception e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("{\"success\": false, \"message\": \"Error al obtener resumen de lotes\"}");
+                }
+                break;
         }
     }
 

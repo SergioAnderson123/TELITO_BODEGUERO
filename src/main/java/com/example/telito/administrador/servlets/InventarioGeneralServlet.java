@@ -21,9 +21,9 @@ public class InventarioGeneralServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Logística
+        // Logística (inventario agrupado por producto)
         InventarioDao inventarioDao = new InventarioDao();
-        ArrayList<InventarioBean> listaLogistica = inventarioDao.obtenerInventario();
+        ArrayList<InventarioBean> listaLogistica = inventarioDao.obtenerInventarioAgrupado(null, null, 1, 100);
         request.setAttribute("listaLogistica", listaLogistica);
 
         // Almacén (primer página de lotes registrados)

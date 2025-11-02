@@ -19,6 +19,7 @@ public class LoteDao {
 
         // SE AÑADE LA CONDICIÓN WHERE para filtrar por el estado + cálculo de paquetes + estado de stock
         String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, l.estado, " +
+                "l.producto_id, " +
                 "p.nombre AS nombre_producto, p.codigo_sku AS codigo_sku, p.unidades_por_paquete, " +
                 "FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes_disponibles, " +
                 "u.nombre AS nombre_ubicacion, " +
@@ -51,6 +52,7 @@ public class LoteDao {
                     lote.setPaquetesDisponibles(rs.getInt("paquetes_disponibles"));
                     lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
                     lote.setEstado(rs.getString("estado"));
+                    lote.setProductoId(rs.getInt("producto_id"));
                     lote.setNombreProducto(rs.getString("nombre_producto"));
                     lote.setCodigoSKU(rs.getString("codigo_sku")); // SKU del producto
                     lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
@@ -232,5 +234,42 @@ public class LoteDao {
         } catch (SQLException e) {
             throw new RuntimeException("Error al registrar el lote", e);
         }
+    }
+    
+    /**
+     * Obtiene el resumen de lotes por producto (todos los lotes con stock > 0)
+     * @param productoId ID del producto
+     * @return Lista de arrays con [id_lote, codigo_lote, stock_actual, fecha_vencimiento, unidades_por_paquete, paquetes]
+     */
+    public ArrayList<Object[]> obtenerResumenLotesPorProducto(int productoId) {
+        ArrayList<Object[]> lotes = new ArrayList<>();
+        String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, " +
+                     "p.unidades_por_paquete, FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes " +
+                     "FROM lotes l " +
+                     "INNER JOIN productos p ON l.producto_id = p.id_producto " +
+                     "WHERE l.producto_id = ? AND l.stock_actual > 0 " +
+                     "ORDER BY l.fecha_vencimiento ASC, l.codigo_lote ASC";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, productoId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] lote = new Object[6];
+                    lote[0] = rs.getInt("id_lote");
+                    lote[1] = rs.getString("codigo_lote");
+                    lote[2] = rs.getInt("stock_actual");
+                    lote[3] = rs.getDate("fecha_vencimiento");
+                    lote[4] = rs.getInt("unidades_por_paquete");
+                    lote[5] = rs.getInt("paquetes");
+                    lotes.add(lote);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al obtener resumen de lotes", e);
+        }
+        return lotes;
     }
 }

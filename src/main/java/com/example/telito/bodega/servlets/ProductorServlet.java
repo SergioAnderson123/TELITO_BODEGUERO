@@ -245,6 +245,48 @@ public class ProductorServlet extends HttpServlet {
                     response.getWriter().write("{\"success\": false, \"message\": \"Error interno del servidor\"}");
                 }
                 return;
+                
+            case "obtenerResumenLotesProducto":
+                // Endpoint para obtener resumen completo de lotes de un producto (con stock inicial y restante)
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                
+                try {
+                    int productoIdResumen = Integer.parseInt(request.getParameter("productoId"));
+                    
+                    LoteDao loteDaoResumen = new LoteDao();
+                    List<Object[]> resumenLotes = loteDaoResumen.obtenerResumenCompletoLotesPorProducto(productoIdResumen);
+                    
+                    // Construir JSON
+                    StringBuilder jsonResumen = new StringBuilder();
+                    jsonResumen.append("{\"success\": true, \"lotes\": [");
+                    
+                    for (int i = 0; i < resumenLotes.size(); i++) {
+                        Object[] loteData = resumenLotes.get(i);
+                        if (i > 0) jsonResumen.append(",");
+                        jsonResumen.append("{");
+                        jsonResumen.append("\"idLote\": ").append(loteData[0]).append(",");
+                        jsonResumen.append("\"codigoLote\": \"").append(loteData[1]).append("\",");
+                        jsonResumen.append("\"stockInicial\": ").append(loteData[2]).append(",");
+                        jsonResumen.append("\"stockRestante\": ").append(loteData[3]).append(",");
+                        jsonResumen.append("\"paquetesInicial\": ").append(loteData[4]).append(",");
+                        jsonResumen.append("\"paquetesRestante\": ").append(loteData[5]).append(",");
+                        String fecha = loteData[6] != null ? loteData[6].toString() : "";
+                        jsonResumen.append("\"fechaVencimiento\": ").append(fecha.isEmpty() ? "null" : "\"" + fecha + "\"").append(",");
+                        jsonResumen.append("\"unidadesPorPaquete\": ").append(loteData[7]);
+                        jsonResumen.append("}");
+                    }
+                    
+                    jsonResumen.append("]}");
+                    response.getWriter().write(jsonResumen.toString());
+                    
+                } catch (Exception e) {
+                    System.err.println("❌ ERROR al obtener resumen de lotes: " + e.getMessage());
+                    e.printStackTrace();
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("{\"success\": false, \"message\": \"Error al obtener resumen de lotes\"}");
+                }
+                return;
 
         }
     }
@@ -455,15 +497,96 @@ public class ProductorServlet extends HttpServlet {
                     System.out.println("ID Orden: " + idOrden2);
                     System.out.println("ID Lote: " + idLote);
                     
-                    // Actualizar la orden con el lote asignado
+                    // Obtener los detalles de la orden para saber la cantidad
                     OrdenCompraDao ordenCompraDao3 = new OrdenCompraDao();
+                    Object[] detalleOrden = ordenCompraDao3.obtenerDetalleOrden(idOrden2);
+                    
+                    if (detalleOrden == null) {
+                        System.err.println("❌ No se encontró la orden");
+                        response.getWriter().write("{\"success\": false, \"message\": \"Orden no encontrada\"}");
+                        return;
+                    }
+                    
+                    // La cantidad de la orden viene en paquetes (índice 5 según obtenerDetalleOrden)
+                    int cantidadOrdenPaquetes = (Integer) detalleOrden[5];
+                    
+                    // Obtener el lote para saber su stock actual y unidades por paquete
+                    LoteDao loteDao = new LoteDao();
+                    Object[] loteInfo = loteDao.buscarLotePorId(idLote);
+                    
+                    if (loteInfo == null) {
+                        System.err.println("❌ No se encontró el lote");
+                        response.getWriter().write("{\"success\": false, \"message\": \"Lote no encontrado\"}");
+                        return;
+                    }
+                    
+                    int stockActualLote = (Integer) loteInfo[3]; // stock_actual en unidades
+                    int unidadesPorPaqueteLote = (Integer) loteInfo[4];
+                    
+                    // Convertir la cantidad de la orden de paquetes a unidades
+                    int cantidadOrdenUnidades = cantidadOrdenPaquetes * unidadesPorPaqueteLote;
+                    
+                    System.out.println("=== CÁLCULO DE DESCUENTO ===");
+                    System.out.println("Cantidad orden: " + cantidadOrdenPaquetes + " paquetes");
+                    System.out.println("Unidades por paquete: " + unidadesPorPaqueteLote);
+                    System.out.println("Total unidades a descontar: " + cantidadOrdenPaquetes + " × " + unidadesPorPaqueteLote + " = " + cantidadOrdenUnidades + " unidades");
+                    System.out.println("Stock actual del lote: " + stockActualLote + " unidades");
+                    System.out.println("Stock en paquetes: " + (stockActualLote / unidadesPorPaqueteLote) + " paquetes");
+                    
+                    // Verificar que haya stock suficiente
+                    if (stockActualLote < cantidadOrdenUnidades) {
+                        System.err.println("❌ Stock insuficiente. Lote tiene " + stockActualLote + " unidades (" + (stockActualLote / unidadesPorPaqueteLote) + " paquetes), orden requiere " + cantidadOrdenUnidades + " unidades (" + cantidadOrdenPaquetes + " paquetes)");
+                        response.getWriter().write("{\"success\": false, \"message\": \"Stock insuficiente en el lote\"}");
+                        return;
+                    }
+                    
+                    // Calcular el nuevo stock después de descontar
+                    int nuevoStock = stockActualLote - cantidadOrdenUnidades;
+                    int nuevoStockPaquetes = nuevoStock / unidadesPorPaqueteLote;
+                    
+                    System.out.println("Stock después del descuento: " + nuevoStock + " unidades (" + nuevoStockPaquetes + " paquetes)");
+                    System.out.println("El lote debe mantenerse con stock > 0: " + (nuevoStock > 0));
+                    
+                    // Actualizar el stock del lote
+                    boolean stockActualizado = loteDao.actualizarStock(idLote, nuevoStock);
+                    
+                    if (!stockActualizado) {
+                        System.err.println("❌ No se pudo actualizar el stock del lote");
+                        response.getWriter().write("{\"success\": false, \"message\": \"Error al actualizar el stock del lote\"}");
+                        return;
+                    }
+                    
+                    System.out.println("✓ Stock actualizado correctamente. El lote ahora tiene " + nuevoStock + " unidades (" + nuevoStockPaquetes + " paquetes)");
+                    
+                    // Registrar movimiento de salida
+                    try {
+                        com.example.telito.almacen.daos.MovimientoDao movimientoDao = new com.example.telito.almacen.daos.MovimientoDao();
+                        com.example.telito.almacen.beans.Movimiento movimiento = new com.example.telito.almacen.beans.Movimiento();
+                        movimiento.setLoteId(idLote);
+                        movimiento.setUsuarioId(usuarioSesion.getIdUsuario());
+                        movimiento.setOrdenCompraId(idOrden2);
+                        movimiento.setTipoMovimiento("Salida");
+                        movimiento.setCantidad(cantidadOrdenUnidades); // Cantidad en unidades
+                        movimiento.setMotivo("Asignación a orden de compra: " + detalleOrden[1]); // número_orden
+                        movimiento.setPedidoId(null);
+                        
+                        movimientoDao.registrarMovimiento(movimiento);
+                        System.out.println("✓ Movimiento de salida registrado: " + cantidadOrdenUnidades + " unidades");
+                    } catch (Exception e) {
+                        System.err.println("⚠️ ADVERTENCIA: No se pudo registrar el movimiento de salida: " + e.getMessage());
+                        // Continuamos aunque falle el registro del movimiento
+                    }
+                    
+                    // Actualizar la orden con el lote asignado
                     boolean asignado = ordenCompraDao3.completarOrden(idOrden2, idLote);
                     
                     if (asignado) {
-                        System.out.println("✓ Lote asignado correctamente a la orden");
+                        System.out.println("✓ Lote asignado correctamente a la orden. Stock restante: " + nuevoStock + " unidades");
                         response.getWriter().write("{\"success\": true, \"message\": \"Lote asignado correctamente\"}");
                     } else {
-                        System.err.println("❌ No se pudo asignar el lote");
+                        System.err.println("❌ No se pudo asignar el lote a la orden");
+                        // Revertir el cambio de stock si falla la asignación
+                        loteDao.actualizarStock(idLote, stockActualLote);
                         response.getWriter().write("{\"success\": false, \"message\": \"No se pudo asignar el lote\"}");
                     }
                     

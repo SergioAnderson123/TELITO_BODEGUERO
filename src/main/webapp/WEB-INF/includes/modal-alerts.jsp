@@ -117,9 +117,51 @@
 </style>
 
 <script>
+    // Variables globales para las instancias de modales (reutilización)
+    let alertModalInstance = null;
+    let confirmModalInstance = null;
+    let successModalInstance = null;
+    let errorModalInstance = null;
+    
+    // Función para obtener o crear instancia del modal de alerta
+    function getAlertModal() {
+        if (!alertModalInstance) {
+            const modalElement = document.getElementById('customAlertModal');
+            alertModalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+        }
+        return alertModalInstance;
+    }
+    
+    // Función para obtener o crear instancia del modal de confirmación
+    function getConfirmModal() {
+        if (!confirmModalInstance) {
+            const modalElement = document.getElementById('customConfirmModal');
+            confirmModalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+        }
+        return confirmModalInstance;
+    }
+    
+    // Función para obtener o crear instancia del modal de éxito
+    function getSuccessModal() {
+        if (!successModalInstance) {
+            const modalElement = document.getElementById('customSuccessModal');
+            successModalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+        }
+        return successModalInstance;
+    }
+    
+    // Función para obtener o crear instancia del modal de error
+    function getErrorModal() {
+        if (!errorModalInstance) {
+            const modalElement = document.getElementById('customErrorModal');
+            errorModalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+        }
+        return errorModalInstance;
+    }
+    
     // Función para mostrar alerta personalizada
     function showAlert(message, title = 'Información', type = 'info') {
-        const modal = new bootstrap.Modal(document.getElementById('customAlertModal'));
+        const modal = getAlertModal();
         const iconElement = document.getElementById('customAlertIcon');
         const titleElement = document.getElementById('customAlertTitleText');
         const messageElement = document.getElementById('customAlertMessage');
@@ -143,7 +185,7 @@
     // Función para mostrar confirmación personalizada
     function showConfirm(message, onConfirm, title = '¿Estás seguro?') {
         return new Promise((resolve) => {
-            const modal = new bootstrap.Modal(document.getElementById('customConfirmModal'));
+            const modal = getConfirmModal();
             const titleElement = document.getElementById('customConfirmTitle');
             const messageElement = document.getElementById('customConfirmMessage');
             const confirmBtn = document.getElementById('customConfirmBtn');
@@ -176,14 +218,14 @@
     
     // Función para mostrar éxito
     function showSuccess(message) {
-        const modal = new bootstrap.Modal(document.getElementById('customSuccessModal'));
+        const modal = getSuccessModal();
         document.getElementById('customSuccessMessage').textContent = message;
         modal.show();
     }
     
     // Función para mostrar error
     function showError(message) {
-        const modal = new bootstrap.Modal(document.getElementById('customErrorModal'));
+        const modal = getErrorModal();
         document.getElementById('customErrorMessage').textContent = message;
         modal.show();
     }

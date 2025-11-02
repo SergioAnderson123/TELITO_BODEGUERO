@@ -31,14 +31,13 @@ public class ProductoDao {
                 "u.id_usuario, u.nombres, u.apellidos, " +
                 "IFNULL(l_sum.stock_total, 0) as stock_total, " +
                 "COUNT(DISTINCT CASE " +
-                "    WHEN lotes.id_lote IS NOT NULL " +
-                "    AND lotes.id_lote NOT IN (SELECT lote_id FROM ordenes_compra WHERE lote_id IS NOT NULL AND estado = 'Aprobado') " +
+                "    WHEN lotes.id_lote IS NOT NULL AND lotes.stock_actual > 0 " +
                 "    THEN lotes.id_lote " +
                 "END) as numero_lotes " +
                 "FROM productos p " +
                 "INNER JOIN categorias c ON (p.categoria_id = c.id_categoria) " +
                 "INNER JOIN usuarios u ON (p.productor_id = u.id_usuario) " +
-                "LEFT JOIN (SELECT producto_id, SUM(stock_actual) as stock_total FROM lotes GROUP BY producto_id) l_sum ON (p.id_producto = l_sum.producto_id) " +
+                "LEFT JOIN (SELECT producto_id, SUM(stock_actual) as stock_total FROM lotes WHERE stock_actual > 0 GROUP BY producto_id) l_sum ON (p.id_producto = l_sum.producto_id) " +
                 "LEFT JOIN lotes ON p.id_producto = lotes.producto_id " +
                 "WHERE p.productor_id = ? AND u.activo = 1 AND p.activo = 1 " +
                 "GROUP BY p.id_producto";

@@ -283,13 +283,6 @@
                             <i class="fas fa-tags"></i>Actualizar Precios
                         </a>
                     </li>
-
-                    <!-- Ir a Roles -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="<%= request.getContextPath() %>/">
-                            <i class="fas fa-th-large"></i>Ir a Roles
-                        </a>
-                    </li>
                 </ul>
             </nav>
         </div>
@@ -334,17 +327,10 @@
                         <select id="statusFilter" class="form-select">
                             <option value="">Todos los estados</option>
                             <option value="Pendiente">Pendiente</option>
-                            <option value="Completada">Completada</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <select id="destinoFilter" class="form-select">
-                            <option value="">Todos los destinos</option>
-                            <option value="Miraflores">Miraflores</option>
-                            <option value="San Isidro">San Isidro</option>
-                            <option value="La Molina">La Molina</option>
-                            <option value="Surco">Surco</option>
-                            <option value="Barranco">Barranco</option>
+                            <option value="Aprobado">Aprobado</option>
+                            <option value="Rechazado">Rechazado</option>
+                            <option value="Recibido">Recibido</option>
+                            <option value="En Proceso">En Proceso</option>
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-12">
@@ -498,7 +484,6 @@
     // Funcionalidad de búsqueda y filtros
     const searchInput = document.getElementById('searchInput');
     const statusFilter = document.getElementById('statusFilter');
-    const destinoFilter = document.getElementById('destinoFilter');
     const table = document.getElementById('ordenesTable');
     const tbody = table.querySelector('tbody');
 
@@ -509,7 +494,6 @@
     function applyFilters() {
         const searchTerm = normalize(searchInput.value);
         const status = statusFilter.value;
-        const solicitante = destinoFilter.value;
 
         const rows = Array.from(tbody.querySelectorAll('tr'));
 
@@ -517,29 +501,25 @@
             const codigo = normalize(row.dataset.codigo);
             const producto = normalize(row.dataset.producto);
             const rowStatus = row.dataset.estado;
-            const rowSolicitante = normalize(row.dataset.solicitante);
 
             const matchesSearch = !searchTerm || 
                 codigo.includes(searchTerm) || 
                 producto.includes(searchTerm);
             const matchesStatus = !status || rowStatus === status;
-            const matchesSolicitante = !solicitante || rowSolicitante.includes(normalize(solicitante));
 
-            row.style.display = (matchesSearch && matchesStatus && matchesSolicitante) ? '' : 'none';
+            row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
         });
     }
 
     function limpiarFiltros() {
         searchInput.value = '';
         statusFilter.value = '';
-        destinoFilter.value = '';
         applyFilters();
     }
 
     // Event listeners
     searchInput.addEventListener('input', applyFilters);
     statusFilter.addEventListener('change', applyFilters);
-    destinoFilter.addEventListener('change', applyFilters);
 
     // Variables globales para el modal
     let ordenActualId = null;
