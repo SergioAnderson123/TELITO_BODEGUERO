@@ -3,6 +3,7 @@ package com.example.telito.administrador.servlets;
 import com.example.telito.administrador.beans.Usuario;
 import com.example.telito.administrador.daos.UsuarioDAO;
 import com.example.telito.administrador.beans.Rol;
+import com.example.telito.util.EmailUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 @WebServlet(name = "UsuarioServlet", value = "/UsuarioServlet")
@@ -205,9 +207,169 @@ public class UsuarioServlet extends HttpServlet {
                 // ========== TODO VÁLIDO - CREAR USUARIO ==========
                 try {
                     Usuario usuarioNuevo = mapearUsuarioDesdeRequest(request);
-                    boolean creado = usuarioDAO.crearUsuario(usuarioNuevo);
+                    String passwordOriginal = password; // Guardar antes de encriptar
+                    
+                    // Verificar si existe un usuario inactivo con ese email para reactivarlo
+                    int idUsuarioInactivo = usuarioDAO.obtenerIdUsuarioPorEmail(email);
+                    boolean creado = false;
+                    
+                    if (idUsuarioInactivo > 0) {
+                        // Existe un usuario inactivo con ese email, reactivarlo y actualizarlo
+                        System.out.println("🔄 Usuario inactivo encontrado con ese email (ID: " + idUsuarioInactivo + "). Reactivando...");
+                        Usuario usuarioExistente = usuarioDAO.obtenerUsuarioPorId(idUsuarioInactivo);
+                        if (usuarioExistente != null && !usuarioExistente.isActivo()) {
+                            // Asegurar que el email esté asignado correctamente
+                            if (usuarioExistente.getEmail() == null || usuarioExistente.getEmail().trim().isEmpty()) {
+                                usuarioExistente.setEmail(email); // Usar el email del request
+                            }
+                            
+                            // Actualizar datos del usuario existente
+                            usuarioExistente.setNombres(usuarioNuevo.getNombres());
+                            usuarioExistente.setApellidos(usuarioNuevo.getApellidos());
+                            usuarioExistente.setPassword(usuarioNuevo.getPassword());
+                            usuarioExistente.setRol(usuarioNuevo.getRol());
+                            usuarioExistente.setActivo(true); // Reactivar
+                            
+                            creado = usuarioDAO.actualizarUsuarioConPassword(usuarioExistente);
+                            
+                            // Usar el usuario existente (con su ID) para el correo
+                            if (creado) {
+                                System.out.println("✓ Usuario reactivado exitosamente. Email: " + usuarioExistente.getEmail());
+                                usuarioNuevo = usuarioExistente;
+                            } else {
+                                System.err.println("⚠ ERROR: No se pudo reactivar el usuario");
+                            }
+                        }
+                    } else {
+                        System.out.println("➕ Creando nuevo usuario con email: " + email);
+                    }
+                    
+                    if (!creado) {
+                        // No existe usuario inactivo, crear uno nuevo
+                        creado = usuarioDAO.crearUsuario(usuarioNuevo);
+                    }
                     
                     if (creado) {
+                        // ========== ENVIAR CORREO DE BIENVENIDA AL NUEVO USUARIO ==========
+                        try {
+                            // Verificar que el usuario tenga email válido
+                            String emailDestino = usuarioNuevo.getEmail();
+                            if (emailDestino == null || emailDestino.trim().isEmpty()) {
+                                System.err.println("⚠ ERROR: El usuario no tiene un email válido para enviar correo");
+                            } else {
+                                System.out.println("📧 Preparando envío de correo de bienvenida a: " + emailDestino);
+                                
+                                String nombreRol = usuarioDAO.obtenerNombreRolPorId(usuarioNuevo.getRol().getIdRol());
+                                nombreRol = (nombreRol != null) ? nombreRol : "Usuario";
+                                
+                                // Construir el mensaje HTML escapando los % en los colores CSS
+                                String mensaje = """
+                                <html>
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <style>
+                                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #2b2d42; }
+                                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                                        .header { background: linear-gradient(160deg, #006d77 0%%, #055e68 100%%); 
+                                                 color: white; padding: 25px; border-radius: 8px 8px 0 0; text-align: center; }
+                                        .content { background: #edf6f9; padding: 25px; border-radius: 0 0 8px 8px; }
+                                        .credentials { background: white; padding: 20px; border-radius: 5px; 
+                                                     margin: 15px 0; border-left: 4px solid #006d77; }
+                                        .credential-item { padding: 8px 0; border-bottom: 1px solid #e9ecef; }
+                                        .credential-item:last-child { border-bottom: none; }
+                                        .label { font-weight: bold; color: #006d77; }
+                                        .value { color: #2b2d42; font-family: monospace; }
+                                        .warning { background: #fff3cd; padding: 15px; border-radius: 5px; 
+                                                  border-left: 4px solid #ffc107; margin: 15px 0; }
+                                        .footer { margin-top: 20px; padding-top: 15px; border-top: 1px solid #e9ecef; 
+                                                 font-size: 12px; color: #6c757d; text-align: center; }
+                                        .button { display: inline-block; padding: 12px 30px; background: #006d77; 
+                                                color: white; text-decoration: none; border-radius: 5px; 
+                                                margin: 15px 0; transition: background 0.3s; }
+                                        .button:hover { background: #055e68; }
+                                    </style>
+                                </head>
+                                <body>
+                                    <div class="container">
+                                        <div class="header">
+                                            <h2>¡Bienvenido a TELITO BODEGUERO!</h2>
+                                        </div>
+                                        <div class="content">
+                                            <p>Estimado/a <strong>%s %s</strong>,</p>
+                                            <p>Nos complace informarte que tu cuenta ha sido creada exitosamente en el sistema <strong>TELITO BODEGUERO</strong>.</p>
+                                            
+                                            <div class="credentials">
+                                                <h3 style="margin-top: 0; color: #006d77;">📋 Credenciales de Acceso</h3>
+                                                <div class="credential-item">
+                                                    <span class="label">Email:</span> <span class="value">%s</span>
+                                                </div>
+                                                <div class="credential-item">
+                                                    <span class="label">Contraseña temporal:</span> <span class="value">%s</span>
+                                                </div>
+                                                <div class="credential-item">
+                                                    <span class="label">Rol asignado:</span> <span class="value">%s</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="warning">
+                                                <strong>⚠️ Importante:</strong>
+                                                <ul style="margin: 10px 0;">
+                                                    <li>Por seguridad, cambia tu contraseña al iniciar sesión por primera vez</li>
+                                                    <li>Guarda estas credenciales en un lugar seguro</li>
+                                                    <li>Si no solicitaste esta cuenta, contacta al administrador inmediatamente</li>
+                                                </ul>
+                                            </div>
+                                            
+                                            <p><strong>Próximos pasos:</strong></p>
+                                            <ol>
+                                                <li>Accede al sistema usando las credenciales proporcionadas</li>
+                                                <li>Cambia tu contraseña temporal por una contraseña segura</li>
+                                                <li>Revisa tu perfil y completa tu información</li>
+                                            </ol>
+                                            
+                                            <p style="text-align: center;">
+                                                <a href="%s/acceso/login" class="button">Iniciar Sesión</a>
+                                            </p>
+                                            
+                                            <div class="footer">
+                                                <p>Este es un correo automático generado por el sistema TELITO BODEGUERO.</p>
+                                                <p>Fecha de creación: %s</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </body>
+                                </html>
+                                """.formatted(
+                                    usuarioNuevo.getNombres(),
+                                    usuarioNuevo.getApellidos(),
+                                    usuarioNuevo.getEmail(),
+                                    passwordOriginal,
+                                    nombreRol,
+                                    request.getContextPath(),
+                                    new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                                );
+                            
+                                boolean correoEnviado = EmailUtil.sendSystemAlertHTML(
+                                    emailDestino,
+                                    "Bienvenido a TELITO BODEGUERO - Credenciales de Acceso",
+                                    mensaje
+                                );
+                                
+                                if (correoEnviado) {
+                                    System.out.println("✓ Correo de bienvenida enviado exitosamente a: " + emailDestino);
+                                } else {
+                                    System.err.println("⚠ ERROR: No se pudo enviar el correo de bienvenida a: " + emailDestino);
+                                    System.err.println("   Verifica la configuración de email en email.properties");
+                                }
+                            }
+                        } catch (Exception e) {
+                            // No bloquear la creación si falla el correo
+                            System.err.println("⚠ ERROR al enviar correo de bienvenida: " + e.getMessage());
+                            System.err.println("   Detalles completos del error:");
+                            e.printStackTrace();
+                        }
+                        // ========== FIN ENVÍO DE CORREO ==========
+                        
                         session.setAttribute("successMsg", "Usuario creado con éxito.");
                         response.sendRedirect(request.getContextPath() + "/UsuarioServlet");
                     } else {
@@ -241,7 +403,143 @@ public class UsuarioServlet extends HttpServlet {
                 // Lee los datos del form, actualiza la BD y redirige.
                 try {
                     Usuario usuarioActualizado = mapearUsuarioDesdeRequest(request);
+                    
+                    // Obtener datos anteriores para comparar cambios
+                    Usuario usuarioAnterior = usuarioDAO.obtenerUsuarioPorId(usuarioActualizado.getIdUsuario());
+                    String passwordNueva = request.getParameter("password");
+                    boolean passwordCambiada = passwordNueva != null && !passwordNueva.trim().isEmpty();
+                    
                     usuarioDAO.actualizarUsuario(usuarioActualizado);
+                    
+                    // ========== ENVIAR CORREO DE CONFIRMACIÓN DE ACTUALIZACIÓN ==========
+                    try {
+                        if (usuarioAnterior != null) {
+                            String nombreRol = usuarioDAO.obtenerNombreRolPorId(usuarioActualizado.getRol().getIdRol());
+                            nombreRol = (nombreRol != null) ? nombreRol : "Usuario";
+                            
+                            // Detectar qué cambió
+                            ArrayList<String> cambios = new ArrayList<>();
+                            if (!usuarioAnterior.getNombres().equals(usuarioActualizado.getNombres()) || 
+                                !usuarioAnterior.getApellidos().equals(usuarioActualizado.getApellidos())) {
+                                cambios.add("Nombre y/o apellidos");
+                            }
+                            if (!usuarioAnterior.getEmail().equals(usuarioActualizado.getEmail())) {
+                                cambios.add("Email: " + usuarioAnterior.getEmail() + " → " + usuarioActualizado.getEmail());
+                            }
+                            if (usuarioAnterior.getRol().getIdRol() != usuarioActualizado.getRol().getIdRol()) {
+                                String nombreRolAnterior = usuarioDAO.obtenerNombreRolPorId(usuarioAnterior.getRol().getIdRol());
+                                cambios.add("Rol: " + nombreRolAnterior + " → " + nombreRol);
+                            }
+                            if (usuarioAnterior.isActivo() != usuarioActualizado.isActivo()) {
+                                cambios.add("Estado: " + (usuarioAnterior.isActivo() ? "Activo" : "Inactivo") + " → " + 
+                                          (usuarioActualizado.isActivo() ? "Activo" : "Inactivo"));
+                            }
+                            
+                            if (passwordCambiada) {
+                                cambios.add("Contraseña (se cambió tu contraseña)");
+                            }
+                            
+                            if (!cambios.isEmpty()) {
+                                StringBuilder cambiosLista = new StringBuilder();
+                                for (String cambio : cambios) {
+                                    cambiosLista.append("<li>").append(cambio).append("</li>");
+                                }
+                                
+                                // Construir el mensaje HTML escapando los % en los colores CSS
+                                String mensaje = """
+                                    <html>
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <style>
+                                            body { font-family: Arial, sans-serif; line-height: 1.6; color: #2b2d42; }
+                                            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                                            .header { background: linear-gradient(160deg, #006d77 0%%, #055e68 100%%); 
+                                                     color: white; padding: 25px; border-radius: 8px 8px 0 0; text-align: center; }
+                                            .content { background: #edf6f9; padding: 25px; border-radius: 0 0 8px 8px; }
+                                            .changes { background: white; padding: 20px; border-radius: 5px; 
+                                                     margin: 15px 0; border-left: 4px solid #83c5be; }
+                                            .warning { background: #fff3cd; padding: 15px; border-radius: 5px; 
+                                                      border-left: 4px solid #ffc107; margin: 15px 0; }
+                                            .footer { margin-top: 20px; padding-top: 15px; border-top: 1px solid #e9ecef; 
+                                                     font-size: 12px; color: #6c757d; text-align: center; }
+                                        </style>
+                                    </head>
+                                    <body>
+                                        <div class="container">
+                                            <div class="header">
+                                                <h2>✅ Perfil Actualizado</h2>
+                                            </div>
+                                            <div class="content">
+                                                <p>Estimado/a <strong>%s %s</strong>,</p>
+                                                <p>Tu perfil de usuario ha sido actualizado exitosamente en el sistema <strong>TELITO BODEGUERO</strong>.</p>
+                                                
+                                                <div class="changes">
+                                                    <h3 style="margin-top: 0; color: #006d77;">📝 Cambios Realizados</h3>
+                                                    <ul>
+                                                        %s
+                                                    </ul>
+                                                </div>
+                                                
+                                                <div class="warning">
+                                                    <strong>⚠️ Importante:</strong>
+                                                    %s
+                                                </div>
+                                                
+                                                <p><strong>Información actualizada:</strong></p>
+                                                <ul>
+                                                    <li><strong>Email:</strong> %s</li>
+                                                    <li><strong>Rol:</strong> %s</li>
+                                                    <li><strong>Estado:</strong> %s</li>
+                                                </ul>
+                                                
+                                                <p>Si no realizaste estos cambios, contacta al administrador inmediatamente.</p>
+                                                
+                                                <div class="footer">
+                                                    <p>Este es un correo automático generado por el sistema TELITO BODEGUERO.</p>
+                                                    <p>Fecha de actualización: %s</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </body>
+                                    </html>
+                                    """.formatted(
+                                        usuarioActualizado.getNombres(),
+                                        usuarioActualizado.getApellidos(),
+                                        cambiosLista.toString(),
+                                        passwordCambiada ? 
+                                            "<ul><li>Si solicitaste el cambio de contraseña, ya puedes iniciar sesión con la nueva contraseña</li>" +
+                                            "<li>Si NO solicitaste este cambio, contacta al administrador inmediatamente</li></ul>" :
+                                            "<p>No se realizaron cambios en tu contraseña.</p>",
+                                        usuarioActualizado.getEmail(),
+                                        nombreRol,
+                                        usuarioActualizado.isActivo() ? "Activo" : "Inactivo",
+                                        new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                                    );
+                                
+                                // Determinar email de destino (si cambió el email, usar el anterior para enviar la notificación)
+                                String emailDestino = !usuarioAnterior.getEmail().equals(usuarioActualizado.getEmail()) ? 
+                                    usuarioAnterior.getEmail() : usuarioActualizado.getEmail();
+                                
+                                boolean correoEnviado = EmailUtil.sendSystemAlertHTML(
+                                    emailDestino,
+                                    "Perfil Actualizado - TELITO BODEGUERO",
+                                    mensaje
+                                );
+                                
+                                if (correoEnviado) {
+                                    System.out.println("✓ Correo de confirmación de actualización enviado a: " + emailDestino);
+                                } else {
+                                    System.err.println("⚠ No se pudo enviar el correo de confirmación");
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        // No bloquear la actualización si falla el correo
+                        System.err.println("⚠ Error al enviar correo de confirmación de actualización: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    // ========== FIN ENVÍO DE CORREO ==========
+                    
                     session.setAttribute("successMsg", "Usuario actualizado con éxito.");
                 } catch (NumberFormatException e) {
                     session.setAttribute("errorMsg", "Error al procesar los datos para actualizar.");

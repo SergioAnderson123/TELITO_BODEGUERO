@@ -5,6 +5,9 @@ import com.example.telito.almacen.daos.LoteDao;
 import com.example.telito.almacen.daos.MovimientoDao;
 import com.example.telito.almacen.daos.PedidoDao;
 import com.example.telito.almacen.daos.PlanTransporteDao;
+import com.example.telito.administrador.daos.AlertaDAO;
+import com.example.telito.administrador.daos.UsuarioDAO;
+import com.example.telito.util.EmailUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession; // Importante para obtener el usuario
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 @WebServlet("/almacen/PedidoServlet")
@@ -164,7 +168,73 @@ public class PedidoServlet extends HttpServlet {
                 // 3. Actualizamos el estado del pedido a "Despachado"
                 pedidoDao.actualizarEstado(idPedido, "Despachado");
 
-                // 4. Redirigimos a la lista de pedidos
+                // 4. ENVIAR NOTIFICACIONES POR CORREO
+                try {
+                    // Notificar a usuarios de logística sobre el pedido despachado
+                    AlertaDAO alertaDAO = new AlertaDAO();
+                    UsuarioDAO usuarioDAO = new UsuarioDAO();
+                    
+                    // Obtener emails de usuarios del rol LOGISTICA
+                    ArrayList<String> emailsLogistica = alertaDAO.obtenerEmailsPorRol("LOGISTICA");
+                    
+                    if (!emailsLogistica.isEmpty() && pedido != null) {
+                        String mensaje = """
+                            <h2>Pedido Despachado - Requiere Plan de Transporte</h2>
+                            <p>Se ha despachado un pedido que requiere coordinación de transporte.</p>
+                            <p><strong>Número de Pedido:</strong> %s</p>
+                            <p><strong>Cliente:</strong> %s</p>
+                            <p><strong>Destino:</strong> %s</p>
+                            <p><strong>Fecha de Despacho:</strong> %s</p>
+                            <hr>
+                            <p><strong>Productos:</strong></p>
+                            <ul>
+                            """.formatted(
+                                pedido.getNumeroPedido(),
+                                pedido.getCliente() != null ? pedido.getCliente().getNombre() : "N/A",
+                                pedido.getDestino(),
+                                new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                            );
+                        
+                        // Agregar productos del pedido
+                        if (pedido.getItems() != null && !pedido.getItems().isEmpty()) {
+                            for (PedidoItem item : pedido.getItems()) {
+                                mensaje += String.format(
+                                    "<li>%s - Cantidad: %d</li>%n",
+                                    item.getNombreProducto(),
+                                    item.getCantidadRequerida()
+                                );
+                            }
+                        }
+                        mensaje += """
+                            </ul>
+                            <p>Por favor, coordina el plan de transporte para este pedido.</p>
+                            """;
+                        
+                        // Enviar correo a todos los usuarios de logística
+                        int correosEnviados = 0;
+                        for (String email : emailsLogistica) {
+                            boolean enviado = EmailUtil.sendSystemAlertHTML(
+                                email,
+                                "Pedido Despachado - Requiere Transporte",
+                                mensaje
+                            );
+                            if (enviado) {
+                                correosEnviados++;
+                            }
+                        }
+                        
+                        if (correosEnviados > 0) {
+                            System.out.println("✓ Se enviaron " + correosEnviados + " correo(s) a logística sobre el pedido despachado");
+                        }
+                    }
+                } catch (Exception e) {
+                    // No bloquear la operación si falla el correo
+                    System.err.println("⚠ Error al enviar correo de notificación de pedido despachado: " + e.getMessage());
+                    e.printStackTrace();
+                }
+                // ========== FIN ENVÍO DE CORREO ==========
+
+                // 5. Redirigimos a la lista de pedidos
                 response.sendRedirect(request.getContextPath() + "/almacen/PedidoServlet");
             } else {
                 // Si hubo un error, volvemos a cargar la página de preparación mostrando el mensaje de error
@@ -218,7 +288,60 @@ public class PedidoServlet extends HttpServlet {
                 // 3. Cambiar el estado del plan de transporte a "Salida"
                 planDao.actualizarEstado(idPlan, "Salida");
 
-                // 4. Redirigir a la lista
+                // 4. ENVIAR NOTIFICACIÓN A LOGÍSTICA SOBRE EL DESPACHO DEL PLAN
+                try {
+                    AlertaDAO alertaDAO = new AlertaDAO();
+                    
+                    // Obtener emails de usuarios del rol LOGISTICA
+                    ArrayList<String> emailsLogistica = alertaDAO.obtenerEmailsPorRol("LOGISTICA");
+                    
+                    if (!emailsLogistica.isEmpty() && plan != null) {
+                        // Obtener información del lote para el correo
+                        Lote loteDespachado = loteDao.buscarLotePorId(plan.getIdLote());
+                        String codigoLote = (loteDespachado != null) ? loteDespachado.getCodigoLote() : "N/A";
+                        
+                        String mensaje = """
+                            <h2>Plan de Transporte Despachado</h2>
+                            <p>El plan de transporte ha sido despachado exitosamente desde almacén.</p>
+                            <p><strong>Número de Plan:</strong> %s</p>
+                            <p><strong>Lote:</strong> %s</p>
+                            <p><strong>Cantidad Despachada:</strong> %d paquetes</p>
+                            <p><strong>Fecha de Despacho:</strong> %s</p>
+                            <hr>
+                            <p>La mercancía está lista para ser transportada según el plan de transporte.</p>
+                            <p>Por favor, coordina el transporte para la fecha de entrega programada.</p>
+                            """.formatted(
+                                plan.getNumeroPlan(),
+                                codigoLote,
+                                cantidadADespachar,
+                                new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                            );
+                        
+                        // Enviar correo a todos los usuarios de logística
+                        int correosEnviados = 0;
+                        for (String email : emailsLogistica) {
+                            boolean enviado = EmailUtil.sendSystemAlertHTML(
+                                email,
+                                "Plan de Transporte Despachado - Listo para Transporte",
+                                mensaje
+                            );
+                            if (enviado) {
+                                correosEnviados++;
+                            }
+                        }
+                        
+                        if (correosEnviados > 0) {
+                            System.out.println("✓ Se enviaron " + correosEnviados + " correo(s) a logística sobre el plan de transporte despachado");
+                        }
+                    }
+                } catch (Exception e) {
+                    // No bloquear la operación si falla el correo
+                    System.err.println("⚠ Error al enviar correo de notificación de plan de transporte despachado: " + e.getMessage());
+                    e.printStackTrace();
+                }
+                // ========== FIN ENVÍO DE CORREO ==========
+
+                // 5. Redirigir a la lista
                 response.sendRedirect(request.getContextPath() + "/almacen/PedidoServlet");
             } else {
                 // Stock insuficiente

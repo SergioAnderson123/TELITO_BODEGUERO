@@ -19,13 +19,20 @@ public class AlertCountFilter implements Filter {
         String path = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
 
         // No ejecuto la consulta para los archivos de CSS, JS, etc., para no sobrecargar la BD.
+        // IMPORTANTE: Usar getSession(false) para NO crear sesiones automáticamente
+        // En ventana incógnita NO debería haber cookie de sesión, así que NO debe crear sesión nueva
         if (!path.startsWith("/assets")) {
-            HttpSession session = httpRequest.getSession();
-            AlertaDAO alertaDAO = new AlertaDAO();
-            // Llamo al método que cuenta las reglas activas.
-            int reglasActivas = alertaDAO.contarReglasDeAlertaActivas();
-            // Guardo el número en la sesión para poder usarlo en cualquier JSP.
-            session.setAttribute("alertasAbiertas", reglasActivas);
+            HttpSession session = httpRequest.getSession(false); // NO crear sesión si no existe
+            if (session != null) {
+                // Solo actualizar contador si la sesión ya existe (usuario autenticado)
+                AlertaDAO alertaDAO = new AlertaDAO();
+                // Llamo al método que cuenta las reglas activas.
+                int reglasActivas = alertaDAO.contarReglasDeAlertaActivas();
+                // Guardo el número en la sesión para poder usarlo en cualquier JSP.
+                session.setAttribute("alertasAbiertas", reglasActivas);
+            }
+            // Si session == null, significa que no hay cookie de sesión (ventana incógnita o sin login)
+            // En ese caso, NO crear sesión nueva - AuthFilter se encargará de redirigir al login
         }
 
         // Le digo a la petición que continúe su camino normal.

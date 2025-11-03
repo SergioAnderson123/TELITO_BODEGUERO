@@ -4,6 +4,7 @@ import com.example.telito.administrador.beans.AlertaConfig;
 import com.example.telito.administrador.beans.Categoria;
 import com.example.telito.administrador.beans.Rol;
 import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.EmailUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -210,11 +211,17 @@ public class AlertaDAO {
     // Retorna mensajes de alertas calculadas dinámicamente para el rol indicado
     public ArrayList<String> listarAlertasParaRol(String rolNombre) {
         ArrayList<String> mensajes = new ArrayList<>();
-        String sqlReglas = "SELECT * FROM alertas_configuracion WHERE activo = 1 AND rol_a_notificar = ?";
+        // Usar UPPER() para comparación case-insensitive
+        String sqlReglas = """
+            SELECT ac.*, r.nombre AS nombre_rol
+            FROM alertas_configuracion ac
+            INNER JOIN roles r ON ac.rol_a_notificar = r.id_rol
+            WHERE ac.activo = 1 AND UPPER(r.nombre) = UPPER(?)
+            """;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sqlReglas)) {
-            pstmt.setString(1, rolNombre.toUpperCase());
+            pstmt.setString(1, rolNombre);
             try (ResultSet rsReglas = pstmt.executeQuery()) {
                 while (rsReglas.next()) {
                     String tipoAlerta = rsReglas.getString("tipo_alerta");
@@ -443,5 +450,107 @@ public class AlertaDAO {
         pstmt.setString(5, alerta.getRolANotificar().getNombre());
         pstmt.setString(6, alerta.getMensajePersonalizado());
         pstmt.setBoolean(7, alerta.isActivo());
+    }
+    
+    /**
+     * Obtiene todos los emails de usuarios activos de un rol específico.
+     * 
+     * @param rolNombre Nombre del rol (ej: "LOGISTICA", "ALMACEN", etc.)
+     * @return Lista de emails de usuarios activos con ese rol
+     */
+    public ArrayList<String> obtenerEmailsPorRol(String rolNombre) {
+        ArrayList<String> emails = new ArrayList<>();
+        // Usar UPPER() en ambos lados para comparación case-insensitive
+        String sql = "SELECT DISTINCT u.email FROM usuarios u " +
+                     "INNER JOIN roles r ON u.rol_id = r.id_rol " +
+                     "WHERE UPPER(r.nombre) = UPPER(?) AND u.activo = 1 AND u.email IS NOT NULL AND u.email != ''";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, rolNombre); // Ya no necesitamos .toUpperCase() porque usamos UPPER() en SQL
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String email = rs.getString("email");
+                    if (email != null && !email.trim().isEmpty()) {
+                        emails.add(email.trim());
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return emails;
+    }
+    
+    /**
+     * Envía correos electrónicos de alerta a todos los usuarios de un rol específico.
+     * 
+     * @param rolNombre Nombre del rol a notificar
+     * @param alertTitle Título de la alerta
+     * @param alertMessages Lista de mensajes de alerta
+     * @return Número de correos enviados exitosamente
+     */
+    public int enviarAlertasPorCorreo(String rolNombre, String alertTitle, ArrayList<String> alertMessages) {
+        if (alertMessages == null || alertMessages.isEmpty()) {
+            return 0;
+        }
+        
+        ArrayList<String> emails = obtenerEmailsPorRol(rolNombre);
+        if (emails.isEmpty()) {
+            System.out.println("⚠ No se encontraron usuarios activos con email para el rol: " + rolNombre);
+            return 0;
+        }
+        
+        // Construir mensaje consolidado
+        StringBuilder mensajeConsolidado = new StringBuilder();
+        mensajeConsolidado.append("Se han detectado ").append(alertMessages.size()).append(" alerta(s):\n\n");
+        for (int i = 0; i < alertMessages.size(); i++) {
+            mensajeConsolidado.append((i + 1)).append(". ").append(alertMessages.get(i)).append("\n");
+        }
+        
+        // Enviar correos
+        int enviados = 0;
+        for (String email : emails) {
+            boolean enviado = EmailUtil.sendSystemAlert(email, alertTitle, mensajeConsolidado.toString());
+            if (enviado) {
+                enviados++;
+            }
+        }
+        
+        System.out.println("✓ Se enviaron " + enviados + " correo(s) de alerta al rol: " + rolNombre);
+        return enviados;
+    }
+    
+    /**
+     * Obtiene la lista de roles únicos que tienen alertas activas configuradas.
+     * Útil para el scheduler de alertas automáticas.
+     * 
+     * @return Lista de nombres de roles que tienen alertas activas
+     */
+    public ArrayList<String> obtenerRolesConAlertasActivas() {
+        ArrayList<String> roles = new ArrayList<>();
+        String sql = """
+            SELECT DISTINCT r.nombre
+            FROM alertas_configuracion ac
+            INNER JOIN roles r ON ac.rol_a_notificar = r.id_rol
+            WHERE ac.activo = 1
+            """;
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            
+            while (rs.next()) {
+                String rolNombre = rs.getString("nombre");
+                if (rolNombre != null && !rolNombre.trim().isEmpty()) {
+                    roles.add(rolNombre.trim());
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener roles con alertas activas: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return roles;
     }
 }

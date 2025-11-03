@@ -14,6 +14,8 @@ import com.example.telito.logistica.daos.ProductoDao;
 import com.example.telito.logistica.daos.ProveedorDao;
 import com.example.telito.logistica.daos.ZonaDao;
 import com.example.telito.logistica.daos.DistritoDao;
+import com.example.telito.administrador.daos.UsuarioDAO;
+import com.example.telito.util.EmailUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -381,11 +383,74 @@ public class OrdenCompraServlet extends HttpServlet {
                 System.out.println("Monto Total: " + montoTotal);
                 System.out.println("Usuario ID (Logística): " + usuarioId);
                 
-                // Guardar la orden de compra con el ID del usuario logueado
-                boolean guardado = ordenCompraDao.crearOrdenCompra(null, productorId, productoId, cantidad, usuarioId, montoTotal, distritoId);
+                // Guardar la orden de compra con el ID del usuario logueado y obtener el ID
+                int idOrdenCreada = ordenCompraDao.crearOrdenCompraYRetornarId(null, productorId, productoId, cantidad, usuarioId, montoTotal, distritoId);
                 
-                if (guardado) {
-                    System.out.println("✓ SERVLET: Orden guardada exitosamente");
+                if (idOrdenCreada > 0) {
+                    System.out.println("✓ SERVLET: Orden guardada exitosamente con ID: " + idOrdenCreada);
+                    
+                    // ========== ENVIAR NOTIFICACIÓN AL PRODUCTOR SOBRE LA NUEVA ORDEN ==========
+                    try {
+                        // Obtener datos de la orden recién creada
+                        Object[] datosOrden = ordenCompraDao.obtenerDatosBasicosOrden(idOrdenCreada);
+                        if (datosOrden != null) {
+                            int productorIdOrd = (Integer) datosOrden[4];
+                            String numeroOrden = (String) datosOrden[0];
+                            String nombreProducto = (String) datosOrden[1];
+                            int cantidadOrd = (Integer) datosOrden[2];
+                            double montoTotalOrd = (Double) datosOrden[3];
+                            
+                            // Obtener email del productor
+                            UsuarioDAO usuarioDAO = new UsuarioDAO();
+                            String emailProductor = usuarioDAO.obtenerEmailPorId(productorIdOrd);
+                            
+                            if (emailProductor != null && !emailProductor.trim().isEmpty()) {
+                                String mensaje = """
+                                    <h2>Nueva Orden de Compra Pendiente de Revisión</h2>
+                                    <p>Se ha creado una nueva orden de compra que requiere tu revisión y respuesta.</p>
+                                    <p><strong>Número de Orden:</strong> %s</p>
+                                    <p><strong>Producto:</strong> %s</p>
+                                    <p><strong>Cantidad:</strong> %d paquetes</p>
+                                    <p><strong>Monto Total:</strong> S/. %.2f</p>
+                                    <p><strong>Fecha de Creación:</strong> %s</p>
+                                    <hr>
+                                    <p><strong>Acción requerida:</strong></p>
+                                    <ul>
+                                        <li>Por favor, revisa los detalles de la orden en tu panel de productor</li>
+                                        <li>Confirma si puedes cumplir con la orden o si necesitas hacer alguna observación</li>
+                                        <li>Una vez revisada, envía tu respuesta a logística</li>
+                                    </ul>
+                                    <p>Logística revisará tu respuesta y te notificará si la orden es aprobada o rechazada.</p>
+                                    """.formatted(
+                                        numeroOrden,
+                                        nombreProducto,
+                                        cantidadOrd,
+                                        montoTotalOrd,
+                                        new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                                    );
+                                
+                                boolean correoEnviado = EmailUtil.sendSystemAlertHTML(
+                                    emailProductor,
+                                    "Nueva Orden de Compra - Requiere Revisión",
+                                    mensaje
+                                );
+                                
+                                if (correoEnviado) {
+                                    System.out.println("✓ Correo enviado al productor: " + emailProductor);
+                                } else {
+                                    System.err.println("⚠ No se pudo enviar el correo al productor");
+                                }
+                            } else {
+                                System.out.println("⚠ Productor no tiene email configurado. ID: " + productorIdOrd);
+                            }
+                        }
+                    } catch (Exception e) {
+                        // No bloquear la operación si falla el correo
+                        System.err.println("⚠ Error al enviar correo de notificación de nueva orden: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    // ========== FIN ENVÍO DE CORREO ==========
+                    
                     response.sendRedirect(request.getContextPath() + "/orden-compra?successMsg=Orden de compra creada exitosamente");
                 } else {
                     System.err.println("❌ SERVLET: Fallo al guardar la orden");
@@ -449,6 +514,93 @@ public class OrdenCompraServlet extends HttpServlet {
                 
                 if (actualizado) {
                     System.out.println("✓ Estado actualizado correctamente");
+                    
+                    // ========== ENVÍO DE CORREO AL PRODUCTOR ==========
+                    try {
+                        // Obtener datos de la orden
+                        Object[] datosOrden = ordenCompraDao2.obtenerDatosBasicosOrden(idOrden);
+                        if (datosOrden != null) {
+                            int productorId = (Integer) datosOrden[4];
+                            String numeroOrden = (String) datosOrden[0];
+                            String nombreProducto = (String) datosOrden[1];
+                            int cantidad = (Integer) datosOrden[2];
+                            double montoTotal = (Double) datosOrden[3];
+                            
+                            // Obtener email del productor
+                            UsuarioDAO usuarioDAO = new UsuarioDAO();
+                            String emailProductor = usuarioDAO.obtenerEmailPorId(productorId);
+                            
+                            if (emailProductor != null && !emailProductor.trim().isEmpty()) {
+                                String asunto;
+                                String mensaje;
+                                
+                                if ("Aprobado".equals(nuevoEstado)) {
+                                    asunto = "TELITO BODEGUERO - Orden de Compra Aprobada";
+                                    mensaje = """
+                                        <h2>¡Tu Orden de Compra ha sido Aprobada!</h2>
+                                        <p><strong>Número de Orden:</strong> %s</p>
+                                        <p><strong>Producto:</strong> %s</p>
+                                        <p><strong>Cantidad:</strong> %d paquetes</p>
+                                        <p><strong>Monto Total:</strong> S/. %.2f</p>
+                                        <p><strong>Fecha de Aprobación:</strong> %s</p>
+                                        <hr>
+                                        <p><strong>Próximos pasos:</strong></p>
+                                        <ul>
+                                            <li>Por favor, prepara la mercancía según lo acordado</li>
+                                            <li>Una vez lista, regístrala en el sistema como lote</li>
+                                            <li>Coordina la entrega con el personal de logística</li>
+                                        </ul>
+                                        <p>Te notificaremos cuando la mercancía sea recibida en el almacén.</p>
+                                        """.formatted(
+                                            numeroOrden,
+                                            nombreProducto,
+                                            cantidad,
+                                            montoTotal,
+                                            new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                                        );
+                                } else {
+                                    // Rechazado
+                                    asunto = "TELITO BODEGUERO - Orden de Compra Rechazada";
+                                    mensaje = """
+                                        <h2>Orden de Compra Rechazada</h2>
+                                        <p>Lamentamos informarte que tu orden de compra ha sido rechazada.</p>
+                                        <p><strong>Número de Orden:</strong> %s</p>
+                                        <p><strong>Producto:</strong> %s</p>
+                                        <p><strong>Cantidad:</strong> %d paquetes</p>
+                                        <p><strong>Fecha de Rechazo:</strong> %s</p>
+                                        <hr>
+                                        <p>Si tienes preguntas sobre el motivo del rechazo, por favor contacta al personal de logística.</p>
+                                        """.formatted(
+                                            numeroOrden,
+                                            nombreProducto,
+                                            cantidad,
+                                            new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                                        );
+                                }
+                                
+                                // Enviar correo HTML
+                                boolean correoEnviado = EmailUtil.sendSystemAlertHTML(
+                                    emailProductor,
+                                    asunto,
+                                    mensaje
+                                );
+                                
+                                if (correoEnviado) {
+                                    System.out.println("✓ Correo enviado al productor: " + emailProductor);
+                                } else {
+                                    System.err.println("⚠ No se pudo enviar el correo al productor");
+                                }
+                            } else {
+                                System.out.println("⚠ Productor no tiene email configurado. ID: " + productorId);
+                            }
+                        }
+                    } catch (Exception e) {
+                        // No bloquear la operación si falla el correo
+                        System.err.println("⚠ Error al enviar correo de notificación: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    // ========== FIN ENVÍO DE CORREO ==========
+                    
                     response.getWriter().write("{\"success\":true,\"message\":\"Estado actualizado\"}");
                 } else {
                     System.err.println("❌ No se pudo actualizar el estado");

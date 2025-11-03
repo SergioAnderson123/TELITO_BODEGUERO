@@ -20,6 +20,17 @@ public class LogisticaAlertServlet extends HttpServlet {
         AlertaDAO alertaDAO = new AlertaDAO();
         ArrayList<String> mensajes = alertaDAO.listarAlertasParaRol("LOGISTICA");
 
+        // Opción para enviar correos automáticamente si hay alertas
+        // Si no se especifica el parámetro, por defecto NO envía (para evitar spam)
+        // Pero se puede habilitar con ?enviarCorreo=true o crear un job programado
+        String enviarCorreo = request.getParameter("enviarCorreo");
+        if ("true".equalsIgnoreCase(enviarCorreo) && !mensajes.isEmpty()) {
+            int correosEnviados = alertaDAO.enviarAlertasPorCorreo("LOGISTICA", "Alertas del Sistema - Logística", mensajes);
+            request.getSession().setAttribute("successMsg", "Se enviaron " + correosEnviados + " correo(s) de alerta exitosamente.");
+        } else if (mensajes.isEmpty()) {
+            request.getSession().setAttribute("infoMsg", "No hay alertas activas para el rol LOGISTICA.");
+        }
+
         String format = request.getParameter("format");
         if ("json".equalsIgnoreCase(format)) {
             response.setContentType("application/json;charset=UTF-8");

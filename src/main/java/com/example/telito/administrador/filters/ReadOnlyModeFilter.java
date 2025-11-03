@@ -14,17 +14,22 @@ public class ReadOnlyModeFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
-        HttpSession session = req.getSession();
-
-        // Activar/desactivar modo readonly desde query param
-        String mode = req.getParameter("mode");
-        if ("readonly".equalsIgnoreCase(mode)) {
-            session.setAttribute("readonly", Boolean.TRUE);
-        } else if ("edit".equalsIgnoreCase(mode)) {
-            session.removeAttribute("readonly");
+        // IMPORTANTE: Usar getSession(false) para NO crear sesiones automáticamente
+        // En ventana incógnita NO debería haber cookie de sesión, así que NO debe crear sesión nueva
+        HttpSession session = req.getSession(false);
+        
+        // Solo procesar modo readonly si hay una sesión válida (usuario autenticado)
+        if (session != null) {
+            // Activar/desactivar modo readonly desde query param
+            String mode = req.getParameter("mode");
+            if ("readonly".equalsIgnoreCase(mode)) {
+                session.setAttribute("readonly", Boolean.TRUE);
+            } else if ("edit".equalsIgnoreCase(mode)) {
+                session.removeAttribute("readonly");
+            }
         }
 
-        Boolean readonly = (Boolean) session.getAttribute("readonly");
+        Boolean readonly = (session != null) ? (Boolean) session.getAttribute("readonly") : null;
         String method = req.getMethod();
         String uri = req.getRequestURI();
         String ctx = req.getContextPath();

@@ -147,5 +147,68 @@ public class PedidoDao {
             throw new RuntimeException("Error al actualizar el estado del pedido", e);
         }
     }
+    
+    /**
+     * Obtiene la lista de pedidos pendientes para recordatorios.
+     * 
+     * @return Lista de pedidos con estado "Pendiente"
+     */
+    public ArrayList<Pedido> listarPedidosPendientes() {
+        ArrayList<Pedido> listaPedidos = new ArrayList<>();
+        String sql = """
+            SELECT p.id_pedido, p.numero_pedido, p.destino, p.estado_preparacion,
+                   c.nombre AS nombre_cliente, c.id_cliente
+            FROM pedidos p
+            INNER JOIN clientes c ON p.cliente_id = c.id_cliente
+            WHERE p.estado_preparacion = 'Pendiente'
+            ORDER BY p.id_pedido ASC
+            """;
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Pedido pedido = new Pedido();
+                pedido.setIdPedido(rs.getInt("id_pedido"));
+                pedido.setNumeroPedido(rs.getString("numero_pedido"));
+                pedido.setDestino(rs.getString("destino"));
+                pedido.setEstadoPreparacion(rs.getString("estado_preparacion"));
+                
+                // Agregar cliente si existe
+                Cliente cliente = new Cliente();
+                cliente.setIdCliente(rs.getInt("id_cliente"));
+                cliente.setNombre(rs.getString("nombre_cliente"));
+                pedido.setCliente(cliente);
+                
+                listaPedidos.add(pedido);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al listar pedidos pendientes", e);
+        }
+        return listaPedidos;
+    }
+    
+    /**
+     * Cuenta la cantidad de pedidos pendientes.
+     * 
+     * @return Número de pedidos con estado "Pendiente"
+     */
+    public int contarPedidosPendientes() {
+        String sql = "SELECT COUNT(*) FROM pedidos WHERE estado_preparacion = 'Pendiente'";
+        int total = 0;
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al contar pedidos pendientes", e);
+        }
+        return total;
+    }
 
 }

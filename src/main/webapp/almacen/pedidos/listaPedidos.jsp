@@ -23,15 +23,82 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="page-header">
-                            <h2><i class="fas fa-truck-loading me-2"></i>Registro de Salidas - Planes de Transporte</h2>
-                            <p class="text-muted">Gestiona los planes de transporte pendientes de preparación.</p>
+                            <h2><i class="fas fa-truck-loading me-2"></i>Registro de Salidas</h2>
+                            <p class="text-muted">Gestiona pedidos y planes de transporte pendientes de preparación.</p>
                         </div>
                     </div>
                 </div>
 
+                <!-- TABLA DE PEDIDOS -->
                 <div class="row mt-4">
                     <div class="col-12">
-                        <!-- TABLA DE PLANES DE TRANSPORTE -->
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Pedidos Pendientes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="bg-light">
+                                        <tr>
+                                            <th scope="col">N° Pedido</th>
+                                            <th scope="col">Cliente</th>
+                                            <th scope="col">Destino</th>
+                                            <th scope="col">Estado</th>
+                                            <th scope="col">Acciones</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <c:choose>
+                                            <c:when test="${not empty listaPedidos}">
+                                                <c:forEach var="pedido" items="${listaPedidos}">
+                                                    <tr>
+                                                        <td><span class="badge bg-primary">${pedido.numeroPedido}</span></td>
+                                                        <td>${pedido.cliente != null ? pedido.cliente.nombre : 'N/A'}</td>
+                                                        <td>${pedido.destino}</td>
+                                                        <td>
+                                                            <c:choose>
+                                                                <c:when test="${pedido.estadoPreparacion == 'Pendiente'}">
+                                                                    <span class="badge bg-warning">Pendiente</span>
+                                                                </c:when>
+                                                                <c:when test="${pedido.estadoPreparacion == 'Despachado'}">
+                                                                    <span class="badge bg-success">Despachado</span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="badge bg-secondary">${pedido.estadoPreparacion}</span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                        <td>
+                                                            <c:if test="${pedido.estadoPreparacion == 'Pendiente'}">
+                                                                <a href="PedidoServlet?action=preparar&id=${pedido.idPedido}" class="btn btn-primary btn-sm">
+                                                                    <i class="fas fa-box-open me-1"></i>Preparar
+                                                                </a>
+                                                            </c:if>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted">
+                                                        <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                                                        No hay pedidos pendientes.
+                                                    </td>
+                                                </tr>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLA DE PLANES DE TRANSPORTE -->
+                <div class="row mt-4">
+                    <div class="col-12">
                         <div class="card">
                             <div class="card-header bg-info text-white">
                                 <h5 class="mb-0"><i class="fas fa-truck-loading me-2"></i>Planes de Transporte</h5>

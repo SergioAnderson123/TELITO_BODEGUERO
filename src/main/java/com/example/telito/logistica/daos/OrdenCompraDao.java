@@ -167,7 +167,7 @@ public class OrdenCompraDao {
         System.out.println("SQL: " + sql);
         
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             int idx = 1;
             if (includeNumero) {
                 pstmt.setString(idx++, numeroOrden);
@@ -196,6 +196,64 @@ public class OrdenCompraDao {
             System.err.println("Message: " + e.getMessage());
             e.printStackTrace();
             return false;
+        }
+    }
+    
+    /**
+     * Crea una orden de compra y retorna el ID de la orden creada.
+     * Útil cuando se necesita el ID para notificaciones por correo.
+     * 
+     * @param numeroOrden Número de orden (puede ser null)
+     * @param productorId ID del productor
+     * @param productoId ID del producto
+     * @param cantidad Cantidad de paquetes
+     * @param usuarioId ID del usuario que crea la orden (logística)
+     * @param montoTotal Monto total de la orden
+     * @param distritoId ID del distrito
+     * @return ID de la orden creada, o 0 si falla
+     */
+    public int crearOrdenCompraYRetornarId(String numeroOrden, int productorId, int productoId, int cantidad, int usuarioId, double montoTotal, int distritoId) {
+        String sql;
+        boolean includeNumero = numeroOrden != null && !numeroOrden.isEmpty();
+        if (includeNumero) {
+            sql = "INSERT INTO ordenes_compra (numero_Orden, productor_id, producto_id, cantidad, usuario_id, estado, monto_total, distrito_id) VALUES (?, ?, ?, ?, ?, 'Pendiente', ?, ?)";
+        } else {
+            sql = "INSERT INTO ordenes_compra (productor_id, producto_id, cantidad, usuario_id, estado, monto_total, distrito_id) VALUES (?, ?, ?, ?, 'Pendiente', ?, ?)";
+        }
+        
+        System.out.println("=== DEBUG DAO - CREAR ORDEN DE COMPRA Y RETORNAR ID ===");
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            int idx = 1;
+            if (includeNumero) {
+                pstmt.setString(idx++, numeroOrden);
+            }
+            pstmt.setInt(idx++, productorId);
+            pstmt.setInt(idx++, productoId);
+            pstmt.setInt(idx++, cantidad);
+            pstmt.setInt(idx++, usuarioId);
+            pstmt.setDouble(idx++, montoTotal);
+            pstmt.setInt(idx, distritoId);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int idOrden = generatedKeys.getInt(1);
+                        System.out.println("✓ DAO: Orden creada con ID: " + idOrden);
+                        return idOrden;
+                    }
+                }
+            }
+            return 0;
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR SQL al crear orden de compra:");
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            System.err.println("Message: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
         }
     }
 
@@ -310,5 +368,74 @@ public class OrdenCompraDao {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    /**
+     * Obtiene el ID del productor (usuario) asociado a una orden de compra.
+     * Útil para enviar notificaciones por correo.
+     * 
+     * @param idOrden ID de la orden de compra
+     * @return ID del productor, o 0 si no se encuentra
+     */
+    public int obtenerProductorIdPorOrden(int idOrden) {
+        String sql = "SELECT productor_id FROM ordenes_compra WHERE id_orden_compra = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idOrden);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("productor_id");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener productor_id de la orden: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    /**
+     * Obtiene los datos básicos de una orden para notificaciones.
+     * 
+     * @param idOrden ID de la orden de compra
+     * @return Array con [numeroOrden, nombreProducto, cantidad, montoTotal] o null
+     */
+    public Object[] obtenerDatosBasicosOrden(int idOrden) {
+        String sql = """
+            SELECT 
+                IFNULL(oc.numero_Orden, CONCAT('OC', LPAD(oc.id_orden_compra, 3, '0'))) AS numero_orden,
+                pr.nombre AS nombre_producto,
+                oc.cantidad,
+                oc.monto_total,
+                oc.productor_id
+            FROM ordenes_compra oc
+            INNER JOIN productos pr ON oc.producto_id = pr.id_producto
+            WHERE oc.id_orden_compra = ?
+            """;
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idOrden);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Object[] datos = new Object[5];
+                    datos[0] = rs.getString("numero_orden");
+                    datos[1] = rs.getString("nombre_producto");
+                    datos[2] = rs.getInt("cantidad");
+                    datos[3] = rs.getDouble("monto_total");
+                    datos[4] = rs.getInt("productor_id");
+                    return datos;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener datos básicos de la orden: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 }

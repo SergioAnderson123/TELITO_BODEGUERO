@@ -17,6 +17,8 @@ public class MovimientoProductoServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) throws IOException, ServletException {
+        // IMPORTANTE: NO crear sesión aquí - AuthFilter se encarga de validar sesión
+        // Si llegamos aquí, significa que AuthFilter ya validó la autenticación
         response.setContentType("text/html");
 
         // Obtener parámetros de búsqueda y filtros

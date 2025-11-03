@@ -248,6 +248,29 @@ public class UsuarioDAO {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Actualiza un usuario incluyendo la contraseña (útil para reactivar usuarios).
+     */
+    public boolean actualizarUsuarioConPassword(Usuario usuario) {
+        String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, password = SHA2(?, 256), rol_id = ?, activo = ? WHERE id_usuario = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, usuario.getNombres());
+            pstmt.setString(2, usuario.getApellidos());
+            pstmt.setString(3, usuario.getEmail());
+            pstmt.setString(4, usuario.getPassword());
+            pstmt.setInt(5, usuario.getRol().getIdRol());
+            pstmt.setBoolean(6, usuario.isActivo());
+            pstmt.setInt(7, usuario.getIdUsuario());
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar usuario con contraseña: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     // Borrado lógico, para 'banear' al usuario sin borrarlo de la BD.
     public void deshabilitarUsuario(int id) {
@@ -260,18 +283,52 @@ public class UsuarioDAO {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Obtiene el nombre del rol por su ID.
+     * Útil para notificaciones por correo.
+     * 
+     * @param rolId ID del rol
+     * @return Nombre del rol o null si no existe
+     */
+    public String obtenerNombreRolPorId(int rolId) {
+        String sql = "SELECT nombre FROM roles WHERE id_rol = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, rolId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("nombre");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener nombre del rol: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-    // Método para autenticar usuarios en el login
-    public Usuario autenticarUsuario(String email, String password) {
+    // Método para autenticar usuarios en el login (por email o nombre de usuario)
+    public Usuario autenticarUsuario(String emailOUsuario, String password) {
         Usuario usuario = null;
-        String sql = "SELECT u.*, r.nombre AS nombre_rol FROM usuarios u " +
-                "INNER JOIN roles r ON u.rol_id = r.id_rol " +
-                "WHERE u.email = ? AND u.password = SHA2(?, 256) AND u.activo = 1";
+        // Autenticar por email O por nombre de usuario (combinando nombres y apellidos)
+        String sql = """
+            SELECT u.*, r.nombre AS nombre_rol 
+            FROM usuarios u 
+            INNER JOIN roles r ON u.rol_id = r.id_rol 
+            WHERE (u.email = ? OR CONCAT(u.nombres, ' ', u.apellidos) = ? OR u.nombres = ?)
+            AND u.password = SHA2(?, 256) 
+            AND u.activo = 1
+            """;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, email);
-            pstmt.setString(2, password);
+            pstmt.setString(1, emailOUsuario);  // Email
+            pstmt.setString(2, emailOUsuario);  // Nombre completo (nombres + apellidos)
+            pstmt.setString(3, emailOUsuario);  // Solo nombres
+            pstmt.setString(4, password);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -338,10 +395,11 @@ public class UsuarioDAO {
     // ========== MÉTODOS DE VALIDACIÓN ==========
     
     /**
-     * Verifica si ya existe un usuario registrado con el email especificado
+     * Verifica si ya existe un usuario ACTIVO registrado con el email especificado.
+     * Solo considera usuarios activos, permitiendo reutilizar emails de usuarios inactivos.
      */
     public boolean existeEmail(String email) {
-        String sql = "SELECT COUNT(*) as total FROM usuarios WHERE email = ?";
+        String sql = "SELECT COUNT(*) as total FROM usuarios WHERE email = ? AND activo = 1";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -358,5 +416,62 @@ public class UsuarioDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    /**
+     * Verifica si existe un usuario (activo o inactivo) con el email especificado.
+     * Útil para detectar si un usuario fue eliminado con borrado lógico.
+     * 
+     * @param email Email a verificar
+     * @return ID del usuario si existe, 0 si no existe
+     */
+    public int obtenerIdUsuarioPorEmail(String email) {
+        String sql = "SELECT id_usuario FROM usuarios WHERE email = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, email);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_usuario");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener ID de usuario por email: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    // ========== MÉTODOS AUXILIARES PARA CORREOS ==========
+    
+    /**
+     * Obtiene el email de un usuario por su ID.
+     * Útil para enviar notificaciones por correo.
+     * 
+     * @param usuarioId ID del usuario
+     * @return Email del usuario, o null si no existe o no tiene email
+     */
+    public String obtenerEmailPorId(int usuarioId) {
+        String sql = "SELECT email FROM usuarios WHERE id_usuario = ? AND activo = 1";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, usuarioId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    String email = rs.getString("email");
+                    return (email != null && !email.trim().isEmpty()) ? email : null;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener email del usuario: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 }

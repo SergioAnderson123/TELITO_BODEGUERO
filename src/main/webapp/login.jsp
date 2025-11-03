@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.UUID" %>
 
 <!doctype html>
 <html lang="es">
@@ -204,18 +205,21 @@
             </div>
             <% } %>
 
-            <form method="POST" action="<%= request.getContextPath() %>/acceso/login" novalidate>
+            <form method="POST" action="<%= request.getContextPath() %>/acceso/login" novalidate id="loginForm">
+                <%-- Token CSRF para prevenir ataques - Generado por el servlet --%>
+                <input type="hidden" name="csrfToken" value="<%= request.getAttribute("csrfToken") != null ? request.getAttribute("csrfToken") : "" %>">
+                
                 <div class="form-floating">
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Correo electrónico" required>
-                    <label for="email"><i class="fas fa-envelope me-2"></i>Correo electrónico</label>
+                    <input type="text" class="form-control" id="email" name="email" placeholder="Correo electrónico o nombre de usuario" required autocomplete="username">
+                    <label for="email"><i class="fas fa-user me-2"></i>Correo electrónico o nombre de usuario</label>
                 </div>
 
                 <div class="form-floating">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required autocomplete="current-password">
                     <label for="password"><i class="fas fa-lock me-2"></i>Contraseña</label>
                 </div>
 
-                <button type="submit" class="btn btn-login">
+                <button type="submit" class="btn btn-login" id="btnLogin">
                     <i class="fas fa-sign-in-alt me-2"></i>
                     Iniciar Sesión
                 </button>
@@ -244,14 +248,12 @@
                 emailInput.classList.remove('is-invalid');
                 passwordInput.classList.remove('is-invalid');
 
-                // Validar email
+                // Validar email o nombre de usuario (puede ser email o nombre)
                 if (!emailInput.value.trim()) {
                     emailInput.classList.add('is-invalid');
                     isValid = false;
-                } else if (!isValidEmail(emailInput.value)) {
-                    emailInput.classList.add('is-invalid');
-                    isValid = false;
                 }
+                // Ya no validamos formato de email estricto, puede ser nombre de usuario
 
                 // Validar contraseña
                 if (!passwordInput.value.trim()) {
@@ -264,10 +266,11 @@
                 }
             });
 
-            function isValidEmail(email) {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return emailRegex.test(email);
-            }
+            // Función ya no necesaria ya que aceptamos email o nombre de usuario
+            // function isValidEmail(email) {
+            //     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            //     return emailRegex.test(email);
+            // }
 
             // Efecto de focus en los inputs
             const inputs = document.querySelectorAll('.form-control');
