@@ -553,4 +553,30 @@ public class AlertaDAO {
         
         return roles;
     }
+    
+    /**
+     * Obtiene todas las alertas sin paginación.
+     * Útil para exportar a Excel.
+     * 
+     * @return Lista completa de alertas configuradas
+     */
+    public ArrayList<AlertaConfig> listarTodasAlertas() {
+        ArrayList<AlertaConfig> listaAlertas = new ArrayList<>();
+        String sql = "SELECT a.*, c.nombre AS nombre_categoria " +
+                "FROM alertas_configuracion a " +
+                "LEFT JOIN categorias c ON a.categoria_id = c.id_categoria " +
+                "ORDER BY a.id_alerta_config";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                listaAlertas.add(mapResultSetToAlertaConfig(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listaAlertas;
+    }
 }

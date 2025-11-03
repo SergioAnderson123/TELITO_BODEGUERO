@@ -2,8 +2,11 @@ package com.example.telito.util;
 
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -273,6 +276,120 @@ public class EmailUtil {
     public static boolean isEmailConfigured() {
         return EMAIL_FROM != null && !EMAIL_FROM.isEmpty() && 
                EMAIL_PASSWORD != null && !EMAIL_PASSWORD.isEmpty();
+    }
+    
+    /**
+     * Envía un correo electrónico con un archivo adjunto.
+     * 
+     * @param to Dirección de correo del destinatario
+     * @param subject Asunto del correo
+     * @param messageBody Cuerpo del mensaje (puede ser HTML)
+     * @param isHtml true si el mensaje es HTML, false si es texto plano
+     * @param attachmentFile Archivo a adjuntar
+     * @param attachmentName Nombre del archivo adjunto (opcional, si es null usa el nombre del archivo)
+     * @return true si el correo se envió exitosamente, false en caso contrario
+     */
+    public static boolean sendEmailWithAttachment(String to, String subject, String messageBody, 
+                                                   boolean isHtml, File attachmentFile, String attachmentName) {
+        if (EMAIL_FROM == null || EMAIL_FROM.isEmpty() || 
+            EMAIL_PASSWORD == null || EMAIL_PASSWORD.isEmpty()) {
+            logger.severe("✗ Error: Credenciales de email no configuradas.");
+            return false;
+        }
+        
+        if (to == null || to.trim().isEmpty()) {
+            logger.warning("⚠ Dirección de correo destinatario vacía.");
+            return false;
+        }
+        
+        if (attachmentFile == null || !attachmentFile.exists() || !attachmentFile.isFile()) {
+            logger.warning("⚠ Archivo adjunto no válido o no existe.");
+            return false;
+        }
+        
+        try {
+            // Configurar propiedades SMTP
+            Properties props = new Properties();
+            props.put("mail.smtp.host", SMTP_HOST);
+            props.put("mail.smtp.port", SMTP_PORT);
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.ssl.trust", SMTP_HOST);
+            props.put("mail.debug", "false");
+            
+            // Crear sesión con autenticación
+            Session session = Session.getInstance(props, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(EMAIL_FROM, EMAIL_PASSWORD);
+                }
+            });
+            
+            // Crear mensaje
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(EMAIL_FROM));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            message.setSubject(subject);
+            
+            // Crear el cuerpo del mensaje
+            MimeBodyPart messageBodyPart = new MimeBodyPart();
+            if (isHtml) {
+                messageBodyPart.setContent(messageBody, "text/html; charset=utf-8");
+            } else {
+                messageBodyPart.setText(messageBody);
+            }
+            
+            // Crear parte del adjunto
+            MimeBodyPart attachmentPart = new MimeBodyPart();
+            attachmentPart.attachFile(attachmentFile);
+            if (attachmentName != null && !attachmentName.trim().isEmpty()) {
+                attachmentPart.setFileName(attachmentName);
+            }
+            
+            // Combinar partes en un multipart
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(messageBodyPart);
+            multipart.addBodyPart(attachmentPart);
+            
+            // Establecer el contenido del mensaje
+            message.setContent(multipart);
+            
+            // Enviar mensaje
+            Transport.send(message);
+            
+            logger.info("✓ Correo con adjunto enviado exitosamente a: " + to);
+            logger.info("   Archivo adjunto: " + (attachmentName != null ? attachmentName : attachmentFile.getName()));
+            return true;
+            
+        } catch (MessagingException e) {
+            logger.severe("✗ Error al enviar correo con adjunto a " + to + ": " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            logger.severe("✗ Error al leer archivo adjunto: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            logger.severe("✗ Error inesperado al enviar correo con adjunto: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Envía un correo HTML con un archivo adjunto (método de conveniencia).
+     * 
+     * @param toEmail Email del destinatario
+     * @param subject Asunto del correo
+     * @param htmlMessage Mensaje HTML
+     * @param attachmentFile Archivo a adjuntar
+     * @param attachmentName Nombre del archivo adjunto
+     * @return true si el correo se envió exitosamente
+     */
+    public static boolean sendSystemAlertHTMLWithAttachment(String toEmail, String subject, 
+                                                             String htmlMessage, File attachmentFile, String attachmentName) {
+        String finalSubject = subject.startsWith("TELITO BODEGUERO") ? subject : "TELITO BODEGUERO - " + subject;
+        return sendEmailWithAttachment(toEmail, finalSubject, htmlMessage, true, attachmentFile, attachmentName);
     }
 }
 

@@ -103,6 +103,11 @@ public class OrdenCompraDao {
         return listaOrdenes;
     }
 
+    // === MÉTODO PARA OBTENER TODAS LAS ÓRDENES SIN PAGINACIÓN (para reportes) ===
+    public ArrayList<OrdenCompraBean> listarTodasOrdenes(String busqueda, String proveedorId, String estado) {
+        return obtenerOrdenes(busqueda, proveedorId, estado, 1, Integer.MAX_VALUE);
+    }
+
     // === MÉTODO PARA CONTAR TOTAL DE ÓRDENES CON FILTROS ===
     public int contarOrdenes(String busqueda, String proveedorId, String estado) {
         String sql = """

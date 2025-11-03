@@ -74,7 +74,29 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 fw-semibold">Lista de Usuarios</h5>
-                        <div>
+                        <div class="d-flex gap-2">
+                            <%
+                                // Construir URL de parámetros para mantener filtros en la exportación
+                                String exportUrl = request.getContextPath() + "/UsuarioReporteServlet?action=exportar";
+                                if (busqueda != null && !busqueda.isEmpty()) exportUrl += "&busqueda=" + java.net.URLEncoder.encode(busqueda, "UTF-8");
+                                if (rolFiltro != null && !rolFiltro.isEmpty()) exportUrl += "&rol=" + rolFiltro;
+                                if (estadoFiltro != null && !estadoFiltro.isEmpty()) exportUrl += "&estado=" + estadoFiltro;
+                                if (currentSortBy != null && !currentSortBy.isEmpty()) exportUrl += "&sortBy=" + currentSortBy;
+                                if (currentSortOrder != null && !currentSortOrder.isEmpty()) exportUrl += "&sortOrder=" + currentSortOrder;
+                                
+                                String sendUrl = request.getContextPath() + "/UsuarioReporteServlet?action=formEnviar";
+                                if (busqueda != null && !busqueda.isEmpty()) sendUrl += "&busqueda=" + java.net.URLEncoder.encode(busqueda, "UTF-8");
+                                if (rolFiltro != null && !rolFiltro.isEmpty()) sendUrl += "&rol=" + rolFiltro;
+                                if (estadoFiltro != null && !estadoFiltro.isEmpty()) sendUrl += "&estado=" + estadoFiltro;
+                                if (currentSortBy != null && !currentSortBy.isEmpty()) sendUrl += "&sortBy=" + currentSortBy;
+                                if (currentSortOrder != null && !currentSortOrder.isEmpty()) sendUrl += "&sortOrder=" + currentSortOrder;
+                            %>
+                            <a href="<%= exportUrl %>" class="btn btn-sm btn-success">
+                                <i class="fas fa-file-excel me-2"></i>Exportar a Excel
+                            </a>
+                            <a href="<%= sendUrl %>" class="btn btn-sm btn-info text-white">
+                                <i class="fas fa-envelope me-2"></i>Enviar por Correo
+                            </a>
                             <a href="<%= request.getContextPath() %>/UsuarioServlet?action=formCrear" class="btn btn-sm btn-primary">
                                 <i class="fas fa-plus me-2"></i>Agregar Usuario
                             </a>

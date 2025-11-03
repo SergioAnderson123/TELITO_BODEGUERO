@@ -39,19 +39,25 @@
                     <c:remove var="tipoMensaje" scope="session"/>
                 </c:if>
 
-                <!-- Botón crear conductor y tamaño de página -->
+                <!-- Botón crear conductor, reportes y tamaño de página -->
                 <div class="row mb-3">
-                    <div class="col-6">
-                        <a href="${pageContext.request.contextPath}/administrador/ConductorServlet?action=crear" class="btn btn-primary">
+                    <div class="col-6 d-flex gap-2">
+                        <a href="${pageContext.request.contextPath}/administrador/ConductorServlet?action=crear" class="btn btn-sm btn-primary">
                             <i class="fas fa-plus me-2"></i>Nuevo Conductor
+                        </a>
+                        <a href="${pageContext.request.contextPath}/administrador/ConductorReporteServlet?action=exportar" class="btn btn-sm btn-success">
+                            <i class="fas fa-file-excel me-2"></i>Exportar a Excel
+                        </a>
+                        <a href="${pageContext.request.contextPath}/administrador/ConductorReporteServlet?action=formEnviar" class="btn btn-sm btn-info text-white">
+                            <i class="fas fa-envelope me-2"></i>Enviar por Correo
                         </a>
                     </div>
                     <div class="col-6 d-flex justify-content-end align-items-center">
-                        <form method="get" action="${pageContext.request.contextPath}/administrador/ConductorServlet">
+                        <form method="get" action="${pageContext.request.contextPath}/administrador/ConductorServlet" class="d-flex align-items-center gap-2">
                             <input type="hidden" name="action" value="listar">
                             <input type="hidden" name="page" value="1">
-                            <label class="me-2 text-muted small">Mostrar</label>
-                            <select name="size" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <label for="sizeSelect" class="text-muted small mb-0">Mostrar</label>
+                            <select id="sizeSelect" name="size" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
                                 <option value="10" ${size == 10 ? 'selected' : ''}>10</option>
                                 <option value="25" ${size == 25 ? 'selected' : ''}>25</option>
                                 <option value="50" ${size == 50 ? 'selected' : ''}>50</option>

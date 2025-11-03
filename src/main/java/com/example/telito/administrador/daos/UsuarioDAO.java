@@ -445,6 +445,98 @@ public class UsuarioDAO {
         return 0;
     }
     
+    /**
+     * Obtiene todos los usuarios que coinciden con los filtros especificados.
+     * Sin paginación, útil para exportar a Excel.
+     * 
+     * @param busqueda Búsqueda por nombre, apellido o email
+     * @param rolId Filtro por rol
+     * @param estado Filtro por estado (1=activo, 0=inactivo, null=todos)
+     * @param sortBy Columna por la cual ordenar
+     * @param sortOrder Dirección del ordenamiento (ASC/DESC)
+     * @return Lista de usuarios que coinciden con los filtros
+     */
+    public ArrayList<Usuario> listarTodosUsuarios(String busqueda, String rolId, String estado, String sortBy, String sortOrder) {
+        ArrayList<Usuario> listaUsuarios = new ArrayList<>();
+        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
+                "INNER JOIN roles r ON u.rol_id = r.id_rol WHERE 1=1";
+
+        // Aplicar filtros
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (u.nombres LIKE ? OR u.apellidos LIKE ? OR u.email LIKE ?)";
+        }
+        if (rolId != null && !rolId.trim().isEmpty()) {
+            sql += " AND u.rol_id = ?";
+        }
+        if (estado != null && !estado.trim().isEmpty()) {
+            sql += " AND u.activo = ?";
+        } else if (estado == null) {
+            sql += " AND u.activo = 1"; // Por defecto, solo activos
+        }
+
+        // Ordenamiento
+        String columnaOrden = "u.id_usuario";
+        String direccionOrden = "ASC";
+
+        if (sortBy != null && !sortBy.trim().isEmpty()) {
+            switch (sortBy) {
+                case "usuario": columnaOrden = "u.nombres"; break;
+                case "correo": columnaOrden = "u.email"; break;
+                case "rol": columnaOrden = "r.nombre"; break;
+                case "estado": columnaOrden = "u.activo"; break;
+            }
+        }
+        if (sortOrder != null && (sortOrder.equalsIgnoreCase("asc") || sortOrder.equalsIgnoreCase("desc"))) {
+            direccionOrden = sortOrder.toUpperCase();
+        }
+        sql += " ORDER BY " + columnaOrden + " " + direccionOrden;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int parameterIndex = 1;
+            if (busqueda != null && !busqueda.trim().isEmpty()) {
+                String busquedaConWildcards = "%" + busqueda + "%";
+                pstmt.setString(parameterIndex++, busquedaConWildcards);
+                pstmt.setString(parameterIndex++, busquedaConWildcards);
+                pstmt.setString(parameterIndex++, busquedaConWildcards);
+            }
+            if (rolId != null && !rolId.trim().isEmpty()) {
+                pstmt.setInt(parameterIndex++, Integer.parseInt(rolId));
+            }
+            if (estado != null && !estado.trim().isEmpty()) {
+                pstmt.setInt(parameterIndex++, Integer.parseInt(estado));
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Usuario usuario = new Usuario();
+                    usuario.setIdUsuario(rs.getInt("id_usuario"));
+                    usuario.setNombres(rs.getString("nombres"));
+                    usuario.setApellidos(rs.getString("apellidos"));
+                    usuario.setEmail(rs.getString("email"));
+                    usuario.setActivo(rs.getBoolean("activo"));
+
+                    try {
+                        usuario.setFotoPerfil(rs.getString("foto_perfil"));
+                    } catch (SQLException e) {
+                        usuario.setFotoPerfil(null);
+                    }
+
+                    Rol rol = new Rol();
+                    rol.setIdRol(rs.getInt("rol_id"));
+                    rol.setNombre(rs.getString("nombre_rol"));
+                    usuario.setRol(rol);
+
+                    listaUsuarios.add(usuario);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listaUsuarios;
+    }
+
     // ========== MÉTODOS AUXILIARES PARA CORREOS ==========
     
     /**

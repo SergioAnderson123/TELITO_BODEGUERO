@@ -272,4 +272,57 @@ public class LoteDao {
         }
         return lotes;
     }
+    
+    /**
+     * Obtiene todos los lotes registrados sin paginación.
+     * Útil para exportar a Excel.
+     * 
+     * @return Lista completa de lotes registrados
+     */
+    public ArrayList<Lote> listarTodosLotesRegistrados() {
+        ArrayList<Lote> lista = new ArrayList<>();
+
+        String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, l.estado, " +
+                "l.producto_id, " +
+                "p.nombre AS nombre_producto, p.codigo_sku AS codigo_sku, p.unidades_por_paquete, " +
+                "FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes_disponibles, " +
+                "u.nombre AS nombre_ubicacion, " +
+                "CASE " +
+                "    WHEN smc.id_stock_minimo IS NULL THEN 'No configurado' " +
+                "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) = 0 THEN 'Sin Stock' " +
+                "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_critico_lote THEN 'Sin Stock' " +
+                "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_minimo_lote THEN 'Poco Stock' " +
+                "    ELSE 'En Stock' " +
+                "END AS estado_stock " +
+                "FROM lotes l " +
+                "INNER JOIN productos p ON l.producto_id = p.id_producto " +
+                "INNER JOIN ubicaciones u ON l.ubicacion_id = u.id_ubicacion " +
+                "LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1 " +
+                "WHERE l.estado = 'Registrado' " +
+                "ORDER BY l.codigo_lote ASC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Lote lote = new Lote();
+                lote.setIdLote(rs.getInt("id_lote"));
+                lote.setCodigoLote(rs.getString("codigo_lote"));
+                lote.setStockActual(rs.getInt("stock_actual"));
+                lote.setPaquetesDisponibles(rs.getInt("paquetes_disponibles"));
+                lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
+                lote.setEstado(rs.getString("estado"));
+                lote.setProductoId(rs.getInt("producto_id"));
+                lote.setNombreProducto(rs.getString("nombre_producto"));
+                lote.setCodigoSKU(rs.getString("codigo_sku"));
+                lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
+                lote.setEstadoStock(rs.getString("estado_stock"));
+                lista.add(lote);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al listar todos los lotes registrados", e);
+        }
+        return lista;
+    }
 }

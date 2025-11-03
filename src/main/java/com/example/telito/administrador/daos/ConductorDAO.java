@@ -154,5 +154,32 @@ public class ConductorDAO {
         }
         return false;
     }
+
+    /**
+     * Obtiene todos los conductores sin paginación.
+     * Útil para exportar a Excel.
+     * 
+     * @return Lista completa de conductores
+     */
+    public ArrayList<Conductor> listarTodosConductores() {
+        ArrayList<Conductor> lista = new ArrayList<>();
+        String sql = "SELECT id_conductor, nombre_completo, licencia FROM conductores ORDER BY nombre_completo ASC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Conductor conductor = new Conductor();
+                conductor.setIdConductor(rs.getInt("id_conductor"));
+                conductor.setNombreCompleto(rs.getString("nombre_completo"));
+                conductor.setLicencia(rs.getString("licencia"));
+                lista.add(conductor);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
 }
 

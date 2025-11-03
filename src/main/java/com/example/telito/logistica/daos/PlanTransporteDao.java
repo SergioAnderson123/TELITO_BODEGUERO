@@ -197,4 +197,93 @@ public class PlanTransporteDao {
         }
         return ultimoId;
     }
+
+    // === MÉTODO PARA OBTENER TODOS LOS PLANES AGRUPADOS POR VIAJE SIN PAGINACIÓN (para reportes) ===
+    public ArrayList<PlanTransporteBean> listarTodosPlanesAgrupadosPorViaje(String busqueda, String conductorId, String estado, String fechaDesde, String fechaHasta) {
+        ArrayList<PlanTransporteBean> listaPlanes = new ArrayList<>();
+        
+        // Consulta agrupada por numero_plan para obtener un registro por viaje
+        // Usamos COALESCE para fecha_salida: si existe fecha_creacion la usamos, sino usamos fecha_entrega - 1 día como estimación
+        String sql = """
+            SELECT
+                pt.numero_plan AS numeroViaje,
+                c.nombre_completo AS nombreConductor,
+                v.placa AS placaVehiculo,
+                DATE_FORMAT(COALESCE(MIN(pt.fecha_salida), DATE_SUB(MIN(pt.fecha_entrega), INTERVAL 1 DAY)), '%d/%m/%Y') AS fechaSalida,
+                DATE_FORMAT(MIN(pt.fecha_entrega), '%d/%m/%Y') AS fechaEntrega,
+                MAX(pt.estado) AS estado,
+                d.nombre AS nombreDestino,
+                COUNT(DISTINCT pt.lote_id) AS cantidadLotes
+            FROM planes_transporte pt
+            INNER JOIN lotes l ON pt.lote_id = l.id_lote
+            INNER JOIN productos p ON l.producto_id = p.id_producto
+            INNER JOIN conductores c ON pt.conductor_id = c.id_conductor
+            INNER JOIN vehiculos v ON pt.vehiculo_id = v.id_vehiculo
+            INNER JOIN distritos d ON pt.distrito_id = d.idDistrito
+            WHERE 1=1
+            """;
+        
+        List<Object> params = new ArrayList<>();
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (pt.numero_plan LIKE ? OR v.placa LIKE ? OR c.nombre_completo LIKE ?)";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+        
+        if (conductorId != null && !conductorId.trim().isEmpty()) {
+            sql += " AND pt.conductor_id = ?";
+            params.add(Integer.parseInt(conductorId));
+        }
+        
+        if (estado != null && !estado.trim().isEmpty()) {
+            sql += " AND pt.estado = ?";
+            params.add(estado.trim());
+        }
+        
+        if (fechaDesde != null && !fechaDesde.trim().isEmpty()) {
+            sql += " AND pt.fecha_entrega >= ?";
+            params.add(fechaDesde.trim());
+        }
+        
+        if (fechaHasta != null && !fechaHasta.trim().isEmpty()) {
+            sql += " AND pt.fecha_entrega <= ?";
+            params.add(fechaHasta.trim());
+        }
+        
+        sql += " GROUP BY pt.numero_plan, c.nombre_completo, v.placa, d.nombre ORDER BY pt.numero_plan DESC";
+        
+        try (Connection conn = DatabaseConnection.getConnection(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    PlanTransporteBean plan = new PlanTransporteBean(
+                        rs.getString("numeroViaje"),
+                        null, // nombreProducto - no necesario en reporte agrupado
+                        null, // codigoLote - no necesario en reporte agrupado
+                        rs.getString("estado"),
+                        rs.getString("nombreConductor"),
+                        rs.getString("placaVehiculo"),
+                        rs.getString("fechaEntrega"),
+                        rs.getString("nombreDestino")
+                    );
+                    plan.setFechaSalida(rs.getString("fechaSalida"));
+                    plan.setCantidadLotes(rs.getInt("cantidadLotes"));
+                    listaPlanes.add(plan);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        
+        return listaPlanes;
+    }
 }

@@ -173,6 +173,11 @@ public class InventarioDao {
         return listaInventario;
     }
 
+    // === MÉTODO PARA OBTENER TODO EL INVENTARIO AGRUPADO SIN PAGINACIÓN (para reportes) ===
+    public ArrayList<InventarioBean> listarTodoInventarioAgrupado(String busqueda, String estadoFiltro) {
+        return obtenerInventarioAgrupado(busqueda, estadoFiltro, 1, Integer.MAX_VALUE);
+    }
+
     // === MÉTODO PARA CONTAR TOTAL DE REGISTROS CON FILTROS ===
     public int contarInventarioAgrupado(String busqueda, String estadoFiltro) {
         String sql = """

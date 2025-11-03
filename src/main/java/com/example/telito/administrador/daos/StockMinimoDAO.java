@@ -172,4 +172,47 @@ public class StockMinimoDAO {
         }
         return 5; // Valor por defecto
     }
+
+    /**
+     * Obtiene todas las configuraciones de stock mínimo sin filtros.
+     * Útil para exportar a Excel.
+     * 
+     * @return Lista completa de configuraciones de stock mínimo
+     */
+    public ArrayList<StockMinimoConfig> listarTodasConfiguraciones() {
+        ArrayList<StockMinimoConfig> lista = new ArrayList<>();
+        String sql = "SELECT smc.*, p.nombre as producto_nombre, p.codigo_sku as producto_codigo " +
+                "FROM stock_minimo_config smc " +
+                "JOIN productos p ON smc.producto_id = p.id_producto " +
+                "ORDER BY p.nombre";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                StockMinimoConfig config = new StockMinimoConfig();
+                config.setIdStockMinimo(rs.getInt("id_stock_minimo"));
+                config.setStockMinimoProducto(rs.getInt("stock_minimo_producto"));
+                config.setStockCriticoProducto(rs.getInt("stock_critico_producto"));
+                config.setStockMinimoLote(rs.getInt("stock_minimo_lote"));
+                config.setStockCriticoLote(rs.getInt("stock_critico_lote"));
+                config.setActivo(rs.getBoolean("activo"));
+                config.setFechaCreacion(rs.getTimestamp("fecha_creacion"));
+                config.setFechaActualizacion(rs.getTimestamp("fecha_actualizacion"));
+
+                // Crear objeto producto básico
+                Producto producto = new Producto();
+                producto.setIdProducto(rs.getInt("producto_id"));
+                producto.setNombre(rs.getString("producto_nombre"));
+                producto.setCodigoSku(rs.getString("producto_codigo"));
+                config.setProducto(producto);
+
+                lista.add(config);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
 }

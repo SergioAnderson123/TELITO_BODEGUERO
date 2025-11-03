@@ -6,20 +6,6 @@
     <jsp:include page="/administrador/layouts/head.jsp">
         <jsp:param name="pageTitle" value="Crear Usuario"/>
     </jsp:include>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="<%= request.getContextPath() %>/administrador/assets/css/style.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <title>Crear Usuario – Telito Bodeguero</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta charset="UTF-8">
-    <style>
-        .form-label { font-weight: 700; }
-        .form-control, .form-select { font-weight: 600; }
-        .form-control::placeholder { font-weight: 600; }
-        .form-select option { font-weight: 600; }
-        .btn { font-weight: 700; }
-        .page-header .pageheader-title { font-weight: 800; }
-    </style>
 </head>
 <body>
 <div class="dashboard-main-wrapper">
@@ -30,13 +16,9 @@
 
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
-            <div class="row">
-                <div class="col-12">
-                    <div class="page-header pt-3">
-                        <h2 class="pageheader-title"><i class="fas fa-user-plus me-2"></i>Crear Nuevo Usuario</h2>
-                        <p class="pageheader-text">Complete los datos para registrar un nuevo usuario en el sistema.</p>
-                    </div>
-                </div>
+            <div class="page-header mb-4">
+                <h2 class="pageheader-title"><i class="fas fa-user-plus me-2"></i>Crear Nuevo Usuario</h2>
+                <p class="pageheader-text">Complete los datos para registrar un nuevo usuario en el sistema.</p>
             </div>
 
             <div class="row">
@@ -120,6 +102,6 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

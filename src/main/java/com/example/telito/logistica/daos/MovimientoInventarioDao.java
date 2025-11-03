@@ -22,6 +22,7 @@ public class MovimientoInventarioDao {
                 DATE_FORMAT(mi.fecha, '%d/%m/%Y') as fechaFormateada,
                 p.nombre AS nombreProducto,
                 mi.tipo,
+                mi.cantidad,
                 COALESCE(ubi.nombre, 'N/A') AS destino,
                 l.codigo_lote AS codigoLote,
                 CONCAT(u.nombres, ' ', u.apellidos) AS responsable,
@@ -85,6 +86,7 @@ public class MovimientoInventarioDao {
                             rs.getString("fechaFormateada"),
                             rs.getString("nombreProducto"),
                             rs.getString("tipo"),
+                            rs.getInt("cantidad"),
                             rs.getString("destino"),
                             rs.getString("codigoLote"),
                             rs.getString("responsable"),
@@ -162,5 +164,10 @@ public class MovimientoInventarioDao {
     // === MÉTODO PARA OBTENER TODO SIN FILTROS (para mantener compatibilidad) ===
     public ArrayList<MovimientoInventarioBean> obtenerMovimientos() {
         return obtenerMovimientos(null, null, null);
+    }
+
+    // === MÉTODO PARA OBTENER TODOS LOS MOVIMIENTOS SIN PAGINACIÓN (para reportes) ===
+    public ArrayList<MovimientoInventarioBean> listarTodosMovimientos(String busqueda, String tipo, String periodo) {
+        return obtenerMovimientos(busqueda, tipo, periodo, 1, Integer.MAX_VALUE);
     }
 }

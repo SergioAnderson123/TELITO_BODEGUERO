@@ -23,10 +23,30 @@
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
             <div class="container-fluid px-4">
-                <div class="page-header mb-4">
-                    <h2 class="pageheader-title"><i class="fas fa-boxes-stacked me-2"></i>Inventario General</h2>
-                    <p class="pageheader-text">Vista de solo lectura consolidada de Logística, Almacén y Productores.</p>
+                <div class="page-header mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="pageheader-title"><i class="fas fa-boxes-stacked me-2"></i>Inventario General</h2>
+                        <p class="pageheader-text">Vista de solo lectura consolidada de Logística, Almacén y Productores.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="${pageContext.request.contextPath}/administrador/InventarioGeneralReporteServlet?action=exportar" class="btn btn-success">
+                            <i class="fas fa-file-excel me-2"></i>Exportar a Excel
+                        </a>
+                        <a href="${pageContext.request.contextPath}/administrador/InventarioGeneralReporteServlet?action=formEnviar" class="btn btn-info text-white">
+                            <i class="fas fa-envelope me-2"></i>Enviar por Correo
+                        </a>
+                    </div>
                 </div>
+
+                <!-- Mensajes de alerta -->
+                <c:if test="${not empty sessionScope.mensaje}">
+                    <div class="alert alert-${sessionScope.tipoMensaje} alert-dismissible fade show" role="alert">
+                        ${sessionScope.mensaje}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <c:remove var="mensaje" scope="session"/>
+                    <c:remove var="tipoMensaje" scope="session"/>
+                </c:if>
 
                 <!-- Logística -->
                 <div class="card">

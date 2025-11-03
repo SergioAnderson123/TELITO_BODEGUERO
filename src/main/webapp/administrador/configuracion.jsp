@@ -111,38 +111,6 @@
                         </a>
                     </div>
                 </div>
-
-                <div class="col-lg-4 col-md-6">
-                    <div class="config-card email-card">
-                        <a href="<%= request.getContextPath() %>/administrador/enviar-correo.jsp" class="text-decoration-none">
-                            <div class="config-card-header">
-                                <div class="config-icon email-icon">
-                                    <i class="fas fa-envelope"></i>
-                                </div>
-                                <div class="config-badge email-badge">
-                                    <i class="fas fa-paper-plane"></i>
-                                </div>
-                            </div>
-                            <div class="config-card-body">
-                                <h4 class="config-title">Prueba de Correos</h4>
-                                <p class="config-description">Prueba el envío de correos electrónicos del sistema</p>
-                                <div class="config-stats">
-                                    <div class="stat-item">
-                                        <span class="stat-number">📧</span>
-                                        <span class="stat-label">Correos</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <span class="stat-number">✓</span>
-                                        <span class="stat-label">Listo</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="config-card-footer">
-                                <span class="config-action">Probar <i class="fas fa-arrow-right"></i></span>
-                            </div>
-                        </a>
-                    </div>
-                </div>
             </div>
         </div>
         <jsp:include page="/administrador/layouts/footer.jsp" />
@@ -277,10 +245,6 @@
 
     .template-card .config-card-header {
         background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    }
-
-    .email-card .config-card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
 
     /* Responsive */

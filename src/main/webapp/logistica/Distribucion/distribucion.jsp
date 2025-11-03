@@ -2,6 +2,7 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.example.telito.logistica.beans.PlanTransporteBean" %>
 <%@ page import="com.example.telito.logistica.beans.ConductorBean" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!doctype html>
 <html lang="es">
 <head>
@@ -19,11 +20,57 @@
         <div class="dashboard-content">
             <div class="row">
                 <div class="col-12">
-                    <div class="page-header">
-                        <h2><i class="fas fa-truck me-2"></i>Planes de Transporte</h2>
+                    <div class="page-header mb-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2><i class="fas fa-truck me-2"></i>Planes de Transporte</h2>
+                            <p class="text-muted mb-0">Seguimiento de entregas y análisis de rutas.</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <%
+                                String busquedaParam = request.getParameter("busqueda");
+                                String conductorParam = request.getParameter("conductor");
+                                String estadoParam = request.getParameter("estado");
+                                String fechaDesdeParam = request.getParameter("fecha_desde");
+                                String fechaHastaParam = request.getParameter("fecha_hasta");
+                                StringBuilder urlParams = new StringBuilder();
+                                if (busquedaParam != null && !busquedaParam.trim().isEmpty()) {
+                                    urlParams.append("&busqueda=").append(java.net.URLEncoder.encode(busquedaParam, "UTF-8"));
+                                }
+                                if (conductorParam != null && !conductorParam.trim().isEmpty()) {
+                                    urlParams.append("&conductor=").append(java.net.URLEncoder.encode(conductorParam, "UTF-8"));
+                                }
+                                if (estadoParam != null && !estadoParam.trim().isEmpty()) {
+                                    urlParams.append("&estado=").append(java.net.URLEncoder.encode(estadoParam, "UTF-8"));
+                                }
+                                if (fechaDesdeParam != null && !fechaDesdeParam.trim().isEmpty()) {
+                                    urlParams.append("&fecha_desde=").append(java.net.URLEncoder.encode(fechaDesdeParam, "UTF-8"));
+                                }
+                                if (fechaHastaParam != null && !fechaHastaParam.trim().isEmpty()) {
+                                    urlParams.append("&fecha_hasta=").append(java.net.URLEncoder.encode(fechaHastaParam, "UTF-8"));
+                                }
+                                String urlBase = request.getContextPath() + "/logistica/DistribucionTransporteReporteServlet?action=exportar" + urlParams.toString();
+                                String urlEnviar = request.getContextPath() + "/logistica/DistribucionTransporteReporteServlet?action=formEnviar" + urlParams.toString();
+                            %>
+                            <a href="<%= urlBase %>" class="btn btn-sm btn-success">
+                                <i class="fas fa-file-excel me-2"></i>Exportar a Excel
+                            </a>
+                            <a href="<%= urlEnviar %>" class="btn btn-sm btn-info text-white">
+                                <i class="fas fa-envelope me-2"></i>Enviar por Correo
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Mensajes de alerta -->
+            <c:if test="${not empty sessionScope.mensaje}">
+                <div class="alert alert-${sessionScope.tipoMensaje} alert-dismissible fade show" role="alert">
+                    ${sessionScope.mensaje}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <c:remove var="mensaje" scope="session"/>
+                <c:remove var="tipoMensaje" scope="session"/>
+            </c:if>
 
             <div class="card mb-4">
                 <div class="card-body">

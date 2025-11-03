@@ -9,7 +9,9 @@ public class PlanTransporteBean {
     private String nombreConductor;
     private String placaVehiculo;
     private String fechaEntrega; // Usamos String para la fecha ya formateada
+    private String fechaSalida; // Fecha de salida para reportes
     private String nombreDestino;
+    private int cantidadLotes; // Cantidad de lotes por viaje
 
     // Constructor vacío
     public PlanTransporteBean() {
@@ -90,5 +92,21 @@ public class PlanTransporteBean {
 
     public void setNombreDestino(String nombreDestino) {
         this.nombreDestino = nombreDestino;
+    }
+
+    public String getFechaSalida() {
+        return fechaSalida;
+    }
+
+    public void setFechaSalida(String fechaSalida) {
+        this.fechaSalida = fechaSalida;
+    }
+
+    public int getCantidadLotes() {
+        return cantidadLotes;
+    }
+
+    public void setCantidadLotes(int cantidadLotes) {
+        this.cantidadLotes = cantidadLotes;
     }
 }

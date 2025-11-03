@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.example.telito.logistica.beans.InventarioBean" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <%@ page import="com.example.telito.administrador.beans.Usuario" %>
 <%
@@ -29,9 +30,45 @@
         <div class="dashboard-content">
             <div class="row">
                 <div class="col-12">
-                    <div class="page-header"><h2><i class="fas fa-warehouse me-2"></i>Gestion de Inventario</h2></div>
+                    <div class="page-header mb-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2><i class="fas fa-warehouse me-2"></i>Gestion de Inventario</h2>
+                            <p class="text-muted mb-0">Administra el inventario agrupado por producto con información de stock y precios.</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <%
+                                String busquedaParam = request.getParameter("busqueda");
+                                String estadoParam = request.getParameter("estado");
+                                StringBuilder urlParams = new StringBuilder();
+                                if (busquedaParam != null && !busquedaParam.trim().isEmpty()) {
+                                    urlParams.append("&busqueda=").append(java.net.URLEncoder.encode(busquedaParam, "UTF-8"));
+                                }
+                                if (estadoParam != null && !estadoParam.trim().isEmpty()) {
+                                    urlParams.append("&estado=").append(java.net.URLEncoder.encode(estadoParam, "UTF-8"));
+                                }
+                                String urlBase = request.getContextPath() + "/logistica/InventarioLogisticaReporteServlet?action=exportar" + urlParams.toString();
+                                String urlEnviar = request.getContextPath() + "/logistica/InventarioLogisticaReporteServlet?action=formEnviar" + urlParams.toString();
+                            %>
+                            <a href="<%= urlBase %>" class="btn btn-sm btn-success">
+                                <i class="fas fa-file-excel me-2"></i>Exportar a Excel
+                            </a>
+                            <a href="<%= urlEnviar %>" class="btn btn-sm btn-info text-white">
+                                <i class="fas fa-envelope me-2"></i>Enviar por Correo
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Mensajes de alerta -->
+            <c:if test="${not empty sessionScope.mensaje}">
+                <div class="alert alert-${sessionScope.tipoMensaje} alert-dismissible fade show" role="alert">
+                    ${sessionScope.mensaje}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <c:remove var="mensaje" scope="session"/>
+                <c:remove var="tipoMensaje" scope="session"/>
+            </c:if>
 
             <div class="card mb-4">
                 <div class="card-body">

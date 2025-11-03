@@ -49,7 +49,15 @@
                     <option value="50" <%= (request.getAttribute("size")!=null && (Integer)request.getAttribute("size")==50) ? "selected" : "" %>>50</option>
                 </select>
             </form>
-            <a href="<%= request.getContextPath() %>/AlertaServlet?action=formCrear" class="btn btn-primary"><i class="fas fa-plus"></i> Crear Nueva Regla</a>
+            <a href="<%= request.getContextPath() %>/AlertaReporteServlet?action=exportar" class="btn btn-success">
+                <i class="fas fa-file-excel me-2"></i>Exportar a Excel
+            </a>
+            <a href="<%= request.getContextPath() %>/AlertaReporteServlet?action=formEnviar" class="btn btn-info text-white">
+                <i class="fas fa-envelope me-2"></i>Enviar por Correo
+            </a>
+            <a href="<%= request.getContextPath() %>/AlertaServlet?action=formCrear" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Crear Nueva Regla
+            </a>
         </div>
     </div>
 
