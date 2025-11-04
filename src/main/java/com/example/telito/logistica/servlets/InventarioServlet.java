@@ -52,6 +52,8 @@ public class InventarioServlet extends HttpServlet {
         request.setAttribute("size", size);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalRows", totalRows);
+        request.setAttribute("baseUrl", request.getContextPath() + "/InventarioServlet");
+        request.setAttribute("itemName", "productos");
 
         // Forward a la JSP
         String vista = "/logistica/Inventario/inventario.jsp";

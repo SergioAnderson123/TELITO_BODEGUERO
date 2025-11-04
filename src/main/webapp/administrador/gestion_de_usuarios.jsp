@@ -73,7 +73,7 @@
             <div class="table-card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-semibold">Lista de Usuarios</h5>
+                        <h5 class="mb-0 fw-semibold">Tabla de Usuarios</h5>
                         <div class="d-flex gap-2">
                             <%
                                 // Construir URL de parámetros para mantener filtros en la exportación
@@ -161,6 +161,13 @@
                             </tr>
                             </thead>
                             <tbody>
+                            <% 
+                                Integer currentPageObj = (Integer) request.getAttribute("currentPage");
+                                Integer sizeObj = (Integer) request.getAttribute("size");
+                                int currentPageInt = (currentPageObj != null) ? currentPageObj : 1;
+                                int sizeInt = (sizeObj != null) ? sizeObj : 10;
+                                int contador = (currentPageInt - 1) * sizeInt + 1;
+                            %>
                             <% if (listaUsuarios != null && !listaUsuarios.isEmpty()) { %>
                             <% for (Usuario usuario : listaUsuarios) {
                                 String roleName = usuario.getRol().getNombre();
@@ -181,7 +188,7 @@
                                 }
                             %>
                             <tr>
-                                <td><%= usuario.getIdUsuario() %></td>
+                                <td><%= contador++ %></td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <img src="https://ui-avatars.com/api/?name=<%= usuario.getNombres() %>+<%= usuario.getApellidos() %>&background=667eea&color=fff" alt="Avatar" class="rounded-circle me-3" width="40" height="40">
@@ -209,37 +216,9 @@
                             <% } %>
                             </tbody>
                         </table>
-                        <%-- Paginación --%>
-                        <%
-                            Integer currentPage = (Integer) request.getAttribute("currentPage");
-                            Integer totalPages = (Integer) request.getAttribute("totalPages");
-                            Integer size = (Integer) request.getAttribute("size");
-                            if (currentPage == null) currentPage = 1;
-                            if (totalPages == null) totalPages = 1;
-                            if (size == null) size = 10;
-                            String base = request.getContextPath() + "/UsuarioServlet?action=listar";
-                            if (busqueda != null && !busqueda.isEmpty()) base += "&busqueda=" + busqueda;
-                            if (rolFiltro != null && !rolFiltro.isEmpty()) base += "&rol=" + rolFiltro;
-                            if (estadoFiltro != null && !estadoFiltro.isEmpty()) base += "&estado=" + estadoFiltro;
-                            if (currentSortBy != null && !currentSortBy.isEmpty()) base += "&sortBy=" + currentSortBy;
-                            if (currentSortOrder != null && !currentSortOrder.isEmpty()) base += "&sortOrder=" + currentSortOrder;
-                        %>
-                        <nav aria-label="Paginación de usuarios" class="d-flex justify-content-between align-items-center mt-3">
-                            <div class="text-muted small">
-                                Página <%= currentPage %> de <%= totalPages %>
-                            </div>
-                            <ul class="pagination mb-0">
-                                <li class="page-item <%= currentPage <= 1 ? "disabled" : "" %>">
-                                    <a class="page-link" href="<%= base %>&page=<%= currentPage - 1 %>&size=<%= size %>" tabindex="-1">Anterior</a>
-                                </li>
-                                <% for (int p = 1; p <= totalPages; p++) { %>
-                                <li class="page-item <%= p == currentPage ? "active" : "" %>"><a class="page-link" href="<%= base %>&page=<%= p %>&size=<%= size %>"><%= p %></a></li>
-                                <% } %>
-                                <li class="page-item <%= currentPage >= totalPages ? "disabled" : "" %>">
-                                    <a class="page-link" href="<%= base %>&page=<%= currentPage + 1 %>&size=<%= size %>">Siguiente</a>
-                                </li>
-                            </ul>
-                        </nav>
+                        
+                        <%-- Incluir componente de paginación --%>
+                        <jsp:include page="/WEB-INF/includes/pagination.jsp" />
                     </div>
                 </div>
             </div>

@@ -20,8 +20,12 @@
         listaOrdenes = new ArrayList<>();
     }
     
-    // Calcular estadísticas desde la lista real
-    int totalOrdenes = listaOrdenes.size();
+    // Obtener total de órdenes del servlet (paginación)
+    Integer totalOrdenesAttr = (Integer) request.getAttribute("totalRows");
+    int totalOrdenes = (totalOrdenesAttr != null) ? totalOrdenesAttr : listaOrdenes.size();
+    
+    // Calcular estadísticas desde la lista paginada (solo para mostrar en la página actual)
+    // Nota: Las estadísticas completas deberían calcularse en el servlet si se necesitan
     int ordenesPendientes = 0;
     int ordenesCompletadas = 0;
     
@@ -127,9 +131,21 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
             margin-bottom: 40px;
+            border: none;
         }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .card-header h2 { margin: 0; color: var(--turquoise-dark); }
+        .card-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 20px 30px;
+            margin: -30px -30px 25px -30px;
+        }
+        .card-header h2, .card-header h5 { margin: 0; color: white; }
+        .card-body { padding: 0; }
 
         /* Formularios y Botones */
         form label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark); }
@@ -188,6 +204,24 @@
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 600;
+        }
+
+        /* Paginación */
+        .pagination .page-link {
+            color: var(--turquoise-dark);
+            border-color: var(--border-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 0 2px;
+        }
+        .pagination .page-link:hover {
+            background-color: var(--seafoam-light);
+            border-color: var(--seafoam);
+        }
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
+            border-color: var(--turquoise-dark);
+            color: white;
         }
 
         /* =====================
@@ -370,7 +404,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% int i = 1; %>
+                        <% 
+                            Integer currentPageObj = (Integer) request.getAttribute("currentPage");
+                            Integer sizeObj = (Integer) request.getAttribute("size");
+                            int currentPage = (currentPageObj != null) ? currentPageObj : 1;
+                            int size = (sizeObj != null) ? sizeObj : 10;
+                            int i = (currentPage - 1) * size + 1;
+                        %>
                         <% for (Object orden : listaOrdenes) { %>
                             <% Object[] ordenData = (Object[]) orden; %>
                             <tr data-codigo="<%= ordenData[1] %>" 
@@ -424,6 +464,9 @@
                         <% } %>
                     </tbody>
                 </table>
+                
+                <%-- Incluir componente de paginación --%>
+                <jsp:include page="/WEB-INF/includes/pagination.jsp" />
             </div>
         </div>
     </div>

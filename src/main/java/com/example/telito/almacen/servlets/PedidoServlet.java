@@ -37,8 +37,10 @@ public class PedidoServlet extends HttpServlet {
                 int registrosPorPagina = 10;
                 String pageStr = request.getParameter("page");
                 int paginaActual = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
+                if (paginaActual < 1) paginaActual = 1;
                 int totalRegistros = pedidoDao.contarPedidos();
                 int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
+                if (totalPaginas == 0) totalPaginas = 1;
                 int offset = (paginaActual - 1) * registrosPorPagina;
                 ArrayList<Pedido> listaPaginada = pedidoDao.listarPedidosPaginados(offset, registrosPorPagina);
 
@@ -48,8 +50,12 @@ public class PedidoServlet extends HttpServlet {
 
                 request.setAttribute("listaPedidos", listaPaginada);
                 request.setAttribute("listaPlanes", listaPlanes);
-                request.setAttribute("paginaActual", paginaActual);
-                request.setAttribute("totalPaginas", totalPaginas);
+                request.setAttribute("currentPage", paginaActual);
+                request.setAttribute("size", registrosPorPagina);
+                request.setAttribute("totalPages", totalPaginas);
+                request.setAttribute("totalRows", totalRegistros);
+                request.setAttribute("baseUrl", request.getContextPath() + "/almacen/PedidoServlet");
+                request.setAttribute("itemName", "pedidos");
 
                 view = request.getRequestDispatcher("/almacen/pedidos/listaPedidos.jsp");
                 view.forward(request, response);

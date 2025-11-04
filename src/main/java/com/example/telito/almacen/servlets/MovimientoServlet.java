@@ -41,9 +41,10 @@ public class MovimientoServlet extends HttpServlet {
 
         switch (action) {
             case "listar":
-                int registrosPorPagina = 15;
+                int registrosPorPagina = 10;
                 String pageStr = request.getParameter("page");
                 int paginaActual = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
+                if (paginaActual < 1) paginaActual = 1;
 
                 String filtro = request.getParameter("filtro");
                 int totalRegistros;
@@ -61,11 +62,16 @@ public class MovimientoServlet extends HttpServlet {
                 }
 
                 int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
+                if (totalPaginas == 0) totalPaginas = 1;
 
                 request.setAttribute("listaMovimientos", listaMovimientos);
-                request.setAttribute("paginaActual", paginaActual);
-                request.setAttribute("totalPaginas", totalPaginas);
                 request.setAttribute("filtroActual", filtro);
+                request.setAttribute("currentPage", paginaActual);
+                request.setAttribute("size", registrosPorPagina);
+                request.setAttribute("totalPages", totalPaginas);
+                request.setAttribute("totalRows", totalRegistros);
+                request.setAttribute("baseUrl", request.getContextPath() + "/almacen/MovimientoServlet");
+                request.setAttribute("itemName", "movimientos");
 
                 RequestDispatcher view = request.getRequestDispatcher("/almacen/movimientos/historialMovimientos.jsp");
                 view.forward(request, response);

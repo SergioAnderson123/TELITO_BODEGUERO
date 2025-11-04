@@ -39,10 +39,15 @@ public class LoteServlet extends HttpServlet {
 
                 int registrosPorPagina = 10;
                 int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
+                if (totalPaginas == 0) totalPaginas = 1;
 
                 request.setAttribute("listaLotes", listaLotes);
-                request.setAttribute("paginaActual", page);
-                request.setAttribute("totalPaginas", totalPaginas);
+                request.setAttribute("currentPage", page);
+                request.setAttribute("size", registrosPorPagina);
+                request.setAttribute("totalPages", totalPaginas);
+                request.setAttribute("totalRows", totalRegistros);
+                request.setAttribute("baseUrl", request.getContextPath() + "/almacen/LoteServlet");
+                request.setAttribute("itemName", "lotes");
 
                 RequestDispatcher view = request.getRequestDispatcher("/almacen/lotes/gestionarStock.jsp");
                 view.forward(request, response);

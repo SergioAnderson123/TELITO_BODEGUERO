@@ -46,6 +46,10 @@ public class ConductorServlet extends HttpServlet {
                 request.setAttribute("size", size);
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("totalRows", totalRows);
+                request.setAttribute("baseUrl", request.getContextPath() + "/administrador/ConductorServlet");
+                request.setAttribute("param1Name", "action");
+                request.setAttribute("param1Value", "listar");
+                request.setAttribute("itemName", "conductores");
 
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/administrador/gestion-conductores.jsp");
                 dispatcher.forward(request, response);

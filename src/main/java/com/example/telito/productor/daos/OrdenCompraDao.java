@@ -8,6 +8,111 @@ import java.util.List;
 public class OrdenCompraDao {
 
     /**
+     * Obtener todas las órdenes de compra dirigidas a un productor específico con paginación
+     * @param productorId ID del usuario productor
+     * @param offset Número de registros a saltar
+     * @param limit Número máximo de registros a retornar
+     * @return Lista de objetos con datos de la orden
+     */
+    public List<Object[]> listarOrdenesPorProductor(int productorId, int offset, int limit) {
+        List<Object[]> ordenes = new ArrayList<>();
+        
+        // Primero actualizamos solo las órdenes Pendientes SIN lote asignado a Recibido
+        String updateSql = "UPDATE ordenes_compra oc " +
+                          "INNER JOIN productos p ON oc.producto_id = p.id_producto " +
+                          "SET oc.estado = 'Recibido' " +
+                          "WHERE p.productor_id = ? AND oc.estado = 'Pendiente' AND oc.lote_id IS NULL";
+        
+        String selectSql = "SELECT oc.id_orden_compra, " +
+                          "IFNULL(oc.numero_Orden, CONCAT('OC', LPAD(oc.id_orden_compra, 3, '0'))) AS numero_orden, " +
+                          "p.nombre AS producto_nombre, " +
+                          "oc.cantidad, " +
+                          "oc.monto_total, " +
+                          "CONCAT(u.nombres, ' ', u.apellidos) AS usuario_logistica, " +
+                          "oc.estado, " +
+                          "oc.lote_id " +
+                          "FROM ordenes_compra oc " +
+                          "INNER JOIN productos p ON oc.producto_id = p.id_producto " +
+                          "INNER JOIN usuarios u ON oc.usuario_id = u.id_usuario " +
+                          "WHERE p.productor_id = ? " +
+                          "ORDER BY oc.id_orden_compra DESC " +
+                          "LIMIT ? OFFSET ?";
+
+        System.out.println("=== DEBUG DAO PRODUCTOR - Listar Órdenes ===");
+        System.out.println("Productor ID: " + productorId);
+        System.out.println("Offset: " + offset + ", Limit: " + limit);
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // Actualizar órdenes pendientes a recibido
+            try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                updateStmt.setInt(1, productorId);
+                int updated = updateStmt.executeUpdate();
+                if (updated > 0) {
+                    System.out.println("✓ Órdenes actualizadas de Pendiente a Recibido: " + updated);
+                }
+            }
+            
+            // Luego obtener todas las órdenes
+            try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
+                selectStmt.setInt(1, productorId);
+                selectStmt.setInt(2, limit);
+                selectStmt.setInt(3, offset);
+                
+                try (ResultSet rs = selectStmt.executeQuery()) {
+                    int count = 0;
+                    while (rs.next()) {
+                        Object[] orden = new Object[8];
+                        orden[0] = rs.getInt("id_orden_compra");
+                        orden[1] = rs.getString("numero_orden");
+                        orden[2] = rs.getString("producto_nombre");
+                        orden[3] = rs.getInt("cantidad");
+                        orden[4] = rs.getDouble("monto_total");
+                        orden[5] = rs.getString("usuario_logistica"); // Usuario que creó la orden
+                        orden[6] = rs.getString("estado");
+                        orden[7] = rs.getObject("lote_id"); // puede ser null
+                        ordenes.add(orden);
+                        count++;
+                    }
+                    System.out.println("✓ Órdenes encontradas: " + count);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR: Error al listar órdenes de compra por productor:");
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            System.err.println("Message: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return ordenes;
+    }
+
+    /**
+     * Contar el total de órdenes de compra de un productor
+     * @param productorId ID del usuario productor
+     * @return Total de órdenes
+     */
+    public int contarOrdenesPorProductor(int productorId) {
+        String sql = "SELECT COUNT(*) " +
+                     "FROM ordenes_compra oc " +
+                     "INNER JOIN productos p ON oc.producto_id = p.id_producto " +
+                     "WHERE p.productor_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, productorId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Error al contar órdenes de compra por productor: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
      * Obtener todas las órdenes de compra dirigidas a un productor específico
      * @param productorId ID del usuario productor
      * @return Lista de objetos con datos de la orden

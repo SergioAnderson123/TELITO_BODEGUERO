@@ -65,7 +65,7 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h5>Lista de Vehículos</h5>
+                                <h5>Tabla de Vehículos</h5>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -81,9 +81,16 @@
                                         </tr>
                                         </thead>
                                         <tbody>
+                                        <%
+                                            Integer currentPageObj = (Integer) request.getAttribute("currentPage");
+                                            Integer sizeObj = (Integer) request.getAttribute("size");
+                                            int currentPageInt = (currentPageObj != null) ? currentPageObj : 1;
+                                            int sizeInt = (sizeObj != null) ? sizeObj : 10;
+                                            int contador = (currentPageInt - 1) * sizeInt + 1;
+                                        %>
                                         <c:forEach var="vehiculo" items="${listaVehiculos}">
                                             <tr>
-                                                <td>${vehiculo.idVehiculo}</td>
+                                                <td><%= contador++ %></td>
                                                 <td><span class="badge bg-primary">${vehiculo.placa}</span></td>
                                                 <td>${vehiculo.marca}</td>
                                                 <td>${vehiculo.modelo}</td>
@@ -105,30 +112,9 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <%-- Paginación --%>
-                                <%
-                                    Integer currentPage = (Integer) request.getAttribute("currentPage");
-                                    Integer totalPages = (Integer) request.getAttribute("totalPages");
-                                    Integer size = (Integer) request.getAttribute("size");
-                                    if (currentPage == null) currentPage = 1;
-                                    if (totalPages == null) totalPages = 1;
-                                    if (size == null) size = 10;
-                                    String base = request.getContextPath() + "/administrador/VehiculoServlet?action=listar";
-                                %>
-                                <nav aria-label="Paginación de vehículos" class="d-flex justify-content-between align-items-center mt-3">
-                                    <div class="text-muted small">Página <%= currentPage %> de <%= totalPages %></div>
-                                    <ul class="pagination mb-0">
-                                        <li class="page-item <%= currentPage <= 1 ? "disabled" : "" %>">
-                                            <a class="page-link" href="<%= base %>&page=<%= currentPage - 1 %>&size=<%= size %>">Anterior</a>
-                                        </li>
-                                        <% for (int p = 1; p <= totalPages; p++) { %>
-                                        <li class="page-item <%= p == currentPage ? "active" : "" %>"><a class="page-link" href="<%= base %>&page=<%= p %>&size=<%= size %>"><%= p %></a></li>
-                                        <% } %>
-                                        <li class="page-item <%= currentPage >= totalPages ? "disabled" : "" %>">
-                                            <a class="page-link" href="<%= base %>&page=<%= currentPage + 1 %>&size=<%= size %>">Siguiente</a>
-                                        </li>
-                                    </ul>
-                                </nav>
+                                
+                                <%-- Incluir componente de paginación --%>
+                                <jsp:include page="/WEB-INF/includes/pagination.jsp" />
                             </div>
                         </div>
                     </div>

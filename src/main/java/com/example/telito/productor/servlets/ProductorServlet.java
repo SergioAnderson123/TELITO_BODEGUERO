@@ -56,8 +56,23 @@ public class ProductorServlet extends HttpServlet {
 
         switch (action) {
             case "listarProductos":
-                // Obtener la lista de productos del productor logueado
-                ArrayList<Producto> listaProductos = productoDao.listarProductosPorProductor(idProductor);
+                // Paginación
+                int pageProductos = 1;
+                int sizeProductos = 10;
+                try {
+                    String pageParamProductos = request.getParameter("page");
+                    if (pageParamProductos != null && !pageParamProductos.isEmpty()) {
+                        pageProductos = Integer.parseInt(pageParamProductos);
+                        if (pageProductos < 1) pageProductos = 1;
+                    }
+                } catch (NumberFormatException e) {
+                    pageProductos = 1;
+                }
+
+                int offsetProductos = (pageProductos - 1) * sizeProductos;
+                
+                // Obtener la lista de productos del productor logueado con paginación
+                ArrayList<Producto> listaProductos = productoDao.listarProductosPorProductor(idProductor, offsetProductos, sizeProductos);
 
                 // Obtener estadísticas del productor
                 int totalProductos = productoDao.contarTotalProductos(idProductor);
@@ -65,12 +80,26 @@ public class ProductorServlet extends HttpServlet {
                 int totalCategorias = productoDao.contarTotalCategorias(idProductor);
                 ArrayList<Categoria> todasLasCategorias = productoDao.listarTodasLasCategorias();
 
+                // Calcular paginación
+                int totalPagesProductos = (int) Math.ceil((double) totalProductos / sizeProductos);
+                if (totalPagesProductos == 0) totalPagesProductos = 1;
+
                 // Enviar datos a la vista
                 request.setAttribute("listaProductos", listaProductos);
                 request.setAttribute("totalProductos", totalProductos);
                 request.setAttribute("fueraDeStock", fueraDeStock);
                 request.setAttribute("totalCategorias", totalCategorias);
                 request.setAttribute("todasLasCategorias", todasLasCategorias);
+                
+                // Atributos de paginación
+                request.setAttribute("currentPage", pageProductos);
+                request.setAttribute("totalPages", totalPagesProductos);
+                request.setAttribute("totalRows", totalProductos);
+                request.setAttribute("size", sizeProductos);
+                request.setAttribute("baseUrl", request.getContextPath() + "/ProductorServlet");
+                request.setAttribute("param1Name", "action");
+                request.setAttribute("param1Value", "listarProductos");
+                request.setAttribute("itemName", "productos");
 
                 RequestDispatcher view = request.getRequestDispatcher("productor/misProductos.jsp");
                 view.forward(request, response);
@@ -97,11 +126,42 @@ public class ProductorServlet extends HttpServlet {
                 break;
 
             case "ordenesCompra":
-                // Cargar las órdenes de compra del productor logueado
+                // Paginación
+                int pageOrdenes = 1;
+                int sizeOrdenes = 10;
+                try {
+                    String pageParamOrdenes = request.getParameter("page");
+                    if (pageParamOrdenes != null && !pageParamOrdenes.isEmpty()) {
+                        pageOrdenes = Integer.parseInt(pageParamOrdenes);
+                        if (pageOrdenes < 1) pageOrdenes = 1;
+                    }
+                } catch (NumberFormatException e) {
+                    pageOrdenes = 1;
+                }
+
+                int offsetOrdenes = (pageOrdenes - 1) * sizeOrdenes;
+                
+                // Cargar las órdenes de compra del productor logueado con paginación
                 OrdenCompraDao ordenCompraDao = new OrdenCompraDao();
-                List<Object[]> listaOrdenes = ordenCompraDao.listarOrdenesPorProductor(idProductor);
+                List<Object[]> listaOrdenes = ordenCompraDao.listarOrdenesPorProductor(idProductor, offsetOrdenes, sizeOrdenes);
+                int totalOrdenes = ordenCompraDao.contarOrdenesPorProductor(idProductor);
+                
+                // Calcular paginación
+                int totalPagesOrdenes = (int) Math.ceil((double) totalOrdenes / sizeOrdenes);
+                if (totalPagesOrdenes == 0) totalPagesOrdenes = 1;
                 
                 request.setAttribute("listaOrdenes", listaOrdenes);
+                
+                // Atributos de paginación
+                request.setAttribute("currentPage", pageOrdenes);
+                request.setAttribute("totalPages", totalPagesOrdenes);
+                request.setAttribute("totalRows", totalOrdenes);
+                request.setAttribute("size", sizeOrdenes);
+                request.setAttribute("baseUrl", request.getContextPath() + "/ProductorServlet");
+                request.setAttribute("param1Name", "action");
+                request.setAttribute("param1Value", "ordenesCompra");
+                request.setAttribute("itemName", "órdenes");
+                
                 view = request.getRequestDispatcher("productor/ordenesDeCompra.jsp");
                 view.forward(request, response);
                 break;

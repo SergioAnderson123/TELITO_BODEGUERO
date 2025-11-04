@@ -46,6 +46,10 @@ public class VehiculoServlet extends HttpServlet {
                 request.setAttribute("size", size);
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("totalRows", totalRows);
+                request.setAttribute("baseUrl", request.getContextPath() + "/administrador/VehiculoServlet");
+                request.setAttribute("param1Name", "action");
+                request.setAttribute("param1Value", "listar");
+                request.setAttribute("itemName", "vehículos");
 
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/administrador/gestion-vehiculos.jsp");
                 dispatcher.forward(request, response);

@@ -33,8 +33,8 @@
                 <div class="row mt-4">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Pedidos Pendientes</h5>
+                            <div class="card-header">
+                                <h5>Pedidos Pendientes</h5>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -91,6 +91,9 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                
+                                <%-- Incluir componente de paginación --%>
+                                <jsp:include page="/WEB-INF/includes/pagination.jsp" />
                             </div>
                         </div>
                     </div>
@@ -100,8 +103,8 @@
                 <div class="row mt-4">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header bg-info text-white">
-                                <h5 class="mb-0"><i class="fas fa-truck-loading me-2"></i>Planes de Transporte</h5>
+                            <div class="card-header">
+                                <h5>Planes de Transporte</h5>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">

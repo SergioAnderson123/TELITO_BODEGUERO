@@ -51,7 +51,7 @@
                 <!-- Logística -->
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0"><i class="fas fa-truck me-2"></i>Logística</h5>
+                        <h5 class="card-title mb-0">Logística</h5>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -99,7 +99,7 @@
                 <!-- Almacén -->
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0"><i class="fas fa-warehouse me-2"></i>Almacén</h5>
+                        <h5 class="card-title mb-0">Almacén</h5>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -141,7 +141,7 @@
                 <!-- Productores -->
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0"><i class="fas fa-seedling me-2"></i>Productores</h5>
+                        <h5 class="card-title mb-0">Productores</h5>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">

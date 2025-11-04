@@ -190,11 +190,11 @@
                             <%-- Incluir componente de paginación --%>
                             <%
                                 request.setAttribute("param1Name", "busqueda");
-                                request.setAttribute("param1Value", request.getParameter("busqueda"));
+                                request.setAttribute("param1Value", request.getAttribute("busqueda"));
                                 request.setAttribute("param2Name", "conductor");
-                                request.setAttribute("param2Value", request.getParameter("conductor"));
+                                request.setAttribute("param2Value", request.getAttribute("conductorFiltro"));
                                 request.setAttribute("param3Name", "estado");
-                                request.setAttribute("param3Value", request.getParameter("estado"));
+                                request.setAttribute("param3Value", request.getAttribute("estadoFiltro"));
                             %>
                             <jsp:include page="/WEB-INF/includes/pagination.jsp" />
 

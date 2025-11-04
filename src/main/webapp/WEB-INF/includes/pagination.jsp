@@ -24,13 +24,19 @@
     String baseUrl = (String) request.getAttribute("baseUrl");
     String itemName = (String) request.getAttribute("itemName");
     
-    // Parámetros adicionales para filtros
+    // Parámetros adicionales para filtros (soporta hasta 6 parámetros)
     String param1Name = (String) request.getAttribute("param1Name");
     String param1Value = (String) request.getAttribute("param1Value");
     String param2Name = (String) request.getAttribute("param2Name");
     String param2Value = (String) request.getAttribute("param2Value");
     String param3Name = (String) request.getAttribute("param3Name");
     String param3Value = (String) request.getAttribute("param3Value");
+    String param4Name = (String) request.getAttribute("param4Name");
+    String param4Value = (String) request.getAttribute("param4Value");
+    String param5Name = (String) request.getAttribute("param5Name");
+    String param5Value = (String) request.getAttribute("param5Value");
+    String param6Name = (String) request.getAttribute("param6Name");
+    String param6Value = (String) request.getAttribute("param6Value");
     
     // Valores por defecto
     if (currentPage == null) currentPage = 1;
@@ -53,6 +59,15 @@
     }
     if (param3Name != null && param3Value != null && !param3Value.isEmpty()) {
         additionalParams.append("&").append(param3Name).append("=").append(java.net.URLEncoder.encode(param3Value, "UTF-8"));
+    }
+    if (param4Name != null && param4Value != null && !param4Value.isEmpty()) {
+        additionalParams.append("&").append(param4Name).append("=").append(java.net.URLEncoder.encode(param4Value, "UTF-8"));
+    }
+    if (param5Name != null && param5Value != null && !param5Value.isEmpty()) {
+        additionalParams.append("&").append(param5Name).append("=").append(java.net.URLEncoder.encode(param5Value, "UTF-8"));
+    }
+    if (param6Name != null && param6Value != null && !param6Value.isEmpty()) {
+        additionalParams.append("&").append(param6Name).append("=").append(java.net.URLEncoder.encode(param6Value, "UTF-8"));
     }
 %>
 

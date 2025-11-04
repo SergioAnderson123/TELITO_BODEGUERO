@@ -145,6 +145,22 @@ public class UsuarioServlet extends HttpServlet {
                 request.setAttribute("size", size);
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("totalRows", totalRows);
+                
+                // Atributos para componente de paginación reutilizable
+                request.setAttribute("baseUrl", request.getContextPath() + "/UsuarioServlet");
+                request.setAttribute("param1Name", "action");
+                request.setAttribute("param1Value", "listar");
+                request.setAttribute("param2Name", "busqueda");
+                request.setAttribute("param2Value", busqueda);
+                request.setAttribute("param3Name", "rol");
+                request.setAttribute("param3Value", rolId);
+                request.setAttribute("param4Name", "estado");
+                request.setAttribute("param4Value", estado);
+                request.setAttribute("param5Name", "sortBy");
+                request.setAttribute("param5Value", sortBy);
+                request.setAttribute("param6Name", "sortOrder");
+                request.setAttribute("param6Value", sortOrder);
+                request.setAttribute("itemName", "usuarios");
 
             logger.debug("Listando usuarios: página {}, total: {}", page, totalRows);
 

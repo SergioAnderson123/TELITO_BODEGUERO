@@ -92,19 +92,8 @@
                                 </tbody>
                             </table>
 
-                            <nav class="mt-4" aria-label="Page navigation">
-                                <ul class="pagination justify-content-center">
-                                    <li class="page-item <c:if test='${paginaActual == 1}'>disabled</c:if>">
-                                        <a class="page-link" href="EntradaServlet?page=${paginaActual - 1}">Anterior</a>
-                                    </li>
-                                    <li class="page-item active" aria-current="page">
-                                        <span class="page-link">Página ${paginaActual} de ${totalPaginas}</span>
-                                    </li>
-                                    <li class="page-item <c:if test='${paginaActual == totalPaginas}'>disabled</c:if>">
-                                        <a class="page-link" href="EntradaServlet?page=${paginaActual + 1}">Siguiente</a>
-                                    </li>
-                                </ul>
-                            </nav>
+                            <%-- Incluir componente de paginación --%>
+                            <jsp:include page="/WEB-INF/includes/pagination.jsp" />
 
                         </div>
                     </div>

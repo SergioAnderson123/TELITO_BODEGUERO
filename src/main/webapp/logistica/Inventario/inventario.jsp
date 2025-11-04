@@ -159,88 +159,14 @@
                                 </table>
                             </div>
 
-                            <%-- Paginación del lado del servidor --%>
+                            <%-- Incluir componente de paginación --%>
                             <%
-                                Integer currentPage = (Integer) request.getAttribute("currentPage");
-                                Integer totalPages = (Integer) request.getAttribute("totalPages");
-                                Integer totalRows = (Integer) request.getAttribute("totalRows");
-                                Integer size = (Integer) request.getAttribute("size");
-                                String busqueda = (String) request.getAttribute("busqueda");
-                                String estadoFiltro = (String) request.getAttribute("estadoFiltro");
-                                
-                                if (currentPage == null) currentPage = 1;
-                                if (totalPages == null) totalPages = 1;
-                                if (totalRows == null) totalRows = 0;
-                                if (size == null) size = 10;
-                                
-                                int startRow = (currentPage - 1) * size + 1;
-                                int endRow = Math.min(currentPage * size, totalRows);
+                                request.setAttribute("param1Name", "busqueda");
+                                request.setAttribute("param1Value", request.getAttribute("busqueda"));
+                                request.setAttribute("param2Name", "estado");
+                                request.setAttribute("param2Value", request.getAttribute("estadoFiltro"));
                             %>
-
-                            <% if (totalPages > 1 || totalRows > 0) { %>
-                            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
-                                <div class="pagination-info mb-2 mb-sm-0">
-                                    <span class="text-muted">
-                                        <% if (totalRows > 0) { %>
-                                            Mostrando <%= startRow %>-<%= endRow %> de <%= totalRows %> productos
-                                        <% } else { %>
-                                            No hay registros para mostrar
-                                        <% } %>
-                                    </span>
-                                </div>
-
-                                <% if (totalPages > 1) { %>
-                                <nav aria-label="Paginación de inventario">
-                                    <ul class="pagination pagination-sm mb-0">
-                                        <%-- Botón Anterior --%>
-                                        <li class="page-item <%= (currentPage <= 1) ? "disabled" : "" %>">
-                                            <a class="page-link" href="<%= request.getContextPath() %>/InventarioServlet?page=<%= currentPage - 1 %>&size=<%= size %><%= (busqueda != null ? "&busqueda=" + busqueda : "") %><%= (estadoFiltro != null ? "&estado=" + estadoFiltro : "") %>" tabindex="-1">
-                                                <i class="fas fa-chevron-left"></i>
-                                            </a>
-                                        </li>
-
-                                        <%-- Primera página --%>
-                                        <% if (currentPage > 3) { %>
-                                        <li class="page-item">
-                                            <a class="page-link" href="<%= request.getContextPath() %>/InventarioServlet?page=1&size=<%= size %><%= (busqueda != null ? "&busqueda=" + busqueda : "") %><%= (estadoFiltro != null ? "&estado=" + estadoFiltro : "") %>">1</a>
-                                        </li>
-                                        <% if (currentPage > 4) { %>
-                                        <li class="page-item disabled"><span class="page-link">...</span></li>
-                                        <% } %>
-                                        <% } %>
-
-                                        <%-- Páginas alrededor de la actual --%>
-                                        <%
-                                            int startPage = Math.max(1, currentPage - 2);
-                                            int endPage = Math.min(totalPages, currentPage + 2);
-                                            for (int i = startPage; i <= endPage; i++) {
-                                        %>
-                                        <li class="page-item <%= (i == currentPage) ? "active" : "" %>">
-                                            <a class="page-link" href="<%= request.getContextPath() %>/InventarioServlet?page=<%= i %>&size=<%= size %><%= (busqueda != null ? "&busqueda=" + busqueda : "") %><%= (estadoFiltro != null ? "&estado=" + estadoFiltro : "") %>"><%= i %></a>
-                                        </li>
-                                        <% } %>
-
-                                        <%-- Última página --%>
-                                        <% if (currentPage < totalPages - 2) { %>
-                                        <% if (currentPage < totalPages - 3) { %>
-                                        <li class="page-item disabled"><span class="page-link">...</span></li>
-                                        <% } %>
-                                        <li class="page-item">
-                                            <a class="page-link" href="<%= request.getContextPath() %>/InventarioServlet?page=<%= totalPages %>&size=<%= size %><%= (busqueda != null ? "&busqueda=" + busqueda : "") %><%= (estadoFiltro != null ? "&estado=" + estadoFiltro : "") %>"><%= totalPages %></a>
-                                        </li>
-                                        <% } %>
-
-                                        <%-- Botón Siguiente --%>
-                                        <li class="page-item <%= (currentPage >= totalPages) ? "disabled" : "" %>">
-                                            <a class="page-link" href="<%= request.getContextPath() %>/InventarioServlet?page=<%= currentPage + 1 %>&size=<%= size %><%= (busqueda != null ? "&busqueda=" + busqueda : "") %><%= (estadoFiltro != null ? "&estado=" + estadoFiltro : "") %>">
-                                                <i class="fas fa-chevron-right"></i>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                                <% } %>
-                            </div>
-                            <% } %>
+                            <jsp:include page="/WEB-INF/includes/pagination.jsp" />
                         </div>
                     </div>
                 </div>

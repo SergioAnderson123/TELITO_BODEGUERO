@@ -59,6 +59,11 @@ public class PlanTransporteServlet extends HttpServlet {
 
                 request.setAttribute("listaConductores", conductorDao.listarConductores());
                 request.setAttribute("listaPlanes", listaPlanes);
+                request.setAttribute("busqueda", busqueda);
+                request.setAttribute("conductorFiltro", conductorId);
+                request.setAttribute("estadoFiltro", estado);
+                request.setAttribute("fechaDesdeFiltro", fechaDesde);
+                request.setAttribute("fechaHastaFiltro", fechaHasta);
                 request.setAttribute("currentPage", page);
                 request.setAttribute("size", size);
                 request.setAttribute("totalPages", totalPages);

@@ -36,14 +36,20 @@ public class EntradaServlet extends HttpServlet {
                 int registrosPorPagina = 10;
                 String pageStr = request.getParameter("page");
                 int paginaActual = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
+                if (paginaActual < 1) paginaActual = 1;
                 int totalRegistros = ordenCompraDao.contarOrdenesPendientes();
                 int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
+                if (totalPaginas == 0) totalPaginas = 1;
                 int offset = (paginaActual - 1) * registrosPorPagina;
                 ArrayList<OrdenCompra> listaPaginada = ordenCompraDao.listarOrdenesPaginadas(offset, registrosPorPagina);
 
                 request.setAttribute("listaOrdenes", listaPaginada);
-                request.setAttribute("paginaActual", paginaActual);
-                request.setAttribute("totalPaginas", totalPaginas);
+                request.setAttribute("currentPage", paginaActual);
+                request.setAttribute("size", registrosPorPagina);
+                request.setAttribute("totalPages", totalPaginas);
+                request.setAttribute("totalRows", totalRegistros);
+                request.setAttribute("baseUrl", request.getContextPath() + "/almacen/EntradaServlet");
+                request.setAttribute("itemName", "órdenes");
 
                 view = request.getRequestDispatcher("/almacen/entradas/listaOrdenes.jsp");
                 view.forward(request, response);
