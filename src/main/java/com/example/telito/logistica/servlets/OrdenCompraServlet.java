@@ -15,6 +15,7 @@ import com.example.telito.logistica.daos.ProveedorDao;
 import com.example.telito.logistica.daos.ZonaDao;
 import com.example.telito.logistica.daos.DistritoDao;
 import com.example.telito.administrador.daos.UsuarioDAO;
+import com.example.telito.administrador.daos.AlertaDAO;
 import com.example.telito.util.EmailUtil;
 
 import java.io.IOException;
@@ -558,6 +559,87 @@ public class OrdenCompraServlet extends HttpServlet {
                                             montoTotal,
                                             new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
                                         );
+                                    
+                                    // ========== ENVÍO DE CORREO A ALMACÉN ==========
+                                    // Notificar a almacén que la orden fue aprobada y deben estar preparados para registrar la entrada
+                                    try {
+                                        AlertaDAO alertaDAO = new AlertaDAO();
+                                        
+                                        // Intentar obtener emails de usuarios de almacén con diferentes variaciones del nombre del rol
+                                        ArrayList<String> emailsAlmacen = alertaDAO.obtenerEmailsPorRol("Almacenero");
+                                        System.out.println("Emails encontrados con rol 'Almacenero': " + emailsAlmacen.size());
+                                        
+                                        if (emailsAlmacen.isEmpty()) {
+                                            System.out.println("⚠ No se encontraron emails con rol 'Almacenero', intentando variaciones...");
+                                            emailsAlmacen = alertaDAO.obtenerEmailsPorRol("ALMACENERO");
+                                            System.out.println("Emails encontrados con rol 'ALMACENERO': " + emailsAlmacen.size());
+                                            
+                                            if (emailsAlmacen.isEmpty()) {
+                                                emailsAlmacen = alertaDAO.obtenerEmailsPorRol("ALMACEN");
+                                                System.out.println("Emails encontrados con rol 'ALMACEN': " + emailsAlmacen.size());
+                                            }
+                                            
+                                            if (emailsAlmacen.isEmpty()) {
+                                                emailsAlmacen = alertaDAO.obtenerEmailsPorRol("BODEGA");
+                                                System.out.println("Emails encontrados con rol 'BODEGA': " + emailsAlmacen.size());
+                                            }
+                                        }
+                                        
+                                        if (!emailsAlmacen.isEmpty()) {
+                                            String asuntoAlmacen = "TELITO BODEGUERO - Orden de Compra Aprobada - Preparar Registro de Entrada";
+                                            String mensajeAlmacen = """
+                                                <h2>¡Orden de Compra Aprobada por Logística!</h2>
+                                                <p>El personal de logística ha aprobado una nueva orden de compra. El almacén debe estar preparado para registrar la entrada cuando el productor entregue la mercancía.</p>
+                                                <p><strong>Número de Orden:</strong> %s</p>
+                                                <p><strong>Producto:</strong> %s</p>
+                                                <p><strong>Cantidad:</strong> %d paquetes</p>
+                                                <p><strong>Monto Total:</strong> S/. %.2f</p>
+                                                <p><strong>Fecha de Aprobación:</strong> %s</p>
+                                                <hr>
+                                                <p><strong>Acción requerida:</strong></p>
+                                                <ul>
+                                                    <li>Estar preparado para recibir la mercancía del productor</li>
+                                                    <li>Una vez que el productor entregue, registrar la entrada en el sistema</li>
+                                                    <li>Verificar la cantidad y estado de la mercancía recibida</li>
+                                                </ul>
+                                                <p>El productor recibirá una notificación para preparar la mercancía. Te notificaremos cuando esté lista para ser recibida.</p>
+                                                """.formatted(
+                                                    numeroOrden,
+                                                    nombreProducto,
+                                                    cantidad,
+                                                    montoTotal,
+                                                    new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                                                );
+                                            
+                                            // Enviar correo a todos los usuarios de almacén
+                                            int correosEnviados = 0;
+                                            for (String email : emailsAlmacen) {
+                                                boolean enviado = EmailUtil.sendSystemAlertHTML(
+                                                    email,
+                                                    asuntoAlmacen,
+                                                    mensajeAlmacen
+                                                );
+                                                if (enviado) {
+                                                    correosEnviados++;
+                                                    System.out.println("✓ Correo enviado a almacén: " + email);
+                                                }
+                                            }
+                                            
+                                            if (correosEnviados > 0) {
+                                                System.out.println("✓✓✓ Se enviaron " + correosEnviados + " correo(s) a almacén sobre la orden aprobada");
+                                            } else {
+                                                System.err.println("⚠ No se pudo enviar ningún correo a almacén");
+                                            }
+                                        } else {
+                                            System.err.println("⚠ No se encontraron usuarios de almacén con email configurado para notificar");
+                                        }
+                                    } catch (Exception e) {
+                                        // No bloquear la operación si falla el correo a almacén
+                                        System.err.println("⚠ Error al enviar correo a almacén: " + e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                    // ========== FIN ENVÍO DE CORREO A ALMACÉN ==========
+                                    
                                 } else {
                                     // Rechazado
                                     asunto = "TELITO BODEGUERO - Orden de Compra Rechazada";

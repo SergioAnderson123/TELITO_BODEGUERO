@@ -118,4 +118,31 @@ public class OrdenCompraDao {
             throw new RuntimeException("Error al actualizar estado de la orden", e);
         }
     }
+
+    /**
+     * Obtiene el usuario_id de logística que creó la orden de compra.
+     * Útil para enviar notificaciones por correo.
+     * 
+     * @param idOrden ID de la orden de compra
+     * @return ID del usuario de logística, o 0 si no se encuentra
+     */
+    public int obtenerUsuarioIdLogistica(int idOrden) {
+        String sql = "SELECT usuario_id FROM ordenes_compra WHERE id_orden_compra = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idOrden);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("usuario_id");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener usuario_id de logística de la orden: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

@@ -2,6 +2,8 @@ package com.example.telito.almacen.servlets;
 
 import com.example.telito.almacen.beans.*;
 import com.example.telito.almacen.daos.*;
+import com.example.telito.administrador.daos.UsuarioDAO;
+import com.example.telito.util.EmailUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -348,7 +350,74 @@ public class EntradaServlet extends HttpServlet {
             // 8. Actualizamos el estado de la orden a "Aprobado" (ciclo completo)
             ordenCompraDao.actualizarEstado(idOrden, "Aprobado");
 
-            // 9. Redirigimos a la lista de inventario para ver el lote
+            // 9. ========== ENVÍO DE CORREO A LOGÍSTICA ==========
+            // Notificar a logística que la entrada fue registrada exitosamente
+            try {
+                // Obtener el usuario_id de logística que creó la orden
+                int usuarioIdLogistica = ordenCompraDao.obtenerUsuarioIdLogistica(idOrden);
+                
+                if (usuarioIdLogistica > 0) {
+                    System.out.println("=== ENVIANDO CORREO A LOGÍSTICA ===");
+                    System.out.println("Usuario ID de logística: " + usuarioIdLogistica);
+                    
+                    // Obtener email del usuario de logística
+                    UsuarioDAO usuarioDAO = new UsuarioDAO();
+                    String emailLogistica = usuarioDAO.obtenerEmailPorId(usuarioIdLogistica);
+                    
+                    if (emailLogistica != null && !emailLogistica.trim().isEmpty()) {
+                        System.out.println("✓ Email obtenido: " + emailLogistica);
+                        
+                        // Obtener información del lote para el correo
+                        Lote loteRegistrado = loteDao.buscarLotePorId(loteId);
+                        String codigoLote = (loteRegistrado != null) ? loteRegistrado.getCodigoLote() : "N/A";
+                        
+                        String asunto = "TELITO BODEGUERO - Entrada de Inventario Registrada";
+                        String mensaje = """
+                            <h2>¡Entrada de Inventario Registrada Exitosamente!</h2>
+                            <p>El personal de almacén ha registrado la entrada de la orden de compra que creaste.</p>
+                            <p><strong>Número de Orden:</strong> %s</p>
+                            <p><strong>Producto:</strong> %s</p>
+                            <p><strong>Cantidad:</strong> %d paquetes</p>
+                            <p><strong>Código de Lote:</strong> %s</p>
+                            <p><strong>Fecha de Registro:</strong> %s</p>
+                            <hr>
+                            <p><strong>Estado:</strong> La mercancía ha sido recibida y registrada en el almacén.</p>
+                            <p>La orden está ahora completa y el producto está disponible en el inventario.</p>
+                            """.formatted(
+                                oc.getNumeroOrden(),
+                                oc.getNombreProducto(),
+                                oc.getCantidad(),
+                                codigoLote,
+                                new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                            );
+                        
+                        // Enviar correo HTML
+                        System.out.println("Enviando correo a: " + emailLogistica);
+                        boolean correoEnviado = EmailUtil.sendSystemAlertHTML(
+                            emailLogistica,
+                            asunto,
+                            mensaje
+                        );
+                        
+                        if (correoEnviado) {
+                            System.out.println("✓✓✓ Correo enviado exitosamente a logística: " + emailLogistica);
+                        } else {
+                            System.err.println("⚠⚠⚠ No se pudo enviar el correo a logística: " + emailLogistica);
+                        }
+                    } else {
+                        System.err.println("⚠ Usuario de logística no tiene email configurado. ID: " + usuarioIdLogistica);
+                    }
+                } else {
+                    System.err.println("⚠ No se encontró el usuario de logística para la orden ID: " + idOrden);
+                }
+            } catch (Exception e) {
+                // No bloquear la operación si falla el correo
+                System.err.println("⚠ Error al enviar correo a logística: " + e.getMessage());
+                e.printStackTrace();
+            }
+            // ========== FIN ENVÍO DE CORREO A LOGÍSTICA ==========
+
+            // 10. Redirigimos a la lista de inventario para ver el lote
             response.sendRedirect(request.getContextPath() + "/almacen/LoteServlet");
 
         } catch (Exception e) {

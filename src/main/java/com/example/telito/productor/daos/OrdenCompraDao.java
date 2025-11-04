@@ -186,6 +186,11 @@ public class OrdenCompraDao {
             
             int rowsAffected = pstmt.executeUpdate();
             System.out.println("✓ Filas actualizadas: " + rowsAffected);
+            
+            if (rowsAffected == 0) {
+                System.err.println("⚠️ ADVERTENCIA: No se encontró la orden con ID " + idOrden + " o ya tiene el estado " + nuevoEstado);
+            }
+            
             return rowsAffected > 0;
         } catch (SQLException e) {
             System.err.println("❌ ERROR: Error al actualizar estado de orden:");
@@ -194,7 +199,75 @@ public class OrdenCompraDao {
             System.err.println("Message: " + e.getMessage());
             e.printStackTrace();
             return false;
+        } catch (Exception e) {
+            System.err.println("❌ ERROR INESPERADO: Error al actualizar estado de orden:");
+            System.err.println("Message: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
+    }
+
+    /**
+     * Obtiene los datos básicos de una orden para notificaciones.
+     * Incluye el usuario_id de logística que creó la orden.
+     * 
+     * @param idOrden ID de la orden de compra
+     * @return Array con [numeroOrden, nombreProducto, cantidad, montoTotal, usuarioIdLogistica] o null
+     */
+    public Object[] obtenerDatosBasicosOrden(int idOrden) {
+        String sql = """
+            SELECT 
+                IFNULL(oc.numero_Orden, CONCAT('OC', LPAD(oc.id_orden_compra, 3, '0'))) AS numero_orden,
+                pr.nombre AS nombre_producto,
+                oc.cantidad,
+                oc.monto_total,
+                oc.usuario_id
+            FROM ordenes_compra oc
+            INNER JOIN productos pr ON oc.producto_id = pr.id_producto
+            WHERE oc.id_orden_compra = ?
+            """;
+
+        System.out.println("=== DEBUG DAO - OBTENER DATOS BÁSICOS ORDEN ===");
+        System.out.println("ID Orden: " + idOrden);
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idOrden);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Object[] datos = new Object[5];
+                    datos[0] = rs.getString("numero_orden");
+                    datos[1] = rs.getString("nombre_producto");
+                    datos[2] = rs.getInt("cantidad");
+                    datos[3] = rs.getDouble("monto_total");
+                    datos[4] = rs.getInt("usuario_id");
+                    
+                    System.out.println("✓ Datos obtenidos:");
+                    System.out.println("  - Número orden: " + datos[0]);
+                    System.out.println("  - Producto: " + datos[1]);
+                    System.out.println("  - Cantidad: " + datos[2]);
+                    System.out.println("  - Monto total: " + datos[3]);
+                    System.out.println("  - Usuario ID logística: " + datos[4]);
+                    
+                    return datos;
+                } else {
+                    System.err.println("❌ No se encontró la orden con ID: " + idOrden);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ ERROR: Error al obtener datos básicos de orden:");
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            System.err.println("Message: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("❌ ERROR INESPERADO: Error al obtener datos básicos de orden:");
+            System.err.println("Message: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 }
 

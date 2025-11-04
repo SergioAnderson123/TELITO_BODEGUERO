@@ -5,6 +5,8 @@ import com.example.telito.productor.beans.Categoria;
 import com.example.telito.productor.beans.Producto;
 import com.example.telito.productor.beans.Usuario;
 import com.example.telito.productor.daos.ProductoDao;
+import com.example.telito.administrador.daos.UsuarioDAO;
+import com.example.telito.util.EmailUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -457,8 +459,22 @@ public class ProductorServlet extends HttpServlet {
                 response.setCharacterEncoding("UTF-8");
                 
                 try {
-                    int idOrden = Integer.parseInt(request.getParameter("idOrden"));
+                    String idOrdenStr = request.getParameter("idOrden");
                     String nuevoEstado = request.getParameter("nuevoEstado");
+                    
+                    // Validar parámetros
+                    if (idOrdenStr == null || idOrdenStr.trim().isEmpty()) {
+                        response.getWriter().write("{\"success\": false, \"message\": \"ID de orden es requerido\"}");
+                        return;
+                    }
+                    
+                    if (nuevoEstado == null || nuevoEstado.trim().isEmpty()) {
+                        response.getWriter().write("{\"success\": false, \"message\": \"Nuevo estado es requerido\"}");
+                        return;
+                    }
+                    
+                    int idOrden = Integer.parseInt(idOrdenStr);
+                    nuevoEstado = nuevoEstado.trim();
                     
                     System.out.println("=== DEBUG SERVLET - CAMBIAR ESTADO ORDEN ===");
                     System.out.println("ID Orden: " + idOrden);
@@ -468,8 +484,93 @@ public class ProductorServlet extends HttpServlet {
                     boolean actualizado = ordenCompraDao.actualizarEstadoOrden(idOrden, nuevoEstado);
                     
                     if (actualizado) {
-                        response.getWriter().write("{\"success\": true, \"message\": \"Estado actualizado correctamente\"}");
                         System.out.println("✓ Estado actualizado correctamente");
+                        
+                        // ========== ENVÍO DE CORREO AL USUARIO DE LOGÍSTICA ==========
+                        // Solo enviar correo si el nuevo estado es "En Proceso"
+                        System.out.println("=== DEBUG: Verificando envío de correo ===");
+                        System.out.println("Nuevo estado recibido: '" + nuevoEstado + "'");
+                        System.out.println("¿Es 'En Proceso'? " + "En Proceso".equals(nuevoEstado));
+                        
+                        if ("En Proceso".equals(nuevoEstado)) {
+                            System.out.println("✓ El estado es 'En Proceso', procediendo a enviar correo...");
+                            try {
+                                // Obtener datos de la orden
+                                System.out.println("Obteniendo datos básicos de la orden ID: " + idOrden);
+                                Object[] datosOrden = ordenCompraDao.obtenerDatosBasicosOrden(idOrden);
+                                
+                                if (datosOrden != null) {
+                                    System.out.println("✓ Datos de orden obtenidos correctamente");
+                                    String numeroOrden = (String) datosOrden[0];
+                                    String nombreProducto = (String) datosOrden[1];
+                                    int cantidad = (Integer) datosOrden[2];
+                                    double montoTotal = (Double) datosOrden[3];
+                                    int usuarioIdLogistica = (Integer) datosOrden[4];
+                                    
+                                    System.out.println("Número de orden: " + numeroOrden);
+                                    System.out.println("Producto: " + nombreProducto);
+                                    System.out.println("Cantidad: " + cantidad);
+                                    System.out.println("Monto total: " + montoTotal);
+                                    System.out.println("Usuario ID de logística: " + usuarioIdLogistica);
+                                    
+                                    // Obtener email del usuario de logística
+                                    UsuarioDAO usuarioDAO = new UsuarioDAO();
+                                    System.out.println("Obteniendo email del usuario de logística ID: " + usuarioIdLogistica);
+                                    String emailLogistica = usuarioDAO.obtenerEmailPorId(usuarioIdLogistica);
+                                    
+                                    if (emailLogistica != null && !emailLogistica.trim().isEmpty()) {
+                                        System.out.println("✓ Email obtenido: " + emailLogistica);
+                                        
+                                        String asunto = "TELITO BODEGUERO - Orden de Compra Aceptada por Productor";
+                                        String mensaje = """
+                                            <h2>¡Orden de Compra Aceptada!</h2>
+                                            <p>El productor ha aceptado la orden de compra y está en proceso de preparación.</p>
+                                            <p><strong>Número de Orden:</strong> %s</p>
+                                            <p><strong>Producto:</strong> %s</p>
+                                            <p><strong>Cantidad:</strong> %d paquetes</p>
+                                            <p><strong>Monto Total:</strong> S/. %.2f</p>
+                                            <p><strong>Fecha de Aceptación:</strong> %s</p>
+                                            <hr>
+                                            <p><strong>Estado actual:</strong> En Proceso</p>
+                                            <p>El productor está preparando la mercancía. Se te notificará cuando esté lista para ser recibida en el almacén.</p>
+                                            """.formatted(
+                                                numeroOrden,
+                                                nombreProducto,
+                                                cantidad,
+                                                montoTotal,
+                                                new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                                            );
+                                        
+                                        // Enviar correo HTML
+                                        System.out.println("Enviando correo a: " + emailLogistica);
+                                        boolean correoEnviado = EmailUtil.sendSystemAlertHTML(
+                                            emailLogistica,
+                                            asunto,
+                                            mensaje
+                                        );
+                                        
+                                        if (correoEnviado) {
+                                            System.out.println("✓✓✓ Correo enviado exitosamente al usuario de logística: " + emailLogistica);
+                                        } else {
+                                            System.err.println("⚠⚠⚠ No se pudo enviar el correo al usuario de logística: " + emailLogistica);
+                                        }
+                                    } else {
+                                        System.err.println("⚠⚠⚠ Usuario de logística no tiene email configurado. ID: " + usuarioIdLogistica);
+                                        System.err.println("Email obtenido: " + (emailLogistica == null ? "null" : "vacío"));
+                                    }
+                                } else {
+                                    System.err.println("❌❌❌ No se pudieron obtener los datos de la orden ID: " + idOrden);
+                                }
+                            } catch (Exception e) {
+                                // No bloquear la operación si falla el correo
+                                System.err.println("❌❌❌ Error al enviar correo de notificación: " + e.getMessage());
+                                e.printStackTrace();
+                            }
+                        } else {
+                            System.out.println("⚠ El estado no es 'En Proceso', no se enviará correo. Estado recibido: '" + nuevoEstado + "'");
+                        }
+                        
+                        response.getWriter().write("{\"success\": true, \"message\": \"Estado actualizado correctamente\"}");
                     } else {
                         response.getWriter().write("{\"success\": false, \"message\": \"No se pudo actualizar el estado\"}");
                         System.err.println("❌ No se pudo actualizar el estado");
@@ -477,8 +578,9 @@ public class ProductorServlet extends HttpServlet {
                 } catch (NumberFormatException e) {
                     response.getWriter().write("{\"success\": false, \"message\": \"ID de orden inválido\"}");
                     System.err.println("❌ ERROR: ID de orden inválido - " + e.getMessage());
+                    e.printStackTrace();
                 } catch (Exception e) {
-                    response.getWriter().write("{\"success\": false, \"message\": \"Error interno del servidor\"}");
+                    response.getWriter().write("{\"success\": false, \"message\": \"Error interno del servidor: " + e.getMessage().replace("\"", "\\\"") + "\"}");
                     System.err.println("❌ ERROR: Error al cambiar estado - " + e.getMessage());
                     e.printStackTrace();
                 }
@@ -580,8 +682,93 @@ public class ProductorServlet extends HttpServlet {
                     // Actualizar la orden con el lote asignado
                     boolean asignado = ordenCompraDao3.completarOrden(idOrden2, idLote);
                     
+                    System.out.println("=== RESULTADO ASIGNACIÓN LOTE ===");
+                    System.out.println("¿Asignado exitosamente? " + asignado);
+                    
                     if (asignado) {
                         System.out.println("✓ Lote asignado correctamente a la orden. Stock restante: " + nuevoStock + " unidades");
+                        
+                        // ========== ENVÍO DE CORREO AL USUARIO DE LOGÍSTICA ==========
+                        // Cuando se asigna un lote, el estado cambia a "Pendiente"
+                        // Enviar correo notificando que el productor ha aceptado y preparado la orden
+                        System.out.println("=== INICIANDO ENVÍO DE CORREO POR ASIGNACIÓN DE LOTE ===");
+                        System.out.println("ID Orden para correo: " + idOrden2);
+                        System.out.println("ID Lote asignado: " + idLote);
+                        try {
+                            // Obtener datos de la orden
+                            System.out.println("Obteniendo datos básicos de la orden ID: " + idOrden2);
+                            Object[] datosOrdenEmail = ordenCompraDao3.obtenerDatosBasicosOrden(idOrden2);
+                            
+                            if (datosOrdenEmail != null) {
+                                System.out.println("✓ Datos de orden obtenidos correctamente");
+                                String numeroOrden = (String) datosOrdenEmail[0];
+                                String nombreProducto = (String) datosOrdenEmail[1];
+                                int cantidad = (Integer) datosOrdenEmail[2];
+                                double montoTotal = (Double) datosOrdenEmail[3];
+                                int usuarioIdLogistica = (Integer) datosOrdenEmail[4];
+                                
+                                System.out.println("Número de orden: " + numeroOrden);
+                                System.out.println("Producto: " + nombreProducto);
+                                System.out.println("Cantidad: " + cantidad);
+                                System.out.println("Monto total: " + montoTotal);
+                                System.out.println("Usuario ID de logística: " + usuarioIdLogistica);
+                                
+                                // Obtener email del usuario de logística
+                                UsuarioDAO usuarioDAO = new UsuarioDAO();
+                                System.out.println("Obteniendo email del usuario de logística ID: " + usuarioIdLogistica);
+                                String emailLogistica = usuarioDAO.obtenerEmailPorId(usuarioIdLogistica);
+                                
+                                if (emailLogistica != null && !emailLogistica.trim().isEmpty()) {
+                                    System.out.println("✓ Email obtenido: " + emailLogistica);
+                                    
+                                    String asunto = "TELITO BODEGUERO - Orden de Compra Preparada por Productor";
+                                    String mensaje = """
+                                        <h2>¡Orden de Compra Preparada!</h2>
+                                        <p>El productor ha aceptado y preparado la orden de compra. El lote ha sido asignado y está listo para ser recibido en el almacén.</p>
+                                        <p><strong>Número de Orden:</strong> %s</p>
+                                        <p><strong>Producto:</strong> %s</p>
+                                        <p><strong>Cantidad:</strong> %d paquetes</p>
+                                        <p><strong>Monto Total:</strong> S/. %.2f</p>
+                                        <p><strong>Código de Lote:</strong> %s</p>
+                                        <p><strong>Fecha de Preparación:</strong> %s</p>
+                                        <hr>
+                                        <p><strong>Estado actual:</strong> Pendiente</p>
+                                        <p>La orden está lista para ser recibida en el almacén. Por favor, coordina la recepción de la mercancía.</p>
+                                        """.formatted(
+                                            numeroOrden,
+                                            nombreProducto,
+                                            cantidad,
+                                            montoTotal,
+                                            loteInfo[1] != null ? loteInfo[1].toString() : "N/A", // código del lote
+                                            new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                                        );
+                                    
+                                    // Enviar correo HTML
+                                    System.out.println("Enviando correo a: " + emailLogistica);
+                                    boolean correoEnviado = EmailUtil.sendSystemAlertHTML(
+                                        emailLogistica,
+                                        asunto,
+                                        mensaje
+                                    );
+                                    
+                                    if (correoEnviado) {
+                                        System.out.println("✓✓✓ Correo enviado exitosamente al usuario de logística: " + emailLogistica);
+                                    } else {
+                                        System.err.println("⚠⚠⚠ No se pudo enviar el correo al usuario de logística: " + emailLogistica);
+                                    }
+                                } else {
+                                    System.err.println("⚠⚠⚠ Usuario de logística no tiene email configurado. ID: " + usuarioIdLogistica);
+                                    System.err.println("Email obtenido: " + (emailLogistica == null ? "null" : "vacío"));
+                                }
+                            } else {
+                                System.err.println("❌❌❌ No se pudieron obtener los datos de la orden ID: " + idOrden2);
+                            }
+                        } catch (Exception e) {
+                            // No bloquear la operación si falla el correo
+                            System.err.println("❌❌❌ Error al enviar correo de notificación: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                        
                         response.getWriter().write("{\"success\": true, \"message\": \"Lote asignado correctamente\"}");
                     } else {
                         System.err.println("❌ No se pudo asignar el lote a la orden");

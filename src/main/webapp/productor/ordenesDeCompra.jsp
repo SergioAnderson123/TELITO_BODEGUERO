@@ -754,7 +754,17 @@
                     },
                     body: 'idOrden=' + idOrden + '&nuevoEstado=' + encodeURIComponent(nuevoEstado)
                 })
-                .then(response => response.json())
+                .then(response => {
+                    // Verificar si la respuesta es OK
+                    if (!response.ok) {
+                        throw new Error('Error HTTP: ' + response.status);
+                    }
+                    // Intentar parsear como JSON
+                    return response.json().catch(() => {
+                        // Si no es JSON válido, devolver un objeto de error
+                        throw new Error('La respuesta del servidor no es válida');
+                    });
+                })
                 .then(data => {
                     if (data.success) {
                         // Obtener la fila de la tabla
