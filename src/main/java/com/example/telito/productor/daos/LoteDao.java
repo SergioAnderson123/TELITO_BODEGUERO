@@ -1,4 +1,4 @@
-package com.example.telito.bodega.daos;
+package com.example.telito.productor.daos;
 
 import com.example.telito.util.DatabaseConnection;
 
@@ -346,10 +346,12 @@ public class LoteDao {
     public List<Object[]> listarLotesPorProductor(int productorId) {
         List<Object[]> lotes = new ArrayList<>();
         String sql = "SELECT l.codigo_lote, p.nombre as producto_nombre, p.codigo_sku, " +
-                "u.nombre as ubicacion, l.stock_actual, l.fecha_vencimiento " +
+                "u.nombre as ubicacion, l.stock_actual, l.fecha_vencimiento, " +
+                "COALESCE(d.nombre, 'Sin asignar') as distrito, l.estado " +
                 "FROM lotes l " +
                 "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                 "INNER JOIN ubicaciones u ON l.ubicacion_id = u.id_ubicacion " +
+                "LEFT JOIN distritos d ON l.distrito_id = d.id_distrito " +
                 "WHERE p.productor_id = ? " +
                 "ORDER BY l.codigo_lote DESC";
 
@@ -358,13 +360,15 @@ public class LoteDao {
             pstmt.setInt(1, productorId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    Object[] lote = new Object[6];
+                    Object[] lote = new Object[8];
                     lote[0] = rs.getString("codigo_lote");
                     lote[1] = rs.getString("producto_nombre");
                     lote[2] = rs.getString("codigo_sku");
                     lote[3] = rs.getString("ubicacion");
                     lote[4] = rs.getInt("stock_actual");
                     lote[5] = rs.getDate("fecha_vencimiento");
+                    lote[6] = rs.getString("distrito");
+                    lote[7] = rs.getString("estado");
                     lotes.add(lote);
                 }
             }
@@ -673,3 +677,4 @@ public class LoteDao {
         return lotes;
     }
 }
+

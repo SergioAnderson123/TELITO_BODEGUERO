@@ -134,4 +134,23 @@ public class Movimiento {
     public void setFecha(Timestamp fecha) {
         this.fecha = fecha;
     }
+
+    /**
+     * Método auxiliar para obtener la fecha formateada como string.
+     * Usado por ExcelUtil para generar reportes.
+     */
+    public String getFechaFormateada() {
+        if (fecha == null) {
+            return "";
+        }
+        return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(fecha);
+    }
+
+    /**
+     * Método auxiliar para obtener el tipo de movimiento.
+     * Usado por ExcelUtil para generar reportes.
+     */
+    public String getTipo() {
+        return tipoMovimiento;
+    }
 }

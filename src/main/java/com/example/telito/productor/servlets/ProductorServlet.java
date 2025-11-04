@@ -1,10 +1,10 @@
-package com.example.telito.bodega.servlets;
-import com.example.telito.bodega.daos.LoteDao;
-import com.example.telito.bodega.daos.OrdenCompraDao;
-import com.example.telito.bodega.beans.Categoria;
-import com.example.telito.bodega.beans.Producto;
-import com.example.telito.bodega.beans.Usuario;
-import com.example.telito.bodega.daos.ProductoDao;
+package com.example.telito.productor.servlets;
+import com.example.telito.productor.daos.LoteDao;
+import com.example.telito.productor.daos.OrdenCompraDao;
+import com.example.telito.productor.beans.Categoria;
+import com.example.telito.productor.beans.Producto;
+import com.example.telito.productor.beans.Usuario;
+import com.example.telito.productor.daos.ProductoDao;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -605,3 +605,4 @@ public class ProductorServlet extends HttpServlet {
         }
     }
 }
+

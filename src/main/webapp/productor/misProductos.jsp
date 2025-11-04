@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.example.telito.bodega.beans.Producto" %>
-<%@ page import="com.example.telito.bodega.beans.Categoria" %>
+<%@ page import="com.example.telito.productor.beans.Producto" %>
+<%@ page import="com.example.telito.productor.beans.Categoria" %>
 <%@ page import="java.util.ArrayList" %>
 <%--
     JSP: Mis Productos
@@ -10,7 +10,7 @@
       - totalProductos (int), fueraDeStock (int), totalCategorias (int)
     Navegación: Sidebar con sección "Mis Productos" activa.
 --%>
-<jsp:useBean id="listaProductos" scope="request" type="java.util.ArrayList<com.example.telito.bodega.beans.Producto>" />
+<jsp:useBean id="listaProductos" scope="request" type="java.util.ArrayList<com.example.telito.productor.beans.Producto>" />
 
 <%
     int totalProductos = (request.getAttribute("totalProductos") != null) ? (int) request.getAttribute("totalProductos") : 0;
@@ -249,9 +249,29 @@
     <!-- ===================== Contenido principal ===================== -->
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
-            <div class="page-header">
-                <h2><i class="fas fa-shopping-cart me-2"></i>Mis Productos</h2>
-                <p class="text-muted">Vista general de tu inventario y herramientas de gestión.</p>
+            <div class="page-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h2><i class="fas fa-shopping-cart me-2"></i>Mis Productos</h2>
+                    <p class="text-muted mb-0">Vista general de tu inventario y herramientas de gestión.</p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <div class="btn-group">
+                        <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=exportar" class="btn btn-sm" style="background: linear-gradient(160deg, #28a745 0%, #20c997 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
+                            <i class="fas fa-file-excel me-2"></i>Exportar Productos
+                        </a>
+                        <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=formEnviar" class="btn btn-sm" style="background: linear-gradient(160deg, #17a2b8 0%, #138496 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
+                            <i class="fas fa-envelope me-2"></i>Enviar Productos
+                        </a>
+                    </div>
+                    <div class="btn-group">
+                        <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=exportar" class="btn btn-sm" style="background: linear-gradient(160deg, #6f42c1 0%, #5a32a3 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
+                            <i class="fas fa-boxes me-2"></i>Exportar Lotes
+                        </a>
+                        <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=formEnviar" class="btn btn-sm" style="background: linear-gradient(160deg, #e83e8c 0%, #d91a72 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
+                            <i class="fas fa-envelope me-2"></i>Enviar Lotes
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <!-- ===================== Mensaje de resultado (éxito/error) ===================== -->
@@ -265,6 +285,20 @@
                 <%= alertMessage %>
             </div>
             <%
+                }
+                // Mensajes de sesión para reportes
+                String mensaje = (String) session.getAttribute("mensaje");
+                String tipoMensaje = (String) session.getAttribute("tipoMensaje");
+                if (mensaje != null) {
+            %>
+            <div class="alert alert-<%= tipoMensaje != null ? tipoMensaje : "info" %> alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+                <i class="fas <%= "success".equals(tipoMensaje) ? "fa-check-circle" : "info".equals(tipoMensaje) ? "fa-info-circle" : "fa-exclamation-triangle" %> me-2"></i>
+                <%= mensaje %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <%
+                    session.removeAttribute("mensaje");
+                    session.removeAttribute("tipoMensaje");
                 }
             %>
 

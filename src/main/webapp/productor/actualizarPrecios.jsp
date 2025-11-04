@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.example.telito.bodega.beans.Producto" %>
+<%@ page import="com.example.telito.productor.beans.Producto" %>
 <%--
     JSP: Actualizar Precios
     Propósito: Buscar un producto por SKU y actualizar su precio sugerido.

@@ -291,9 +291,19 @@
     <!-- ===================== Contenido principal ===================== -->
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
-            <div class="page-header">
-                <h2><i class="fas fa-chart-pie me-2"></i>Órdenes de Compra</h2>
-                <p class="text-muted">Gestiona y monitorea las órdenes de compra de tus productos.</p>
+            <div class="page-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h2><i class="fas fa-chart-pie me-2"></i>Órdenes de Compra</h2>
+                    <p class="text-muted mb-0">Gestiona y monitorea las órdenes de compra de tus productos.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="<%= request.getContextPath() %>/productor/OrdenCompraReporteServlet?action=exportar" class="btn btn-sm" style="background: linear-gradient(160deg, #28a745 0%, #20c997 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
+                        <i class="fas fa-file-excel me-2"></i>Exportar a Excel
+                    </a>
+                    <a href="<%= request.getContextPath() %>/productor/OrdenCompraReporteServlet?action=formEnviar" class="btn btn-sm" style="background: linear-gradient(160deg, #17a2b8 0%, #138496 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
+                        <i class="fas fa-envelope me-2"></i>Enviar por Correo
+                    </a>
+                </div>
             </div>
 
             <!-- ===================== Tarjetas de estadísticas ===================== -->

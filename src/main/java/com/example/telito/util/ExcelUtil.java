@@ -1689,5 +1689,570 @@ public class ExcelUtil {
             workbook.write(outputStream);
         }
     }
+
+    /**
+     * Genera un archivo Excel con la lista de productos del productor.
+     * Incluye filtros automáticos en las columnas y formato profesional.
+     * 
+     * @param listaProductos Lista de productos del productor a exportar
+     * @param outputStream Stream de salida donde se escribirá el archivo Excel
+     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
+     * @throws IOException Si ocurre un error al escribir el archivo
+     */
+    public static void generarExcelProductosProductor(ArrayList<?> listaProductos, OutputStream outputStream, String filtrosInformacion) throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Mis Productos");
+            
+            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle dataStyle = crearEstiloDatos(workbook);
+            CellStyle titleStyle = crearEstiloTitulo(workbook);
+            CellStyle currencyStyle = crearEstiloMoneda(workbook);
+            
+            int rowNum = 0;
+            
+            Row titleRow = sheet.createRow(rowNum++);
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("REPORTE DE PRODUCTOS - PRODUCTOR - TELITO BODEGUERO");
+            titleCell.setCellStyle(titleStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 7));
+            
+            if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
+                Row filterRow = sheet.createRow(rowNum++);
+                Cell filterCell = filterRow.createCell(0);
+                filterCell.setCellValue("Filtros aplicados: " + filtrosInformacion);
+                filterCell.setCellStyle(dataStyle);
+                sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
+            }
+            
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
+            
+            rowNum++;
+            
+            int headerRowIndex = rowNum;
+            Row headerRow = sheet.createRow(rowNum++);
+            String[] headers = {"SKU", "Producto", "Descripción", "Categoría", "Precio por Paquete", "Unidades por Paquete", "Stock Total", "N° de Lotes"};
+            int colNum = 0;
+            for (String header : headers) {
+                Cell cell = headerRow.createCell(colNum++);
+                cell.setCellValue(header);
+                cell.setCellStyle(headerStyle);
+            }
+            
+            double valorTotalInventario = 0.0;
+            for (Object obj : listaProductos) {
+                Row row = sheet.createRow(rowNum++);
+                try {
+                    Cell cell = row.createCell(0);
+                    cell.setCellValue((String) obj.getClass().getMethod("getCodigoSKU").invoke(obj));
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(1);
+                    cell.setCellValue((String) obj.getClass().getMethod("getNombre").invoke(obj));
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(2);
+                    String descripcion = (String) obj.getClass().getMethod("getDescripcion").invoke(obj);
+                    cell.setCellValue(descripcion != null ? descripcion : "");
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(3);
+                    Object categoriaObj = obj.getClass().getMethod("getCategoria").invoke(obj);
+                    String categoriaNombre = (String) categoriaObj.getClass().getMethod("getNombre").invoke(categoriaObj);
+                    cell.setCellValue(categoriaNombre != null ? categoriaNombre : "");
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(4);
+                    double precio = (Double) obj.getClass().getMethod("getPrecioActual").invoke(obj);
+                    cell.setCellValue(precio);
+                    cell.setCellStyle(currencyStyle);
+                    
+                    cell = row.createCell(5);
+                    int unidades = (Integer) obj.getClass().getMethod("getUnidadesPorPaquete").invoke(obj);
+                    cell.setCellValue(unidades);
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(6);
+                    double stockTotal = (Double) obj.getClass().getMethod("getStockTotal").invoke(obj);
+                    cell.setCellValue(stockTotal);
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(7);
+                    int numLotes = (Integer) obj.getClass().getMethod("getNumeroLotes").invoke(obj);
+                    cell.setCellValue(numLotes);
+                    cell.setCellStyle(dataStyle);
+                    
+                    // Calcular valor total del inventario (stock * precio por unidad)
+                    double precioPorUnidad = precio / unidades;
+                    valorTotalInventario += stockTotal * precioPorUnidad;
+                    
+                } catch (Exception e) {
+                    System.err.println("Error al procesar producto: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+            
+            rowNum++;
+            Row totalRow = sheet.createRow(rowNum++);
+            Cell totalLabelCell = totalRow.createCell(0);
+            totalLabelCell.setCellValue("VALOR TOTAL DEL INVENTARIO:");
+            totalLabelCell.setCellStyle(headerStyle);
+            
+            Cell totalValueCell = totalRow.createCell(4);
+            totalValueCell.setCellValue(valorTotalInventario);
+            totalValueCell.setCellStyle(currencyStyle);
+            
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+                sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
+            }
+            
+            sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
+                headerRowIndex, headerRowIndex, 0, headers.length - 1));
+            sheet.createFreezePane(0, headerRowIndex + 1);
+            
+            workbook.write(outputStream);
+        }
+    }
+
+    /**
+     * Genera un archivo Excel con la lista de lotes del productor.
+     * Incluye filtros automáticos en las columnas y formato profesional.
+     * 
+     * @param listaLotes Lista de lotes del productor a exportar
+     * @param outputStream Stream de salida donde se escribirá el archivo Excel
+     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
+     * @throws IOException Si ocurre un error al escribir el archivo
+     */
+    public static void generarExcelLotesProductor(ArrayList<?> listaLotes, OutputStream outputStream, String filtrosInformacion) throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Mis Lotes");
+            
+            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle dataStyle = crearEstiloDatos(workbook);
+            CellStyle titleStyle = crearEstiloTitulo(workbook);
+            
+            int rowNum = 0;
+            
+            Row titleRow = sheet.createRow(rowNum++);
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("REPORTE DE LOTES - PRODUCTOR - TELITO BODEGUERO");
+            titleCell.setCellStyle(titleStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 8));
+            
+            if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
+                Row filterRow = sheet.createRow(rowNum++);
+                Cell filterCell = filterRow.createCell(0);
+                filterCell.setCellValue("Filtros aplicados: " + filtrosInformacion);
+                filterCell.setCellStyle(dataStyle);
+                sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
+            }
+            
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
+            
+            rowNum++;
+            
+            int headerRowIndex = rowNum;
+            Row headerRow = sheet.createRow(rowNum++);
+            String[] headers = {"Código Lote", "Producto", "SKU", "Stock Actual", "Fecha Vencimiento", "Ubicación", "Distrito", "Estado"};
+            int colNum = 0;
+            for (String header : headers) {
+                Cell cell = headerRow.createCell(colNum++);
+                cell.setCellValue(header);
+                cell.setCellStyle(headerStyle);
+            }
+            
+            int totalStock = 0;
+            for (Object obj : listaLotes) {
+                Row row = sheet.createRow(rowNum++);
+                try {
+                    // Si el objeto es un Object[], usarlo directamente
+                    if (obj instanceof Object[]) {
+                        Object[] lote = (Object[]) obj;
+                        // [0] = codigo_lote, [1] = producto_nombre, [2] = codigo_sku, 
+                        // [3] = ubicacion, [4] = stock_actual, [5] = fecha_vencimiento, 
+                        // [6] = distrito, [7] = estado
+                        
+                        Cell cell = row.createCell(0);
+                        cell.setCellValue(lote[0] != null ? lote[0].toString() : "");
+                        cell.setCellStyle(dataStyle);
+                        
+                        cell = row.createCell(1);
+                        cell.setCellValue(lote[1] != null ? lote[1].toString() : "");
+                        cell.setCellStyle(dataStyle);
+                        
+                        cell = row.createCell(2);
+                        cell.setCellValue(lote[2] != null ? lote[2].toString() : "");
+                        cell.setCellStyle(dataStyle);
+                        
+                        cell = row.createCell(3);
+                        int stock = lote[4] != null ? (Integer) lote[4] : 0;
+                        cell.setCellValue(stock);
+                        cell.setCellStyle(dataStyle);
+                        totalStock += stock;
+                        
+                        cell = row.createCell(4);
+                        if (lote[5] != null && lote[5] instanceof java.sql.Date) {
+                            cell.setCellValue(new java.text.SimpleDateFormat("dd/MM/yyyy").format((java.sql.Date) lote[5]));
+                        } else {
+                            cell.setCellValue("");
+                        }
+                        cell.setCellStyle(dataStyle);
+                        
+                        cell = row.createCell(5);
+                        cell.setCellValue(lote[3] != null ? lote[3].toString() : "");
+                        cell.setCellStyle(dataStyle);
+                        
+                        cell = row.createCell(6);
+                        cell.setCellValue(lote[6] != null ? lote[6].toString() : "");
+                        cell.setCellStyle(dataStyle);
+                        
+                        cell = row.createCell(7);
+                        cell.setCellValue(lote[7] != null ? lote[7].toString() : "");
+                        cell.setCellStyle(dataStyle);
+                    } else {
+                        // Si es un bean, usar reflexión
+                        Cell cell = row.createCell(0);
+                        cell.setCellValue((String) obj.getClass().getMethod("getCodigoLote").invoke(obj));
+                        cell.setCellStyle(dataStyle);
+                        
+                        cell = row.createCell(1);
+                        String nombreProducto = (String) obj.getClass().getMethod("getNombreProducto").invoke(obj);
+                        cell.setCellValue(nombreProducto != null ? nombreProducto : "");
+                        cell.setCellStyle(dataStyle);
+                        
+                        cell = row.createCell(2);
+                        String sku = (String) obj.getClass().getMethod("getCodigoSKU").invoke(obj);
+                        cell.setCellValue(sku != null ? sku : "");
+                        cell.setCellStyle(dataStyle);
+                        
+                        cell = row.createCell(3);
+                        int stock = (Integer) obj.getClass().getMethod("getStockActual").invoke(obj);
+                        cell.setCellValue(stock);
+                        cell.setCellStyle(dataStyle);
+                        totalStock += stock;
+                        
+                        cell = row.createCell(4);
+                        java.sql.Date fechaVenc = (java.sql.Date) obj.getClass().getMethod("getFechaVencimiento").invoke(obj);
+                        if (fechaVenc != null) {
+                            cell.setCellValue(new java.text.SimpleDateFormat("dd/MM/yyyy").format(fechaVenc));
+                        } else {
+                            cell.setCellValue("");
+                        }
+                        cell.setCellStyle(dataStyle);
+                        
+                        cell = row.createCell(5);
+                        String ubicacion = (String) obj.getClass().getMethod("getNombreUbicacion").invoke(obj);
+                        cell.setCellValue(ubicacion != null ? ubicacion : "");
+                        cell.setCellStyle(dataStyle);
+                        
+                        cell = row.createCell(6);
+                        String distrito = (String) obj.getClass().getMethod("getNombreDistrito").invoke(obj);
+                        cell.setCellValue(distrito != null ? distrito : "");
+                        cell.setCellStyle(dataStyle);
+                        
+                        cell = row.createCell(7);
+                        String estado = (String) obj.getClass().getMethod("getEstado").invoke(obj);
+                        cell.setCellValue(estado != null ? estado : "");
+                        cell.setCellStyle(dataStyle);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error al procesar lote: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+            
+            rowNum++;
+            Row totalRow = sheet.createRow(rowNum++);
+            Cell totalLabelCell = totalRow.createCell(0);
+            totalLabelCell.setCellValue("STOCK TOTAL:");
+            totalLabelCell.setCellStyle(headerStyle);
+            
+            Cell totalValueCell = totalRow.createCell(3);
+            totalValueCell.setCellValue(totalStock);
+            totalValueCell.setCellStyle(dataStyle);
+            
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+                sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
+            }
+            
+            sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
+                headerRowIndex, headerRowIndex, 0, headers.length - 1));
+            sheet.createFreezePane(0, headerRowIndex + 1);
+            
+            workbook.write(outputStream);
+        }
+    }
+
+    /**
+     * Genera un archivo Excel con la lista de lotes del almacén.
+     * Incluye filtros automáticos en las columnas y formato profesional.
+     * 
+     * @param listaLotes Lista de lotes del almacén a exportar
+     * @param outputStream Stream de salida donde se escribirá el archivo Excel
+     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
+     * @throws IOException Si ocurre un error al escribir el archivo
+     */
+    public static void generarExcelLotesAlmacen(ArrayList<?> listaLotes, OutputStream outputStream, String filtrosInformacion) throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Lotes Almacén");
+            
+            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle dataStyle = crearEstiloDatos(workbook);
+            CellStyle titleStyle = crearEstiloTitulo(workbook);
+            
+            int rowNum = 0;
+            
+            Row titleRow = sheet.createRow(rowNum++);
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("REPORTE DE LOTES - ALMACÉN - TELITO BODEGUERO");
+            titleCell.setCellStyle(titleStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 8));
+            
+            if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
+                Row filterRow = sheet.createRow(rowNum++);
+                Cell filterCell = filterRow.createCell(0);
+                filterCell.setCellValue("Filtros aplicados: " + filtrosInformacion);
+                filterCell.setCellStyle(dataStyle);
+                sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
+            }
+            
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
+            
+            rowNum++;
+            
+            int headerRowIndex = rowNum;
+            Row headerRow = sheet.createRow(rowNum++);
+            String[] headers = {"Código Lote", "Producto", "SKU", "Stock Actual", "Paquetes Disponibles", 
+                               "Fecha Vencimiento", "Ubicación", "Estado Stock", "Estado"};
+            int colNum = 0;
+            for (String header : headers) {
+                Cell cell = headerRow.createCell(colNum++);
+                cell.setCellValue(header);
+                cell.setCellStyle(headerStyle);
+            }
+            
+            int totalStock = 0;
+            int totalPaquetes = 0;
+            for (Object obj : listaLotes) {
+                Row row = sheet.createRow(rowNum++);
+                try {
+                    Cell cell = row.createCell(0);
+                    cell.setCellValue((String) obj.getClass().getMethod("getCodigoLote").invoke(obj));
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(1);
+                    String nombreProducto = (String) obj.getClass().getMethod("getNombreProducto").invoke(obj);
+                    cell.setCellValue(nombreProducto != null ? nombreProducto : "");
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(2);
+                    String sku = (String) obj.getClass().getMethod("getCodigoSKU").invoke(obj);
+                    cell.setCellValue(sku != null ? sku : "");
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(3);
+                    int stock = (Integer) obj.getClass().getMethod("getStockActual").invoke(obj);
+                    cell.setCellValue(stock);
+                    cell.setCellStyle(dataStyle);
+                    totalStock += stock;
+                    
+                    cell = row.createCell(4);
+                    int paquetes = (Integer) obj.getClass().getMethod("getPaquetesDisponibles").invoke(obj);
+                    cell.setCellValue(paquetes);
+                    cell.setCellStyle(dataStyle);
+                    totalPaquetes += paquetes;
+                    
+                    cell = row.createCell(5);
+                    java.sql.Date fechaVenc = (java.sql.Date) obj.getClass().getMethod("getFechaVencimiento").invoke(obj);
+                    if (fechaVenc != null) {
+                        cell.setCellValue(new java.text.SimpleDateFormat("dd/MM/yyyy").format(fechaVenc));
+                    } else {
+                        cell.setCellValue("");
+                    }
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(6);
+                    String ubicacion = (String) obj.getClass().getMethod("getNombreUbicacion").invoke(obj);
+                    cell.setCellValue(ubicacion != null ? ubicacion : "");
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(7);
+                    String estadoStock = (String) obj.getClass().getMethod("getEstadoStock").invoke(obj);
+                    cell.setCellValue(estadoStock != null ? estadoStock : "");
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(8);
+                    String estado = (String) obj.getClass().getMethod("getEstado").invoke(obj);
+                    cell.setCellValue(estado != null ? estado : "");
+                    cell.setCellStyle(dataStyle);
+                } catch (Exception e) {
+                    System.err.println("Error al procesar lote: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+            
+            rowNum++;
+            Row totalRow = sheet.createRow(rowNum++);
+            Cell totalLabelCell = totalRow.createCell(0);
+            totalLabelCell.setCellValue("STOCK TOTAL:");
+            totalLabelCell.setCellStyle(headerStyle);
+            
+            Cell totalValueCell = totalRow.createCell(3);
+            totalValueCell.setCellValue(totalStock);
+            totalValueCell.setCellStyle(headerStyle);
+            
+            Cell totalPaquetesLabelCell = totalRow.createCell(4);
+            totalPaquetesLabelCell.setCellValue("PAQUETES TOTALES:");
+            totalPaquetesLabelCell.setCellStyle(headerStyle);
+            
+            Cell totalPaquetesValueCell = totalRow.createCell(5);
+            totalPaquetesValueCell.setCellValue(totalPaquetes);
+            totalPaquetesValueCell.setCellStyle(headerStyle);
+            
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+                sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
+            }
+            
+            sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
+                headerRowIndex, headerRowIndex, 0, headers.length - 1));
+            sheet.createFreezePane(0, headerRowIndex + 1);
+            
+            workbook.write(outputStream);
+        }
+    }
+
+    /**
+     * Genera un archivo Excel con la lista de órdenes de compra del productor.
+     * Incluye filtros automáticos en las columnas y formato profesional.
+     * 
+     * @param listaOrdenes Lista de órdenes de compra del productor a exportar
+     * @param outputStream Stream de salida donde se escribirá el archivo Excel
+     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
+     * @throws IOException Si ocurre un error al escribir el archivo
+     */
+    public static void generarExcelOrdenesCompraProductor(ArrayList<?> listaOrdenes, OutputStream outputStream, String filtrosInformacion) throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Órdenes de Compra");
+            
+            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle dataStyle = crearEstiloDatos(workbook);
+            CellStyle titleStyle = crearEstiloTitulo(workbook);
+            CellStyle currencyStyle = crearEstiloMoneda(workbook);
+            
+            int rowNum = 0;
+            
+            Row titleRow = sheet.createRow(rowNum++);
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("REPORTE DE ÓRDENES DE COMPRA - PRODUCTOR - TELITO BODEGUERO");
+            titleCell.setCellStyle(titleStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 6));
+            
+            if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
+                Row filterRow = sheet.createRow(rowNum++);
+                Cell filterCell = filterRow.createCell(0);
+                filterCell.setCellValue("Filtros aplicados: " + filtrosInformacion);
+                filterCell.setCellStyle(dataStyle);
+                sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 6));
+            }
+            
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 6));
+            
+            rowNum++;
+            
+            int headerRowIndex = rowNum;
+            Row headerRow = sheet.createRow(rowNum++);
+            String[] headers = {"N° de Orden", "Producto", "Cantidad", "Monto Total", "Usuario Logística", "Estado", "Lote Asignado"};
+            int colNum = 0;
+            for (String header : headers) {
+                Cell cell = headerRow.createCell(colNum++);
+                cell.setCellValue(header);
+                cell.setCellStyle(headerStyle);
+            }
+            
+            double montoTotalGeneral = 0.0;
+            for (Object obj : listaOrdenes) {
+                Row row = sheet.createRow(rowNum++);
+                try {
+                    // Objeto es un Object[] con: [id, numeroOrden, productoNombre, cantidad, montoTotal, usuarioLogistica, estado, loteId]
+                    Object[] orden = (Object[]) obj;
+                    
+                    Cell cell = row.createCell(0);
+                    cell.setCellValue((String) orden[1]);
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(1);
+                    cell.setCellValue((String) orden[2]);
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(2);
+                    cell.setCellValue((Integer) orden[3]);
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(3);
+                    double monto = (Double) orden[4];
+                    cell.setCellValue(monto);
+                    cell.setCellStyle(currencyStyle);
+                    montoTotalGeneral += monto;
+                    
+                    cell = row.createCell(4);
+                    cell.setCellValue((String) orden[5]);
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(5);
+                    String estado = (String) orden[6];
+                    cell.setCellValue(estado != null ? estado : "");
+                    cell.setCellStyle(dataStyle);
+                    
+                    cell = row.createCell(6);
+                    Object loteId = orden[7];
+                    cell.setCellValue(loteId != null ? "Asignado (ID: " + loteId.toString() + ")" : "Sin asignar");
+                    cell.setCellStyle(dataStyle);
+                    
+                } catch (Exception e) {
+                    System.err.println("Error al procesar orden de compra: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+            
+            rowNum++;
+            Row totalRow = sheet.createRow(rowNum++);
+            Cell totalLabelCell = totalRow.createCell(0);
+            totalLabelCell.setCellValue("TOTAL GENERAL:");
+            totalLabelCell.setCellStyle(headerStyle);
+            
+            Cell totalValueCell = totalRow.createCell(3);
+            totalValueCell.setCellValue(montoTotalGeneral);
+            totalValueCell.setCellStyle(currencyStyle);
+            
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+                sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
+            }
+            
+            sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
+                headerRowIndex, headerRowIndex, 0, headers.length - 1));
+            sheet.createFreezePane(0, headerRowIndex + 1);
+            
+            workbook.write(outputStream);
+        }
+    }
 }
 

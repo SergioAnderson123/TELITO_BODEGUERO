@@ -1,8 +1,8 @@
-package com.example.telito.bodega.daos;
+package com.example.telito.productor.daos;
 
-import com.example.telito.bodega.beans.Categoria;
-import com.example.telito.bodega.beans.Producto;
-import com.example.telito.bodega.beans.Usuario;
+import com.example.telito.productor.beans.Categoria;
+import com.example.telito.productor.beans.Producto;
+import com.example.telito.productor.beans.Usuario;
 import com.example.telito.util.DatabaseConnection;
 
 import java.sql.Connection;
@@ -58,7 +58,7 @@ public class ProductoDao {
                     producto.setUnidadesPorPaquete(rs.getInt("unidades_por_paquete"));
 
                     // Asegúrate de que tu clase Producto.java tenga estos campos y sus setters.
-                    producto.setStockTotal(rs.getInt("stock_total"));
+                    producto.setStockTotal(rs.getDouble("stock_total"));
                     producto.setNumeroLotes(rs.getInt("numero_lotes"));
 
                     Categoria categoria = new Categoria();
@@ -265,3 +265,4 @@ public class ProductoDao {
         return categorias;
     }
 }
+

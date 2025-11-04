@@ -168,4 +168,52 @@ public class MovimientoDao {
         }
         return listaMovimientos;
     }
+
+    /**
+     * MÉTODO NUEVO
+     * Obtiene una lista completa de todos los movimientos de inventario sin paginación.
+     * Útil para reportes y exportaciones.
+     * @return ArrayList de objetos Movimiento, cada uno con información detallada.
+     */
+    public ArrayList<Movimiento> listarTodosMovimientos() {
+        ArrayList<Movimiento> listaMovimientos = new ArrayList<>();
+
+        String sql = "SELECT " +
+                "m.id_movimiento, m.tipo, m.cantidad, m.motivo, m.fecha, " +
+                "l.codigo_lote, " +
+                "p.nombre AS nombre_producto, " +
+                "CONCAT(u.nombres, ' ', u.apellidos) AS nombre_usuario, " +
+                "ped.numero_pedido, " +
+                "oc.numero_orden " +
+                "FROM movimientos_inventario m " +
+                "INNER JOIN lotes l ON (m.lote_id = l.id_lote) " +
+                "INNER JOIN productos p ON (l.producto_id = p.id_producto) " +
+                "INNER JOIN usuarios u ON (m.usuario_id = u.id_usuario) " +
+                "LEFT JOIN pedidos ped ON (m.pedido_id = ped.id_pedido) " +
+                "LEFT JOIN ordenes_compra oc ON (m.orden_compra_id = oc.id_orden_compra) " +
+                "ORDER BY m.fecha DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Movimiento mov = new Movimiento();
+                mov.setIdMovimiento(rs.getInt("id_movimiento"));
+                mov.setTipoMovimiento(rs.getString("tipo"));
+                mov.setCantidad(rs.getInt("cantidad"));
+                mov.setMotivo(rs.getString("motivo"));
+                mov.setFecha(rs.getTimestamp("fecha"));
+                mov.setCodigoLote(rs.getString("codigo_lote"));
+                mov.setNombreProducto(rs.getString("nombre_producto"));
+                mov.setNombreUsuario(rs.getString("nombre_usuario"));
+                mov.setNumeroPedido(rs.getString("numero_pedido"));
+                mov.setNumeroOrdenCompra(rs.getString("numero_orden"));
+                listaMovimientos.add(mov);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al listar todos los movimientos de inventario", e);
+        }
+        return listaMovimientos;
+    }
 }

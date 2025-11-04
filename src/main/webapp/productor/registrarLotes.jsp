@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.example.telito.bodega.beans.Producto" %>
+<%@ page import="com.example.telito.productor.beans.Producto" %>
 <%@ page import="java.util.ArrayList" %>
 <%--
     JSP: Registrar Lotes
@@ -11,6 +11,7 @@
     Notas: El código de lote se genera automáticamente en formato L--0001, L--0002, etc. El distrito se asigna por defecto.
 --%>
 
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!doctype html>
 <html lang="es">
 <head>

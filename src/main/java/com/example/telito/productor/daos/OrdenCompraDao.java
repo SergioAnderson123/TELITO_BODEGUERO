@@ -1,4 +1,4 @@
-package com.example.telito.bodega.daos;
+package com.example.telito.productor.daos;
 
 import com.example.telito.util.DatabaseConnection;
 import java.sql.*;
@@ -197,6 +197,4 @@ public class OrdenCompraDao {
         }
     }
 }
-
-
 

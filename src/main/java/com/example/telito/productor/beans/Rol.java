@@ -1,4 +1,4 @@
-package com.example.telito.bodega.beans;
+package com.example.telito.productor.beans;
 
 public class Rol {
 

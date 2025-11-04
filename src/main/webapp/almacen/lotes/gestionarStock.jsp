@@ -23,12 +23,32 @@
                 <!-- ENCABEZADO -->
                 <div class="row">
                     <div class="col-12">
-                        <div class="page-header">
-                            <h2><i class="fas fa-box me-2"></i>Gestión de Inventario</h2>
-                            <p class="text-muted">Administra el stock de productos y ajusta inventarios según sea necesario.</p>
+                        <div class="page-header mb-4 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2><i class="fas fa-box me-2"></i>Gestión de Inventario</h2>
+                                <p class="text-muted mb-0">Administra el stock de productos y ajusta inventarios según sea necesario.</p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="<%= request.getContextPath() %>/almacen/LoteReporteServlet?action=exportar" class="btn btn-sm btn-success">
+                                    <i class="fas fa-file-excel me-2"></i>Exportar a Excel
+                                </a>
+                                <a href="<%= request.getContextPath() %>/almacen/LoteReporteServlet?action=formEnviar" class="btn btn-sm btn-info text-white">
+                                    <i class="fas fa-envelope me-2"></i>Enviar por Correo
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Mensajes de alerta -->
+                <c:if test="${not empty sessionScope.mensaje}">
+                    <div class="alert alert-${sessionScope.tipoMensaje} alert-dismissible fade show" role="alert">
+                        ${sessionScope.mensaje}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <c:remove var="mensaje" scope="session"/>
+                    <c:remove var="tipoMensaje" scope="session"/>
+                </c:if>
 
                 <!-- BUSCADOR -->
                 <div class="mx-auto d-none d-md-block">

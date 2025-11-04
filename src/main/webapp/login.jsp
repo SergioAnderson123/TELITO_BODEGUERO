@@ -198,6 +198,12 @@
             </div>
 
             <%-- Mostrar mensajes de error --%>
+            <div id="errorAlert" style="display: none;">
+                <div class="alert alert-danger" role="alert" id="errorMessageDiv">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="errorMessageText"></span>
+                </div>
+            </div>
             <% if (request.getAttribute("errorMsg") != null) { %>
             <div class="alert alert-danger" role="alert">
                 <i class="fas fa-exclamation-triangle me-2"></i>
@@ -247,6 +253,12 @@
                 // Limpiar validaciones anteriores
                 emailInput.classList.remove('is-invalid');
                 passwordInput.classList.remove('is-invalid');
+                
+                // Ocultar mensaje de error anterior
+                const errorAlert = document.getElementById('errorAlert');
+                if (errorAlert) {
+                    errorAlert.style.display = 'none';
+                }
 
                 // Validar email o nombre de usuario (puede ser email o nombre)
                 if (!emailInput.value.trim()) {
@@ -263,6 +275,16 @@
 
                 if (!isValid) {
                     e.preventDefault();
+                    // Mostrar mensaje de error
+                    if (errorAlert) {
+                        const errorMessageText = document.getElementById('errorMessageText');
+                        if (errorMessageText) {
+                            errorMessageText.textContent = 'Por favor, complete todos los campos.';
+                        }
+                        errorAlert.style.display = 'block';
+                        // Hacer scroll al mensaje de error
+                        errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
                 }
             });
 
