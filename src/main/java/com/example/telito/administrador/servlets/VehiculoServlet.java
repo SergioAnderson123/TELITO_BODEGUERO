@@ -98,6 +98,15 @@ public class VehiculoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Verificar que el usuario tenga rol de administrador
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a VehiculoServlet (POST) desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");

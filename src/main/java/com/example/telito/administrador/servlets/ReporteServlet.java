@@ -1,9 +1,9 @@
 package com.example.telito.administrador.servlets;
 
 import com.example.telito.administrador.daos.ReporteDAO;
+import com.example.telito.util.AuthorizationHelper;
 import com.google.gson.Gson;
 import com.example.telito.administrador.beans.Usuario;
-
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -23,6 +23,16 @@ public class ReporteServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Verificar que el usuario tenga rol de administrador
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a ReporteServlet desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+        
         String action = request.getParameter("action") == null ? "" : request.getParameter("action");
         ReporteDAO reporteDAO = new ReporteDAO();
         Gson gson = new Gson();
@@ -111,7 +121,7 @@ public class ReporteServlet extends HttpServlet {
             case "productor": {
                 // --- LÓGICA PARA REPORTE PRODUCTOR ---
                 int productorId = 3; // fallback por defecto
-                HttpSession session = request.getSession(false);
+                // Reutilizar la variable session ya declarada al inicio del método
                 if (session != null) {
                     Object u = session.getAttribute("usuario");
                     if (u instanceof Usuario) {

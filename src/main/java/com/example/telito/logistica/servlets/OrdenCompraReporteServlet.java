@@ -2,6 +2,7 @@ package com.example.telito.logistica.servlets;
 
 import com.example.telito.logistica.beans.OrdenCompraBean;
 import com.example.telito.logistica.daos.OrdenCompraDao;
+import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.ExcelUtil;
 import com.example.telito.util.EmailUtil;
 import jakarta.servlet.ServletException;
@@ -25,6 +26,15 @@ public class OrdenCompraReporteServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Verificar que el usuario tenga rol de logística
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederLogistica(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de logística intentó acceder a OrdenCompraReporteServlet desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
         String action = request.getParameter("action");
         if (action == null) {
@@ -46,6 +56,15 @@ public class OrdenCompraReporteServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Verificar que el usuario tenga rol de logística
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederLogistica(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de logística intentó acceder a OrdenCompraReporteServlet (POST) desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
         String action = request.getParameter("action");
         if ("enviar".equals(action)) {

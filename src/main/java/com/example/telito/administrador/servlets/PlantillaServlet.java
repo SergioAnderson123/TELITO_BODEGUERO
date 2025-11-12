@@ -3,7 +3,7 @@ package com.example.telito.administrador.servlets;
 import com.example.telito.administrador.beans.PlantillaConfig;
 import com.example.telito.administrador.beans.PlantillaMapeo;
 import com.example.telito.administrador.daos.PlantillaDAO;
-
+import com.example.telito.util.AuthorizationHelper;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -23,9 +23,26 @@ public class PlantillaServlet extends HttpServlet {
     // doGet para mostrar las páginas o para acciones que no sean de formularios (como deshabilitar).
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Verificar que el usuario tenga rol de administrador
+        HttpSession session = request.getSession(false);
+        if (session == null || !AuthorizationHelper.puedeAccederAdministrador(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a PlantillaServlet desde: " + 
+                             request.getRemoteAddr());
+            if (session != null) {
+                com.example.telito.administrador.beans.Usuario usuario = 
+                    (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
+                if (usuario != null && usuario.getRol() != null) {
+                    System.err.println("   → Usuario ID: " + usuario.getIdUsuario() + ", Rol ID: " + usuario.getRol().getIdRol() + 
+                                     ", Rol Nombre: " + usuario.getRol().getNombre());
+                }
+            }
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+        
         String action = request.getParameter("action") == null ? "listar" : request.getParameter("action");
         PlantillaDAO plantillaDAO = new PlantillaDAO();
-        HttpSession session = request.getSession();
         RequestDispatcher view;
 
         switch (action) {
@@ -79,9 +96,18 @@ public class PlantillaServlet extends HttpServlet {
     // doPost para procesar los formularios de "guardar" y "actualizar".
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Verificar que el usuario tenga rol de administrador
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a PlantillaServlet (POST) desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+        
         String action = request.getParameter("action") == null ? "" : request.getParameter("action");
         PlantillaDAO plantillaDAO = new PlantillaDAO();
-        HttpSession session = request.getSession();
 
         try {
             switch (action) {

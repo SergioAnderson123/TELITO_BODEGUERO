@@ -207,6 +207,16 @@ public class OrdenCompraServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Verificar que el usuario tenga rol de logística
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederLogistica(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de logística intentó acceder a OrdenCompraServlet (POST) desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+        
         // (El método doPost para guardar no cambia)
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action") == null ? "listar" : request.getParameter("action");

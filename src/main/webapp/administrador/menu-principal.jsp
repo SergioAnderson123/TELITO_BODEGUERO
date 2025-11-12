@@ -17,9 +17,16 @@
         <div class="dashboard-content">
     <div class="row">
         <div class="col-12">
-            <div class="page-header pt-3">
-                <h2 class="pageheader-title"><i class="fas fa-chart-pie me-2"></i>¡Bienvenido, Administrador!</h2>
-                <p class="pageheader-text">Resumen general del sistema y accesos rápidos.</p>
+            <div class="page-header pt-3 d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="pageheader-title"><i class="fas fa-chart-pie me-2"></i>¡Bienvenido, Administrador!</h2>
+                    <p class="pageheader-text">Resumen general del sistema y accesos rápidos.</p>
+                </div>
+                <div class="mt-3 mt-md-0">
+                    <button class="btn btn-primary btn-lg shadow-sm" onclick="location.href='<%= request.getContextPath() %>/UsuarioServlet?action=formCrear'" style="font-weight: 600; padding: 12px 24px;">
+                        <i class="fas fa-user-plus me-2"></i> Crear usuario
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -47,15 +54,9 @@
         <div class="col-lg-3 col-md-6 mb-4"><a href="<%= request.getContextPath() %>/administrador/reportes?action=globales" class="card quick-link-card"><div class="card-body text-center"><i class="fas fa-chart-pie fs-1 mb-3"></i><h5 class="text-dark">Reportes globales</h5><span class="text-muted small">KPIs y tableros</span></div></a></div>
         <div class="col-lg-3 col-md-6 mb-4"><a href="<%= request.getContextPath() %>/administrador/acceso-roles.jsp" class="card quick-link-card"><div class="card-body text-center"><i class="fas fa-user-shield fs-1 mb-3"></i><h5 class="text-dark">Roles y permisos</h5><span class="text-muted small">Asignación y políticas</span></div></a></div>
         <div class="col-lg-3 col-md-6 mb-4"><a href="<%= request.getContextPath() %>/administrador/configuracion.jsp" class="card quick-link-card"><div class="card-body text-center"><i class="fas fa-cogs fs-1 mb-3"></i><h5 class="text-dark">Configuración</h5><span class="text-muted small">Sistema y plantillas</span></div></a></div>
-        <div class="col-lg-3 col-md-6 mb-4"><a href="#" class="card quick-link-card"><div class="card-body text-center"><i class="fas fa-chart-line fs-1 mb-3"></i><h5 class="text-dark">Reportes globales</h5><span class="text-muted small">Indicadores y métricas</span></div></a></div>
+        <div class="col-lg-3 col-md-6 mb-4"><a href="<%= request.getContextPath() %>/administrador/reportes?action=globales" class="card quick-link-card"><div class="card-body text-center"><i class="fas fa-chart-line fs-1 mb-3"></i><h5 class="text-dark">Reportes globales</h5><span class="text-muted small">Indicadores y métricas</span></div></a></div>
     </div>
 
-    <div class="row mt-3">
-        <div class="col-12">
-            <button class="btn btn-primary" onclick="location.href='<%= request.getContextPath() %>/UsuarioServlet?action=formCrear'"><i class="fas fa-user-plus me-2"></i> Crear usuario</button>
-            <button class="btn btn-light" onclick="location.href='<%= request.getContextPath() %>/administrador/reportes?action=globales'"><i class="fas fa-eye me-2"></i> Ver reportes</button>
-        </div>
-    </div>
         </div>
         <jsp:include page="/administrador/layouts/footer.jsp" />
     </div>

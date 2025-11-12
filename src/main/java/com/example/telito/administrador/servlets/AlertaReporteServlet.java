@@ -2,6 +2,7 @@ package com.example.telito.administrador.servlets;
 
 import com.example.telito.administrador.beans.AlertaConfig;
 import com.example.telito.administrador.daos.AlertaDAO;
+import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.ExcelUtil;
 import com.example.telito.util.EmailUtil;
 import jakarta.servlet.ServletException;
@@ -29,6 +30,15 @@ public class AlertaReporteServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
+        // Verificar que el usuario tenga rol de administrador
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a AlertaReporteServlet desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
         
         String action = request.getParameter("action");
         if (action == null) {
@@ -50,6 +60,15 @@ public class AlertaReporteServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
+        // Verificar que el usuario tenga rol de administrador
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a AlertaReporteServlet (POST) desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
         
         String action = request.getParameter("action");
         if ("enviar".equals(action)) {

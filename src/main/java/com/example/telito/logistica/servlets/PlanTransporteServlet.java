@@ -106,6 +106,15 @@ public class PlanTransporteServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Verificar que el usuario tenga rol de logística
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederLogistica(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de logística intentó acceder a PlanTransporteServlet (POST) desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
         // === LÓGICA PARA GUARDAR EL NUEVO PLAN ===
 

@@ -2,6 +2,7 @@ package com.example.telito.administrador.servlets;
 
 import com.example.telito.administrador.beans.Usuario;
 import com.example.telito.administrador.daos.UsuarioDAO;
+import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.FileUploadUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -26,6 +27,16 @@ public class PerfilServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
+        
+        // Verificar que el usuario tenga rol de administrador
+        if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a PerfilServlet desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+        
         Usuario usuario = (Usuario) session.getAttribute("usuario");
 
         if (usuario == null) {
@@ -49,6 +60,15 @@ public class PerfilServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
+        
+        // Verificar que el usuario tenga rol de administrador
+        if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a PerfilServlet (POST) desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
         
         if (session == null || session.getAttribute("usuario") == null) {
             response.sendRedirect(request.getContextPath() + "/acceso/login");

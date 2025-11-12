@@ -163,6 +163,9 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="<%= request.getContextPath() %>/ProductorServlet?action=formActualizarPrecios"><i class="fas fa-tags"></i>Actualizar Precios</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<%= request.getContextPath() %>/"><i class="fas fa-home"></i>Ir a la web principal</a>
+                    </li>
                 </ul>
             </nav>
         </div>

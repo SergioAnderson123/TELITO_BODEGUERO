@@ -178,6 +178,12 @@
                                 <i class="fas fa-tags"></i>Actualizar Precios
                             </a>
                         </li>
+                        <!-- Ir a la web principal -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="<%= request.getContextPath() %>/">
+                                <i class="fas fa-home"></i>Ir a la web principal
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </div>
