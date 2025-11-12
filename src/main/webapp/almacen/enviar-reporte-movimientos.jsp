@@ -1,70 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-<%
-    String errorMsg = (String) session.getAttribute("errorMsg");
-    if (errorMsg != null) {
-        session.removeAttribute("errorMsg");
-    }
-%>
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enviar Reporte por Correo - Telito Bodeguero</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --turquoise-dark: #006d77;
-            --seafoam: #83c5be;
-            --seafoam-light: #edf6f9;
-            --white: #ffffff;
-            --text-dark: #2b2d42;
-            --text-muted: #6c757d;
-            --border-color: #e9ecef;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            margin: 0;
-            background-color: var(--seafoam-light);
-            color: var(--text-dark);
-        }
-        .dashboard-main-wrapper { display: flex; min-height: 100vh; }
-        .dashboard-header {
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: fixed; top: 0; right: 0; left: 250px; z-index: 999;
-            height: 70px; border-bottom: 1px solid var(--border-color);
-        }
-        .dashboard-wrapper { margin-left: 250px; width: calc(100% - 250px); min-height: 100vh; }
-        .dashboard-content { margin-top: 70px; padding: 30px; }
-        .nav-left-sidebar {
-            width: 250px;
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, #055e68 100%);
-            min-height: 100vh; position: fixed; left: 0; top: 0; z-index: 1000;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-        .nav-link { color: rgba(255,255,255,0.9) !important; padding: 12px 20px; border-radius: 8px; margin: 5px 15px; transition: all 0.3s ease; display: flex; align-items: center; }
-        .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.18); color: #fff !important; transform: translateX(5px); }
-        .nav-link i { margin-right: 10px; width: 20px; }
-        .card {
-            background-color: var(--white);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            margin-bottom: 40px;
-        }
-        .btn-primary {
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
-            border: none;
-        }
-        .btn-secondary {
-            background: #8d99ae;
-            border: none;
-        }
-    </style>
+    <jsp:include page="/almacen/layouts/head.jsp">
+        <jsp:param name="pageTitle" value="Enviar Reporte por Correo"/>
+    </jsp:include>
 </head>
 <body>
 <div class="dashboard-main-wrapper">
@@ -73,15 +15,15 @@
     </jsp:include>
     <jsp:include page="/almacen/layouts/header_almacen.jsp" />
 
-    <!-- Content -->
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
-            <% if (errorMsg != null) { %>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <%= errorMsg %>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            <% } %>
+            <c:if test="${not empty sessionScope.errorMsg}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    ${sessionScope.errorMsg}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <c:remove var="errorMsg" scope="session"/>
+            </c:if>
 
             <div class="page-header mb-4">
                 <h2><i class="fas fa-envelope me-2"></i>Enviar Reporte de Movimientos por Correo</h2>
@@ -151,6 +93,7 @@
             </div>
         </div>
     </div>
+    <jsp:include page="/almacen/layouts/footer.jsp" />
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

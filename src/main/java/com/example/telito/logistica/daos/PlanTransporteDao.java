@@ -203,13 +203,13 @@ public class PlanTransporteDao {
         ArrayList<PlanTransporteBean> listaPlanes = new ArrayList<>();
         
         // Consulta agrupada por numero_plan para obtener un registro por viaje
-        // Usamos COALESCE para fecha_salida: si existe fecha_creacion la usamos, sino usamos fecha_entrega - 1 día como estimación
+        // Calculamos fecha_salida como fecha_entrega - 1 día (estimación)
         String sql = """
             SELECT
                 pt.numero_plan AS numeroViaje,
                 c.nombre_completo AS nombreConductor,
                 v.placa AS placaVehiculo,
-                DATE_FORMAT(COALESCE(MIN(pt.fecha_salida), DATE_SUB(MIN(pt.fecha_entrega), INTERVAL 1 DAY)), '%d/%m/%Y') AS fechaSalida,
+                DATE_FORMAT(DATE_SUB(MIN(pt.fecha_entrega), INTERVAL 1 DAY), '%d/%m/%Y') AS fechaSalida,
                 DATE_FORMAT(MIN(pt.fecha_entrega), '%d/%m/%Y') AS fechaEntrega,
                 MAX(pt.estado) AS estado,
                 d.nombre AS nombreDestino,

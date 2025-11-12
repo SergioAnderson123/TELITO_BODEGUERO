@@ -18,26 +18,38 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-@WebServlet(name = "OrdenCompraReporteServlet", value = "/productor/OrdenCompraReporteServlet")
+@WebServlet(name = "ProductorOrdenCompraReporteServlet", value = "/productor/OrdenCompraReporteServlet")
 public class OrdenCompraReporteServlet extends HttpServlet {
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        System.out.println("=== OrdenCompraReporteServlet inicializado correctamente ===");
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        System.out.println("=== OrdenCompraReporteServlet.doGet() llamado ===");
         String action = request.getParameter("action");
+        System.out.println("Action recibido: " + action);
+        
         if (action == null) {
             action = "exportar";
         }
 
         switch (action) {
             case "exportar":
+                System.out.println("Ejecutando exportarExcel...");
                 exportarExcel(request, response);
                 break;
             case "formEnviar":
+                System.out.println("Ejecutando mostrarFormularioEnvio...");
                 mostrarFormularioEnvio(request, response);
                 break;
             default:
+                System.out.println("Acción no válida: " + action);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
         }
     }
@@ -46,10 +58,15 @@ public class OrdenCompraReporteServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        System.out.println("=== OrdenCompraReporteServlet.doPost() llamado ===");
         String action = request.getParameter("action");
+        System.out.println("Action recibido en POST: " + action);
+        
         if ("enviar".equals(action)) {
+            System.out.println("Ejecutando enviarPorCorreo...");
             enviarPorCorreo(request, response);
         } else {
+            System.out.println("Acción no válida en POST: " + action);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
         }
     }
@@ -67,10 +84,13 @@ public class OrdenCompraReporteServlet extends HttpServlet {
         }
 
         int idProductor = usuarioSesion.getIdUsuario();
+        System.out.println("ID Productor: " + idProductor);
+        
         OrdenCompraDao ordenCompraDao = new OrdenCompraDao();
 
         // Obtener todas las órdenes del productor
         List<Object[]> listaOrdenes = ordenCompraDao.listarOrdenesPorProductor(idProductor);
+        System.out.println("Órdenes encontradas: " + listaOrdenes.size());
 
         String filtrosInfo = "Todas las órdenes";
 
@@ -82,7 +102,9 @@ public class OrdenCompraReporteServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         try (OutputStream out = response.getOutputStream()) {
-            ExcelUtil.generarExcelOrdenesCompraProductor((java.util.ArrayList<?>) (Object) listaOrdenes, out, filtrosInfo);
+            // Convertir List a ArrayList para el método de ExcelUtil
+            java.util.ArrayList<Object[]> arrayListOrdenes = new java.util.ArrayList<>(listaOrdenes);
+            ExcelUtil.generarExcelOrdenesCompraProductor(arrayListOrdenes, out, filtrosInfo);
             out.flush();
         } catch (Exception e) {
             System.err.println("Error al generar Excel: " + e.getMessage());
@@ -95,6 +117,9 @@ public class OrdenCompraReporteServlet extends HttpServlet {
     private void mostrarFormularioEnvio(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        System.out.println("=== mostrarFormularioEnvio() llamado ===");
+        System.out.println("Redirigiendo a: /productor/enviar-reporte-ordenes.jsp");
+        
         request.getRequestDispatcher("/productor/enviar-reporte-ordenes.jsp")
             .forward(request, response);
     }
@@ -113,10 +138,14 @@ public class OrdenCompraReporteServlet extends HttpServlet {
         }
 
         int idProductor = usuarioSesion.getIdUsuario();
+        System.out.println("ID Productor en enviarPorCorreo: " + idProductor);
 
         String emailDestino = request.getParameter("email_destino");
         String asunto = request.getParameter("asunto");
         String mensaje = request.getParameter("mensaje");
+        
+        System.out.println("Email destino: " + emailDestino);
+        System.out.println("Asunto: " + asunto);
 
         if (emailDestino == null || emailDestino.trim().isEmpty()) {
             session.setAttribute("errorMsg", "El email de destino es obligatorio.");
@@ -135,6 +164,7 @@ public class OrdenCompraReporteServlet extends HttpServlet {
 
         // Obtener todas las órdenes del productor
         List<Object[]> listaOrdenes = ordenCompraDao.listarOrdenesPorProductor(idProductor);
+        System.out.println("Órdenes encontradas para correo: " + listaOrdenes.size());
 
         String filtrosInfo = "Todas las órdenes";
 
@@ -151,7 +181,9 @@ public class OrdenCompraReporteServlet extends HttpServlet {
             tempFile = new File(tempDirFile, nombreArchivo);
 
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-                ExcelUtil.generarExcelOrdenesCompraProductor((java.util.ArrayList<?>) (Object) listaOrdenes, fos, filtrosInfo);
+                // Convertir List a ArrayList para el método de ExcelUtil
+                java.util.ArrayList<Object[]> arrayListOrdenes = new java.util.ArrayList<>(listaOrdenes);
+                ExcelUtil.generarExcelOrdenesCompraProductor(arrayListOrdenes, fos, filtrosInfo);
                 fos.flush();
             }
 

@@ -293,14 +293,6 @@
                             <i class="fas fa-envelope me-2"></i>Enviar Productos
                         </a>
                     </div>
-                    <div class="btn-group">
-                        <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=exportar" class="btn btn-sm" style="background: linear-gradient(160deg, #6f42c1 0%, #5a32a3 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
-                            <i class="fas fa-boxes me-2"></i>Exportar Lotes
-                        </a>
-                        <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=formEnviar" class="btn btn-sm" style="background: linear-gradient(160deg, #e83e8c 0%, #d91a72 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
-                            <i class="fas fa-envelope me-2"></i>Enviar Lotes
-                        </a>
-                    </div>
                 </div>
             </div>
 

@@ -1,8 +1,11 @@
 package com.example.telito.util;
 
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,7 +33,7 @@ public class ExcelUtil {
             XSSFSheet sheet = workbook.createSheet("Usuarios");
             
             // Crear estilos
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
             
@@ -43,6 +46,13 @@ public class ExcelUtil {
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 5));
             
+            // Fecha de generación
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 5));
+            
             // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
                 Row filterRow = sheet.createRow(rowNum++);
@@ -52,17 +62,11 @@ public class ExcelUtil {
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 5));
             }
             
-            // Fecha de generación
-            Row dateRow = sheet.createRow(rowNum++);
-            Cell dateCell = dateRow.createCell(0);
-            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-            dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 5));
-            
             // Fila en blanco
             rowNum++;
             
-            // Encabezados
+            // Encabezados - guardar el índice de esta fila para el autoFilter
+            int headerRowIndex = rowNum;
             Row headerRow = sheet.createRow(rowNum++);
             String[] headers = {"ID", "Nombres", "Apellidos", "Correo Electrónico", "Rol", "Estado"};
             int colNum = 0;
@@ -130,8 +134,8 @@ public class ExcelUtil {
                 sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
             }
             
-            // Aplicar filtro automático a los encabezados (empieza después de las filas de título)
-            int headerRowIndex = filtrosInformacion != null && !filtrosInformacion.trim().isEmpty() ? 3 : 2;
+            // Aplicar filtro automático a los encabezados (en la misma fila de encabezados)
+            // headerRowIndex ya fue guardado anteriormente cuando se creó la fila de encabezados
             sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
                 headerRowIndex, headerRowIndex, 0, headers.length - 1));
             
@@ -157,6 +161,46 @@ public class ExcelUtil {
         style.setFont(font);
         style.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        
+        return style;
+    }
+    
+    /**
+     * Crea un estilo para los encabezados de la tabla con color verde (#28a745).
+     * Similar al color usado en los sidebars de administrador.
+     */
+    private static CellStyle crearEstiloEncabezadoVerde(Workbook workbook) {
+        if (!(workbook instanceof XSSFWorkbook)) {
+            // Si no es XSSFWorkbook, usar el estilo estándar
+            return crearEstiloEncabezado(workbook);
+        }
+        
+        XSSFWorkbook xssfWorkbook = (XSSFWorkbook) workbook;
+        XSSFCellStyle style = xssfWorkbook.createCellStyle();
+        XSSFFont font = xssfWorkbook.createFont();
+        
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 11);
+        font.setColor(IndexedColors.WHITE.getIndex());
+        
+        style.setFont(font);
+        
+        // Color verde #28a745 = RGB(40, 167, 69)
+        java.awt.Color javaColor = new java.awt.Color(40, 167, 69);
+        XSSFColor greenColor = new XSSFColor(javaColor, null);
+        style.setFillForegroundColor(greenColor);
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
         style.setBorderBottom(BorderStyle.THIN);
@@ -228,7 +272,7 @@ public class ExcelUtil {
             XSSFSheet sheet = workbook.createSheet("Conductores");
             
             // Crear estilos
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
             
@@ -241,6 +285,13 @@ public class ExcelUtil {
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 2));
             
+            // Fecha de generación
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 2));
+            
             // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
                 Row filterRow = sheet.createRow(rowNum++);
@@ -250,17 +301,11 @@ public class ExcelUtil {
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 2));
             }
             
-            // Fecha de generación
-            Row dateRow = sheet.createRow(rowNum++);
-            Cell dateCell = dateRow.createCell(0);
-            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-            dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 2));
-            
             // Fila en blanco
             rowNum++;
             
-            // Encabezados
+            // Encabezados - guardar el índice de esta fila para el autoFilter
+            int headerRowIndex = rowNum;
             Row headerRow = sheet.createRow(rowNum++);
             String[] headers = {"ID", "Nombre Completo", "Licencia"};
             int colNum = 0;
@@ -305,8 +350,8 @@ public class ExcelUtil {
                 sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
             }
             
-            // Aplicar filtro automático a los encabezados
-            int headerRowIndex = filtrosInformacion != null && !filtrosInformacion.trim().isEmpty() ? 3 : 2;
+            // Aplicar filtro automático a los encabezados (en la misma fila de encabezados)
+            // headerRowIndex ya fue guardado anteriormente cuando se creó la fila de encabezados
             sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
                 headerRowIndex, headerRowIndex, 0, headers.length - 1));
             
@@ -333,7 +378,7 @@ public class ExcelUtil {
             XSSFSheet sheet = workbook.createSheet("Alertas");
             
             // Crear estilos
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
             
@@ -346,6 +391,13 @@ public class ExcelUtil {
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 6));
             
+            // Fecha de generación
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 6));
+            
             // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
                 Row filterRow = sheet.createRow(rowNum++);
@@ -355,17 +407,11 @@ public class ExcelUtil {
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 6));
             }
             
-            // Fecha de generación
-            Row dateRow = sheet.createRow(rowNum++);
-            Cell dateCell = dateRow.createCell(0);
-            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-            dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 6));
-            
             // Fila en blanco
             rowNum++;
             
-            // Encabezados
+            // Encabezados - guardar el índice de esta fila para el autoFilter
+            int headerRowIndex = rowNum;
             Row headerRow = sheet.createRow(rowNum++);
             String[] headers = {"ID", "Nombre", "Tipo", "Condición", "Categoría", "Rol a Notificar", "Estado"};
             int colNum = 0;
@@ -468,8 +514,8 @@ public class ExcelUtil {
                 sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
             }
             
-            // Aplicar filtro automático a los encabezados
-            int headerRowIndex = filtrosInformacion != null && !filtrosInformacion.trim().isEmpty() ? 3 : 2;
+            // Aplicar filtro automático a los encabezados (en la misma fila de encabezados)
+            // headerRowIndex ya fue guardado anteriormente cuando se creó la fila de encabezados
             sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
                 headerRowIndex, headerRowIndex, 0, headers.length - 1));
             
@@ -502,7 +548,7 @@ public class ExcelUtil {
             
             // ========== HOJA 1: LOGÍSTICA ==========
             XSSFSheet sheetLogistica = workbook.createSheet("Logística");
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
             
@@ -521,9 +567,12 @@ public class ExcelUtil {
             dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
             dateCell.setCellStyle(dataStyle);
             sheetLogistica.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 5));
+            
+            // Fila en blanco
             rowNum++;
             
-            // Encabezados Logística
+            // Encabezados Logística - guardar el índice de esta fila para el autoFilter
+            int headerRowIndexLogistica = rowNum;
             Row headerRow = sheetLogistica.createRow(rowNum++);
             String[] headersLogistica = {"SKU", "Producto", "Paquetes", "Precio por Paquete", "Costo por Unidad", "Estado"};
             int colNum = 0;
@@ -567,7 +616,7 @@ public class ExcelUtil {
             }
             
             // Ajustar columnas y filtros Logística
-            int headerRowIndexLogistica = 2;
+            // headerRowIndexLogistica ya fue guardado anteriormente cuando se creó la fila de encabezados
             for (int i = 0; i < headersLogistica.length; i++) {
                 sheetLogistica.autoSizeColumn(i);
                 sheetLogistica.setColumnWidth(i, sheetLogistica.getColumnWidth(i) + 1000);
@@ -591,9 +640,12 @@ public class ExcelUtil {
             dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
             dateCell.setCellStyle(dataStyle);
             sheetAlmacen.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 5));
+            
+            // Fila en blanco
             rowNum++;
             
-            // Encabezados Almacén
+            // Encabezados Almacén - guardar el índice de esta fila para el autoFilter
+            int headerRowIndexAlmacen = rowNum;
             headerRow = sheetAlmacen.createRow(rowNum++);
             String[] headersAlmacen = {"Código Lote", "Producto", "Ubicación", "Stock", "Vencimiento", "Estado"};
             colNum = 0;
@@ -642,7 +694,7 @@ public class ExcelUtil {
             }
             
             // Ajustar columnas y filtros Almacén
-            int headerRowIndexAlmacen = 2;
+            // headerRowIndexAlmacen ya fue guardado anteriormente cuando se creó la fila de encabezados
             for (int i = 0; i < headersAlmacen.length; i++) {
                 sheetAlmacen.autoSizeColumn(i);
                 sheetAlmacen.setColumnWidth(i, sheetAlmacen.getColumnWidth(i) + 1000);
@@ -666,9 +718,12 @@ public class ExcelUtil {
             dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
             dateCell.setCellStyle(dataStyle);
             sheetProductores.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 3));
+            
+            // Fila en blanco
             rowNum++;
             
-            // Encabezados Productores
+            // Encabezados Productores - guardar el índice de esta fila para el autoFilter
+            int headerRowIndexProductores = rowNum;
             headerRow = sheetProductores.createRow(rowNum++);
             String[] headersProductores = {"SKU", "Producto", "Categoría", "Stock Total"};
             colNum = 0;
@@ -704,7 +759,7 @@ public class ExcelUtil {
             }
             
             // Ajustar columnas y filtros Productores
-            int headerRowIndexProductores = 2;
+            // headerRowIndexProductores ya fue guardado anteriormente cuando se creó la fila de encabezados
             for (int i = 0; i < headersProductores.length; i++) {
                 sheetProductores.autoSizeColumn(i);
                 sheetProductores.setColumnWidth(i, sheetProductores.getColumnWidth(i) + 1000);
@@ -733,7 +788,7 @@ public class ExcelUtil {
             XSSFSheet sheet = workbook.createSheet("Stock Mínimo");
 
             // Crear estilos
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
 
@@ -746,6 +801,13 @@ public class ExcelUtil {
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 7));
 
+            // Fecha de generación
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
+
             // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
                 Row filterRow = sheet.createRow(rowNum++);
@@ -755,17 +817,11 @@ public class ExcelUtil {
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
             }
 
-            // Fecha de generación
-            Row dateRow = sheet.createRow(rowNum++);
-            Cell dateCell = dateRow.createCell(0);
-            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-            dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
-
             // Fila en blanco
             rowNum++;
 
-            // Encabezados
+            // Encabezados - guardar el índice de esta fila para el autoFilter
+            int headerRowIndex = rowNum;
             Row headerRow = sheet.createRow(rowNum++);
             String[] headers = {"Producto", "Código", "Stock Mín. Lote", "Stock Crít. Lote", "Stock Mín. Total", "Stock Crít. Total", "Estado", "Última Actualización"};
             int colNum = 0;
@@ -851,8 +907,8 @@ public class ExcelUtil {
                 sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
             }
 
-            // Aplicar filtro automático a los encabezados
-            int headerRowIndex = filtrosInformacion != null && !filtrosInformacion.trim().isEmpty() ? 3 : 2;
+            // Aplicar filtro automático a los encabezados (en la misma fila de encabezados)
+            // headerRowIndex ya fue guardado anteriormente cuando se creó la fila de encabezados
             sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
                 headerRowIndex, headerRowIndex, 0, headers.length - 1));
 
@@ -881,7 +937,7 @@ public class ExcelUtil {
             XSSFSheet sheet = workbook.createSheet("Inventario Logística");
 
             // Crear estilos
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
             CellStyle currencyStyle = crearEstiloMoneda(workbook);
@@ -895,6 +951,13 @@ public class ExcelUtil {
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 6));
 
+            // Fecha de generación
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 6));
+
             // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
                 Row filterRow = sheet.createRow(rowNum++);
@@ -903,13 +966,6 @@ public class ExcelUtil {
                 filterCell.setCellStyle(dataStyle);
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 6));
             }
-
-            // Fecha de generación
-            Row dateRow = sheet.createRow(rowNum++);
-            Cell dateCell = dateRow.createCell(0);
-            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-            dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 6));
 
             // Fila en blanco
             rowNum++;
@@ -1026,7 +1082,7 @@ public class ExcelUtil {
             XSSFSheet sheet = workbook.createSheet("Órdenes de Compra");
 
             // Crear estilos
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
             CellStyle currencyStyle = crearEstiloMoneda(workbook);
@@ -1040,6 +1096,13 @@ public class ExcelUtil {
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 7));
 
+            // Fecha de generación
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
+
             // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
                 Row filterRow = sheet.createRow(rowNum++);
@@ -1048,13 +1111,6 @@ public class ExcelUtil {
                 filterCell.setCellStyle(dataStyle);
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
             }
-
-            // Fecha de generación
-            Row dateRow = sheet.createRow(rowNum++);
-            Cell dateCell = dateRow.createCell(0);
-            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-            dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
 
             // Fila en blanco
             rowNum++;
@@ -1151,6 +1207,7 @@ public class ExcelUtil {
             }
 
             // Aplicar filtro automático a los encabezados (en la misma fila de encabezados)
+            // headerRowIndex ya fue guardado anteriormente cuando se creó la fila de encabezados
             sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
                 headerRowIndex, headerRowIndex, 0, headers.length - 1));
 
@@ -1180,7 +1237,7 @@ public class ExcelUtil {
             XSSFSheet sheet = workbook.createSheet("Movimientos Inventario");
 
             // Crear estilos
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
             CellStyle summaryStyle = crearEstiloResumen(workbook);
@@ -1194,6 +1251,13 @@ public class ExcelUtil {
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 7));
 
+            // Fecha de generación
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
+
             // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
                 Row filterRow = sheet.createRow(rowNum++);
@@ -1202,13 +1266,6 @@ public class ExcelUtil {
                 filterCell.setCellStyle(dataStyle);
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
             }
-
-            // Fecha de generación
-            Row dateRow = sheet.createRow(rowNum++);
-            Cell dateCell = dateRow.createCell(0);
-            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-            dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
 
             // Fila en blanco
             rowNum++;
@@ -1373,6 +1430,7 @@ public class ExcelUtil {
             }
 
             // Aplicar filtro automático a los encabezados (en la misma fila de encabezados)
+            // headerRowIndex ya fue guardado anteriormente cuando se creó la fila de encabezados
             sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
                 headerRowIndex, headerRowIndex, 0, headers.length - 1));
 
@@ -1433,7 +1491,7 @@ public class ExcelUtil {
             XSSFSheet sheet = workbook.createSheet("Distribución y Transporte");
 
             // Crear estilos
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
             CellStyle summaryStyle = crearEstiloResumen(workbook);
@@ -1447,6 +1505,13 @@ public class ExcelUtil {
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 7));
 
+            // Fecha de generación
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
+
             // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
                 Row filterRow = sheet.createRow(rowNum++);
@@ -1455,13 +1520,6 @@ public class ExcelUtil {
                 filterCell.setCellStyle(dataStyle);
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
             }
-
-            // Fecha de generación
-            Row dateRow = sheet.createRow(rowNum++);
-            Cell dateCell = dateRow.createCell(0);
-            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-            dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
 
             // Fila en blanco
             rowNum++;
@@ -1679,6 +1737,7 @@ public class ExcelUtil {
             }
 
             // Aplicar filtro automático a los encabezados (en la misma fila de encabezados)
+            // headerRowIndex ya fue guardado anteriormente cuando se creó la fila de encabezados
             sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
                 headerRowIndex, headerRowIndex, 0, headers.length - 1));
 
@@ -1703,19 +1762,28 @@ public class ExcelUtil {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Mis Productos");
             
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
             CellStyle currencyStyle = crearEstiloMoneda(workbook);
             
             int rowNum = 0;
             
+            // Título del reporte
             Row titleRow = sheet.createRow(rowNum++);
             Cell titleCell = titleRow.createCell(0);
             titleCell.setCellValue("REPORTE DE PRODUCTOS - PRODUCTOR - TELITO BODEGUERO");
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 7));
             
+            // Fecha de generación
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
+            
+            // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
                 Row filterRow = sheet.createRow(rowNum++);
                 Cell filterCell = filterRow.createCell(0);
@@ -1724,14 +1792,10 @@ public class ExcelUtil {
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
             }
             
-            Row dateRow = sheet.createRow(rowNum++);
-            Cell dateCell = dateRow.createCell(0);
-            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-            dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
-            
+            // Fila en blanco
             rowNum++;
             
+            // Encabezados - guardar el índice de esta fila para el autoFilter
             int headerRowIndex = rowNum;
             Row headerRow = sheet.createRow(rowNum++);
             String[] headers = {"SKU", "Producto", "Descripción", "Categoría", "Precio por Paquete", "Unidades por Paquete", "Stock Total", "N° de Lotes"};
@@ -1805,15 +1869,22 @@ public class ExcelUtil {
             totalValueCell.setCellValue(valorTotalInventario);
             totalValueCell.setCellStyle(currencyStyle);
             
+            // Ajustar ancho de columnas
             for (int i = 0; i < headers.length; i++) {
                 sheet.autoSizeColumn(i);
+                // Agregar un poco más de espacio
                 sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
             }
             
+            // Aplicar filtro automático a los encabezados (en la misma fila de encabezados)
+            // headerRowIndex ya fue guardado anteriormente cuando se creó la fila de encabezados
             sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
                 headerRowIndex, headerRowIndex, 0, headers.length - 1));
+            
+            // Congelar paneles (dejar visibles los encabezados al hacer scroll)
             sheet.createFreezePane(0, headerRowIndex + 1);
             
+            // Escribir al stream
             workbook.write(outputStream);
         }
     }
@@ -1831,18 +1902,27 @@ public class ExcelUtil {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Mis Lotes");
             
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
             
             int rowNum = 0;
             
+            // Título del reporte
             Row titleRow = sheet.createRow(rowNum++);
             Cell titleCell = titleRow.createCell(0);
             titleCell.setCellValue("REPORTE DE LOTES - PRODUCTOR - TELITO BODEGUERO");
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 8));
             
+            // Fecha de generación
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
+            
+            // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
                 Row filterRow = sheet.createRow(rowNum++);
                 Cell filterCell = filterRow.createCell(0);
@@ -1851,14 +1931,10 @@ public class ExcelUtil {
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
             }
             
-            Row dateRow = sheet.createRow(rowNum++);
-            Cell dateCell = dateRow.createCell(0);
-            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-            dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
-            
+            // Fila en blanco
             rowNum++;
             
+            // Encabezados - guardar el índice de esta fila para el autoFilter
             int headerRowIndex = rowNum;
             Row headerRow = sheet.createRow(rowNum++);
             String[] headers = {"Código Lote", "Producto", "SKU", "Stock Actual", "Fecha Vencimiento", "Ubicación", "Distrito", "Estado"};
@@ -1979,15 +2055,22 @@ public class ExcelUtil {
             totalValueCell.setCellValue(totalStock);
             totalValueCell.setCellStyle(dataStyle);
             
+            // Ajustar ancho de columnas
             for (int i = 0; i < headers.length; i++) {
                 sheet.autoSizeColumn(i);
+                // Agregar un poco más de espacio
                 sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
             }
             
+            // Aplicar filtro automático a los encabezados (en la misma fila de encabezados)
+            // headerRowIndex ya fue guardado anteriormente cuando se creó la fila de encabezados
             sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
                 headerRowIndex, headerRowIndex, 0, headers.length - 1));
+            
+            // Congelar paneles (dejar visibles los encabezados al hacer scroll)
             sheet.createFreezePane(0, headerRowIndex + 1);
             
+            // Escribir al stream
             workbook.write(outputStream);
         }
     }
@@ -2005,18 +2088,27 @@ public class ExcelUtil {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Lotes Almacén");
             
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
             
             int rowNum = 0;
             
+            // Título del reporte
             Row titleRow = sheet.createRow(rowNum++);
             Cell titleCell = titleRow.createCell(0);
             titleCell.setCellValue("REPORTE DE LOTES - ALMACÉN - TELITO BODEGUERO");
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 8));
             
+            // Fecha de generación
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
+            
+            // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
                 Row filterRow = sheet.createRow(rowNum++);
                 Cell filterCell = filterRow.createCell(0);
@@ -2025,14 +2117,10 @@ public class ExcelUtil {
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
             }
             
-            Row dateRow = sheet.createRow(rowNum++);
-            Cell dateCell = dateRow.createCell(0);
-            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-            dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
-            
+            // Fila en blanco
             rowNum++;
             
+            // Encabezados - guardar el índice de esta fila para el autoFilter
             int headerRowIndex = rowNum;
             Row headerRow = sheet.createRow(rowNum++);
             String[] headers = {"Código Lote", "Producto", "SKU", "Stock Actual", "Paquetes Disponibles", 
@@ -2122,15 +2210,22 @@ public class ExcelUtil {
             totalPaquetesValueCell.setCellValue(totalPaquetes);
             totalPaquetesValueCell.setCellStyle(headerStyle);
             
+            // Ajustar ancho de columnas
             for (int i = 0; i < headers.length; i++) {
                 sheet.autoSizeColumn(i);
+                // Agregar un poco más de espacio
                 sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
             }
             
+            // Aplicar filtro automático a los encabezados (en la misma fila de encabezados)
+            // headerRowIndex ya fue guardado anteriormente cuando se creó la fila de encabezados
             sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
                 headerRowIndex, headerRowIndex, 0, headers.length - 1));
+            
+            // Congelar paneles (dejar visibles los encabezados al hacer scroll)
             sheet.createFreezePane(0, headerRowIndex + 1);
             
+            // Escribir al stream
             workbook.write(outputStream);
         }
     }
@@ -2148,19 +2243,28 @@ public class ExcelUtil {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Órdenes de Compra");
             
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            CellStyle headerStyle = crearEstiloEncabezadoVerde(workbook);
             CellStyle dataStyle = crearEstiloDatos(workbook);
             CellStyle titleStyle = crearEstiloTitulo(workbook);
             CellStyle currencyStyle = crearEstiloMoneda(workbook);
             
             int rowNum = 0;
             
+            // Título del reporte
             Row titleRow = sheet.createRow(rowNum++);
             Cell titleCell = titleRow.createCell(0);
             titleCell.setCellValue("REPORTE DE ÓRDENES DE COMPRA - PRODUCTOR - TELITO BODEGUERO");
             titleCell.setCellStyle(titleStyle);
             sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 6));
             
+            // Fecha de generación
+            Row dateRow = sheet.createRow(rowNum++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+            dateCell.setCellStyle(dataStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 6));
+            
+            // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
                 Row filterRow = sheet.createRow(rowNum++);
                 Cell filterCell = filterRow.createCell(0);
@@ -2169,14 +2273,10 @@ public class ExcelUtil {
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 6));
             }
             
-            Row dateRow = sheet.createRow(rowNum++);
-            Cell dateCell = dateRow.createCell(0);
-            dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-            dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 6));
-            
+            // Fila en blanco
             rowNum++;
             
+            // Encabezados - guardar el índice de esta fila para el autoFilter
             int headerRowIndex = rowNum;
             Row headerRow = sheet.createRow(rowNum++);
             String[] headers = {"N° de Orden", "Producto", "Cantidad", "Monto Total", "Usuario Logística", "Estado", "Lote Asignado"};
@@ -2242,15 +2342,22 @@ public class ExcelUtil {
             totalValueCell.setCellValue(montoTotalGeneral);
             totalValueCell.setCellStyle(currencyStyle);
             
+            // Ajustar ancho de columnas
             for (int i = 0; i < headers.length; i++) {
                 sheet.autoSizeColumn(i);
+                // Agregar un poco más de espacio
                 sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
             }
             
+            // Aplicar filtro automático a los encabezados (en la misma fila de encabezados)
+            // headerRowIndex ya fue guardado anteriormente cuando se creó la fila de encabezados
             sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(
                 headerRowIndex, headerRowIndex, 0, headers.length - 1));
+            
+            // Congelar paneles (dejar visibles los encabezados al hacer scroll)
             sheet.createFreezePane(0, headerRowIndex + 1);
             
+            // Escribir al stream
             workbook.write(outputStream);
         }
     }

@@ -89,4 +89,25 @@
     <!-- 3. ReadOnlyModeFilter: Modo solo lectura (TERCERO) -->
     <!-- Este filtro ya está configurado con @WebFilter -->
 
+    <!-- ========== CONFIGURACIÓN DE SERVLETS ========== -->
+    <!-- Registro explícito de servlets de reportes para asegurar su carga -->
+    <!-- Nota: Se registra explícitamente para evitar conflictos con otros servlets del mismo nombre -->
+    <servlet>
+        <servlet-name>ProductorLoteReporteServlet</servlet-name>
+        <servlet-class>com.example.telito.productor.servlets.LoteReporteServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProductorLoteReporteServlet</servlet-name>
+        <url-pattern>/productor/LoteReporteServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ProductorOrdenCompraReporteServlet</servlet-name>
+        <servlet-class>com.example.telito.productor.servlets.OrdenCompraReporteServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProductorOrdenCompraReporteServlet</servlet-name>
+        <url-pattern>/productor/OrdenCompraReporteServlet</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -187,9 +187,21 @@
         <div class="dashboard-wrapper">
             <div class="dashboard-content">
                 <!-- Page Header -->
-                <div class="page-header">
-                    <h2><i class="fas fa-boxes me-2"></i>Registrar Lotes</h2>
-                    <p>Registra los nuevos lotes de productos distribuidos en diferentes ubicaciones.</p>
+                <div class="page-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2><i class="fas fa-boxes me-2"></i>Registrar Lotes</h2>
+                        <p class="text-muted mb-0">Registra los nuevos lotes de productos distribuidos en diferentes ubicaciones.</p>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <div class="btn-group">
+                            <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=exportar" class="btn btn-sm" style="background: linear-gradient(160deg, #28a745 0%, #20c997 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
+                                <i class="fas fa-boxes me-2"></i>Exportar Lotes
+                            </a>
+                            <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=formEnviar" class="btn btn-sm" style="background: linear-gradient(160deg, #17a2b8 0%, #138496 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
+                                <i class="fas fa-envelope me-2"></i>Enviar Lotes
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Mini pantalla de error para fecha inválida -->

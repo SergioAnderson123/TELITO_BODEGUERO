@@ -18,13 +18,20 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-@WebServlet(name = "LoteReporteServlet", value = "/productor/LoteReporteServlet")
+@WebServlet(name = "ProductorLoteReporteServlet", value = "/productor/LoteReporteServlet")
 public class LoteReporteServlet extends HttpServlet {
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        System.out.println("=== LoteReporteServlet inicializado correctamente ===");
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        System.out.println("=== LoteReporteServlet.doGet() llamado ===");
         String action = request.getParameter("action");
         if (action == null) {
             action = "exportar";
@@ -82,7 +89,9 @@ public class LoteReporteServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         try (OutputStream out = response.getOutputStream()) {
-            ExcelUtil.generarExcelLotesProductor((java.util.ArrayList<?>) (Object) listaLotes, out, filtrosInfo);
+            // Convertir List a ArrayList para el método de ExcelUtil
+            java.util.ArrayList<Object[]> arrayListaLotes = new java.util.ArrayList<>(listaLotes);
+            ExcelUtil.generarExcelLotesProductor(arrayListaLotes, out, filtrosInfo);
             out.flush();
         } catch (Exception e) {
             System.err.println("Error al generar Excel: " + e.getMessage());
@@ -151,7 +160,9 @@ public class LoteReporteServlet extends HttpServlet {
             tempFile = new File(tempDirFile, nombreArchivo);
 
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-                ExcelUtil.generarExcelLotesProductor((java.util.ArrayList<?>) (Object) listaLotes, fos, filtrosInfo);
+                // Convertir List a ArrayList para el método de ExcelUtil
+                java.util.ArrayList<Object[]> arrayListaLotes = new java.util.ArrayList<>(listaLotes);
+                ExcelUtil.generarExcelLotesProductor(arrayListaLotes, fos, filtrosInfo);
                 fos.flush();
             }
 

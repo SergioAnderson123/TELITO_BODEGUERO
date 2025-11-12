@@ -49,6 +49,7 @@
         .nav-link { color: rgba(255,255,255,0.9) !important; padding: 12px 20px; border-radius: 8px; margin: 5px 15px; transition: all 0.3s ease; display: flex; align-items: center; }
         .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.18); color: #fff !important; transform: translateX(5px); }
         .nav-link i { margin-right: 10px; width: 20px; }
+        .nav-divider { color: rgba(255,255,255,0.8); font-weight: 600; padding: 15px 20px 5px; margin-top: 20px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
         .card {
             background-color: var(--white);
             padding: 30px;
@@ -72,10 +73,45 @@
     <div class="dashboard-header">
         <nav class="navbar navbar-expand">
             <div class="container-fluid">
+                <!-- Brand -->
                 <a class="navbar-brand d-flex align-items-center" href="<%= request.getContextPath() %>/ProductorServlet?action=listarProductos">
                     <i class="fas fa-store me-2" style="color: var(--seafoam);"></i>
                     <span>Telito Bodeguero</span>
                 </a>
+
+                <!-- Right actions -->
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <%
+                            com.example.telito.administrador.beans.Usuario usuarioHeader = 
+                                (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
+                            String nombreCompleto = usuarioHeader != null ? 
+                                usuarioHeader.getNombres() + " " + usuarioHeader.getApellidos() : "Usuario";
+                            String fotoUrl = "https://ui-avatars.com/api/?name=User&background=006d77&color=fff&size=200";
+                            if (usuarioHeader != null) {
+                                String foto = usuarioHeader.getFotoPerfil();
+                                if (foto != null && !foto.trim().isEmpty()) {
+                                    if (foto.startsWith("http://") || foto.startsWith("https://")) {
+                                        fotoUrl = foto;
+                                    } else {
+                                        fotoUrl = request.getContextPath() + "/" + foto;
+                                    }
+                                } else {
+                                    fotoUrl = usuarioHeader.getFotoPerfilUrl();
+                                }
+                            }
+                        %>
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <img src="<%= fotoUrl %>" alt="User" class="rounded-circle me-2" width="32" height="32">
+                            <span style="color:#006d77;"><%= nombreCompleto %></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="<%= request.getContextPath() %>/perfil"><i class="fas fa-user me-2"></i>Perfil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="<%= request.getContextPath() %>/logout"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesion</a></li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </nav>
     </div>
@@ -85,19 +121,29 @@
         <div class="menu-list">
             <nav class="navbar navbar-expand">
                 <ul class="navbar-nav flex-column w-100">
+                    <li class="nav-divider"><i class="fas fa-bars me-2"></i>Menú</li>
+                    <!-- Mis productos -->
                     <li class="nav-item">
                         <a class="nav-link" href="<%= request.getContextPath() %>/ProductorServlet?action=listarProductos">
                             <i class="fas fa-shopping-cart"></i>Mis Productos
                         </a>
                     </li>
+                    <!-- Órdenes de Compra -->
                     <li class="nav-item">
                         <a class="nav-link" href="<%= request.getContextPath() %>/ProductorServlet?action=ordenesCompra">
                             <i class="fas fa-chart-pie"></i>Órdenes de Compra
                         </a>
                     </li>
+                    <!-- Registrar lotes -->
                     <li class="nav-item">
                         <a class="nav-link active" href="<%= request.getContextPath() %>/ProductorServlet?action=formRegistrarLote">
                             <i class="fas fa-boxes"></i>Registrar Lotes
+                        </a>
+                    </li>
+                    <!-- Actualizar precios -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="<%= request.getContextPath() %>/ProductorServlet?action=formActualizarPrecios">
+                            <i class="fas fa-tags"></i>Actualizar Precios
                         </a>
                     </li>
                 </ul>

@@ -88,9 +88,9 @@
                                                 <td><strong>${lote.codigoLote}</strong></td>
                                                 <td>
                                                     <button type="button" 
-                                                            class="btn btn-link p-0 text-decoration-none text-primary fw-bold" 
+                                                            class="btn btn-link p-0 text-decoration-none fw-bold" 
                                                             onclick="mostrarResumenLotes(${lote.productoId}, '${lote.nombreProducto}')"
-                                                            style="cursor: pointer;">
+                                                            style="cursor: pointer; color: #2c3e50 !important;">
                                                         ${lote.paquetesDisponibles} paquetes
                                                     </button>
                                                 </td>
