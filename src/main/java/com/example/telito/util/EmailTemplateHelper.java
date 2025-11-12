@@ -45,10 +45,11 @@ public class EmailTemplateHelper {
                               border-left: 4px solid #ffc107; margin: 15px 0; }
                     .footer { margin-top: 20px; padding-top: 15px; border-top: 1px solid #e9ecef; 
                              font-size: 12px; color: #6c757d; text-align: center; }
-                    .button { display: inline-block; padding: 12px 30px; background: #006d77; 
-                            color: white; text-decoration: none; border-radius: 5px; 
-                            margin: 15px 0; transition: background 0.3s; }
-                    .button:hover { background: #055e68; }
+                    .button { display: inline-block; padding: 12px 30px; background: #ffffff; 
+                            color: #000000; text-decoration: none; border-radius: 5px; 
+                            margin: 15px 0; transition: background 0.3s; border: 2px solid #006d77; 
+                            font-weight: bold; }
+                    .button:hover { background: #f0f0f0; border-color: #055e68; }
                 </style>
             </head>
             <body>

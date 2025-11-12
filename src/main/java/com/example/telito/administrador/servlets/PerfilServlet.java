@@ -28,22 +28,13 @@ public class PerfilServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         
-        // Verificar que el usuario tenga rol de administrador
-        if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
-            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a PerfilServlet desde: " + 
-                             request.getRemoteAddr());
-            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
-            response.sendRedirect(redirectUrl);
+        // Verificar que el usuario esté autenticado (todos los roles pueden acceder a su perfil)
+        if (session == null || session.getAttribute("usuario") == null) {
+            response.sendRedirect(request.getContextPath() + "/acceso/login");
             return;
         }
         
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-
-        if (usuario == null) {
-            response.sendRedirect(request.getContextPath() + "/acceso/login");
-            return;
-        }
-
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         Usuario usuarioActualizado = usuarioDAO.obtenerUsuarioPorId(usuario.getIdUsuario());
 
@@ -61,15 +52,7 @@ public class PerfilServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         
-        // Verificar que el usuario tenga rol de administrador
-        if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
-            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a PerfilServlet (POST) desde: " + 
-                             request.getRemoteAddr());
-            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
-            response.sendRedirect(redirectUrl);
-            return;
-        }
-        
+        // Verificar que el usuario esté autenticado (todos los roles pueden actualizar su perfil)
         if (session == null || session.getAttribute("usuario") == null) {
             response.sendRedirect(request.getContextPath() + "/acceso/login");
             return;

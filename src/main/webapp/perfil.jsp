@@ -289,7 +289,8 @@
                     <%
                     String volverUrl = (String) session.getAttribute("perfilReferer");
                     if (volverUrl == null || volverUrl.isEmpty()) {
-                        volverUrl = request.getContextPath() + "/inicio";
+                        // Redirigir según el rol del usuario
+                        volverUrl = com.example.telito.util.AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
                     }
                     %>
                     <a href="<%= volverUrl %>" class="btn btn-secondary" id="btnVolver">
