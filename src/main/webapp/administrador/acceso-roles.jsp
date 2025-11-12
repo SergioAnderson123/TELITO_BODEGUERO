@@ -1,5 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
+<%@ page import="com.example.telito.util.AuthorizationHelper" %>
+<%@ page import="com.example.telito.administrador.beans.Usuario" %>
+<%
+    // Validar que el usuario tenga rol de administrador
+    if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
+        System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a acceso-roles.jsp desde: " + 
+                         request.getRemoteAddr());
+        String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+        response.sendRedirect(redirectUrl);
+        return;
+    }
+%>
 <!doctype html>
 <html lang="es">
 <head>

@@ -1,12 +1,12 @@
 package com.example.telito.logistica.daos;
 
 import com.example.telito.logistica.beans.InventarioBean;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InventarioDao {
+public class InventarioDao extends DAOBase {
 
     // === MÉTODO MODIFICADO PARA MOSTRAR LOTES INDIVIDUALES (como Almacenero) ===
     public ArrayList<InventarioBean> obtenerInventario(String busqueda, String estado, String lotes) {
@@ -43,33 +43,39 @@ public class InventarioDao {
 
         sql += "ORDER BY p.codigo_sku ASC, l.codigo_lote ASC";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             // Establecer parámetros dinámicos
             for (int i = 0; i < params.size(); i++) {
                 pstmt.setObject(i + 1, params.get(i));
             }
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    InventarioBean inventario = new InventarioBean();
-                    inventario.setIdLote(rs.getInt("id_lote"));
-                    inventario.setCodigoLote(rs.getString("codigo_lote"));
-                    inventario.setCodigoSKU(rs.getString("codigo_sku"));
-                    inventario.setNombreProducto(rs.getString("nombre_producto"));
-                    inventario.setStockActual(rs.getInt("stock_actual"));
-                    inventario.setPaquetesDisponibles(rs.getInt("paquetes_disponibles"));
-                    inventario.setNombreUbicacion(rs.getString("nombre_ubicacion"));
-                    inventario.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
-                    inventario.setEstado(rs.getString("estado"));
-                    
-                    listaInventario.add(inventario);
-                }
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                InventarioBean inventario = new InventarioBean();
+                inventario.setIdLote(rs.getInt("id_lote"));
+                inventario.setCodigoLote(rs.getString("codigo_lote"));
+                inventario.setCodigoSKU(rs.getString("codigo_sku"));
+                inventario.setNombreProducto(rs.getString("nombre_producto"));
+                inventario.setStockActual(rs.getInt("stock_actual"));
+                inventario.setPaquetesDisponibles(rs.getInt("paquetes_disponibles"));
+                inventario.setNombreUbicacion(rs.getString("nombre_ubicacion"));
+                inventario.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
+                inventario.setEstado(rs.getString("estado"));
+                
+                listaInventario.add(inventario);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            logger.error("Error al obtener inventario", e);
+            throw new RuntimeException("Error al obtener inventario", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaInventario;
     }
@@ -137,8 +143,13 @@ public class InventarioDao {
 
         sql += "ORDER BY p.codigo_sku ASC LIMIT ? OFFSET ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             // Establecer parámetros dinámicos
             int paramIndex = 1;
@@ -152,23 +163,24 @@ public class InventarioDao {
             pstmt.setInt(paramIndex++, limit);
             pstmt.setInt(paramIndex, offset);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    InventarioBean inventario = new InventarioBean();
-                    inventario.setIdProducto(rs.getInt("id_producto"));
-                    inventario.setCodigoSKU(rs.getString("codigo_sku"));
-                    inventario.setNombreProducto(rs.getString("nombre_producto"));
-                    inventario.setPaquetesDisponibles(rs.getInt("total_paquetes"));
-                    inventario.setPrecioPorPaquete(rs.getDouble("precio_por_paquete"));
-                    inventario.setCostoPorUnidad(rs.getDouble("costo_por_unidad"));
-                    inventario.setEstadoStock(rs.getString("estado_stock"));
-                    
-                    listaInventario.add(inventario);
-                }
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                InventarioBean inventario = new InventarioBean();
+                inventario.setIdProducto(rs.getInt("id_producto"));
+                inventario.setCodigoSKU(rs.getString("codigo_sku"));
+                inventario.setNombreProducto(rs.getString("nombre_producto"));
+                inventario.setPaquetesDisponibles(rs.getInt("total_paquetes"));
+                inventario.setPrecioPorPaquete(rs.getDouble("precio_por_paquete"));
+                inventario.setCostoPorUnidad(rs.getDouble("costo_por_unidad"));
+                inventario.setEstadoStock(rs.getString("estado_stock"));
+                
+                listaInventario.add(inventario);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            logger.error("Error al obtener inventario agrupado", e);
+            throw new RuntimeException("Error al obtener inventario agrupado", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaInventario;
     }
@@ -226,21 +238,28 @@ public class InventarioDao {
 
         sql += ") as subquery";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             // Establecer parámetros dinámicos
             for (int i = 0; i < params.size(); i++) {
                 pstmt.setObject(i + 1, params.get(i));
             }
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total");
-                }
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al contar inventario agrupado", e);
+            throw new RuntimeException("Error al contar inventario agrupado", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return 0;
     }

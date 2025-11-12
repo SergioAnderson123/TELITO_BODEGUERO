@@ -1,19 +1,24 @@
 package com.example.telito.logistica.daos;
 
 import com.example.telito.logistica.beans.ProveedorBean;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class ProveedorDao {
+public class ProveedorDao extends DAOBase {
 
     public ArrayList<ProveedorBean> listarProveedores() {
         ArrayList<ProveedorBean> listaProveedores = new ArrayList<>();
         String sql = "SELECT id_proveedor, nombre FROM proveedores ORDER BY nombre ASC";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 ProveedorBean proveedor = new ProveedorBean();
@@ -22,7 +27,10 @@ public class ProveedorDao {
                 listaProveedores.add(proveedor);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al listar proveedores", e);
+            throw new RuntimeException("Error al listar proveedores", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaProveedores;
     }
@@ -36,9 +44,14 @@ public class ProveedorDao {
                      "WHERE r.nombre = 'Productor' AND u.activo = 1 " +
                      "ORDER BY u.nombres ASC";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 ProveedorBean productor = new ProveedorBean();
@@ -47,7 +60,10 @@ public class ProveedorDao {
                 listaProductores.add(productor);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al listar productores", e);
+            throw new RuntimeException("Error al listar productores", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaProductores;
     }
@@ -62,20 +78,6 @@ public class ProveedorDao {
                      "INNER JOIN roles r ON u.rol_id = r.id_rol " +
                      "WHERE u.id_usuario = ? AND r.nombre = 'Productor' AND u.activo = 1";
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, productorId);
-            
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total") > 0;
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al verificar existencia de productor: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return false;
+        return count(sql, productorId) > 0;
     }
 }

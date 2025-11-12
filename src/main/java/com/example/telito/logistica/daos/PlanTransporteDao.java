@@ -1,13 +1,13 @@
 package com.example.telito.logistica.daos;
 
 import com.example.telito.logistica.beans.PlanTransporteBean;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlanTransporteDao {
+public class PlanTransporteDao extends DAOBase {
 
     // Método sin paginación para compatibilidad
     public ArrayList<PlanTransporteBean> listarPlanesDeTransporte(String busqueda, String conductorId, String estado, String fechaDesde, String fechaHasta) {
@@ -57,7 +57,13 @@ public class PlanTransporteDao {
         }
         sql += " ORDER BY pt.id_plan DESC LIMIT ? OFFSET ?";
         
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             int paramIndex = 1;
             for (Object param : params) {
                 pstmt.setObject(paramIndex++, param);
@@ -69,14 +75,16 @@ public class PlanTransporteDao {
             pstmt.setInt(paramIndex++, limit);
             pstmt.setInt(paramIndex, offset);
             
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    PlanTransporteBean plan = new PlanTransporteBean(rs.getString("numeroViaje"), rs.getString("nombreProducto"), rs.getString("codigoLote"), rs.getString("estado"), rs.getString("nombreConductor"), rs.getString("placaVehiculo"), rs.getString("fechaEntrega"), rs.getString("nombreDestino"));
-                    listaPlanes.add(plan);
-                }
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                PlanTransporteBean plan = new PlanTransporteBean(rs.getString("numeroViaje"), rs.getString("nombreProducto"), rs.getString("codigoLote"), rs.getString("estado"), rs.getString("nombreConductor"), rs.getString("placaVehiculo"), rs.getString("fechaEntrega"), rs.getString("nombreDestino"));
+                listaPlanes.add(plan);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al listar planes de transporte", e);
+            throw new RuntimeException("Error al listar planes de transporte", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaPlanes;
     }
@@ -120,17 +128,26 @@ public class PlanTransporteDao {
             params.add(fechaHasta.trim());
         }
         
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             for (int i = 0; i < params.size(); i++) {
                 pstmt.setObject(i + 1, params.get(i));
             }
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total");
-                }
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("total");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al contar planes de transporte", e);
+            throw new RuntimeException("Error al contar planes de transporte", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return 0;
     }
@@ -141,38 +158,46 @@ public class PlanTransporteDao {
         String sqlProducto = "SELECT producto_id FROM lotes WHERE id_lote = ?";
         String sqlInsert = "INSERT INTO planes_transporte (numero_plan, producto_id, lote_id, estado, conductor_id, vehiculo_id, fecha_entrega, distrito_id) VALUES (?, ?, ?, 'Pendiente', ?, ?, ?, ?)";
 
-        try { Class.forName("com.mysql.cj.jdbc.Driver"); } catch (ClassNotFoundException e) { throw new RuntimeException(e); }
-        String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-        String username = "root";
-        String password = "root";
+        Connection conn = null;
+        PreparedStatement pstmtProducto = null;
+        ResultSet rs = null;
+        PreparedStatement pstmtInsert = null;
 
-        try (Connection conn = DriverManager.getConnection(url, username, password)) {
+        try {
+            conn = getConnection();
             // 1. Obtener el producto_id
             int productoId = 0;
-            try (PreparedStatement pstmtProducto = conn.prepareStatement(sqlProducto)) {
-                pstmtProducto.setInt(1, loteId);
-                try (ResultSet rs = pstmtProducto.executeQuery()) {
-                    if (rs.next()) {
-                        productoId = rs.getInt("producto_id");
-                    }
-                }
+            pstmtProducto = conn.prepareStatement(sqlProducto);
+            pstmtProducto.setInt(1, loteId);
+            rs = pstmtProducto.executeQuery();
+
+            if (rs.next()) {
+                productoId = rs.getInt("producto_id");
             }
+            closeResultSet(rs);
+            closePreparedStatement(pstmtProducto);
 
             // 2. Insertar el nuevo plan de transporte
             if (productoId > 0) {
-                try (PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsert)) {
-                    pstmtInsert.setString(1, numeroPlan);
-                    pstmtInsert.setInt(2, productoId);
-                    pstmtInsert.setInt(3, loteId);
-                    pstmtInsert.setInt(4, conductorId);
-                    pstmtInsert.setInt(5, vehiculoId);
-                    pstmtInsert.setString(6, fechaEntrega);
-                    pstmtInsert.setInt(7, distritoId);
-                    pstmtInsert.executeUpdate();
-                }
+                pstmtInsert = conn.prepareStatement(sqlInsert);
+                pstmtInsert.setString(1, numeroPlan);
+                pstmtInsert.setInt(2, productoId);
+                pstmtInsert.setInt(3, loteId);
+                pstmtInsert.setInt(4, conductorId);
+                pstmtInsert.setInt(5, vehiculoId);
+                pstmtInsert.setString(6, fechaEntrega);
+                pstmtInsert.setInt(7, distritoId);
+                pstmtInsert.executeUpdate();
+                logger.info("Plan de transporte creado: {}", numeroPlan);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al crear plan de transporte", e);
+            throw new RuntimeException("Error al crear plan de transporte", e);
+        } finally {
+            closePreparedStatement(pstmtInsert);
+            closePreparedStatement(pstmtProducto);
+            closeResultSet(rs);
+            closeConnection(conn);
         }
     }
 
@@ -181,21 +206,25 @@ public class PlanTransporteDao {
         String sql = "SELECT MAX(id_plan) FROM planes_transporte";
         int ultimoId = 0;
 
-        try { Class.forName("com.mysql.cj.jdbc.Driver"); } catch (ClassNotFoundException e) { throw new RuntimeException(e); }
-        String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-        String username = "root";
-        String password = "root";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
-        try (Connection conn = DriverManager.getConnection(url, username, password);
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
             if (rs.next()) {
-                ultimoId = rs.getInt(1);
+                return rs.getInt(1);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al obtener último ID de plan de transporte", e);
+            throw new RuntimeException("Error al obtener último ID de plan de transporte", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
-        return ultimoId;
+        return 0;
     }
 
     // === MÉTODO PARA OBTENER TODOS LOS PLANES AGRUPADOS POR VIAJE SIN PAGINACIÓN (para reportes) ===
@@ -255,33 +284,39 @@ public class PlanTransporteDao {
         
         sql += " GROUP BY pt.numero_plan, c.nombre_completo, v.placa, d.nombre ORDER BY pt.numero_plan DESC";
         
-        try (Connection conn = DatabaseConnection.getConnection(); 
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+
             for (int i = 0; i < params.size(); i++) {
                 pstmt.setObject(i + 1, params.get(i));
             }
-            
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    PlanTransporteBean plan = new PlanTransporteBean(
-                        rs.getString("numeroViaje"),
-                        null, // nombreProducto - no necesario en reporte agrupado
-                        null, // codigoLote - no necesario en reporte agrupado
-                        rs.getString("estado"),
-                        rs.getString("nombreConductor"),
-                        rs.getString("placaVehiculo"),
-                        rs.getString("fechaEntrega"),
-                        rs.getString("nombreDestino")
-                    );
-                    plan.setFechaSalida(rs.getString("fechaSalida"));
-                    plan.setCantidadLotes(rs.getInt("cantidadLotes"));
-                    listaPlanes.add(plan);
-                }
+
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                PlanTransporteBean plan = new PlanTransporteBean(
+                    rs.getString("numeroViaje"),
+                    null, // nombreProducto - no necesario en reporte agrupado
+                    null, // codigoLote - no necesario en reporte agrupado
+                    rs.getString("estado"),
+                    rs.getString("nombreConductor"),
+                    rs.getString("placaVehiculo"),
+                    rs.getString("fechaEntrega"),
+                    rs.getString("nombreDestino")
+                );
+                plan.setFechaSalida(rs.getString("fechaSalida"));
+                plan.setCantidadLotes(rs.getInt("cantidadLotes"));
+                listaPlanes.add(plan);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            logger.error("Error al listar todos los planes agrupados por viaje", e);
+            throw new RuntimeException("Error al listar todos los planes agrupados por viaje", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         
         return listaPlanes;

@@ -1,12 +1,11 @@
 package com.example.telito.administrador.daos;
 
 import com.example.telito.administrador.beans.Producto;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class ProductoDAO {
-    // Las credenciales ahora están centralizadas en DatabaseConnection
+public class ProductoDAO extends DAOBase {
 
     // Para la tabla de inventario general, carga todos los productos.
     public ArrayList<Producto> listarProductos() {
@@ -20,9 +19,14 @@ public class ProductoDAO {
                 "GROUP BY p.id_producto " +
                 "ORDER BY p.nombre";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
                 Producto producto = new Producto();
@@ -39,8 +43,10 @@ public class ProductoDAO {
                 listaProductos.add(producto);
             }
         } catch (SQLException e) {
-            System.out.println("Error en ProductoDAO.listarProductos(): " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al listar productos", e);
+            throw new RuntimeException("Error al listar productos", e);
+        } finally {
+            closeResources(conn, stmt, rs);
         }
         return listaProductos;
     }
@@ -48,30 +54,12 @@ public class ProductoDAO {
     // Permite cambiar el stock mínimo de un producto desde la tabla de inventario.
     public void actualizarStockMinimo(int productoId, int stockMinimo) {
         String sql = "UPDATE productos SET stock_minimo = ? WHERE id_producto = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, stockMinimo);
-            pstmt.setInt(2, productoId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        executeUpdate(sql, stockMinimo, productoId);
     }
 
     // Este es para una de las alertas, cuenta productos con stock por debajo del mínimo.
     public int contarProductosConAlertaDeStock() {
-        int total = 0;
         String sql = "SELECT COUNT(*) FROM productos WHERE stock <= stock_minimo AND stock_minimo > 0";
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            if (rs.next()) {
-                total = rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error en ProductoDAO.contarProductosConAlertaDeStock(): " + e.getMessage());
-            e.printStackTrace();
-        }
-        return total;
+        return count(sql);
     }
 }

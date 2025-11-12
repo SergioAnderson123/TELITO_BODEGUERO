@@ -5,57 +5,46 @@ import com.example.telito.almacen.beans.Cliente;
 import com.example.telito.almacen.beans.Lote;
 import com.example.telito.almacen.beans.Pedido;
 import com.example.telito.almacen.beans.PedidoItem;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class PedidoDao {
-    // Las credenciales ahora están centralizadas en DatabaseConnection
+public class PedidoDao extends DAOBase {
 
     public int contarPedidos() {
         String sql = "SELECT COUNT(*) FROM pedidos";
-        int total = 0;
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            if (rs.next()) {
-                total = rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return total;
+        return count(sql);
     }
     public ArrayList<Pedido> listarPedidosPaginados(int offset, int limit) {
         ArrayList<Pedido> listaPedidos = new ArrayList<>();
         String sql = "SELECT p.id_pedido, p.numero_pedido, p.destino, p.estado_preparacion " +
                 " FROM pedidos p LIMIT ? OFFSET ?";
 
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, limit);
             pstmt.setInt(2, offset);
+            rs = pstmt.executeQuery();
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Pedido pedido = new Pedido();
-                    pedido.setIdPedido(rs.getInt("id_pedido"));
-                    pedido.setNumeroPedido(rs.getString("numero_pedido"));
-                    pedido.setDestino(rs.getString("destino"));
-                    pedido.setEstadoPreparacion(rs.getString("estado_preparacion"));
-                    listaPedidos.add(pedido);
-                }
+            while (rs.next()) {
+                Pedido pedido = new Pedido();
+                pedido.setIdPedido(rs.getInt("id_pedido"));
+                pedido.setNumeroPedido(rs.getString("numero_pedido"));
+                pedido.setDestino(rs.getString("destino"));
+                pedido.setEstadoPreparacion(rs.getString("estado_preparacion"));
+                listaPedidos.add(pedido);
             }
         } catch (SQLException e) {
+            logger.error("Error al listar los pedidos", e);
             throw new RuntimeException("Error al listar los pedidos", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaPedidos;
     }
@@ -76,23 +65,28 @@ public class PedidoDao {
                 "INNER JOIN productos prod ON (pi.producto_id = prod.id_producto) " +
                 "WHERE pi.pedido_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection()) {
+        Connection conn = null;
+        PreparedStatement pstmtPedido = null;
+        ResultSet rsPedido = null;
+        PreparedStatement pstmtItems = null;
+        ResultSet rsItems = null;
 
-            try (PreparedStatement pstmtPedido = conn.prepareStatement(sqlPedido)) {
-                pstmtPedido.setInt(1, idPedido);
-                try (ResultSet rsPedido = pstmtPedido.executeQuery()) {
-                    if (rsPedido.next()) {
-                        pedido = new Pedido();
-                        // CAMBIO 2: Corrige los nombres de las columnas para que no usen el alias de la tabla.
-                        pedido.setIdPedido(rsPedido.getInt("id_pedido"));
-                        pedido.setNumeroPedido(rsPedido.getString("numero_pedido"));
-                        pedido.setDestino(rsPedido.getString("destino"));
+        try {
+            conn = getConnection();
+            pstmtPedido = conn.prepareStatement(sqlPedido);
+            pstmtPedido.setInt(1, idPedido);
+            rsPedido = pstmtPedido.executeQuery();
 
-                        Cliente cliente = new Cliente();
-                        cliente.setNombre(rsPedido.getString("c.nombre"));
-                        pedido.setCliente(cliente);
-                    }
-                }
+            if (rsPedido.next()) {
+                pedido = new Pedido();
+                // CAMBIO 2: Corrige los nombres de las columnas para que no usen el alias de la tabla.
+                pedido.setIdPedido(rsPedido.getInt("id_pedido"));
+                pedido.setNumeroPedido(rsPedido.getString("numero_pedido"));
+                pedido.setDestino(rsPedido.getString("destino"));
+
+                Cliente cliente = new Cliente();
+                cliente.setNombre(rsPedido.getString("c.nombre"));
+                pedido.setCliente(cliente);
             }
 
             if (pedido != null) {
@@ -100,52 +94,43 @@ public class PedidoDao {
                 LoteDao loteDao = new LoteDao();
                 ArrayList<PedidoItem> listaItems = new ArrayList<>();
 
-                try (PreparedStatement pstmtItems = conn.prepareStatement(sqlItems)) {
-                    pstmtItems.setInt(1, idPedido);
-                    try (ResultSet rsItems = pstmtItems.executeQuery()) {
-                        while (rsItems.next()) {
-                            PedidoItem item = new PedidoItem();
-                            item.setProductoId(rsItems.getInt("producto_id"));
-                            item.setCantidadRequerida(rsItems.getInt("cantidad_requerida"));
-                            item.setCodigoProducto(rsItems.getString("codigo_sku"));
-                            item.setNombreProducto(rsItems.getString("prod.nombre"));
+                pstmtItems = conn.prepareStatement(sqlItems);
+                pstmtItems.setInt(1, idPedido);
+                rsItems = pstmtItems.executeQuery();
 
-                            // CAMBIO 4: Por cada item, llamamos al LoteDao para que nos traiga
-                            // la lista de lotes disponibles para ese producto.
-                            ArrayList<Lote> lotesDisponibles = loteDao.buscarLotesPorProducto(item.getProductoId());
-                            item.setLotesDisponibles(lotesDisponibles); // Asumiendo que PedidoItem.java tiene este método set
+                while (rsItems.next()) {
+                    PedidoItem item = new PedidoItem();
+                    item.setProductoId(rsItems.getInt("producto_id"));
+                    item.setCantidadRequerida(rsItems.getInt("cantidad_requerida"));
+                    item.setCodigoProducto(rsItems.getString("codigo_sku"));
+                    item.setNombreProducto(rsItems.getString("prod.nombre"));
 
-                            listaItems.add(item);
-                        }
-                    }
+                    // CAMBIO 4: Por cada item, llamamos al LoteDao para que nos traiga
+                    // la lista de lotes disponibles para ese producto.
+                    ArrayList<Lote> lotesDisponibles = loteDao.buscarLotesPorProducto(item.getProductoId());
+                    item.setLotesDisponibles(lotesDisponibles); // Asumiendo que PedidoItem.java tiene este método set
+
+                    listaItems.add(item);
                 }
                 pedido.setItems(listaItems);
             }
 
         } catch (SQLException e) {
+            logger.error("Error al buscar el pedido por ID: " + idPedido, e);
             throw new RuntimeException("Error al buscar el pedido por ID", e);
+        } finally {
+            closeResultSet(rsItems);
+            closePreparedStatement(pstmtItems);
+            closeResultSet(rsPedido);
+            closePreparedStatement(pstmtPedido);
+            closeConnection(conn);
         }
         return pedido;
     }
 
     public void actualizarEstado(int idPedido, String nuevoEstado) {
         String sql = "UPDATE pedidos SET estado_preparacion = ? WHERE id_pedido = ?";
-
-        try{Class.forName("com.mysql.cj.jdbc.Driver");
-        }catch(ClassNotFoundException e){
-            throw new RuntimeException(e);
-        }
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, nuevoEstado);
-            pstmt.setInt(2, idPedido);
-            pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al actualizar el estado del pedido", e);
-        }
+        executeUpdate(sql, nuevoEstado, idPedido);
     }
     
     /**
@@ -164,9 +149,14 @@ public class PedidoDao {
             ORDER BY p.id_pedido ASC
             """;
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
             
             while (rs.next()) {
                 Pedido pedido = new Pedido();
@@ -184,7 +174,10 @@ public class PedidoDao {
                 listaPedidos.add(pedido);
             }
         } catch (SQLException e) {
+            logger.error("Error al listar pedidos pendientes", e);
             throw new RuntimeException("Error al listar pedidos pendientes", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaPedidos;
     }
@@ -196,19 +189,7 @@ public class PedidoDao {
      */
     public int contarPedidosPendientes() {
         String sql = "SELECT COUNT(*) FROM pedidos WHERE estado_preparacion = 'Pendiente'";
-        int total = 0;
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            
-            if (rs.next()) {
-                total = rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al contar pedidos pendientes", e);
-        }
-        return total;
+        return count(sql);
     }
 
 }

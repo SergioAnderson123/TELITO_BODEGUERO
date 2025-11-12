@@ -1,12 +1,12 @@
 package com.example.telito.logistica.daos;
 
 import com.example.telito.logistica.beans.MovimientoInventarioBean;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovimientoInventarioDao {
+public class MovimientoInventarioDao extends DAOBase {
 
     // === MÉTODO MODIFICADO PARA ACEPTAR FILTROS (sin paginación, para compatibilidad) ===
     public ArrayList<MovimientoInventarioBean> obtenerMovimientos(String busqueda, String tipo, String periodo) {
@@ -65,8 +65,13 @@ public class MovimientoInventarioDao {
 
         sql += " ORDER BY mi.fecha DESC LIMIT ? OFFSET ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             // Establecer parámetros dinámicos
             int paramIndex = 1;
@@ -80,24 +85,25 @@ public class MovimientoInventarioDao {
             pstmt.setInt(paramIndex++, limit);
             pstmt.setInt(paramIndex, offset);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    MovimientoInventarioBean movimiento = new MovimientoInventarioBean(
-                            rs.getString("fechaFormateada"),
-                            rs.getString("nombreProducto"),
-                            rs.getString("tipo"),
-                            rs.getInt("cantidad"),
-                            rs.getString("destino"),
-                            rs.getString("codigoLote"),
-                            rs.getString("responsable"),
-                            rs.getString("observaciones")
-                    );
-                    listaMovimientos.add(movimiento);
-                }
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                MovimientoInventarioBean movimiento = new MovimientoInventarioBean(
+                        rs.getString("fechaFormateada"),
+                        rs.getString("nombreProducto"),
+                        rs.getString("tipo"),
+                        rs.getInt("cantidad"),
+                        rs.getString("destino"),
+                        rs.getString("codigoLote"),
+                        rs.getString("responsable"),
+                        rs.getString("observaciones")
+                );
+                listaMovimientos.add(movimiento);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            logger.error("Error al obtener movimientos de inventario", e);
+            throw new RuntimeException("Error al obtener movimientos de inventario", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
 
         return listaMovimientos;
@@ -143,20 +149,27 @@ public class MovimientoInventarioDao {
             }
         }
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             for (int i = 0; i < params.size(); i++) {
                 pstmt.setObject(i + 1, params.get(i));
             }
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total");
-                }
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al contar movimientos de inventario", e);
+            throw new RuntimeException("Error al contar movimientos de inventario", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return 0;
     }

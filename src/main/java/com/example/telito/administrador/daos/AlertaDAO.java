@@ -3,29 +3,18 @@ package com.example.telito.administrador.daos;
 import com.example.telito.administrador.beans.AlertaConfig;
 import com.example.telito.administrador.beans.Categoria;
 import com.example.telito.administrador.beans.Rol;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 import com.example.telito.util.EmailUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class AlertaDAO {
-    // Las credenciales ahora están centralizadas en DatabaseConnection
+public class AlertaDAO extends DAOBase {
 
     // Cuenta las reglas de alerta que están activas para el contador del menú.
     public int contarReglasDeAlertaActivas() {
-        int total = 0;
         String sql = "SELECT COUNT(*) FROM alertas_configuracion WHERE activo = 1";
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            if (rs.next()) {
-                total = rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return total;
+        return count(sql);
     }
 
     // Carga la lista de alertas para la tabla de gestión.
@@ -40,36 +29,35 @@ public class AlertaDAO {
                 "LEFT JOIN categorias c ON a.categoria_id = c.id_categoria " +
                 "ORDER BY a.id_alerta_config LIMIT ? OFFSET ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             int limit = Math.max(1, size);
             int offset = Math.max(0, (Math.max(1, page) - 1) * size);
             pstmt.setInt(1, limit);
             pstmt.setInt(2, offset);
+            rs = pstmt.executeQuery();
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    listaAlertas.add(mapResultSetToAlertaConfig(rs));
-                }
+            while (rs.next()) {
+                listaAlertas.add(mapResultSetToAlertaConfig(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al listar alertas", e);
+            throw new RuntimeException("Error al listar alertas", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaAlertas;
     }
 
     public int contarAlertas() {
         String sql = "SELECT COUNT(*) FROM alertas_configuracion";
-        int total = 0;
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            if (rs.next()) total = rs.getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return total;
+        return count(sql);
     }
 
     // Obtiene una alerta específica para poder editarla.
@@ -80,16 +68,24 @@ public class AlertaDAO {
                 "LEFT JOIN categorias c ON a.categoria_id = c.id_categoria " +
                 "WHERE a.id_alerta_config = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    alerta = mapResultSetToAlertaConfig(rs);
-                }
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                alerta = mapResultSetToAlertaConfig(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al obtener alerta por ID: " + id, e);
+            throw new RuntimeException("Error al obtener alerta", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return alerta;
     }
@@ -98,12 +94,19 @@ public class AlertaDAO {
     public void crearAlerta(AlertaConfig alerta) {
         String sql = "INSERT INTO alertas_configuracion (nombre, tipo_alerta, umbral_dias, categoria_id, rol_a_notificar, mensaje_personalizado, activo) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             setAlertaParams(pstmt, alerta);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al crear alerta", e);
+            throw new RuntimeException("Error al crear alerta", e);
+        } finally {
+            closeResources(conn, pstmt, null);
         }
     }
 
@@ -111,26 +114,27 @@ public class AlertaDAO {
     public void actualizarAlerta(AlertaConfig alerta) {
         String sql = "UPDATE alertas_configuracion SET nombre = ?, tipo_alerta = ?, umbral_dias = ?, " +
                 "categoria_id = ?, rol_a_notificar = ?, mensaje_personalizado = ?, activo = ? WHERE id_alerta_config = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             setAlertaParams(pstmt, alerta);
             pstmt.setInt(8, alerta.getIdAlertaConfig());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al actualizar alerta", e);
+            throw new RuntimeException("Error al actualizar alerta", e);
+        } finally {
+            closeResources(conn, pstmt, null);
         }
     }
 
     // Borrado lógico, solo cambia el estado a inactivo.
     public void deshabilitarAlerta(int id) {
         String sql = "UPDATE alertas_configuracion SET activo = 0 WHERE id_alerta_config = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        executeUpdate(sql, id);
     }
 
     // Este método es más complejo, revisa los productos/lotes que de verdad están en alerta (stock bajo, etc).
@@ -138,9 +142,14 @@ public class AlertaDAO {
         int totalAlertas = 0;
         String sqlReglas = "SELECT * FROM alertas_configuracion WHERE activo = 1";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmtReglas = conn.createStatement();
-             ResultSet rsReglas = stmtReglas.executeQuery(sqlReglas)) {
+        Connection conn = null;
+        Statement stmtReglas = null;
+        ResultSet rsReglas = null;
+
+        try {
+            conn = getConnection();
+            stmtReglas = conn.createStatement();
+            rsReglas = stmtReglas.executeQuery(sqlReglas);
 
             while (rsReglas.next()) {
                 String tipoAlerta = rsReglas.getString("tipo_alerta");
@@ -203,7 +212,10 @@ public class AlertaDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al contar alertas abiertas", e);
+            throw new RuntimeException("Error al contar alertas abiertas", e);
+        } finally {
+            closeResources(conn, stmtReglas, rsReglas);
         }
         return totalAlertas;
     }
@@ -219,11 +231,16 @@ public class AlertaDAO {
             WHERE ac.activo = 1 AND UPPER(r.nombre) = UPPER(?)
             """;
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sqlReglas)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rsReglas = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sqlReglas);
             pstmt.setString(1, rolNombre);
-            try (ResultSet rsReglas = pstmt.executeQuery()) {
-                while (rsReglas.next()) {
+            rsReglas = pstmt.executeQuery();
+            while (rsReglas.next()) {
                     String tipoAlerta = rsReglas.getString("tipo_alerta");
                     Integer categoriaId = rsReglas.getObject("categoria_id", Integer.class);
                     Integer umbralDias = rsReglas.getObject("umbral_dias", Integer.class);
@@ -396,9 +413,11 @@ public class AlertaDAO {
                         }
                     }
                 }
-            }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al listar alertas para rol: " + rolNombre, e);
+            throw new RuntimeException("Error al listar alertas para rol", e);
+        } finally {
+            closeResources(conn, pstmt, rsReglas);
         }
         return mensajes;
     }
@@ -465,19 +484,27 @@ public class AlertaDAO {
                      "INNER JOIN roles r ON u.rol_id = r.id_rol " +
                      "WHERE UPPER(r.nombre) = UPPER(?) AND u.activo = 1 AND u.email IS NOT NULL AND u.email != ''";
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, rolNombre); // Ya no necesitamos .toUpperCase() porque usamos UPPER() en SQL
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    String email = rs.getString("email");
-                    if (email != null && !email.trim().isEmpty()) {
-                        emails.add(email.trim());
-                    }
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String email = rs.getString("email");
+                if (email != null && !email.trim().isEmpty()) {
+                    emails.add(email.trim());
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al obtener emails por rol: " + rolNombre, e);
+            throw new RuntimeException("Error al obtener emails por rol", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return emails;
     }
@@ -497,7 +524,7 @@ public class AlertaDAO {
         
         ArrayList<String> emails = obtenerEmailsPorRol(rolNombre);
         if (emails.isEmpty()) {
-            System.out.println("⚠ No se encontraron usuarios activos con email para el rol: " + rolNombre);
+            logger.warn("No se encontraron usuarios activos con email para el rol: {}", rolNombre);
             return 0;
         }
         
@@ -517,7 +544,7 @@ public class AlertaDAO {
             }
         }
         
-        System.out.println("✓ Se enviaron " + enviados + " correo(s) de alerta al rol: " + rolNombre);
+        logger.info("Se enviaron {} correo(s) de alerta al rol: {}", enviados, rolNombre);
         return enviados;
     }
     
@@ -536,9 +563,14 @@ public class AlertaDAO {
             WHERE ac.activo = 1
             """;
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
             
             while (rs.next()) {
                 String rolNombre = rs.getString("nombre");
@@ -547,8 +579,10 @@ public class AlertaDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error al obtener roles con alertas activas: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al obtener roles con alertas activas", e);
+            throw new RuntimeException("Error al obtener roles con alertas activas", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         
         return roles;
@@ -567,15 +601,23 @@ public class AlertaDAO {
                 "LEFT JOIN categorias c ON a.categoria_id = c.id_categoria " +
                 "ORDER BY a.id_alerta_config";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 listaAlertas.add(mapResultSetToAlertaConfig(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al listar todas las alertas", e);
+            throw new RuntimeException("Error al listar todas las alertas", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaAlertas;
     }

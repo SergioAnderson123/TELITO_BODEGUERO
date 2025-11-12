@@ -1,69 +1,33 @@
 package com.example.telito.almacen.daos;
 
 import com.example.telito.almacen.beans.Movimiento;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class MovimientoDao {
-    // Las credenciales ahora están centralizadas en DatabaseConnection
+public class MovimientoDao extends DAOBase {
 
     public int contarTotalMovimientos() {
         String sql = "SELECT COUNT(*) FROM movimientos_inventario";
-        int total = 0;
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            if (rs.next()) {
-                total = rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al contar los movimientos", e);
-        }
-        return total;
+        return count(sql);
     }
 
     public void registrarMovimiento(Movimiento movimiento) {
         // CORRECCIÓN: Se añade la columna 'orden_compra_id'
         String sql = "INSERT INTO movimientos_inventario (lote_id, usuario_id, pedido_id, orden_compra_id, tipo, cantidad, motivo) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, movimiento.getLoteId());
-            pstmt.setObject(2, movimiento.getUsuarioId());
-            pstmt.setObject(3, movimiento.getPedidoId());
-            pstmt.setObject(4, movimiento.getOrdenCompraId()); // Se añade el ID de orden de compra
-            pstmt.setString(5, movimiento.getTipoMovimiento());
-            pstmt.setInt(6, movimiento.getCantidad());
-            pstmt.setString(7, movimiento.getMotivo());
-            pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al registrar movimiento", e);
-        }
+        executeUpdate(sql,
+            movimiento.getLoteId(),
+            movimiento.getUsuarioId(),
+            movimiento.getPedidoId(),
+            movimiento.getOrdenCompraId(),
+            movimiento.getTipoMovimiento(),
+            movimiento.getCantidad(),
+            movimiento.getMotivo());
     }
     public int contarMovimientosPorUsuario(int usuarioId) {
         String sql = "SELECT COUNT(*) FROM movimientos_inventario WHERE usuario_id = ?";
-        int total = 0;
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, usuarioId);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    total = rs.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al contar los movimientos del usuario", e);
-        }
-        return total;
+        return count(sql, usuarioId);
     }
 
     public ArrayList<Movimiento> listarMovimientosPorUsuarioPaginado(int usuarioId, int limit, int offset) {
@@ -87,31 +51,37 @@ public class MovimientoDao {
                 "ORDER BY m.fecha DESC " +
                 "LIMIT ? OFFSET ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, usuarioId);
             pstmt.setInt(2, limit);
             pstmt.setInt(3, offset);
+            rs = pstmt.executeQuery();
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Movimiento mov = new Movimiento();
-                    mov.setIdMovimiento(rs.getInt("id_movimiento"));
-                    mov.setTipoMovimiento(rs.getString("tipo"));
-                    mov.setCantidad(rs.getInt("cantidad"));
-                    mov.setMotivo(rs.getString("motivo"));
-                    mov.setFecha(rs.getTimestamp("fecha"));
-                    mov.setCodigoLote(rs.getString("codigo_lote"));
-                    mov.setNombreProducto(rs.getString("nombre_producto"));
-                    mov.setNombreUsuario(rs.getString("nombre_usuario"));
-                    mov.setNumeroPedido(rs.getString("numero_pedido"));
-                    mov.setNumeroOrdenCompra(rs.getString("numero_orden"));
-                    listaMovimientos.add(mov);
-                }
+            while (rs.next()) {
+                Movimiento mov = new Movimiento();
+                mov.setIdMovimiento(rs.getInt("id_movimiento"));
+                mov.setTipoMovimiento(rs.getString("tipo"));
+                mov.setCantidad(rs.getInt("cantidad"));
+                mov.setMotivo(rs.getString("motivo"));
+                mov.setFecha(rs.getTimestamp("fecha"));
+                mov.setCodigoLote(rs.getString("codigo_lote"));
+                mov.setNombreProducto(rs.getString("nombre_producto"));
+                mov.setNombreUsuario(rs.getString("nombre_usuario"));
+                mov.setNumeroPedido(rs.getString("numero_pedido"));
+                mov.setNumeroOrdenCompra(rs.getString("numero_orden"));
+                listaMovimientos.add(mov);
             }
         } catch (SQLException e) {
+            logger.error("Error al listar los movimientos del usuario", e);
             throw new RuntimeException("Error al listar los movimientos del usuario", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaMovimientos;
     }
@@ -141,30 +111,36 @@ public class MovimientoDao {
                 "ORDER BY m.fecha DESC " + // Ordenamos por fecha, del más reciente al más antiguo
                 "LIMIT ? OFFSET ?";       // <-- Añadimos límite y offset para paginación
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, limit);
             pstmt.setInt(2, offset);
+            rs = pstmt.executeQuery();
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Movimiento mov = new Movimiento();
-                    mov.setIdMovimiento(rs.getInt("id_movimiento"));
-                    mov.setTipoMovimiento(rs.getString("tipo"));
-                    mov.setCantidad(rs.getInt("cantidad"));
-                    mov.setMotivo(rs.getString("motivo"));
-                    mov.setFecha(rs.getTimestamp("fecha"));
-                    mov.setCodigoLote(rs.getString("codigo_lote"));
-                    mov.setNombreProducto(rs.getString("nombre_producto"));
-                    mov.setNombreUsuario(rs.getString("nombre_usuario"));
-                    mov.setNumeroPedido(rs.getString("numero_pedido"));
-                    mov.setNumeroOrdenCompra(rs.getString("numero_orden"));
-                    listaMovimientos.add(mov);
-                }
+            while (rs.next()) {
+                Movimiento mov = new Movimiento();
+                mov.setIdMovimiento(rs.getInt("id_movimiento"));
+                mov.setTipoMovimiento(rs.getString("tipo"));
+                mov.setCantidad(rs.getInt("cantidad"));
+                mov.setMotivo(rs.getString("motivo"));
+                mov.setFecha(rs.getTimestamp("fecha"));
+                mov.setCodigoLote(rs.getString("codigo_lote"));
+                mov.setNombreProducto(rs.getString("nombre_producto"));
+                mov.setNombreUsuario(rs.getString("nombre_usuario"));
+                mov.setNumeroPedido(rs.getString("numero_pedido"));
+                mov.setNumeroOrdenCompra(rs.getString("numero_orden"));
+                listaMovimientos.add(mov);
             }
         } catch (SQLException e) {
+            logger.error("Error al listar los movimientos de inventario", e);
             throw new RuntimeException("Error al listar los movimientos de inventario", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaMovimientos;
     }
@@ -193,9 +169,14 @@ public class MovimientoDao {
                 "LEFT JOIN ordenes_compra oc ON (m.orden_compra_id = oc.id_orden_compra) " +
                 "ORDER BY m.fecha DESC";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 Movimiento mov = new Movimiento();
@@ -212,7 +193,10 @@ public class MovimientoDao {
                 listaMovimientos.add(mov);
             }
         } catch (SQLException e) {
+            logger.error("Error al listar todos los movimientos de inventario", e);
             throw new RuntimeException("Error al listar todos los movimientos de inventario", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaMovimientos;
     }

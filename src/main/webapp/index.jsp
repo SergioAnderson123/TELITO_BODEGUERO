@@ -68,8 +68,9 @@
         }
 
         .btn-login-nav {
-            border: 2px solid var(--secondary-color);
-            color: var(--secondary-color);
+            border: 2px solid white;
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
             font-weight: 600;
             padding: 0.5rem 1.25rem;
             border-radius: 50px;
@@ -77,8 +78,11 @@
         }
 
         .btn-login-nav:hover {
-            background-color: var(--secondary-color);
+            background-color: white;
             color: var(--primary-color);
+            border-color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
         }
 
         /* --- 3. Sección Héroe --- */
@@ -208,7 +212,6 @@
                     La solución definitiva para gestionar tu inventario, pedidos y despachos en un solo lugar.
                     Preciso, rápido y siempre en la nube.
                 </p>
-                <a href="#" class="btn btn-primary-hero">Solicitar una Demo</a>
             </div>
         </div>
     </div>

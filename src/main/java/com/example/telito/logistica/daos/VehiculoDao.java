@@ -1,20 +1,25 @@
 package com.example.telito.logistica.daos;
 
 import com.example.telito.logistica.beans.VehiculoBean;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class VehiculoDao {
+public class VehiculoDao extends DAOBase {
 
     public ArrayList<VehiculoBean> listarVehiculos() {
         ArrayList<VehiculoBean> lista = new ArrayList<>();
         String sql = "SELECT id_vehiculo, placa FROM vehiculos ORDER BY placa ASC";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 VehiculoBean vehiculo = new VehiculoBean();
@@ -23,7 +28,10 @@ public class VehiculoDao {
                 lista.add(vehiculo);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al listar vehículos", e);
+            throw new RuntimeException("Error al listar vehículos", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return lista;
     }

@@ -139,6 +139,26 @@
             transform: translateY(0);
         }
 
+        .btn-home {
+            width: 100%;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 500;
+            border: 2px solid var(--secondary-color);
+            color: var(--secondary-color);
+            background: transparent;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-home:hover {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(131, 197, 190, 0.3);
+        }
+
         .alert {
             border-radius: 12px;
             border: none;
@@ -271,6 +291,13 @@
                 Iniciar Sesión
             </button>
         </form>
+
+        <div class="text-center mt-3">
+            <a href="<%= request.getContextPath() %>/" class="btn-home">
+                <i class="fas fa-home me-2"></i>
+                Volver al Inicio
+            </a>
+        </div>
 
         <div class="login-footer">
             <p><i class="fas fa-shield-alt me-1"></i> Acceso seguro y protegido</p>

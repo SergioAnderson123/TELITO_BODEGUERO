@@ -1,12 +1,12 @@
 package com.example.telito.logistica.daos;
 
 import com.example.telito.logistica.beans.OrdenCompraBean;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrdenCompraDao {
+public class OrdenCompraDao extends DAOBase {
 
     // === MÉTODO MODIFICADO PARA ACEPTAR FILTROS (sin paginación, para compatibilidad) ===
     public ArrayList<OrdenCompraBean> obtenerOrdenes(String busqueda, String proveedorId, String estado) {
@@ -63,8 +63,13 @@ public class OrdenCompraDao {
 
         sql += " ORDER BY oc.id_orden_compra DESC LIMIT ? OFFSET ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             int paramIndex = 1;
             for (Object param : params) {
@@ -77,28 +82,29 @@ public class OrdenCompraDao {
             pstmt.setInt(paramIndex++, limit);
             pstmt.setInt(paramIndex, offset);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    int idOrden = rs.getInt("id_orden");
-                    String numeroOrden = String.format("OC%03d", idOrden);
-                    String nombreProveedor = rs.getString("nombre_proveedor");
-                    String nombreProducto = rs.getString("nombre_producto");
-                    int cantidadPaquetes = rs.getInt("cantidad_paquetes");
-                    String personalResponsable = rs.getString("personal_responsable");
-                    String estadoRs = rs.getString("estado");
-                    double monto = rs.getDouble("monto_total");
-                    String montoTotal = String.format("S/. %.2f", monto);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                int idOrden = rs.getInt("id_orden");
+                String numeroOrden = String.format("OC%03d", idOrden);
+                String nombreProveedor = rs.getString("nombre_proveedor");
+                String nombreProducto = rs.getString("nombre_producto");
+                int cantidadPaquetes = rs.getInt("cantidad_paquetes");
+                String personalResponsable = rs.getString("personal_responsable");
+                String estadoRs = rs.getString("estado");
+                double monto = rs.getDouble("monto_total");
+                String montoTotal = String.format("S/. %.2f", monto);
 
-                    OrdenCompraBean orden = new OrdenCompraBean(
-                            numeroOrden, nombreProveedor, nombreProducto, cantidadPaquetes,
-                            personalResponsable, estadoRs, montoTotal
-                    );
-                    listaOrdenes.add(orden);
-                }
+                OrdenCompraBean orden = new OrdenCompraBean(
+                        numeroOrden, nombreProveedor, nombreProducto, cantidadPaquetes,
+                        personalResponsable, estadoRs, montoTotal
+                );
+                listaOrdenes.add(orden);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            logger.error("Error al obtener órdenes de compra", e);
+            throw new RuntimeException("Error al obtener órdenes de compra", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaOrdenes;
     }
@@ -141,20 +147,27 @@ public class OrdenCompraDao {
             params.add(estado.trim());
         }
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             for (int i = 0; i < params.size(); i++) {
                 pstmt.setObject(i + 1, params.get(i));
             }
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total");
-                }
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al contar órdenes de compra", e);
+            throw new RuntimeException("Error al contar órdenes de compra", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return 0;
     }
@@ -168,39 +181,32 @@ public class OrdenCompraDao {
             sql = "INSERT INTO ordenes_compra (productor_id, producto_id, cantidad, usuario_id, estado, monto_total, distrito_id) VALUES (?, ?, ?, ?, 'Pendiente', ?, ?)";
         }
         
-        System.out.println("=== DEBUG DAO - CREAR ORDEN DE COMPRA ===");
-        System.out.println("SQL: " + sql);
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             int idx = 1;
             if (includeNumero) {
                 pstmt.setString(idx++, numeroOrden);
-                System.out.println("Param " + (idx-1) + ": " + numeroOrden);
             }
             pstmt.setInt(idx++, productorId);
-            System.out.println("Param " + (idx-1) + " (productor_id): " + productorId);
             pstmt.setInt(idx++, productoId);
-            System.out.println("Param " + (idx-1) + " (producto_id): " + productoId);
             pstmt.setInt(idx++, cantidad);
-            System.out.println("Param " + (idx-1) + " (cantidad): " + cantidad);
             pstmt.setInt(idx++, usuarioId);
-            System.out.println("Param " + (idx-1) + " (usuario_id): " + usuarioId);
             pstmt.setDouble(idx++, montoTotal);
-            System.out.println("Param " + (idx-1) + " (monto_total): " + montoTotal);
             pstmt.setInt(idx, distritoId);
-            System.out.println("Param " + idx + " (distrito_id): " + distritoId);
             
             int rowsAffected = pstmt.executeUpdate();
-            System.out.println("✓ DAO: Filas insertadas = " + rowsAffected);
+            logger.info("Orden de compra creada: {} filas insertadas", rowsAffected);
             return rowsAffected > 0;
         } catch (SQLException e) {
-            System.err.println("❌ ERROR SQL al crear orden de compra:");
-            System.err.println("SQL State: " + e.getSQLState());
-            System.err.println("Error Code: " + e.getErrorCode());
-            System.err.println("Message: " + e.getMessage());
-            e.printStackTrace();
-            return false;
+            logger.error("Error SQL al crear orden de compra", e);
+            throw new RuntimeException("Error al crear orden de compra", e);
+        } finally {
+            closePreparedStatement(pstmt);
+            closeConnection(conn);
         }
     }
     
@@ -226,10 +232,13 @@ public class OrdenCompraDao {
             sql = "INSERT INTO ordenes_compra (productor_id, producto_id, cantidad, usuario_id, estado, monto_total, distrito_id) VALUES (?, ?, ?, ?, 'Pendiente', ?, ?)";
         }
         
-        System.out.println("=== DEBUG DAO - CREAR ORDEN DE COMPRA Y RETORNAR ID ===");
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet generatedKeys = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             int idx = 1;
             if (includeNumero) {
                 pstmt.setString(idx++, numeroOrden);
@@ -243,49 +252,45 @@ public class OrdenCompraDao {
             
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        int idOrden = generatedKeys.getInt(1);
-                        System.out.println("✓ DAO: Orden creada con ID: " + idOrden);
-                        return idOrden;
-                    }
+                generatedKeys = pstmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int idOrden = generatedKeys.getInt(1);
+                    logger.info("Orden de compra creada con ID: {}", idOrden);
+                    return idOrden;
                 }
             }
             return 0;
         } catch (SQLException e) {
-            System.err.println("❌ ERROR SQL al crear orden de compra:");
-            System.err.println("SQL State: " + e.getSQLState());
-            System.err.println("Error Code: " + e.getErrorCode());
-            System.err.println("Message: " + e.getMessage());
-            e.printStackTrace();
-            return 0;
+            logger.error("Error SQL al crear orden de compra y retornar ID", e);
+            throw new RuntimeException("Error al crear orden de compra", e);
+        } finally {
+            closeResultSet(generatedKeys);
+            closePreparedStatement(pstmt);
+            closeConnection(conn);
         }
     }
 
-    // === CÓDIGO RESTAURADO (Y CAUSA DEL ERROR) ===
     public int obtenerUltimoId() {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        String url = "jdbc:mysql://localhost:3306/telito_bodeguero";
-        String username = "root";
-        String password = "root";
-
         String sql = "SELECT MAX(id_orden_compra) FROM ordenes_compra";
-        int ultimoId = 0;
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
-        try (Connection conn = DriverManager.getConnection(url, username, password);
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
             if (rs.next()) {
-                ultimoId = rs.getInt(1);
+                return rs.getInt(1);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al obtener último ID de orden de compra", e);
+            throw new RuntimeException("Error al obtener último ID de orden de compra", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
-        return ultimoId;
+        return 0;
     }
 
     /**
@@ -314,31 +319,36 @@ public class OrdenCompraDao {
                      "LEFT JOIN ubicaciones ub ON l.ubicacion_id = ub.id_ubicacion " +
                      "WHERE oc.id_orden_compra = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, idOrden);
-            
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    Object[] detalle = new Object[11];
-                    detalle[0] = rs.getString("productor");
-                    detalle[1] = rs.getString("personal_responsable");
-                    detalle[2] = rs.getString("producto");
-                    detalle[3] = rs.getString("sku");
-                    detalle[4] = rs.getInt("cantidad_paquetes");
-                    detalle[5] = String.format("S/. %.2f", rs.getDouble("monto_total"));
-                    detalle[6] = rs.getString("estado");
-                    detalle[7] = rs.getString("codigo_lote");
-                    detalle[8] = rs.getDate("fecha_vencimiento");
-                    detalle[9] = rs.getInt("stock_actual");
-                    detalle[10] = rs.getString("ubicacion");
-                    return detalle;
-                }
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                Object[] detalle = new Object[11];
+                detalle[0] = rs.getString("productor");
+                detalle[1] = rs.getString("personal_responsable");
+                detalle[2] = rs.getString("producto");
+                detalle[3] = rs.getString("sku");
+                detalle[4] = rs.getInt("cantidad_paquetes");
+                detalle[5] = String.format("S/. %.2f", rs.getDouble("monto_total"));
+                detalle[6] = rs.getString("estado");
+                detalle[7] = rs.getString("codigo_lote");
+                detalle[8] = rs.getDate("fecha_vencimiento");
+                detalle[9] = rs.getInt("stock_actual");
+                detalle[10] = rs.getString("ubicacion");
+                return detalle;
             }
         } catch (SQLException e) {
-            System.err.println("ERROR: Error al obtener detalle de orden: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al obtener detalle de orden: " + idOrden, e);
+            throw new RuntimeException("Error al obtener detalle de orden", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return null;
     }
@@ -352,27 +362,9 @@ public class OrdenCompraDao {
     public boolean actualizarEstadoOrden(int idOrden, String nuevoEstado) {
         String sql = "UPDATE ordenes_compra SET estado = ? WHERE id_orden_compra = ?";
         
-        System.out.println("=== DEBUG DAO - ACTUALIZAR ESTADO ===");
-        System.out.println("ID Orden: " + idOrden);
-        System.out.println("Nuevo Estado: " + nuevoEstado);
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setString(1, nuevoEstado);
-            pstmt.setInt(2, idOrden);
-            
-            int rowsAffected = pstmt.executeUpdate();
-            System.out.println("✓ Filas actualizadas: " + rowsAffected);
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            System.err.println("❌ ERROR: Error al actualizar estado:");
-            System.err.println("SQL State: " + e.getSQLState());
-            System.err.println("Error Code: " + e.getErrorCode());
-            System.err.println("Message: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
+        int filasAfectadas = executeUpdate(sql, nuevoEstado, idOrden);
+        logger.info("Estado de orden {} actualizado a {}", idOrden, nuevoEstado);
+        return filasAfectadas > 0;
     }
     
     /**
@@ -385,19 +377,24 @@ public class OrdenCompraDao {
     public int obtenerProductorIdPorOrden(int idOrden) {
         String sql = "SELECT productor_id FROM ordenes_compra WHERE id_orden_compra = ?";
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, idOrden);
-            
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("productor_id");
-                }
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("productor_id");
             }
         } catch (SQLException e) {
-            System.err.println("Error al obtener productor_id de la orden: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al obtener productor_id de la orden: " + idOrden, e);
+            throw new RuntimeException("Error al obtener productor_id de la orden", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return 0;
     }
@@ -421,25 +418,30 @@ public class OrdenCompraDao {
             WHERE oc.id_orden_compra = ?
             """;
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, idOrden);
-            
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    Object[] datos = new Object[5];
-                    datos[0] = rs.getString("numero_orden");
-                    datos[1] = rs.getString("nombre_producto");
-                    datos[2] = rs.getInt("cantidad");
-                    datos[3] = rs.getDouble("monto_total");
-                    datos[4] = rs.getInt("productor_id");
-                    return datos;
-                }
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                Object[] datos = new Object[5];
+                datos[0] = rs.getString("numero_orden");
+                datos[1] = rs.getString("nombre_producto");
+                datos[2] = rs.getInt("cantidad");
+                datos[3] = rs.getDouble("monto_total");
+                datos[4] = rs.getInt("productor_id");
+                return datos;
             }
         } catch (SQLException e) {
-            System.err.println("Error al obtener datos básicos de la orden: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al obtener datos básicos de la orden: " + idOrden, e);
+            throw new RuntimeException("Error al obtener datos básicos de la orden", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return null;
     }

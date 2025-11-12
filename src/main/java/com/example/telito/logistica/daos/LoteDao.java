@@ -1,12 +1,12 @@
 package com.example.telito.logistica.daos;
 
 import com.example.telito.logistica.beans.LoteBean;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class LoteDao {
+public class LoteDao extends DAOBase {
 
     public ArrayList<LoteBean> listarLotesDisponibles() {
         ArrayList<LoteBean> lista = new ArrayList<>();
@@ -19,9 +19,14 @@ public class LoteDao {
             ORDER BY p.nombre, l.codigo_lote;
             """;
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 LoteBean lote = new LoteBean();
@@ -31,7 +36,10 @@ public class LoteDao {
                 lista.add(lote);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al listar lotes disponibles", e);
+            throw new RuntimeException("Error al listar lotes disponibles", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return lista;
     }

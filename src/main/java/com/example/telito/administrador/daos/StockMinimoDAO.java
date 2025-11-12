@@ -2,13 +2,12 @@ package com.example.telito.administrador.daos;
 
 import com.example.telito.administrador.beans.StockMinimoConfig;
 import com.example.telito.administrador.beans.Producto;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class StockMinimoDAO {
-    // Las credenciales ahora están centralizadas en DatabaseConnection
+public class StockMinimoDAO extends DAOBase {
 
     // Listar todas las configuraciones de stock mínimo
     public ArrayList<StockMinimoConfig> listarConfiguraciones() {
@@ -19,9 +18,14 @@ public class StockMinimoDAO {
                 "WHERE smc.activo = 1 " +
                 "ORDER BY p.nombre";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
                 StockMinimoConfig config = new StockMinimoConfig();
@@ -44,7 +48,10 @@ public class StockMinimoDAO {
                 lista.add(config);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al listar configuraciones de stock mínimo", e);
+            throw new RuntimeException("Error al listar configuraciones de stock mínimo", e);
+        } finally {
+            closeResources(conn, stmt, rs);
         }
         return lista;
     }
@@ -53,14 +60,19 @@ public class StockMinimoDAO {
     public StockMinimoConfig obtenerPorProducto(int productoId) {
         String sql = "SELECT * FROM stock_minimo_config WHERE producto_id = ? AND activo = 1";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        StockMinimoConfig config = null;
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, productoId);
-            ResultSet rs = pstmt.executeQuery();
+            rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                StockMinimoConfig config = new StockMinimoConfig();
+                config = new StockMinimoConfig();
                 config.setIdStockMinimo(rs.getInt("id_stock_minimo"));
                 config.setStockMinimoProducto(rs.getInt("stock_minimo_producto"));
                 config.setStockCriticoProducto(rs.getInt("stock_critico_producto"));
@@ -73,85 +85,68 @@ public class StockMinimoDAO {
                 Producto producto = new Producto();
                 producto.setIdProducto(rs.getInt("producto_id"));
                 config.setProducto(producto);
-
-                return config;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al obtener configuración por producto ID: " + productoId, e);
+            throw new RuntimeException("Error al obtener configuración de stock mínimo", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
-        return null;
+        return config;
     }
 
     // Crear nueva configuración
     public boolean crearConfiguracion(StockMinimoConfig config) {
         String sql = "INSERT INTO stock_minimo_config (producto_id, stock_minimo_producto, stock_critico_producto, stock_minimo_lote, stock_critico_lote, activo) VALUES (?, ?, ?, ?, ?, ?)";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, config.getProducto().getIdProducto());
-            pstmt.setInt(2, config.getStockMinimoProducto());
-            pstmt.setInt(3, config.getStockCriticoProducto());
-            pstmt.setInt(4, config.getStockMinimoLote());
-            pstmt.setInt(5, config.getStockCriticoLote());
-            pstmt.setBoolean(6, config.isActivo());
-
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        int filasAfectadas = executeUpdate(sql, 
+            config.getProducto().getIdProducto(),
+            config.getStockMinimoProducto(),
+            config.getStockCriticoProducto(),
+            config.getStockMinimoLote(),
+            config.getStockCriticoLote(),
+            config.isActivo());
+        return filasAfectadas > 0;
     }
 
     // Actualizar configuración existente
     public boolean actualizarConfiguracion(StockMinimoConfig config) {
         String sql = "UPDATE stock_minimo_config SET stock_minimo_producto = ?, stock_critico_producto = ?, stock_minimo_lote = ?, stock_critico_lote = ?, activo = ? WHERE id_stock_minimo = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, config.getStockMinimoProducto());
-            pstmt.setInt(2, config.getStockCriticoProducto());
-            pstmt.setInt(3, config.getStockMinimoLote());
-            pstmt.setInt(4, config.getStockCriticoLote());
-            pstmt.setBoolean(5, config.isActivo());
-            pstmt.setInt(6, config.getIdStockMinimo());
-
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        int filasAfectadas = executeUpdate(sql,
+            config.getStockMinimoProducto(),
+            config.getStockCriticoProducto(),
+            config.getStockMinimoLote(),
+            config.getStockCriticoLote(),
+            config.isActivo(),
+            config.getIdStockMinimo());
+        return filasAfectadas > 0;
     }
 
     // Eliminar configuración (marcar como inactiva)
     public boolean eliminarConfiguracion(int idStockMinimo) {
         String sql = "UPDATE stock_minimo_config SET activo = 0 WHERE id_stock_minimo = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, idStockMinimo);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        int filasAfectadas = executeUpdate(sql, idStockMinimo);
+        return filasAfectadas > 0;
     }
 
     // Obtener stock mínimo global por defecto
     public int obtenerStockMinimoGlobal() {
         String sql = "SELECT valor FROM parametros_sistema WHERE clave = 'STOCK_MINIMO_GLOBAL' AND activo = 1";
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
 
             if (rs.next()) {
                 return Integer.parseInt(rs.getString("valor"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al obtener stock mínimo global", e);
+        } finally {
+            closeResources(conn, stmt, rs);
         }
         return 10; // Valor por defecto
     }
@@ -159,16 +154,22 @@ public class StockMinimoDAO {
     // Obtener stock crítico global por defecto
     public int obtenerStockCriticoGlobal() {
         String sql = "SELECT valor FROM parametros_sistema WHERE clave = 'STOCK_CRITICO_GLOBAL' AND activo = 1";
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
 
             if (rs.next()) {
                 return Integer.parseInt(rs.getString("valor"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al obtener stock crítico global", e);
+        } finally {
+            closeResources(conn, stmt, rs);
         }
         return 5; // Valor por defecto
     }
@@ -186,9 +187,14 @@ public class StockMinimoDAO {
                 "JOIN productos p ON smc.producto_id = p.id_producto " +
                 "ORDER BY p.nombre";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
                 StockMinimoConfig config = new StockMinimoConfig();
@@ -211,7 +217,10 @@ public class StockMinimoDAO {
                 lista.add(config);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al listar configuraciones de stock mínimo", e);
+            throw new RuntimeException("Error al listar configuraciones de stock mínimo", e);
+        } finally {
+            closeResources(conn, stmt, rs);
         }
         return lista;
     }

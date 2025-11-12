@@ -1,22 +1,26 @@
 package com.example.telito.administrador.daos;
 
 import com.example.telito.administrador.beans.Categoria;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class CategoriaDAO {
-    // Las credenciales ahora están centralizadas en DatabaseConnection
+public class CategoriaDAO extends DAOBase {
 
     // Listar todas las categorías
     public ArrayList<Categoria> listarCategorias() {
         ArrayList<Categoria> lista = new ArrayList<>();
         String sql = "SELECT * FROM categorias ORDER BY nombre";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
                 Categoria categoria = new Categoria();
@@ -25,7 +29,10 @@ public class CategoriaDAO {
                 lista.add(categoria);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al listar categorías", e);
+            throw new RuntimeException("Error al listar categorías", e);
+        } finally {
+            closeResources(conn, stmt, rs);
         }
         return lista;
     }
@@ -33,22 +40,29 @@ public class CategoriaDAO {
     // Obtener categoría por ID
     public Categoria obtenerPorId(int id) {
         String sql = "SELECT * FROM categorias WHERE id_categoria = ?";
+        Categoria categoria = null;
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
+            rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                Categoria categoria = new Categoria();
+                categoria = new Categoria();
                 categoria.setIdCategoria(rs.getInt("id_categoria"));
                 categoria.setNombre(rs.getString("nombre"));
-                return categoria;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al obtener categoría por ID: " + id, e);
+            throw new RuntimeException("Error al obtener categoría", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
-        return null;
+        return categoria;
     }
 }

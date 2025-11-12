@@ -34,12 +34,6 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/">
-                        <i class="fas fa-home"></i>Ir a la web principal
-                    </a>
-                </li>
-
             </ul>
         </nav>
     </div>

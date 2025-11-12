@@ -1,12 +1,11 @@
 package com.example.telito.almacen.daos;
 
 import com.example.telito.almacen.beans.Lote;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class LoteDao {
-    // Las credenciales ahora están centralizadas en DatabaseConnection
+public class LoteDao extends DAOBase {
 
     /**
      * MÉTODO MODIFICADO: Renombrado y filtrado.
@@ -37,31 +36,37 @@ public class LoteDao {
                 "WHERE l.estado = 'Registrado' " + // <-- FILTRO AÑADIDO
                 "LIMIT ? OFFSET ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, registrosPorPagina);
             pstmt.setInt(2, offset);
+            rs = pstmt.executeQuery();
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Lote lote = new Lote();
-                    lote.setIdLote(rs.getInt("id_lote"));
-                    lote.setCodigoLote(rs.getString("codigo_lote"));
-                    lote.setStockActual(rs.getInt("stock_actual"));
-                    lote.setPaquetesDisponibles(rs.getInt("paquetes_disponibles"));
-                    lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
-                    lote.setEstado(rs.getString("estado"));
-                    lote.setProductoId(rs.getInt("producto_id"));
-                    lote.setNombreProducto(rs.getString("nombre_producto"));
-                    lote.setCodigoSKU(rs.getString("codigo_sku")); // SKU del producto
-                    lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
-                    lote.setEstadoStock(rs.getString("estado_stock")); // Estado del stock calculado
-                    lista.add(lote);
-                }
+            while (rs.next()) {
+                Lote lote = new Lote();
+                lote.setIdLote(rs.getInt("id_lote"));
+                lote.setCodigoLote(rs.getString("codigo_lote"));
+                lote.setStockActual(rs.getInt("stock_actual"));
+                lote.setPaquetesDisponibles(rs.getInt("paquetes_disponibles"));
+                lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
+                lote.setEstado(rs.getString("estado"));
+                lote.setProductoId(rs.getInt("producto_id"));
+                lote.setNombreProducto(rs.getString("nombre_producto"));
+                lote.setCodigoSKU(rs.getString("codigo_sku")); // SKU del producto
+                lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
+                lote.setEstadoStock(rs.getString("estado_stock")); // Estado del stock calculado
+                lista.add(lote);
             }
         } catch (SQLException e) {
+            logger.error("Error al listar los lotes registrados", e);
             throw new RuntimeException("Error al listar los lotes registrados", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return lista;
     }
@@ -72,16 +77,7 @@ public class LoteDao {
      */
     public int contarTotalLotesRegistrados() {
         String sql = "SELECT COUNT(*) FROM lotes WHERE estado = 'Registrado'";
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al contar los lotes registrados", e);
-        }
-        return 0;
+        return count(sql);
     }
 
     /**
@@ -90,14 +86,7 @@ public class LoteDao {
      */
     public void actualizarEstado(int idLote, String nuevoEstado) {
         String sql = "UPDATE lotes SET estado = ? WHERE id_lote = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, nuevoEstado);
-            pstmt.setInt(2, idLote);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al actualizar el estado del lote", e);
-        }
+        executeUpdate(sql, nuevoEstado, idLote);
     }
 
     /**
@@ -112,22 +101,30 @@ public class LoteDao {
                 "WHERE l.producto_id = ? AND l.stock_actual > 0 AND l.estado = 'Registrado' " + // <-- FILTRO AÑADIDO
                 "ORDER BY l.fecha_vencimiento ASC";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, idProducto);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Lote lote = new Lote();
-                    lote.setIdLote(rs.getInt("id_lote"));
-                    lote.setCodigoLote(rs.getString("codigo_lote"));
-                    lote.setStockActual(rs.getInt("stock_actual"));
-                    lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
-                    lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
-                    listaLotes.add(lote);
-                }
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Lote lote = new Lote();
+                lote.setIdLote(rs.getInt("id_lote"));
+                lote.setCodigoLote(rs.getString("codigo_lote"));
+                lote.setStockActual(rs.getInt("stock_actual"));
+                lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
+                lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
+                listaLotes.add(lote);
             }
         } catch (SQLException e) {
+            logger.error("Error al buscar lotes por producto", e);
             throw new RuntimeException("Error al buscar lotes por producto", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return listaLotes;
     }
@@ -137,14 +134,7 @@ public class LoteDao {
 
     public void actualizarStock(int idLote, int nuevoStock) {
         String sql = "UPDATE lotes SET stock_actual = ? WHERE id_lote = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, nuevoStock);
-            pstmt.setInt(2, idLote);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al actualizar el stock", e);
-        }
+        executeUpdate(sql, nuevoStock, idLote);
     }
 
     public Lote buscarLotePorId(int idLote) {
@@ -156,23 +146,31 @@ public class LoteDao {
                 " INNER JOIN ubicaciones u ON (l.ubicacion_id = u.id_ubicacion) " +
                 " WHERE l.id_lote = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, idLote);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    lote = new Lote();
-                    lote.setIdLote(rs.getInt("id_lote"));
-                    lote.setCodigoLote(rs.getString("codigo_lote"));
-                    lote.setStockActual(rs.getInt("stock_actual"));
-                    lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
-                    lote.setEstado(rs.getString("estado"));
-                    lote.setNombreProducto(rs.getString("nombre_producto"));
-                    lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
-                }
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                lote = new Lote();
+                lote.setIdLote(rs.getInt("id_lote"));
+                lote.setCodigoLote(rs.getString("codigo_lote"));
+                lote.setStockActual(rs.getInt("stock_actual"));
+                lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
+                lote.setEstado(rs.getString("estado"));
+                lote.setNombreProducto(rs.getString("nombre_producto"));
+                lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
             }
         } catch (SQLException e) {
+            logger.error("Error al buscar el lote", e);
             throw new RuntimeException("Error al buscar el lote", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return lote;
     }
@@ -182,9 +180,13 @@ public class LoteDao {
         String sql = "INSERT INTO lotes (codigo_lote, stock_actual, fecha_vencimiento, producto_id, ubicacion_id, distrito_id, estado) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
         int generatedId = 0;
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             pstmt.setString(1, lote.getCodigoLote());
             pstmt.setInt(2, lote.getStockActual());
             pstmt.setDate(3, new java.sql.Date(lote.getFechaVencimiento().getTime()));
@@ -194,13 +196,17 @@ public class LoteDao {
             pstmt.setString(7, lote.getEstado()); // <-- SE AÑADE EL ESTADO
             pstmt.executeUpdate();
 
-            try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    generatedId = rs.getInt(1);
-                }
+            rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                generatedId = rs.getInt(1);
             }
         } catch (SQLException e) {
+            logger.error("Error al crear lote", e);
             throw new RuntimeException("Error al crear lote", e);
+        } finally {
+            closeResultSet(rs);
+            closePreparedStatement(pstmt);
+            closeConnection(conn);
         }
         return generatedId;
     }
@@ -210,15 +216,8 @@ public class LoteDao {
      */
     public void actualizarUbicacion(int idLote, int idUbicacion) {
         String sql = "UPDATE lotes SET ubicacion_id = ? WHERE id_lote = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, idUbicacion);
-            pstmt.setInt(2, idLote);
-            pstmt.executeUpdate();
-            System.out.println("✓ Ubicación del lote " + idLote + " actualizada a ubicación " + idUbicacion);
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al actualizar ubicación del lote", e);
-        }
+        executeUpdate(sql, idUbicacion, idLote);
+        logger.info("Ubicación del lote {} actualizada a ubicación {}", idLote, idUbicacion);
     }
 
     /**
@@ -226,14 +225,8 @@ public class LoteDao {
      */
     public void registrarLote(int idLote) {
         String sql = "UPDATE lotes SET estado = 'Registrado' WHERE id_lote = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, idLote);
-            pstmt.executeUpdate();
-            System.out.println("✓ Lote " + idLote + " marcado como 'Registrado'");
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al registrar el lote", e);
-        }
+        executeUpdate(sql, idLote);
+        logger.info("Lote {} marcado como 'Registrado'", idLote);
     }
     
     /**
@@ -250,25 +243,31 @@ public class LoteDao {
                      "WHERE l.producto_id = ? AND l.stock_actual > 0 " +
                      "ORDER BY l.fecha_vencimiento ASC, l.codigo_lote ASC";
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, productoId);
-            
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Object[] lote = new Object[6];
-                    lote[0] = rs.getInt("id_lote");
-                    lote[1] = rs.getString("codigo_lote");
-                    lote[2] = rs.getInt("stock_actual");
-                    lote[3] = rs.getDate("fecha_vencimiento");
-                    lote[4] = rs.getInt("unidades_por_paquete");
-                    lote[5] = rs.getInt("paquetes");
-                    lotes.add(lote);
-                }
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Object[] lote = new Object[6];
+                lote[0] = rs.getInt("id_lote");
+                lote[1] = rs.getString("codigo_lote");
+                lote[2] = rs.getInt("stock_actual");
+                lote[3] = rs.getDate("fecha_vencimiento");
+                lote[4] = rs.getInt("unidades_por_paquete");
+                lote[5] = rs.getInt("paquetes");
+                lotes.add(lote);
             }
         } catch (SQLException e) {
+            logger.error("Error al obtener resumen de lotes", e);
             throw new RuntimeException("Error al obtener resumen de lotes", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return lotes;
     }
@@ -301,9 +300,14 @@ public class LoteDao {
                 "WHERE l.estado = 'Registrado' " +
                 "ORDER BY l.codigo_lote ASC";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 Lote lote = new Lote();
@@ -321,7 +325,10 @@ public class LoteDao {
                 lista.add(lote);
             }
         } catch (SQLException e) {
+            logger.error("Error al listar todos los lotes registrados", e);
             throw new RuntimeException("Error al listar todos los lotes registrados", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return lista;
     }

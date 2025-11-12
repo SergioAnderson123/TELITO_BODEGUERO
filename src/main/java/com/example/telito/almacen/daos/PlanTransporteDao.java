@@ -1,12 +1,12 @@
 package com.example.telito.almacen.daos;
 
 import com.example.telito.almacen.beans.PlanTransporte;
-import com.example.telito.util.DatabaseConnection;
+import com.example.telito.util.DAOBase;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class PlanTransporteDao {
+public class PlanTransporteDao extends DAOBase {
 
     // Listar planes de transporte para el almacén (Pendientes y en Salida)
     public ArrayList<PlanTransporte> listarPlanesPendientes() {
@@ -46,9 +46,14 @@ public class PlanTransporteDao {
             ORDER BY FIELD(pt.estado, 'Pendiente', 'Salida'), pt.fecha_entrega ASC
             """;
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 PlanTransporte plan = new PlanTransporte();
@@ -67,7 +72,10 @@ public class PlanTransporteDao {
                 lista.add(plan);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al listar planes pendientes", e);
+            throw new RuntimeException("Error al listar planes pendientes", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return lista;
     }
@@ -109,29 +117,36 @@ public class PlanTransporteDao {
             WHERE pt.id_plan = ?
             """;
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    plan = new PlanTransporte();
-                    plan.setIdPlan(rs.getInt("id_plan"));
-                    plan.setNumeroPlan(rs.getString("numero_plan"));
-                    plan.setNombreProducto(rs.getString("nombre_producto"));
-                    plan.setCodigoLote(rs.getString("codigo_lote"));
-                    plan.setIdLote(rs.getInt("id_lote"));
-                    plan.setStockDisponible(rs.getInt("stock_actual"));
-                    plan.setPaquetesDisponibles(rs.getInt("paquetes_disponibles"));
-                    plan.setEstado(rs.getString("estado"));
-                    plan.setNombreConductor(rs.getString("nombre_conductor"));
-                    plan.setPlacaVehiculo(rs.getString("placa_vehiculo"));
-                    plan.setFechaEntrega(rs.getString("fecha_entrega"));
-                    plan.setNombreDestino(rs.getString("nombre_destino"));
-                }
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                plan = new PlanTransporte();
+                plan.setIdPlan(rs.getInt("id_plan"));
+                plan.setNumeroPlan(rs.getString("numero_plan"));
+                plan.setNombreProducto(rs.getString("nombre_producto"));
+                plan.setCodigoLote(rs.getString("codigo_lote"));
+                plan.setIdLote(rs.getInt("id_lote"));
+                plan.setStockDisponible(rs.getInt("stock_actual"));
+                plan.setPaquetesDisponibles(rs.getInt("paquetes_disponibles"));
+                plan.setEstado(rs.getString("estado"));
+                plan.setNombreConductor(rs.getString("nombre_conductor"));
+                plan.setPlacaVehiculo(rs.getString("placa_vehiculo"));
+                plan.setFechaEntrega(rs.getString("fecha_entrega"));
+                plan.setNombreDestino(rs.getString("nombre_destino"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error al buscar plan por ID: " + id, e);
+            throw new RuntimeException("Error al buscar plan por ID", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return plan;
     }
@@ -139,37 +154,14 @@ public class PlanTransporteDao {
     // Actualizar el estado del plan de transporte
     public boolean actualizarEstado(int idPlan, String nuevoEstado) {
         String sql = "UPDATE planes_transporte SET estado = ? WHERE id_plan = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, nuevoEstado);
-            pstmt.setInt(2, idPlan);
-
-            int filasAfectadas = pstmt.executeUpdate();
-            return filasAfectadas > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        int filasAfectadas = executeUpdate(sql, nuevoEstado, idPlan);
+        return filasAfectadas > 0;
     }
 
     // Contar planes pendientes
     public int contarPlanesPendientes() {
         String sql = "SELECT COUNT(*) FROM planes_transporte WHERE estado = 'Pendiente'";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
+        return count(sql);
     }
 }
 
