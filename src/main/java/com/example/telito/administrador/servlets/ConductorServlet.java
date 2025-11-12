@@ -2,12 +2,14 @@ package com.example.telito.administrador.servlets;
 
 import com.example.telito.administrador.beans.Conductor;
 import com.example.telito.administrador.daos.ConductorDAO;
+import com.example.telito.util.AuthorizationHelper;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +20,16 @@ public class ConductorServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // Verificar que el usuario tenga rol de administrador
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a ConductorServlet desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
         String action = request.getParameter("action");
         ConductorDAO conductorDAO = new ConductorDAO();

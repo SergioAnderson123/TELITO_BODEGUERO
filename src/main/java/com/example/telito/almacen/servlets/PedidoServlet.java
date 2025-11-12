@@ -7,6 +7,7 @@ import com.example.telito.almacen.daos.PedidoDao;
 import com.example.telito.almacen.daos.PlanTransporteDao;
 import com.example.telito.administrador.daos.AlertaDAO;
 import com.example.telito.administrador.daos.UsuarioDAO;
+import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.EmailUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -26,6 +27,16 @@ public class PedidoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // Verificar que el usuario tenga rol de almacenero
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a PedidoServlet desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
         // --- TU MÉTODO doGet ESTÁ PERFECTO, NO NECESITA CAMBIOS ---
         String action = request.getParameter("action") == null ? "lista" : request.getParameter("action");
@@ -98,8 +109,17 @@ public class PedidoServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Verificar que el usuario tenga rol de almacenero
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a PedidoServlet (POST) desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+
         // Obtenemos el usuario de la sesión para registrar quién hizo el movimiento
-        HttpSession session = request.getSession();
         com.example.telito.administrador.beans.Usuario usuarioSesion = 
             (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
         int usuarioId = (usuarioSesion != null) ? usuarioSesion.getIdUsuario() : 1; // Usamos 1 como fallback si no hay sesión

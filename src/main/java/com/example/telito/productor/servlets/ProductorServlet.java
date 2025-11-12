@@ -6,6 +6,7 @@ import com.example.telito.productor.beans.Producto;
 import com.example.telito.productor.beans.Usuario;
 import com.example.telito.productor.daos.ProductoDao;
 import com.example.telito.administrador.daos.UsuarioDAO;
+import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.EmailUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -13,6 +14,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -35,14 +37,22 @@ public class ProductorServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        // Verificar que el usuario tenga rol de productor
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederProductor(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de productor intentó acceder a ProductorServlet desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
         // Si no se especifica una acción, la acción por defecto será 'listarProductos'
         String action = request.getParameter("action") == null ? "listarProductos" : request.getParameter("action");
 
         // Obtener el ID del productor desde la sesión
         com.example.telito.administrador.beans.Usuario usuarioSesion = 
-            (com.example.telito.administrador.beans.Usuario) request.getSession().getAttribute("usuario");
+            (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
         
         if (usuarioSesion == null) {
             response.sendRedirect(request.getContextPath() + "/acceso/login");
@@ -379,13 +389,22 @@ public class ProductorServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Verificar que el usuario tenga rol de productor
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederProductor(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de productor intentó acceder a ProductorServlet (POST) desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
         String action = request.getParameter("action") == null ? "" : request.getParameter("action");
         ProductoDao productoDao = new ProductoDao();
         
         // Obtener el ID del productor desde la sesión
         com.example.telito.administrador.beans.Usuario usuarioSesion = 
-            (com.example.telito.administrador.beans.Usuario) request.getSession().getAttribute("usuario");
+            (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
         
         if (usuarioSesion == null) {
             response.sendRedirect(request.getContextPath() + "/acceso/login");

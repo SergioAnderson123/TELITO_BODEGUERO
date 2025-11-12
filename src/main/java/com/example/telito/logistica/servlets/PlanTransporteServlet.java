@@ -1,11 +1,13 @@
 package com.example.telito.logistica.servlets;
 
+import com.example.telito.util.AuthorizationHelper;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import com.example.telito.logistica.beans.PlanTransporteBean;
 import com.example.telito.logistica.daos.ConductorDao;
 import com.example.telito.logistica.daos.DistritoDao;
@@ -24,6 +26,15 @@ public class PlanTransporteServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Verificar que el usuario tenga rol de logística
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederLogistica(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de logística intentó acceder a PlanTransporteServlet desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");

@@ -2,6 +2,7 @@ package com.example.telito.almacen.servlets;
 
 import com.example.telito.almacen.beans.Movimiento;
 import com.example.telito.almacen.daos.MovimientoDao;
+import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.ExcelUtil;
 import com.example.telito.util.EmailUtil;
 import jakarta.servlet.ServletException;
@@ -25,6 +26,16 @@ public class MovimientoReporteServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // Verificar que el usuario tenga rol de almacenero
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a MovimientoReporteServlet desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
         String action = request.getParameter("action");
         if (action == null) {

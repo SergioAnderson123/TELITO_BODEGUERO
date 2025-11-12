@@ -1,11 +1,13 @@
 package com.example.telito.logistica.servlets;
 
+import com.example.telito.util.AuthorizationHelper;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import com.example.telito.logistica.beans.InventarioBean;
 import com.example.telito.logistica.daos.InventarioDao;
 
@@ -17,6 +19,16 @@ public class InventarioServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) throws IOException, ServletException {
+        // Verificar que el usuario tenga rol de logística
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederLogistica(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de logística intentó acceder a InventarioServlet desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+        
         response.setContentType("text/html");
 
         // Obtener parámetros de búsqueda y filtros

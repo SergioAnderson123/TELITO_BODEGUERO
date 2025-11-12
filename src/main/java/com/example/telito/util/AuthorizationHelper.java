@@ -148,5 +148,114 @@ public class AuthorizationHelper {
         }
         return usuario.getRol().getIdRol() == rolId;
     }
+
+    /**
+     * Verifica si el usuario actual tiene permisos de almacenero.
+     * 
+     * @param session Sesión HTTP
+     * @return true si el usuario es almacenero, false en caso contrario
+     */
+    public static boolean esAlmacenero(HttpSession session) {
+        return tieneRol(session, ROL_ALMACEN);
+    }
+
+    /**
+     * Verifica si el usuario actual tiene permisos de logística.
+     * 
+     * @param session Sesión HTTP
+     * @return true si el usuario es de logística, false en caso contrario
+     */
+    public static boolean esLogistica(HttpSession session) {
+        return tieneRol(session, ROL_LOGISTICA);
+    }
+
+    /**
+     * Verifica si el usuario actual tiene permisos de productor.
+     * 
+     * @param session Sesión HTTP
+     * @return true si el usuario es productor, false en caso contrario
+     */
+    public static boolean esProductor(HttpSession session) {
+        return tieneRol(session, ROL_PRODUCTOR);
+    }
+
+    /**
+     * Verifica si el usuario puede acceder al módulo de almacén.
+     * Solo los usuarios con rol de almacenero pueden acceder.
+     * 
+     * @param session Sesión HTTP
+     * @return true si el usuario puede acceder al módulo de almacén, false en caso contrario
+     */
+    public static boolean puedeAccederAlmacen(HttpSession session) {
+        return esAlmacenero(session);
+    }
+
+    /**
+     * Verifica si el usuario puede acceder al módulo de logística.
+     * Solo los usuarios con rol de logística pueden acceder.
+     * 
+     * @param session Sesión HTTP
+     * @return true si el usuario puede acceder al módulo de logística, false en caso contrario
+     */
+    public static boolean puedeAccederLogistica(HttpSession session) {
+        return esLogistica(session);
+    }
+
+    /**
+     * Verifica si el usuario puede acceder al módulo de productor.
+     * Solo los usuarios con rol de productor pueden acceder.
+     * 
+     * @param session Sesión HTTP
+     * @return true si el usuario puede acceder al módulo de productor, false en caso contrario
+     */
+    public static boolean puedeAccederProductor(HttpSession session) {
+        return esProductor(session);
+    }
+
+    /**
+     * Verifica si el usuario puede acceder al módulo de administrador.
+     * Solo los usuarios con rol de administrador pueden acceder.
+     * 
+     * @param session Sesión HTTP
+     * @return true si el usuario puede acceder al módulo de administrador, false en caso contrario
+     */
+    public static boolean puedeAccederAdministrador(HttpSession session) {
+        return esAdministrador(session);
+    }
+
+    /**
+     * Obtiene la URL de redirección según el rol del usuario.
+     * 
+     * @param session Sesión HTTP
+     * @param contextPath Context path de la aplicación
+     * @return URL de redirección según el rol, o null si no hay sesión válida
+     */
+    public static String obtenerUrlRedireccionPorRol(HttpSession session, String contextPath) {
+        if (session == null || session.getAttribute("usuario") == null) {
+            return contextPath + "/acceso/login";
+        }
+        
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null || usuario.getRol() == null) {
+            return contextPath + "/acceso/login";
+        }
+        
+        String rolNombre = usuario.getRol().getNombre().toLowerCase();
+        
+        switch (rolNombre) {
+            case "administrador":
+                return contextPath + "/inicio";
+            case "logística":
+            case "logistica":
+                return contextPath + "/InventarioServlet";
+            case "productor":
+                return contextPath + "/productor/index.jsp";
+            case "almacenero":
+            case "almacén":
+                return contextPath + "/almacen/index.jsp";
+            default:
+                return contextPath + "/acceso/login";
+        }
+    }
 }
 

@@ -5,6 +5,7 @@ import com.example.telito.almacen.beans.Movimiento;
 import com.example.telito.almacen.beans.Usuario;
 import com.example.telito.almacen.daos.LoteDao;
 import com.example.telito.almacen.daos.MovimientoDao;
+import com.example.telito.util.AuthorizationHelper;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,6 +23,16 @@ public class LoteServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // Verificar que el usuario tenga rol de almacenero
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a LoteServlet desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
         LoteDao loteDao = new LoteDao();
         String action = request.getParameter("action") == null ? "lista" : request.getParameter("action");
@@ -109,6 +120,16 @@ public class LoteServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Verificar que el usuario tenga rol de almacenero
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a LoteServlet (POST) desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+
         // Tu método doPost para "guardarAjuste" ya está correcto y no necesita cambios.
         String action = request.getParameter("action");
         LoteDao loteDao = new LoteDao();
@@ -121,7 +142,7 @@ public class LoteServlet extends HttpServlet {
                 int cantidadContada = Integer.parseInt(request.getParameter("cantidadContada"));
                 String motivoAjuste = request.getParameter("motivo");
 
-                HttpSession session = request.getSession();
+                // La sesión ya fue obtenida en la verificación de autorización arriba
                 com.example.telito.administrador.beans.Usuario usuarioSesion = 
                     (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
                 int usuarioId = (usuarioSesion != null) ? usuarioSesion.getIdUsuario() : 1;

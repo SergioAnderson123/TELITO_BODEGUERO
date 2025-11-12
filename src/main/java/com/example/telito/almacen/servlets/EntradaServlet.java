@@ -3,6 +3,7 @@ package com.example.telito.almacen.servlets;
 import com.example.telito.almacen.beans.*;
 import com.example.telito.almacen.daos.*;
 import com.example.telito.administrador.daos.UsuarioDAO;
+import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.EmailUtil;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -26,6 +27,16 @@ public class EntradaServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // Verificar que el usuario tenga rol de almacenero
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a EntradaServlet desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
         String action = request.getParameter("action") == null ? "lista" : request.getParameter("action");
         OrdenCompraDao ordenCompraDao = new OrdenCompraDao();
@@ -84,9 +95,17 @@ public class EntradaServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Verificar que el usuario tenga rol de almacenero
+        HttpSession session = request.getSession(false);
+        if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
+            System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a EntradaServlet (POST) desde: " + 
+                             request.getRemoteAddr());
+            String redirectUrl = AuthorizationHelper.obtenerUrlRedireccionPorRol(session, request.getContextPath());
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+
         ArrayList<String> errores = new ArrayList<>();
-        
-        HttpSession session = request.getSession();
         com.example.telito.administrador.beans.Usuario usuario = 
             (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
         int usuarioId = (usuario != null) ? usuario.getIdUsuario() : 1;
