@@ -674,9 +674,31 @@
     // Inicializar
     applyFilters();
 
+    // Variables globales para los modales
+    let productoAEliminarId = null;
+    let productoAEliminarNombre = null;
+    
     // ===================== Función para confirmar eliminación de producto =====================
     function confirmarEliminacion(idProducto, nombreProducto) {
-        if (confirm('¿Estás seguro de que quieres eliminar el producto "' + nombreProducto + '"?\n\nEsta acción no se puede deshacer.')) {
+        productoAEliminarId = idProducto;
+        productoAEliminarNombre = nombreProducto;
+        
+        // Actualizar el mensaje del modal de confirmación
+        document.getElementById('nombreProductoEliminar').textContent = nombreProducto;
+        
+        // Mostrar el modal de confirmación
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmarEliminacionModal'));
+        confirmModal.show();
+    }
+    
+    // Función para proceder con la eliminación
+    function procederEliminacion() {
+        if (productoAEliminarId && productoAEliminarNombre) {
+            // Cerrar el modal de confirmación
+            const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmarEliminacionModal'));
+            confirmModal.hide();
+            
+            // Crear y enviar el formulario
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '<%= request.getContextPath() %>/ProductorServlet';
@@ -687,13 +709,29 @@
             const idInput = document.createElement('input');
             idInput.type = 'hidden';
             idInput.name = 'idProducto';
-            idInput.value = idProducto;
+            idInput.value = productoAEliminarId;
             form.appendChild(actionInput);
             form.appendChild(idInput);
             document.body.appendChild(form);
             form.submit();
         }
     }
+    
+    // Verificar si hay mensaje de éxito en la sesión y mostrar modal de éxito
+    <%
+        String mensajeExito = (String) session.getAttribute("mensaje");
+        String tipoMensajeExito = (String) session.getAttribute("tipoMensaje");
+        boolean mostrarModalExito = mensajeExito != null && "success".equals(tipoMensajeExito) && mensajeExito.contains("eliminado");
+        if (mostrarModalExito) {
+            // Limpiar mensaje de sesión antes de mostrar el modal
+            session.removeAttribute("mensaje");
+            session.removeAttribute("tipoMensaje");
+    %>
+    document.addEventListener('DOMContentLoaded', function() {
+        const successModal = new bootstrap.Modal(document.getElementById('productoEliminadoExitoModal'));
+        successModal.show();
+    });
+    <% } %>
 
     // Recargar página si se vuelve desde el perfil
     if (sessionStorage.getItem('recargarDesdePerfil') === 'true') {
@@ -939,6 +977,64 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== Modal: Confirmar Eliminación de Producto ===================== -->
+<div class="modal fade" id="confirmarEliminacionModal" tabindex="-1" aria-labelledby="confirmarEliminacionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; overflow: hidden;">
+            <div class="modal-header bg-danger text-white" style="border-bottom: none; padding: 20px 25px;">
+                <h5 class="modal-title d-flex align-items-center" id="confirmarEliminacionModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 25px;">
+                <p class="mb-3" style="font-size: 1.1rem;">
+                    ¿Estás seguro de que quieres eliminar el producto <strong id="nombreProductoEliminar"></strong>?
+                </p>
+                <p class="text-muted mb-0" style="font-size: 0.95rem;">
+                    <i class="fas fa-info-circle me-2"></i>Esta acción no se puede deshacer.
+                </p>
+            </div>
+            <div class="modal-footer" style="border-top: none; padding: 20px 25px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="padding: 8px 20px; border-radius: 8px;">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" onclick="procederEliminacion()" style="padding: 8px 20px; border-radius: 8px;">
+                    <i class="fas fa-trash me-2"></i>Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== Modal: Producto Eliminado Exitosamente ===================== -->
+<div class="modal fade" id="productoEliminadoExitoModal" tabindex="-1" aria-labelledby="productoEliminadoExitoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content" style="border-radius: 15px; overflow: hidden; border: none;">
+            <div class="modal-header bg-success text-white d-flex align-items-center justify-content-center" style="border-bottom: none; padding: 20px;">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        <i class="fas fa-check text-success" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <h5 class="modal-title mb-0" id="productoEliminadoExitoModalLabel">¡Éxito!</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center" style="padding: 25px;">
+                <p class="mb-0" style="font-size: 1rem; color: #2b2d42;">
+                    Producto eliminado correctamente
+                </p>
+            </div>
+            <div class="modal-footer d-flex justify-content-center" style="border-top: none; padding: 20px 25px;">
+                <button type="button" class="btn btn-success d-flex align-items-center" data-bs-dismiss="modal" style="padding: 8px 25px; border-radius: 8px;">
+                    <i class="fas fa-check me-2"></i>Aceptar
+                </button>
             </div>
         </div>
     </div>

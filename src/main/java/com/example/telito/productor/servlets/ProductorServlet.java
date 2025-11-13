@@ -479,9 +479,13 @@ public class ProductorServlet extends HttpServlet {
                 request.setAttribute("todasLasCategorias", todasLasCategoriasDesactivar);
                 
                 if (desactivado) {
+                    session.setAttribute("mensaje", "Producto eliminado correctamente.");
+                    session.setAttribute("tipoMensaje", "success");
                     request.setAttribute("alertType", "success");
                     request.setAttribute("alertMessage", "Producto eliminado correctamente.");
                 } else {
+                    session.setAttribute("mensaje", "No se pudo eliminar el producto.");
+                    session.setAttribute("tipoMensaje", "danger");
                     request.setAttribute("alertType", "danger");
                     request.setAttribute("alertMessage", "No se pudo eliminar el producto.");
                 }
