@@ -91,7 +91,7 @@ public class EmailTemplateHelper {
                         </ol>
                         
                         <p style="text-align: center;">
-                            <a href="%s/acceso/login" class="button">Iniciar Sesión</a>
+                            <a href="%s" class="button">Iniciar Sesión</a>
                         </p>
                         
                         <div class="footer">
@@ -103,7 +103,8 @@ public class EmailTemplateHelper {
             </body>
             </html>
             """.formatted(nombres, apellidos, email, password, nombreRol, 
-                          contextPath != null ? contextPath : "", DATE_FORMAT.format(new Date()));
+                          EmailUtil.buildApplicationUrl("/acceso/login", contextPath != null ? contextPath : ""), 
+                          DATE_FORMAT.format(new Date()));
     }
 
     /**

@@ -27,6 +27,7 @@ public class EmailUtil {
     private static String SMTP_PORT = "587";
     private static String EMAIL_FROM = ""; // Configurar en propiedades
     private static String EMAIL_PASSWORD = ""; // Configurar en propiedades
+    private static String APPLICATION_BASE_URL = ""; // URL base de la aplicación para enlaces en correos
     
     // Cargar configuración desde archivo de propiedades
     static {
@@ -47,7 +48,11 @@ public class EmailUtil {
                 SMTP_PORT = props.getProperty("smtp.port", SMTP_PORT);
                 EMAIL_FROM = props.getProperty("email.from", "");
                 EMAIL_PASSWORD = props.getProperty("email.password", "");
+                APPLICATION_BASE_URL = props.getProperty("application.base.url", "");
                 logger.info("✓ Configuración de email cargada desde email.properties");
+                if (!APPLICATION_BASE_URL.isEmpty()) {
+                    logger.info("✓ URL base de la aplicación: " + APPLICATION_BASE_URL);
+                }
             } else {
                 logger.warning("⚠ Archivo email.properties no encontrado. Usando valores por defecto.");
                 logger.warning("⚠ Por favor, configura las credenciales de email.");
@@ -276,6 +281,46 @@ public class EmailUtil {
     public static boolean isEmailConfigured() {
         return EMAIL_FROM != null && !EMAIL_FROM.isEmpty() && 
                EMAIL_PASSWORD != null && !EMAIL_PASSWORD.isEmpty();
+    }
+    
+    /**
+     * Obtiene la URL base de la aplicación configurada en email.properties.
+     * Si no está configurada, retorna una cadena vacía.
+     * 
+     * @return URL base de la aplicación o cadena vacía si no está configurada
+     */
+    public static String getApplicationBaseUrl() {
+        return APPLICATION_BASE_URL != null ? APPLICATION_BASE_URL : "";
+    }
+    
+    /**
+     * Construye la URL completa para un path relativo.
+     * Si la URL base está configurada, la usa. Si no, usa el contextPath proporcionado.
+     * 
+     * @param relativePath Path relativo (ej: "/acceso/login")
+     * @param contextPath Context path de la aplicación (usado como fallback)
+     * @return URL completa para el path proporcionado
+     */
+    public static String buildApplicationUrl(String relativePath, String contextPath) {
+        if (APPLICATION_BASE_URL != null && !APPLICATION_BASE_URL.isEmpty()) {
+            // Asegurar que la URL base no termine con /
+            String baseUrl = APPLICATION_BASE_URL.endsWith("/") ? 
+                APPLICATION_BASE_URL.substring(0, APPLICATION_BASE_URL.length() - 1) : 
+                APPLICATION_BASE_URL;
+            // Asegurar que el path relativo comience con /
+            String path = relativePath.startsWith("/") ? relativePath : "/" + relativePath;
+            return baseUrl + path;
+        } else if (contextPath != null && !contextPath.isEmpty()) {
+            // Fallback: usar contextPath si la URL base no está configurada
+            String basePath = contextPath.endsWith("/") ? 
+                contextPath.substring(0, contextPath.length() - 1) : 
+                contextPath;
+            String path = relativePath.startsWith("/") ? relativePath : "/" + relativePath;
+            return basePath + path;
+        } else {
+            // Último fallback: retornar solo el path relativo
+            return relativePath;
+        }
     }
     
     /**
