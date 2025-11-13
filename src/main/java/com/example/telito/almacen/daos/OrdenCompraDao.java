@@ -95,13 +95,7 @@ public class OrdenCompraDao extends DAOBase {
                 oc.setNumeroOrden(rs.getString("numero_orden"));
                 oc.setProductoId(rs.getInt("producto_id"));
                 oc.setProveedorId(rs.getInt("productor_id"));
-                // Manejar correctamente valores NULL en lote_id
-                Object loteIdObj = rs.getObject("lote_id");
-                if (loteIdObj != null) {
-                    oc.setLoteId(rs.getInt("lote_id"));
-                } else {
-                    oc.setLoteId(0); // 0 indica que no hay lote asignado
-                }
+                oc.setLoteId(rs.getInt("lote_id"));
                 oc.setCantidad(rs.getInt("cantidad"));
                 oc.setEstado(rs.getString("estado"));
                 oc.setNombreProducto(rs.getString("prod.nombre"));

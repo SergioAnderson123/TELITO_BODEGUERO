@@ -685,19 +685,15 @@ public class LoteDao extends DAOBase {
     
     /**
      * Obtiene el resumen completo de todos los lotes de un producto con stock inicial y restante
-     * IMPORTANTE: Solo muestra lotes del productor (estado != 'Registrado'), no los lotes del almacén
      * @param productoId ID del producto
      * @return Lista de arrays con [id_lote, codigo_lote, stock_inicial, stock_actual, paquetes_inicial, paquetes_restante, fecha_vencimiento, unidades_por_paquete]
      */
     public List<Object[]> obtenerResumenCompletoLotesPorProducto(int productoId) {
         List<Object[]> lotes = new ArrayList<>();
-        // Solo mostrar lotes del productor (estado != 'Registrado')
-        // Los lotes con estado = 'Registrado' son lotes que fueron recibidos por el almacén
         String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, p.unidades_por_paquete " +
                      "FROM lotes l " +
                      "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                      "WHERE l.producto_id = ? " +
-                     "AND (l.estado IS NULL OR l.estado != 'Registrado') " +
                      "ORDER BY l.fecha_vencimiento ASC, l.codigo_lote ASC";
         
         Connection conn = null;
