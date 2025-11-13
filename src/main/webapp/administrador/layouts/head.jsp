@@ -36,7 +36,61 @@
     .pagination .page-link { color:var(--turquoise-dark); border-color:var(--border-color); padding:10px 15px; border-radius:8px; margin:0 2px; }
     .pagination .page-item.active .page-link { background:linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%); border-color:var(--turquoise-dark); }
 
-    @media (max-width: 992px) { .nav-left-sidebar { transform:translateX(-100%); transition:transform .3s ease; } .nav-left-sidebar.open { transform:translateX(0); } .dashboard-header { left:0; } .dashboard-wrapper { margin-left:0; width:100%; } .dashboard-content { padding:20px; } }
+    /* =====================
+       Botón Hamburguesa
+    ====================== */
+    .sidebar-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--turquoise-dark);
+        font-size: 1.5rem;
+        padding: 8px 12px;
+        cursor: pointer;
+        margin-right: 15px;
+        transition: color 0.3s ease;
+    }
+    .sidebar-toggle:hover {
+        color: var(--seafoam);
+    }
+    
+    /* Overlay para móvil */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.active {
+        opacity: 1;
+    }
+
+    @media (max-width: 992px) { 
+        .sidebar-toggle {
+            display: inline-block;
+        }
+        .nav-left-sidebar { 
+            position: fixed;
+            transform:translateX(-100%); 
+            transition:transform .3s ease;
+            z-index: 1000;
+        } 
+        .nav-left-sidebar.open { 
+            transform:translateX(0); 
+        }
+        .sidebar-overlay {
+            display: block;
+        }
+        .dashboard-header { left:0; } 
+        .dashboard-wrapper { margin-left:0; width:100%; } 
+        .dashboard-content { padding:20px; } 
+    }
 
     /* Chart specific styles */
     .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-top: 30px; }

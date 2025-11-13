@@ -90,10 +90,58 @@
         .footer-links a { color: var(--text-muted); text-decoration: none; margin: 0 10px; }
         .footer-links a:hover { color: var(--turquoise-dark); }
 
+        /* =====================
+           Botón Hamburguesa
+        ====================== */
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--turquoise-dark);
+            font-size: 1.5rem;
+            padding: 8px 12px;
+            cursor: pointer;
+            margin-right: 15px;
+            transition: color 0.3s ease;
+        }
+        .sidebar-toggle:hover {
+            color: var(--seafoam);
+        }
+        
+        /* Overlay para móvil */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.active {
+            opacity: 1;
+        }
+
         /* Responsive sidebar */
         @media (max-width: 992px) {
-            .nav-left-sidebar { position: fixed; transform: translateX(-100%); transition: transform 0.3s ease; }
-            .nav-left-sidebar.open { transform: translateX(0); }
+            .sidebar-toggle {
+                display: inline-block;
+            }
+            .nav-left-sidebar { 
+                position: fixed; 
+                transform: translateX(-100%); 
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+            .nav-left-sidebar.open { 
+                transform: translateX(0); 
+            }
+            .sidebar-overlay {
+                display: block;
+            }
             .dashboard-header { left: 0; }
             .dashboard-wrapper { margin-left: 0; width: 100%; }
         }
@@ -101,10 +149,17 @@
 </head>
 <body>
     <div class="dashboard-main-wrapper">
+        <!-- ===================== Overlay para móvil ===================== -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
         <!-- ===================== Header / Topbar ===================== -->
         <div class="dashboard-header">
             <nav class="navbar navbar-expand">
                 <div class="container-fluid">
+                    <!-- Botón Hamburguesa -->
+                    <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Toggle sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
                     <!-- Brand -->
                     <a class="navbar-brand d-flex align-items-center" href="<%= request.getContextPath() %>/ProductorServlet?action=listarProductos">
                         <i class="fas fa-store me-2" style="color: var(--seafoam);"></i>
@@ -504,6 +559,59 @@
             sessionStorage.removeItem('recargarDesdePerfil');
             location.reload();
         }
+    </script>
+
+    <script>
+        // ===================== Control del Sidebar en Móvil =====================
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.nav-left-sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            if (sidebar && sidebarOverlay) {
+                sidebar.classList.toggle('open');
+                sidebarOverlay.classList.toggle('active');
+                if (sidebar.classList.contains('open')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+
+        function closeSidebar() {
+            if (sidebar && sidebarOverlay) {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleSidebar();
+            });
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+
+        if (window.innerWidth <= 992) {
+            const sidebarLinks = document.querySelectorAll('.nav-left-sidebar .nav-link');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    setTimeout(closeSidebar, 100);
+                });
+            });
+        }
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 992) {
+                closeSidebar();
+            }
+        });
     </script>
 </body>
 </html>

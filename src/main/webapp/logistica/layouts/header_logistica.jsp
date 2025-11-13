@@ -16,9 +16,16 @@
         }
     }
 %>
+<!-- Overlay para móvil -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 <div class="dashboard-header">
     <nav class="navbar navbar-expand">
         <div class="container-fluid">
+            <!-- Botón Hamburguesa -->
+            <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
             <a class="navbar-brand d-flex align-items-center" href="${pageContext.request.contextPath}/logistica/InventarioServlet">
                 <i class="fas fa-truck me-2" style="color: var(--seafoam);"></i>
                 <span>Telito Bodeguero</span>
@@ -72,6 +79,57 @@ if (sessionStorage.getItem('recargarDesdePerfil') === 'true') {
     sessionStorage.removeItem('recargarDesdePerfil');
     location.reload();
 }
+
+// ===================== Control del Sidebar en Móvil =====================
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebar = document.querySelector('.nav-left-sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+function toggleSidebar() {
+    if (sidebar && sidebarOverlay) {
+        sidebar.classList.toggle('open');
+        sidebarOverlay.classList.toggle('active');
+        if (sidebar.classList.contains('open')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+}
+
+function closeSidebar() {
+    if (sidebar && sidebarOverlay) {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleSidebar();
+    });
+}
+
+if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', closeSidebar);
+}
+
+if (window.innerWidth <= 992) {
+    const sidebarLinks = document.querySelectorAll('.nav-left-sidebar .nav-link');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            setTimeout(closeSidebar, 100);
+        });
+    });
+}
+
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 992) {
+        closeSidebar();
+    }
+});
 
 document.addEventListener('DOMContentLoaded', async function() {
   try {
