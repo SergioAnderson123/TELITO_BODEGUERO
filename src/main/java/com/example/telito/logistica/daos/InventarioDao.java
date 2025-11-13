@@ -13,6 +13,7 @@ public class InventarioDao extends DAOBase {
         ArrayList<InventarioBean> listaInventario = new ArrayList<>();
 
         // Consulta SQL igual que el Almacenero (por lote individual) + cálculo de paquetes
+        // IMPORTANTE: Solo mostrar lotes del almacén (con ubicacion_id asignada), no del productor
         String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, l.estado, " +
                      "p.nombre AS nombre_producto, p.codigo_sku AS codigo_sku, p.unidades_por_paquete, " +
                      "FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes_disponibles, " +
@@ -20,7 +21,8 @@ public class InventarioDao extends DAOBase {
                      "FROM lotes l " +
                      "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                      "INNER JOIN ubicaciones u ON l.ubicacion_id = u.id_ubicacion " +
-                     "WHERE l.estado = 'Registrado' ";
+                     "WHERE l.estado = 'Registrado' " +
+                     "AND l.ubicacion_id IS NOT NULL "; // Solo lotes del almacén
 
         List<Object> params = new ArrayList<>();
 
@@ -113,7 +115,7 @@ public class InventarioDao extends DAOBase {
                     ELSE 'En Stock'
                 END AS estado_stock
             FROM productos p
-            INNER JOIN lotes l ON p.id_producto = l.producto_id AND l.estado = 'Registrado'
+            INNER JOIN lotes l ON p.id_producto = l.producto_id AND l.estado = 'Registrado' AND l.ubicacion_id IS NOT NULL
             LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1
             WHERE 1=1
             """;
@@ -208,7 +210,7 @@ public class InventarioDao extends DAOBase {
                         ELSE 'En Stock'
                     END AS estado_stock
                 FROM productos p
-                INNER JOIN lotes l ON p.id_producto = l.producto_id AND l.estado = 'Registrado'
+                INNER JOIN lotes l ON p.id_producto = l.producto_id AND l.estado = 'Registrado' AND l.ubicacion_id IS NOT NULL
                 LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1
                 WHERE 1=1
             """;

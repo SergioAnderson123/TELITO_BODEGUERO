@@ -17,6 +17,8 @@ public class LoteDao extends DAOBase {
         int offset = (pagina - 1) * registrosPorPagina;
 
         // SE AÑADE LA CONDICIÓN WHERE para filtrar por el estado + cálculo de paquetes + estado de stock
+        // IMPORTANTE: Solo mostrar lotes del almacén (con ubicacion_id asignada, NO NULL)
+        // Los lotes del productor tienen ubicacion_id = NULL o no tienen ubicación del almacén
         String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, l.estado, " +
                 "l.producto_id, " +
                 "p.nombre AS nombre_producto, p.codigo_sku AS codigo_sku, p.unidades_por_paquete, " +
@@ -33,7 +35,8 @@ public class LoteDao extends DAOBase {
                 "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                 "INNER JOIN ubicaciones u ON l.ubicacion_id = u.id_ubicacion " +
                 "LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1 " +
-                "WHERE l.estado = 'Registrado' " + // <-- FILTRO AÑADIDO
+                "WHERE l.estado = 'Registrado' " + // Lotes registrados en almacén
+                "AND l.ubicacion_id IS NOT NULL " + // Solo lotes con ubicación (del almacén, no del productor)
                 "LIMIT ? OFFSET ?";
 
         Connection conn = null;
@@ -76,7 +79,8 @@ public class LoteDao extends DAOBase {
      * Cuenta el total de lotes que están marcados como "Registrado".
      */
     public int contarTotalLotesRegistrados() {
-        String sql = "SELECT COUNT(*) FROM lotes WHERE estado = 'Registrado'";
+        // Solo contar lotes del almacén (con ubicacion_id asignada)
+        String sql = "SELECT COUNT(*) FROM lotes WHERE estado = 'Registrado' AND ubicacion_id IS NOT NULL";
         return count(sql);
     }
 
@@ -95,10 +99,12 @@ public class LoteDao extends DAOBase {
      */
     public ArrayList<Lote> buscarLotesPorProducto(int idProducto) {
         ArrayList<Lote> listaLotes = new ArrayList<>();
+        // Solo buscar lotes del almacén (con ubicacion_id asignada, NO del productor)
         String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, u.nombre AS nombre_ubicacion " +
                 "FROM lotes l " +
                 "INNER JOIN ubicaciones u ON (l.ubicacion_id = u.id_ubicacion) " +
-                "WHERE l.producto_id = ? AND l.stock_actual > 0 AND l.estado = 'Registrado' " + // <-- FILTRO AÑADIDO
+                "WHERE l.producto_id = ? AND l.stock_actual > 0 AND l.estado = 'Registrado' " +
+                "AND l.ubicacion_id IS NOT NULL " + // Solo lotes del almacén
                 "ORDER BY l.fecha_vencimiento ASC";
 
         Connection conn = null;
@@ -236,11 +242,14 @@ public class LoteDao extends DAOBase {
      */
     public ArrayList<Object[]> obtenerResumenLotesPorProducto(int productoId) {
         ArrayList<Object[]> lotes = new ArrayList<>();
+        // Solo mostrar lotes del almacén (con ubicacion_id asignada), no del productor
         String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, " +
                      "p.unidades_por_paquete, FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes " +
                      "FROM lotes l " +
                      "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                      "WHERE l.producto_id = ? AND l.stock_actual > 0 " +
+                     "AND l.ubicacion_id IS NOT NULL " + // Solo lotes del almacén
+                     "AND l.estado = 'Registrado' " + // Solo lotes registrados
                      "ORDER BY l.fecha_vencimiento ASC, l.codigo_lote ASC";
         
         Connection conn = null;
@@ -281,6 +290,7 @@ public class LoteDao extends DAOBase {
     public ArrayList<Lote> listarTodosLotesRegistrados() {
         ArrayList<Lote> lista = new ArrayList<>();
 
+        // Solo mostrar lotes del almacén (con ubicacion_id asignada), no del productor
         String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, l.estado, " +
                 "l.producto_id, " +
                 "p.nombre AS nombre_producto, p.codigo_sku AS codigo_sku, p.unidades_por_paquete, " +
@@ -298,6 +308,7 @@ public class LoteDao extends DAOBase {
                 "INNER JOIN ubicaciones u ON l.ubicacion_id = u.id_ubicacion " +
                 "LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1 " +
                 "WHERE l.estado = 'Registrado' " +
+                "AND l.ubicacion_id IS NOT NULL " + // Solo lotes del almacén
                 "ORDER BY l.codigo_lote ASC";
 
         Connection conn = null;

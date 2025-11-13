@@ -334,48 +334,57 @@ public class EntradaServlet extends HttpServlet {
             
             System.out.println("✓ VALIDACIÓN EXITOSA: Todos los campos coinciden");
 
-            // 6. El lote ya fue asignado por el productor, usamos ese lote_id
-            int loteId = oc.getLoteId();
+            // 6. SIEMPRE crear un NUEVO lote en el almacén (no reutilizar el del productor)
+            // El lote del productor se mantiene separado y se descontará su stock
+            int loteProductorId = oc.getLoteId();
+            int cantidadRecibida = oc.getCantidad();
             
-            if (loteId == 0) {
-                // Si por alguna razón no hay lote asignado, creamos uno nuevo
-                SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
-                java.util.Date utilDate = formato.parse(fechaVencimientoVerificacion);
-                // Reutilizamos la variable ya declarada previamente
-                fechaVencimientoSQL = new java.sql.Date(utilDate.getTime());
-                
-                Lote nuevoLote = new Lote();
-                nuevoLote.setCodigoLote(codigoLoteVerificacion);
-                nuevoLote.setStockActual(oc.getCantidad());
-                nuevoLote.setFechaVencimiento(fechaVencimientoSQL);
-                nuevoLote.setProductoId(oc.getProductoId());
-                nuevoLote.setUbicacionId(idUbicacion);
-                nuevoLote.setDistritoId(idDistrito);
-                nuevoLote.setEstado("Registrado");
-                loteId = loteDao.crearLote(nuevoLote);
-                System.out.println("⚠️ Se creó un nuevo lote porque no había uno asignado: " + loteId);
-            } else {
-                System.out.println("✓ Usando lote asignado por productor: " + loteId);
-                // Actualizar la ubicación del lote existente
-                loteDao.actualizarUbicacion(loteId, idUbicacion);
-                // Actualizar el estado a "Registrado" para que aparezca en Gestión de Inventario
-                loteDao.registrarLote(loteId);
+            // Crear el nuevo lote del almacén
+            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date utilDate = formato.parse(fechaVencimientoVerificacion);
+            fechaVencimientoSQL = new java.sql.Date(utilDate.getTime());
+            
+            Lote nuevoLoteAlmacen = new Lote();
+            nuevoLoteAlmacen.setCodigoLote(codigoLoteVerificacion);
+            nuevoLoteAlmacen.setStockActual(cantidadRecibida); // Cantidad recibida en el almacén
+            nuevoLoteAlmacen.setFechaVencimiento(fechaVencimientoSQL);
+            nuevoLoteAlmacen.setProductoId(oc.getProductoId());
+            nuevoLoteAlmacen.setUbicacionId(idUbicacion); // Ubicación del almacén
+            nuevoLoteAlmacen.setDistritoId(idDistrito);
+            nuevoLoteAlmacen.setEstado("Registrado");
+            int loteAlmacenId = loteDao.crearLote(nuevoLoteAlmacen);
+            System.out.println("✓ Se creó nuevo lote en almacén: " + loteAlmacenId + " con cantidad: " + cantidadRecibida);
+            
+            // 7. DESCONTAR la cantidad recibida del lote del productor (si existe)
+            if (loteProductorId > 0) {
+                Lote loteProductor = loteDao.buscarLotePorId(loteProductorId);
+                if (loteProductor != null && loteProductor.getStockActual() > 0) {
+                    int nuevoStockProductor = loteProductor.getStockActual() - cantidadRecibida;
+                    if (nuevoStockProductor < 0) {
+                        nuevoStockProductor = 0; // No permitir stock negativo
+                        System.err.println("⚠ Advertencia: Se intentó descontar más stock del disponible en el lote del productor");
+                    }
+                    loteDao.actualizarStock(loteProductorId, nuevoStockProductor);
+                    System.out.println("✓ Stock descontado del lote del productor. Lote: " + loteProductorId + 
+                                     " | Stock anterior: " + loteProductor.getStockActual() + 
+                                     " | Stock nuevo: " + nuevoStockProductor);
+                }
             }
 
-            // 7. Registramos el movimiento de entrada
+            // 8. Registramos el movimiento de entrada (usando el lote del almacén)
             Movimiento movimiento = new Movimiento();
-            movimiento.setLoteId(loteId);
+            movimiento.setLoteId(loteAlmacenId); // Usar el lote del almacén, no el del productor
             movimiento.setUsuarioId(usuarioId);
             movimiento.setOrdenCompraId(idOrden);
             movimiento.setTipoMovimiento("Entrada");
-            movimiento.setCantidad(oc.getCantidad());
+            movimiento.setCantidad(cantidadRecibida);
             movimiento.setMotivo("Recepción de OC: " + oc.getNumeroOrden());
             movimientoDao.registrarMovimiento(movimiento);
 
-            // 8. Actualizamos el estado de la orden a "Aprobado" (ciclo completo)
+            // 9. Actualizamos el estado de la orden a "Aprobado" (ciclo completo)
             ordenCompraDao.actualizarEstado(idOrden, "Aprobado");
 
-            // 9. ========== ENVÍO DE CORREO A LOGÍSTICA ==========
+            // 10. ========== ENVÍO DE CORREO A LOGÍSTICA ==========
             // Notificar a logística que la entrada fue registrada exitosamente
             try {
                 // Obtener el usuario_id de logística que creó la orden
@@ -392,8 +401,8 @@ public class EntradaServlet extends HttpServlet {
                     if (emailLogistica != null && !emailLogistica.trim().isEmpty()) {
                         System.out.println("✓ Email obtenido: " + emailLogistica);
                         
-                        // Obtener información del lote para el correo
-                        Lote loteRegistrado = loteDao.buscarLotePorId(loteId);
+                        // Obtener información del lote del almacén para el correo
+                        Lote loteRegistrado = loteDao.buscarLotePorId(loteAlmacenId);
                         String codigoLote = (loteRegistrado != null) ? loteRegistrado.getCodigoLote() : "N/A";
                         
                         String asunto = "TELITO BODEGUERO - Entrada de Inventario Registrada";

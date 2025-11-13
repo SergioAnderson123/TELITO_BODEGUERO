@@ -10,12 +10,14 @@ public class LoteDao extends DAOBase {
 
     public ArrayList<LoteBean> listarLotesDisponibles() {
         ArrayList<LoteBean> lista = new ArrayList<>();
+        // Solo listar lotes del almacén (con ubicacion_id asignada), no del productor
         String sql = """
             SELECT l.id_lote, l.codigo_lote, p.nombre AS nombre_producto
             FROM lotes l
             INNER JOIN productos p ON l.producto_id = p.id_producto
             WHERE l.stock_actual > 0 
             AND l.estado = 'Registrado'
+            AND l.ubicacion_id IS NOT NULL
             ORDER BY p.nombre, l.codigo_lote;
             """;
 
