@@ -82,13 +82,32 @@ public class ConductorServlet extends HttpServlet {
 
             case "eliminar":
                 int idEliminar = Integer.parseInt(request.getParameter("id"));
-                boolean eliminado = conductorDAO.eliminarConductor(idEliminar);
-                if (eliminado) {
-                    request.getSession().setAttribute("mensaje", "Conductor eliminado exitosamente.");
-                    request.getSession().setAttribute("tipoMensaje", "success");
-                } else {
-                    request.getSession().setAttribute("mensaje", "Error al eliminar el conductor.");
+                try {
+                    boolean eliminado = conductorDAO.eliminarConductor(idEliminar);
+                    if (eliminado) {
+                        request.getSession().setAttribute("mensaje", "Conductor eliminado exitosamente.");
+                        request.getSession().setAttribute("tipoMensaje", "success");
+                    } else {
+                        request.getSession().setAttribute("mensaje", "Error al eliminar el conductor. El conductor no existe.");
+                        request.getSession().setAttribute("tipoMensaje", "danger");
+                    }
+                } catch (RuntimeException e) {
+                    // Capturar el mensaje específico sobre planes de transporte asociados
+                    String mensajeError = e.getMessage();
+                    if (mensajeError != null && mensajeError.contains("planes de transporte")) {
+                        request.getSession().setAttribute("mensaje", mensajeError);
+                        request.getSession().setAttribute("tipoMensaje", "warning");
+                    } else {
+                        request.getSession().setAttribute("mensaje", "Error al eliminar el conductor: " + (mensajeError != null ? mensajeError : "Error desconocido"));
+                        request.getSession().setAttribute("tipoMensaje", "danger");
+                    }
+                    System.err.println("Error al eliminar conductor: " + e.getMessage());
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    request.getSession().setAttribute("mensaje", "Error inesperado al eliminar el conductor.");
                     request.getSession().setAttribute("tipoMensaje", "danger");
+                    System.err.println("Error inesperado al eliminar conductor: " + e.getMessage());
+                    e.printStackTrace();
                 }
                 response.sendRedirect(request.getContextPath() + "/administrador/ConductorServlet");
                 break;

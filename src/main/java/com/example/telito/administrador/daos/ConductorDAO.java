@@ -98,11 +98,43 @@ public class ConductorDAO extends DAOBase {
         return filasAfectadas > 0;
     }
 
-    // Eliminar conductor
-    public boolean eliminarConductor(int id) {
+    // Verificar si el conductor tiene planes de transporte asociados
+    public boolean tienePlanesTransporteAsociados(int id) {
+        String sql = "SELECT COUNT(*) FROM planes_transporte WHERE conductor_id = ?";
+        int count = count(sql, id);
+        return count > 0;
+    }
+    
+    // Eliminar conductor (verifica si tiene planes asociados primero)
+    public boolean eliminarConductor(int id) throws RuntimeException {
+        // Verificar si tiene planes de transporte asociados
+        if (tienePlanesTransporteAsociados(id)) {
+            throw new RuntimeException("No se puede eliminar el conductor porque tiene planes de transporte asociados. " +
+                                     "Por favor, elimine o reasigne los planes de transporte primero.");
+        }
+        
         String sql = "DELETE FROM conductores WHERE id_conductor = ?";
-        int filasAfectadas = executeUpdate(sql, id);
-        return filasAfectadas > 0;
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            // Por si acaso todavía ocurre la excepción, la manejamos específicamente
+            logger.error("Error de integridad referencial al eliminar conductor: " + id, e);
+            throw new RuntimeException("No se puede eliminar el conductor porque está siendo utilizado en planes de transporte. " +
+                                     "Por favor, elimine o reasigne los planes de transporte primero.", e);
+        } catch (SQLException e) {
+            logger.error("Error al eliminar conductor: " + id, e);
+            throw new RuntimeException("Error al eliminar el conductor", e);
+        } finally {
+            closeResources(conn, pstmt, null);
+        }
     }
 
     // Verificar si la licencia ya existe (para validaciones)

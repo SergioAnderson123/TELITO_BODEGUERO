@@ -102,11 +102,43 @@ public class VehiculoDAO extends DAOBase {
         return filasAfectadas > 0;
     }
 
-    // Eliminar vehículo
-    public boolean eliminarVehiculo(int id) {
+    // Verificar si el vehículo tiene planes de transporte asociados
+    public boolean tienePlanesTransporteAsociados(int id) {
+        String sql = "SELECT COUNT(*) FROM planes_transporte WHERE vehiculo_id = ?";
+        int count = count(sql, id);
+        return count > 0;
+    }
+    
+    // Eliminar vehículo (verifica si tiene planes asociados primero)
+    public boolean eliminarVehiculo(int id) throws RuntimeException {
+        // Verificar si tiene planes de transporte asociados
+        if (tienePlanesTransporteAsociados(id)) {
+            throw new RuntimeException("No se puede eliminar el vehículo porque tiene planes de transporte asociados. " +
+                                     "Por favor, elimine o reasigne los planes de transporte primero.");
+        }
+        
         String sql = "DELETE FROM vehiculos WHERE id_vehiculo = ?";
-        int filasAfectadas = executeUpdate(sql, id);
-        return filasAfectadas > 0;
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            // Por si acaso todavía ocurre la excepción, la manejamos específicamente
+            logger.error("Error de integridad referencial al eliminar vehículo: " + id, e);
+            throw new RuntimeException("No se puede eliminar el vehículo porque está siendo utilizado en planes de transporte. " +
+                                     "Por favor, elimine o reasigne los planes de transporte primero.", e);
+        } catch (SQLException e) {
+            logger.error("Error al eliminar vehículo: " + id, e);
+            throw new RuntimeException("Error al eliminar el vehículo", e);
+        } finally {
+            closeResources(conn, pstmt, null);
+        }
     }
 
     // Verificar si la placa ya existe (para validaciones)
