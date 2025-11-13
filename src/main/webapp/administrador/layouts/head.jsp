@@ -71,6 +71,11 @@
         opacity: 1;
     }
 
+    /* Estilos para el header en móvil */
+    .navbar-nav .nav-link span {
+        white-space: nowrap;
+    }
+    
     @media (max-width: 992px) { 
         .sidebar-toggle {
             display: inline-block;
@@ -87,9 +92,50 @@
         .sidebar-overlay {
             display: block;
         }
-        .dashboard-header { left:0; } 
+        .dashboard-header { 
+            left:0; 
+            padding: 0 10px;
+        }
+        .dashboard-header .navbar {
+            padding: 0;
+        }
+        .dashboard-header .container-fluid {
+            padding: 0 10px;
+        }
+        .navbar-brand span {
+            font-size: 0.9rem;
+        }
+        /* Ocultar nombre del usuario en móvil, solo mostrar avatar */
+        .navbar-nav .nav-link span {
+            display: none;
+        }
+        .navbar-nav .nav-link {
+            padding: 8px 12px;
+        }
         .dashboard-wrapper { margin-left:0; width:100%; } 
-        .dashboard-content { padding:20px; } 
+        .dashboard-content { padding:20px; }
+        
+        /* Asegurar que los botones sean clickeables en móvil */
+        .config-card a,
+        .btn,
+        button,
+        a[href] {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        .config-card {
+            pointer-events: auto;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .navbar-brand span {
+            display: none;
+        }
+        .navbar-brand i {
+            margin-right: 0;
+        }
     }
 
     /* Chart specific styles */

@@ -97,6 +97,8 @@
             padding: 1rem 0.75rem;
             font-size: 1rem;
             transition: all 0.3s ease;
+            box-sizing: border-box;
+            width: 100%;
         }
 
         .form-floating .form-control:focus {
@@ -233,6 +235,24 @@
 
             .login-header h1 {
                 font-size: 1.5rem;
+            }
+            
+            /* Ajustar inputs para móvil */
+            .form-floating .form-control {
+                font-size: 16px; /* Previene zoom en iOS */
+                padding: 0.75rem 0.5rem;
+            }
+            
+            .form-floating label {
+                font-size: 0.85rem;
+                padding: 0.75rem 0.5rem;
+            }
+            
+            /* Asegurar que el texto no se salga */
+            .form-control {
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
         }
     </style>

@@ -273,6 +273,25 @@
             font-size: 1.5rem;
         }
     }
+    
+    /* Asegurar que los enlaces funcionen en móvil */
+    .config-card a {
+        display: block;
+        width: 100%;
+        height: 100%;
+        text-decoration: none;
+        color: inherit;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+        touch-action: manipulation;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .config-card {
+        cursor: pointer;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+        touch-action: manipulation;
+    }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
