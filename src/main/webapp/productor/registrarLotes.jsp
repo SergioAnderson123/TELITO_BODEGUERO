@@ -345,6 +345,20 @@
                                                     <i class="fas fa-calendar me-1"></i>Deja vacío si el producto no tiene fecha de caducidad.
                                                 </div>
                                             </div>
+                                            
+                                            <!-- Costo de producción -->
+                                            <div class="mb-3">
+                                                <label for="costoProduccion" class="form-label">Costo de Producción por Unidad (Opcional)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">S/</span>
+                                                    <input type="number" class="form-control" id="costoProduccion" name="costoProduccion" 
+                                                           step="0.01" min="0" placeholder="Ej: 2.50" 
+                                                           value="<%= request.getAttribute("form_costoProduccion") != null ? request.getAttribute("form_costoProduccion") : "" %>">
+                                                </div>
+                                                <small class="form-text text-muted">
+                                                    <i class="fas fa-info-circle"></i> Costo de producción por unidad del lote.
+                                                </small>
+                                            </div>
                                         </div>
                                     </div>
                                     

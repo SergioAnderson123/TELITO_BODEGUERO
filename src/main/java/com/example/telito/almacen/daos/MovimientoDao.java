@@ -200,4 +200,55 @@ public class MovimientoDao extends DAOBase {
         }
         return listaMovimientos;
     }
+    
+    /**
+     * Obtiene los movimientos de ajuste de un lote específico.
+     */
+    public ArrayList<Movimiento> listarAjustesPorLote(int loteId) {
+        ArrayList<Movimiento> listaMovimientos = new ArrayList<>();
+        
+        String sql = "SELECT " +
+                "m.id_movimiento, m.tipo, m.cantidad, m.motivo, m.fecha, " +
+                "l.codigo_lote, " +
+                "p.nombre AS nombre_producto, " +
+                "CONCAT(u.nombres, ' ', u.apellidos) AS nombre_usuario " +
+                "FROM movimientos_inventario m " +
+                "INNER JOIN lotes l ON (m.lote_id = l.id_lote) " +
+                "INNER JOIN productos p ON (l.producto_id = p.id_producto) " +
+                "INNER JOIN usuarios u ON (m.usuario_id = u.id_usuario) " +
+                "WHERE m.lote_id = ? AND m.motivo LIKE 'Ajuste de inventario%' " +
+                "ORDER BY m.fecha DESC " +
+                "LIMIT 10";
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, loteId);
+            rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                Movimiento mov = new Movimiento();
+                mov.setIdMovimiento(rs.getInt("id_movimiento"));
+                mov.setTipoMovimiento(rs.getString("tipo"));
+                mov.setCantidad(rs.getInt("cantidad"));
+                mov.setMotivo(rs.getString("motivo"));
+                mov.setFecha(rs.getTimestamp("fecha"));
+                mov.setCodigoLote(rs.getString("codigo_lote"));
+                mov.setNombreProducto(rs.getString("nombre_producto"));
+                mov.setNombreUsuario(rs.getString("nombre_usuario"));
+                listaMovimientos.add(mov);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al listar ajustes por lote", e);
+            throw new RuntimeException("Error al listar ajustes por lote", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return listaMovimientos;
+    }
 }

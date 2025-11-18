@@ -15,8 +15,19 @@ public class VehiculoDAO extends DAOBase {
 
     // Listar vehículos con paginación
     public ArrayList<Vehiculo> listarVehiculos(int page, int size) {
+        return listarVehiculos(null, page, size);
+    }
+    
+    // Listar vehículos con filtros y paginación
+    public ArrayList<Vehiculo> listarVehiculos(String busqueda, int page, int size) {
         ArrayList<Vehiculo> lista = new ArrayList<>();
-        String sql = "SELECT id_vehiculo, placa, marca, modelo, capacidad_kg FROM vehiculos ORDER BY placa ASC LIMIT ? OFFSET ?";
+        String sql = "SELECT id_vehiculo, placa, marca, modelo, capacidad_kg FROM vehiculos WHERE 1=1";
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (placa LIKE ? OR marca LIKE ? OR modelo LIKE ?)";
+        }
+        
+        sql += " ORDER BY placa ASC LIMIT ? OFFSET ?";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -25,11 +36,19 @@ public class VehiculoDAO extends DAOBase {
         try {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
+            
+            int paramIndex = 1;
+            if (busqueda != null && !busqueda.trim().isEmpty()) {
+                String busquedaConWildcards = "%" + busqueda + "%";
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+            }
 
             int limit = Math.max(1, size);
             int offset = Math.max(0, (Math.max(1, page) - 1) * size);
-            pstmt.setInt(1, limit);
-            pstmt.setInt(2, offset);
+            pstmt.setInt(paramIndex++, limit);
+            pstmt.setInt(paramIndex, offset);
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -52,8 +71,43 @@ public class VehiculoDAO extends DAOBase {
 
     // Contar vehículos para paginación
     public int contarVehiculos() {
-        String sql = "SELECT COUNT(*) FROM vehiculos";
-        return count(sql);
+        return contarVehiculos(null);
+    }
+    
+    // Contar vehículos con filtros
+    public int contarVehiculos(String busqueda) {
+        String sql = "SELECT COUNT(*) FROM vehiculos WHERE 1=1";
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (placa LIKE ? OR marca LIKE ? OR modelo LIKE ?)";
+        }
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            
+            if (busqueda != null && !busqueda.trim().isEmpty()) {
+                String busquedaConWildcards = "%" + busqueda + "%";
+                pstmt.setString(1, busquedaConWildcards);
+                pstmt.setString(2, busquedaConWildcards);
+                pstmt.setString(3, busquedaConWildcards);
+            }
+            
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar vehículos", e);
+            throw new RuntimeException("Error al contar vehículos", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
     }
 
     // Buscar vehículo por ID

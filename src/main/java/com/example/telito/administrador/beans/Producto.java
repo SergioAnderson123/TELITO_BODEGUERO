@@ -13,6 +13,7 @@ public class Producto {
     private int productorId;      // <-- AÑADIDO
     private int categoriaId;      // <-- AÑADIDO
     private String categoriaNombre; // <-- AÑADIDO
+    private boolean activo;       // <-- AÑADIDO
 
     // Getters y Setters
 
@@ -102,5 +103,13 @@ public class Producto {
 
     public void setCategoriaNombre(String categoriaNombre) {
         this.categoriaNombre = categoriaNombre;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

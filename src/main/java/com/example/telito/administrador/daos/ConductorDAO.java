@@ -15,8 +15,19 @@ public class ConductorDAO extends DAOBase {
 
     // Listar conductores con paginación
     public ArrayList<Conductor> listarConductores(int page, int size) {
+        return listarConductores(null, page, size);
+    }
+    
+    // Listar conductores con filtros y paginación
+    public ArrayList<Conductor> listarConductores(String busqueda, int page, int size) {
         ArrayList<Conductor> lista = new ArrayList<>();
-        String sql = "SELECT id_conductor, nombre_completo, licencia FROM conductores ORDER BY nombre_completo ASC LIMIT ? OFFSET ?";
+        String sql = "SELECT id_conductor, nombre_completo, licencia FROM conductores WHERE 1=1";
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (nombre_completo LIKE ? OR licencia LIKE ?)";
+        }
+        
+        sql += " ORDER BY nombre_completo ASC LIMIT ? OFFSET ?";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -25,11 +36,18 @@ public class ConductorDAO extends DAOBase {
         try {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
+            
+            int paramIndex = 1;
+            if (busqueda != null && !busqueda.trim().isEmpty()) {
+                String busquedaConWildcards = "%" + busqueda + "%";
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+            }
 
             int limit = Math.max(1, size);
             int offset = Math.max(0, (Math.max(1, page) - 1) * size);
-            pstmt.setInt(1, limit);
-            pstmt.setInt(2, offset);
+            pstmt.setInt(paramIndex++, limit);
+            pstmt.setInt(paramIndex, offset);
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -50,8 +68,42 @@ public class ConductorDAO extends DAOBase {
 
     // Contar conductores para paginación
     public int contarConductores() {
-        String sql = "SELECT COUNT(*) FROM conductores";
-        return count(sql);
+        return contarConductores(null);
+    }
+    
+    // Contar conductores con filtros
+    public int contarConductores(String busqueda) {
+        String sql = "SELECT COUNT(*) FROM conductores WHERE 1=1";
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (nombre_completo LIKE ? OR licencia LIKE ?)";
+        }
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            
+            if (busqueda != null && !busqueda.trim().isEmpty()) {
+                String busquedaConWildcards = "%" + busqueda + "%";
+                pstmt.setString(1, busquedaConWildcards);
+                pstmt.setString(2, busquedaConWildcards);
+            }
+            
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar conductores", e);
+            throw new RuntimeException("Error al contar conductores", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
     }
 
     // Buscar conductor por ID

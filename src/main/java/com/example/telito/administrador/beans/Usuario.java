@@ -8,8 +8,11 @@ public class Usuario {
     private String nombres;
     private String apellidos;
     private String email;
+    private String codigoProductor; // Código único para productores (ej: PROD-0001)
     private String password;
     private boolean activo;
+    private boolean cuentaActivada; // Indica si la cuenta ha sido activada por email
+    private java.sql.Timestamp fechaActivacion; // Fecha en que se activó la cuenta
     private Rol rol; // Objeto Rol para representar la llave foránea
     private String fotoPerfil;
     
@@ -76,6 +79,30 @@ public class Usuario {
 
     public void setFotoPerfil(String fotoPerfil) {
         this.fotoPerfil = fotoPerfil;
+    }
+
+    public String getCodigoProductor() {
+        return codigoProductor;
+    }
+
+    public void setCodigoProductor(String codigoProductor) {
+        this.codigoProductor = codigoProductor;
+    }
+    
+    public boolean isCuentaActivada() {
+        return cuentaActivada;
+    }
+    
+    public void setCuentaActivada(boolean cuentaActivada) {
+        this.cuentaActivada = cuentaActivada;
+    }
+    
+    public java.sql.Timestamp getFechaActivacion() {
+        return fechaActivacion;
+    }
+    
+    public void setFechaActivacion(java.sql.Timestamp fechaActivacion) {
+        this.fechaActivacion = fechaActivacion;
     }
     
     /**

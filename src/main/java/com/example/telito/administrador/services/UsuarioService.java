@@ -5,10 +5,13 @@ import com.example.telito.administrador.beans.Rol;
 import com.example.telito.administrador.daos.UsuarioDAO;
 import com.example.telito.util.EmailTemplateHelper;
 import com.example.telito.util.EmailUtil;
+import com.example.telito.util.EmailService;
+import com.example.telito.util.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Servicio para manejar la lógica de negocio relacionada con usuarios.
@@ -29,9 +32,10 @@ public class UsuarioService {
      * @param usuarioNuevo Usuario a crear
      * @param passwordOriginal Contraseña original antes de encriptar
      * @param contextPath Context path de la aplicación para los emails
+     * @param request HttpServletRequest para obtener IP y User Agent (puede ser null)
      * @return Resultado de la operación con el usuario creado/reactivado
      */
-    public ResultadoCreacionUsuario crearOReactivarUsuario(Usuario usuarioNuevo, String passwordOriginal, String contextPath) {
+    public ResultadoCreacionUsuario crearOReactivarUsuario(Usuario usuarioNuevo, String passwordOriginal, String contextPath, HttpServletRequest request) {
         String email = usuarioNuevo.getEmail();
         boolean creado = false;
         Usuario usuarioFinal = null;
@@ -79,9 +83,16 @@ public class UsuarioService {
             }
             
             if (creado && usuarioFinal != null) {
-                // Enviar correo de bienvenida
-                enviarCorreoBienvenida(usuarioFinal, passwordOriginal, contextPath);
-                return new ResultadoCreacionUsuario(true, usuarioFinal, null);
+                // Obtener el usuario completo de la base de datos para tener el ID correcto
+                Usuario usuarioCompleto = usuarioDAO.obtenerUsuarioPorEmail(usuarioFinal.getEmail());
+                if (usuarioCompleto == null) {
+                    // Si no se encuentra, usar el que acabamos de crear
+                    usuarioCompleto = usuarioFinal;
+                }
+                
+                // Enviar correo de activación
+                enviarCorreoActivacion(usuarioCompleto, contextPath, request);
+                return new ResultadoCreacionUsuario(true, usuarioCompleto, null);
             } else {
                 String error = "Error al guardar el usuario en la base de datos";
                 logger.error(error);
@@ -96,48 +107,51 @@ public class UsuarioService {
     }
 
     /**
-     * Envía correo de bienvenida al nuevo usuario.
+     * Envía correo de activación al nuevo usuario.
      * 
      * @param usuario Usuario al que se envía el correo
-     * @param passwordOriginal Contraseña original antes de encriptar
      * @param contextPath Context path de la aplicación
+     * @param request HttpServletRequest para obtener IP y User Agent (puede ser null)
      */
-    private void enviarCorreoBienvenida(Usuario usuario, String passwordOriginal, String contextPath) {
+    private void enviarCorreoActivacion(Usuario usuario, String contextPath, HttpServletRequest request) {
         try {
             String emailDestino = usuario.getEmail();
             if (emailDestino == null || emailDestino.trim().isEmpty()) {
-                logger.warn("El usuario no tiene un email válido para enviar correo");
+                logger.warn("El usuario no tiene un email válido para enviar correo de activación");
                 return;
             }
             
-            logger.info("Preparando envío de correo de bienvenida a: {}", emailDestino);
+            logger.info("Preparando envío de correo de activación a: {}", emailDestino);
             
-            String nombreRol = usuarioDAO.obtenerNombreRolPorId(usuario.getRol().getIdRol());
-            nombreRol = (nombreRol != null) ? nombreRol : "Usuario";
+            // Obtener IP y User Agent
+            String ipAddress = (request != null) ? request.getRemoteAddr() : "0.0.0.0";
+            String userAgent = (request != null) ? request.getHeader("User-Agent") : "Unknown";
             
-            String mensaje = EmailTemplateHelper.generarMensajeBienvenida(
-                usuario.getNombres(),
-                usuario.getApellidos(),
-                usuario.getEmail(),
-                passwordOriginal,
-                nombreRol,
+            // Crear token de activación
+            String token = TokenService.crearTokenActivacion(usuario.getIdUsuario(), ipAddress, userAgent);
+            
+            if (token == null || token.isEmpty()) {
+                logger.error("No se pudo crear el token de activación para el usuario ID: {}", usuario.getIdUsuario());
+                return;
+            }
+            
+            // Enviar correo de activación
+            String nombreUsuario = usuario.getNombres() + " " + usuario.getApellidos();
+            boolean correoEnviado = EmailService.enviarCorreoActivacion(
+                emailDestino,
+                nombreUsuario,
+                token,
                 contextPath != null ? contextPath : ""
             );
             
-            boolean correoEnviado = EmailUtil.sendSystemAlertHTML(
-                emailDestino,
-                "Bienvenido a TELITO BODEGUERO - Credenciales de Acceso",
-                mensaje
-            );
-            
             if (correoEnviado) {
-                logger.info("Correo de bienvenida enviado exitosamente a: {}", emailDestino);
+                logger.info("✓ Correo de activación enviado exitosamente a: {}", emailDestino);
             } else {
-                logger.warn("No se pudo enviar el correo de bienvenida a: {}. Verifica la configuración de email", emailDestino);
+                logger.warn("⚠ No se pudo enviar el correo de activación a: {}. Verifica la configuración de email", emailDestino);
             }
         } catch (Exception e) {
             // No bloquear la creación si falla el correo
-            logger.error("Error al enviar correo de bienvenida: {}", e.getMessage(), e);
+            logger.error("✗ Error al enviar correo de activación: {}", e.getMessage(), e);
         }
     }
 

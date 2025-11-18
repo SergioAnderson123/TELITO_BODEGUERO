@@ -239,8 +239,15 @@ public class ProductoDao extends DAOBase {
         return count(sql, productorId);
     }
 
-    public Producto obtenerProductoPorSku(String sku) {
-        String sql = "SELECT p.* FROM productos p JOIN usuarios u ON p.productor_id = u.id_usuario WHERE p.codigo_sku = ? AND p.activo = 1 AND u.activo = 1";
+    /**
+     * Obtiene un producto por SKU, pero SOLO si pertenece al productor especificado.
+     * Esto previene que un productor vea o modifique productos de otros productores.
+     * @param sku Código SKU del producto
+     * @param productorId ID del productor (debe ser el dueño del producto)
+     * @return Producto si existe y pertenece al productor, null en caso contrario
+     */
+    public Producto obtenerProductoPorSku(String sku, int productorId) {
+        String sql = "SELECT p.* FROM productos p JOIN usuarios u ON p.productor_id = u.id_usuario WHERE p.codigo_sku = ? AND p.productor_id = ? AND p.activo = 1 AND u.activo = 1";
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -249,6 +256,7 @@ public class ProductoDao extends DAOBase {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, sku);
+            pstmt.setInt(2, productorId);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
@@ -267,19 +275,31 @@ public class ProductoDao extends DAOBase {
         return null;
     }
 
-    public void actualizarPrecio(int idProducto, double nuevoPrecio) {
-        String sql = "UPDATE productos SET precio_actual = ? WHERE id_producto = ?";
-        executeUpdate(sql, nuevoPrecio, idProducto);
+    /**
+     * Actualiza el precio de un producto, pero SOLO si pertenece al productor especificado.
+     * Esto previene que un productor modifique productos de otros productores.
+     * @param idProducto ID del producto a actualizar
+     * @param nuevoPrecio Nuevo precio del producto
+     * @param productorId ID del productor (debe ser el dueño del producto)
+     * @return true si se actualizó correctamente, false si el producto no pertenece al productor
+     */
+    public boolean actualizarPrecio(int idProducto, double nuevoPrecio, int productorId) {
+        String sql = "UPDATE productos SET precio_actual = ? WHERE id_producto = ? AND productor_id = ? AND activo = 1";
+        int filasAfectadas = executeUpdate(sql, nuevoPrecio, idProducto, productorId);
+        return filasAfectadas > 0;
     }
 
     /**
      * Desactiva un producto (soft delete) cambiando activo = 0.
+     * SOLO si el producto pertenece al productor especificado.
+     * Esto previene que un productor elimine productos de otros productores.
      * @param idProducto El ID del producto a desactivar.
-     * @return true si la operación fue exitosa, false en caso contrario.
+     * @param productorId ID del productor (debe ser el dueño del producto)
+     * @return true si la operación fue exitosa, false si el producto no pertenece al productor
      */
-    public boolean desactivarProducto(int idProducto) {
-        String sql = "UPDATE productos SET activo = 0 WHERE id_producto = ?";
-        int filasAfectadas = executeUpdate(sql, idProducto);
+    public boolean desactivarProducto(int idProducto, int productorId) {
+        String sql = "UPDATE productos SET activo = 0 WHERE id_producto = ? AND productor_id = ? AND activo = 1";
+        int filasAfectadas = executeUpdate(sql, idProducto, productorId);
         return filasAfectadas > 0;
     }
 
@@ -312,6 +332,34 @@ public class ProductoDao extends DAOBase {
             closeResources(conn, pstmt, rs);
         }
         return categorias;
+    }
+    
+    /**
+     * Cuenta los productos activos de un productor.
+     */
+    public int contarProductosPorProductor(int productorId) {
+        String sql = "SELECT COUNT(*) as total FROM productos WHERE productor_id = ? AND activo = 1";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, productorId);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar productos por productor", e);
+            throw new RuntimeException("Error al contar productos", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return 0;
     }
 }
 

@@ -170,11 +170,13 @@ public class OrdenCompraDao extends DAOBase {
     }
 
     /**
-     * Obtener detalles completos de una orden de compra
+     * Obtener detalles completos de una orden de compra, pero SOLO si el producto pertenece al productor especificado.
+     * Esto previene que un productor vea órdenes de compra de productos de otros productores.
      * @param idOrden ID de la orden de compra
-     * @return Array con todos los datos de la orden
+     * @param productorId ID del productor (debe ser el dueño del producto de la orden)
+     * @return Array con todos los datos de la orden, o null si no existe o no pertenece al productor
      */
-    public Object[] obtenerDetalleOrden(int idOrden) {
+    public Object[] obtenerDetalleOrden(int idOrden, int productorId) {
         String sql = "SELECT oc.id_orden_compra, " +
                      "oc.numero_Orden, " +
                      "p.nombre AS producto_nombre, " +
@@ -192,7 +194,7 @@ public class OrdenCompraDao extends DAOBase {
                      "INNER JOIN distritos d ON oc.distrito_id = d.idDistrito " +
                      "INNER JOIN zonas z ON d.zona_id = z.idZona " +
                      "INNER JOIN usuarios u ON oc.usuario_id = u.id_usuario " +
-                     "WHERE oc.id_orden_compra = ?";
+                     "WHERE oc.id_orden_compra = ? AND p.productor_id = ? AND p.activo = 1";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -202,6 +204,7 @@ public class OrdenCompraDao extends DAOBase {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, idOrden);
+            pstmt.setInt(2, productorId);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
@@ -230,33 +233,45 @@ public class OrdenCompraDao extends DAOBase {
     }
 
     /**
-     * Actualizar el estado de una orden de compra a "Pendiente" y asociar un lote
+     * Actualizar el estado de una orden de compra a "Pendiente" y asociar un lote.
+     * SOLO si el producto de la orden pertenece al productor especificado.
+     * Esto previene que un productor modifique órdenes de compra de productos de otros productores.
      * @param idOrden ID de la orden de compra
      * @param idLote ID del lote generado
-     * @return true si se actualizó correctamente
+     * @param productorId ID del productor (debe ser el dueño del producto de la orden)
+     * @return true si se actualizó correctamente, false si la orden no pertenece al productor
      */
-    public boolean completarOrden(int idOrden, int idLote) {
-        String sql = "UPDATE ordenes_compra SET estado = 'Pendiente', lote_id = ? WHERE id_orden_compra = ?";
+    public boolean completarOrden(int idOrden, int idLote, int productorId) {
+        String sql = "UPDATE ordenes_compra oc " +
+                     "INNER JOIN productos p ON oc.producto_id = p.id_producto " +
+                     "SET oc.estado = 'Pendiente', oc.lote_id = ? " +
+                     "WHERE oc.id_orden_compra = ? AND p.productor_id = ? AND p.activo = 1";
 
-        int filasAfectadas = executeUpdate(sql, idLote, idOrden);
-        logger.info("Orden {} completada con lote {}", idOrden, idLote);
+        int filasAfectadas = executeUpdate(sql, idLote, idOrden, productorId);
+        logger.info("Orden {} completada con lote {} (productor: {})", idOrden, idLote, productorId);
         return filasAfectadas > 0;
     }
 
     /**
-     * Actualizar el estado de una orden de compra
+     * Actualizar el estado de una orden de compra.
+     * SOLO si el producto de la orden pertenece al productor especificado.
+     * Esto previene que un productor modifique órdenes de compra de productos de otros productores.
      * @param idOrden ID de la orden de compra
      * @param nuevoEstado Nuevo estado de la orden
-     * @return true si se actualizó correctamente
+     * @param productorId ID del productor (debe ser el dueño del producto de la orden)
+     * @return true si se actualizó correctamente, false si la orden no pertenece al productor
      */
-    public boolean actualizarEstadoOrden(int idOrden, String nuevoEstado) {
-        String sql = "UPDATE ordenes_compra SET estado = ? WHERE id_orden_compra = ?";
+    public boolean actualizarEstadoOrden(int idOrden, String nuevoEstado, int productorId) {
+        String sql = "UPDATE ordenes_compra oc " +
+                     "INNER JOIN productos p ON oc.producto_id = p.id_producto " +
+                     "SET oc.estado = ? " +
+                     "WHERE oc.id_orden_compra = ? AND p.productor_id = ? AND p.activo = 1";
 
-        int filasAfectadas = executeUpdate(sql, nuevoEstado, idOrden);
+        int filasAfectadas = executeUpdate(sql, nuevoEstado, idOrden, productorId);
         if (filasAfectadas == 0) {
-            logger.warn("No se encontró la orden con ID {} o ya tiene el estado {}", idOrden, nuevoEstado);
+            logger.warn("No se encontró la orden con ID {} o no pertenece al productor {} o ya tiene el estado {}", idOrden, productorId, nuevoEstado);
         } else {
-            logger.info("Estado de orden {} actualizado a {}", idOrden, nuevoEstado);
+            logger.info("Estado de orden {} actualizado a {} (productor: {})", idOrden, nuevoEstado, productorId);
         }
         return filasAfectadas > 0;
     }
@@ -264,11 +279,13 @@ public class OrdenCompraDao extends DAOBase {
     /**
      * Obtiene los datos básicos de una orden para notificaciones.
      * Incluye el usuario_id de logística que creó la orden.
+     * SOLO si el producto de la orden pertenece al productor especificado.
      * 
      * @param idOrden ID de la orden de compra
+     * @param productorId ID del productor (debe ser el dueño del producto de la orden)
      * @return Array con [numeroOrden, nombreProducto, cantidad, montoTotal, usuarioIdLogistica] o null
      */
-    public Object[] obtenerDatosBasicosOrden(int idOrden) {
+    public Object[] obtenerDatosBasicosOrden(int idOrden, int productorId) {
         String sql = """
             SELECT 
                 IFNULL(oc.numero_Orden, CONCAT('OC', LPAD(oc.id_orden_compra, 3, '0'))) AS numero_orden,
@@ -278,7 +295,7 @@ public class OrdenCompraDao extends DAOBase {
                 oc.usuario_id
             FROM ordenes_compra oc
             INNER JOIN productos pr ON oc.producto_id = pr.id_producto
-            WHERE oc.id_orden_compra = ?
+            WHERE oc.id_orden_compra = ? AND pr.productor_id = ? AND pr.activo = 1
             """;
 
         Connection conn = null;
@@ -289,6 +306,7 @@ public class OrdenCompraDao extends DAOBase {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, idOrden);
+            pstmt.setInt(2, productorId);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {

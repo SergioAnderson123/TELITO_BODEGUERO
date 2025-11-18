@@ -21,6 +21,13 @@
                 </li>
                 
                 <li class="nav-item">
+                    <a class="nav-link <c:if test='${param.activeMenu == "Cargar Excel"}'>active</c:if>"
+                       href="${pageContext.request.contextPath}/almacen/ExcelValidacionServlet?action=form">
+                        <i class="fas fa-file-excel"></i>Cargar Excel
+                    </a>
+                </li>
+                
+                <li class="nav-item">
                     <a class="nav-link <c:if test='${param.activeMenu == "Registrar salidas"}'>active</c:if>"
                        href="${pageContext.request.contextPath}/almacen/PedidoServlet?action=lista">
                         <i class="fas fa-arrow-up"></i>Registrar Salidas
@@ -31,6 +38,20 @@
                     <a class="nav-link ${param.activeMenu == 'Historial' ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/almacen/MovimientoServlet">
                         <i class="fas fa-history"></i>Historial de Movimientos
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link <c:if test='${param.activeMenu == "Incidencias"}'>active</c:if>"
+                       href="${pageContext.request.contextPath}/almacen/IncidenciaServlet">
+                        <i class="fas fa-exclamation-triangle"></i>Incidencias
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link <c:if test='${param.activeMenu == "Productos"}'>active</c:if>"
+                       href="${pageContext.request.contextPath}/almacen/ProductoAlmacenServlet">
+                        <i class="fas fa-boxes-stacked"></i>Productos (Solo Lectura)
                     </a>
                 </li>
 

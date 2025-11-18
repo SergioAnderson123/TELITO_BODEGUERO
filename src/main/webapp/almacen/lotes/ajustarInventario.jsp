@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <!doctype html>
 <html lang="es">
@@ -29,22 +30,72 @@
 
                 <div class="row">
                     <div class="col-lg-5">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Datos del Producto</h5>
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Datos del Producto</h5>
                             </div>
                             <div class="card-body">
                                 <p><strong>Producto:</strong> <c:out value="${lote.nombreProducto}"/></p>
-                                <p><strong>Código (Lote):</strong> <c:out value="${lote.codigoLote}"/></p>
+                                <p><strong>Código (Lote):</strong> <code><c:out value="${lote.codigoLote}"/></code></p>
                                 <p><strong>Cantidad actual:</strong> <span id="stockActualSpan" class="badge bg-primary fs-5">${lote.stockActual}</span></p>
                             </div>
                         </div>
+                        
+                        <!-- Historial de Ajustes -->
+                        <c:if test="${not empty historialAjustes}">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Historial de Ajustes</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                    <table class="table table-sm table-hover mb-0">
+                                        <thead class="table-light sticky-top">
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Tipo</th>
+                                                <th>Cantidad</th>
+                                                <th>Motivo</th>
+                                                <th>Usuario</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <c:forEach var="ajuste" items="${historialAjustes}">
+                                            <tr>
+                                                <td><fmt:formatDate value="${ajuste.fecha}" pattern="dd/MM/yyyy HH:mm"/></td>
+                                                <td>
+                                                    <span class="badge ${ajuste.tipoMovimiento == 'Entrada' ? 'bg-success' : 'bg-danger'}">
+                                                        ${ajuste.tipoMovimiento}
+                                                    </span>
+                                                </td>
+                                                <td>${ajuste.cantidad}</td>
+                                                <td>
+                                                    <small>
+                                                        <c:choose>
+                                                            <c:when test="${ajuste.motivo.startsWith('Ajuste de inventario:')}">
+                                                                ${ajuste.motivo.substring(22)}
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                ${ajuste.motivo}
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </small>
+                                                </td>
+                                                <td><small>${ajuste.nombreUsuario}</small></td>
+                                            </tr>
+                                            </c:forEach>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        </c:if>
                     </div>
 
                     <div class="col-lg-7">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Formulario de Ajuste</h5>
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Formulario de Ajuste</h5>
                             </div>
                             <div class="card-body">
                                 <form method="POST" action="${pageContext.request.contextPath}/almacen/LoteServlet?action=guardarAjuste">

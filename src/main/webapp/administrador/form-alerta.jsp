@@ -24,10 +24,11 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0"><i class="fas fa-plus me-2"></i>Datos de la Alerta</h5>
+                    <div class="col-xl-8 col-lg-10 col-md-12 col-sm-12 col-12 mx-auto">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-gradient-primary text-white mb-4" style="background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%); border-radius: 12px 12px 0 0; margin: -30px -30px 30px -30px; padding: 25px 30px;">
+                                <h5 class="mb-0"><i class="fas fa-bell me-2"></i>Datos de la Alerta</h5>
+                                <small class="text-white-50">Complete todos los campos obligatorios</small>
                             </div>
                             <div class="card-body">
                                 <c:if test="${not empty error}">
@@ -37,15 +38,19 @@
                                     <input type="hidden" name="action" value="crear">
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="nombre" class="form-label">Nombre</label>
-                                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                            <div class="mb-4">
+                                                <label for="nombre" class="form-label fw-semibold">
+                                                    <i class="fas fa-tag text-primary me-2"></i>Nombre <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="text" class="form-control shadow-sm" id="nombre" name="nombre" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="tipoAlerta" class="form-label">Tipo de Alerta</label>
-                                                <select class="form-select" id="tipoAlerta" name="tipoAlerta" required>
+                                            <div class="mb-4">
+                                                <label for="tipoAlerta" class="form-label fw-semibold">
+                                                    <i class="fas fa-filter text-primary me-2"></i>Tipo de Alerta <span class="text-danger">*</span>
+                                                </label>
+                                                <select class="form-select shadow-sm" id="tipoAlerta" name="tipoAlerta" required>
                                                     <option value="">Selecciona un tipo</option>
                                                     <optgroup label="Alertas por Lote (Almacén)">
                                                         <option value="STOCK_MINIMO_LOTE">📦 Stock Mínimo por Lote</option>
@@ -66,15 +71,19 @@
 
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="umbralDias" class="form-label">Umbral (días)</label>
-                                                <input type="number" class="form-control" id="umbralDias" name="umbralDias" min="0" placeholder="Solo para Vencimiento">
+                                            <div class="mb-4">
+                                                <label for="umbralDias" class="form-label fw-semibold">
+                                                    <i class="fas fa-calendar-alt text-primary me-2"></i>Umbral (días)
+                                                </label>
+                                                <input type="number" class="form-control shadow-sm" id="umbralDias" name="umbralDias" min="0" placeholder="Solo para Vencimiento">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="categoriaId" class="form-label">Categoría</label>
-                                                <select class="form-select" id="categoriaId" name="categoriaId">
+                                            <div class="mb-4">
+                                                <label for="categoriaId" class="form-label fw-semibold">
+                                                    <i class="fas fa-folder text-primary me-2"></i>Categoría
+                                                </label>
+                                                <select class="form-select shadow-sm" id="categoriaId" name="categoriaId">
                                                     <option value="">Todas</option>
                                                     <c:forEach var="categoria" items="${listaCategorias}">
                                                         <option value="${categoria.idCategoria}">${categoria.nombre}</option>
@@ -86,9 +95,11 @@
 
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="rolANotificar" class="form-label">Rol a Notificar</label>
-                                                <select class="form-select" id="rolANotificar" name="rolANotificar" required>
+                                            <div class="mb-4">
+                                                <label for="rolANotificar" class="form-label fw-semibold">
+                                                    <i class="fas fa-user-tag text-primary me-2"></i>Rol a Notificar <span class="text-danger">*</span>
+                                                </label>
+                                                <select class="form-select shadow-sm" id="rolANotificar" name="rolANotificar" required>
                                                     <option value="">Selecciona un rol</option>
                                                     <option value="ADMINISTRADOR">Administrador</option>
                                                     <option value="LOGISTICA">Logística</option>
@@ -107,14 +118,20 @@
                                         </div>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label for="mensajePersonalizado" class="form-label">Mensaje Personalizado</label>
-                                        <textarea class="form-control" id="mensajePersonalizado" name="mensajePersonalizado" rows="3" placeholder="Mensaje opcional"></textarea>
+                                    <div class="mb-4">
+                                        <label for="mensajePersonalizado" class="form-label fw-semibold">
+                                            <i class="fas fa-comment text-primary me-2"></i>Mensaje Personalizado
+                                        </label>
+                                        <textarea class="form-control shadow-sm" id="mensajePersonalizado" name="mensajePersonalizado" rows="3" placeholder="Mensaje opcional"></textarea>
                                     </div>
 
-                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                        <a href="${pageContext.request.contextPath}/AlertaServlet" class="btn btn-secondary"><i class="fas fa-times me-1"></i>Cancelar</a>
-                                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Guardar</button>
+                                    <div class="mt-5 pt-4 border-top d-flex justify-content-between align-items-center">
+                                        <a href="${pageContext.request.contextPath}/AlertaServlet" class="btn btn-outline-secondary shadow-sm">
+                                            <i class="fas fa-times me-2"></i>Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-primary shadow-sm px-4">
+                                            <i class="fas fa-save me-2"></i>Guardar
+                                        </button>
                                     </div>
                                 </form>
                             </div>

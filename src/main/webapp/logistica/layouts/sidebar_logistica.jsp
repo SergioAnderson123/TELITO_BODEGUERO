@@ -7,6 +7,13 @@
                 <li class="nav-divider"><i class="fas fa-bars me-2"></i>Menu</li>
 
                 <li class="nav-item">
+                    <a class="nav-link <c:if test='${param.activeMenu == "Dashboard"}'>active</c:if>"
+                       href="${pageContext.request.contextPath}/logistica/DashboardLogisticaServlet">
+                        <i class="fas fa-chart-line"></i>Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a class="nav-link <c:if test='${param.activeMenu == "Movimiento"}'>active</c:if>'"
                        href="${pageContext.request.contextPath}/MovimientoProductoServlet">
                         <i class="fas fa-exchange-alt"></i>Movimiento de Productos

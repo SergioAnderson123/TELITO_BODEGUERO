@@ -42,22 +42,24 @@ public class ConductorServlet extends HttpServlet {
             case "listar":
                 int page = 1;
                 int size = 10;
+                String busqueda = request.getParameter("busqueda");
                 try { page = Integer.parseInt(request.getParameter("page")); } catch (Exception ignored) {}
                 try { size = Integer.parseInt(request.getParameter("size")); } catch (Exception ignored) {}
                 if (page < 1) page = 1;
                 if (size < 1) size = 10;
 
-                int totalRows = conductorDAO.contarConductores();
+                int totalRows = conductorDAO.contarConductores(busqueda);
                 int totalPages = (int) Math.ceil(totalRows / (double) size);
                 if (totalPages == 0) totalPages = 1;
                 if (page > totalPages) page = totalPages;
 
-                ArrayList<Conductor> listaConductores = conductorDAO.listarConductores(page, size);
+                ArrayList<Conductor> listaConductores = conductorDAO.listarConductores(busqueda, page, size);
                 request.setAttribute("listaConductores", listaConductores);
                 request.setAttribute("currentPage", page);
                 request.setAttribute("size", size);
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("totalRows", totalRows);
+                request.setAttribute("busqueda", busqueda);
                 request.setAttribute("baseUrl", request.getContextPath() + "/administrador/ConductorServlet");
                 request.setAttribute("param1Name", "action");
                 request.setAttribute("param1Value", "listar");

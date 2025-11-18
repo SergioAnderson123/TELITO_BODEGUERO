@@ -123,9 +123,10 @@ public class ProductorServlet extends HttpServlet {
 
             case "formActualizarPrecios":
                 // Buscar por SKU (si viene) y mostrar el formulario de actualización de precio
+                // SOLO si el producto pertenece al productor logueado
                 String skuBusqueda = request.getParameter("sku");
                 if (skuBusqueda != null && !skuBusqueda.trim().isEmpty()) {
-                    Producto prod = productoDao.obtenerProductoPorSku(skuBusqueda.trim());
+                    Producto prod = productoDao.obtenerProductoPorSku(skuBusqueda.trim(), idProductor);
                     if (prod != null) {
                         // También enviamos el SKU para mantenerlo en la URL si lo necesitas
                         request.setAttribute("producto", prod);
@@ -178,16 +179,17 @@ public class ProductorServlet extends HttpServlet {
                 
             case "verDetalleOrden":
                 // Ver detalle de una orden de compra (JSON o JSP)
+                // SOLO si la orden pertenece a un producto del productor logueado
                 int idOrden = Integer.parseInt(request.getParameter("idOrden"));
                 OrdenCompraDao ordenDao = new OrdenCompraDao();
-                Object[] detalleOrden = ordenDao.obtenerDetalleOrden(idOrden);
+                Object[] detalleOrden = ordenDao.obtenerDetalleOrden(idOrden, idProductor);
                 
                 if (detalleOrden != null) {
                     request.setAttribute("detalleOrden", detalleOrden);
                     view = request.getRequestDispatcher("productor/ordenesDeCompra.jsp");
                     view.forward(request, response);
                 } else {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Orden no encontrada");
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Orden no encontrada o no te pertenece");
                 }
                 break;
             // Aquí puedes agregar más 'cases' para navegar a otras páginas
@@ -195,10 +197,10 @@ public class ProductorServlet extends HttpServlet {
                 String sku = request.getParameter("sku");
                 String sanitizedSku = (sku == null) ? "" : sku.trim();
 
-                // Usamos el método que ya existe en LoteDao
+                // Usamos el método que ya existe en LoteDao, pero SOLO para productos del productor logueado
                 String nombreProducto = null;
                 if (!sanitizedSku.isEmpty()) {
-                    nombreProducto = loteDao.obtenerNombreProductoPorSKU(sanitizedSku);
+                    nombreProducto = loteDao.obtenerNombreProductoPorSKU(sanitizedSku, idProductor);
                 }
 
                 // Configuramos la respuesta para que sea de tipo JSON
@@ -242,28 +244,28 @@ public class ProductorServlet extends HttpServlet {
                     System.out.println("=== DEBUG SERVLET - OBTENER LOTES PARA ORDEN ===");
                     System.out.println("ID Orden: " + idOrdenLotes);
                     
-                    // Obtener el producto_id de la orden
+                    // Obtener el producto_id de la orden, SOLO si pertenece al productor logueado
                     OrdenCompraDao ordenCompraDao2 = new OrdenCompraDao();
-                    Object[] detalleOrden2 = ordenCompraDao2.obtenerDetalleOrden(idOrdenLotes);
+                    Object[] detalleOrden2 = ordenCompraDao2.obtenerDetalleOrden(idOrdenLotes, idProductor);
                     
                     if (detalleOrden2 == null) {
-                        response.getWriter().write("{\"success\": false, \"message\": \"Orden no encontrada\"}");
+                        response.getWriter().write("{\"success\": false, \"message\": \"Orden no encontrada o no te pertenece\"}");
                         return;
                     }
                     
-                    // Necesitamos obtener el producto_id de la orden
-                    // Para esto, necesitamos modificar el método obtenerDetalleOrden o crear uno nuevo
-                    // Por ahora, vamos a hacer una consulta directa
-                    int productoId = obtenerProductoIdDeOrden(idOrdenLotes);
+                    // Obtener el producto_id del detalle de la orden
+                    // El detalleOrden2[0] es id_orden_compra, pero necesitamos el producto_id
+                    // Usamos el método auxiliar que ahora verifica el productor_id
+                    int productoId = obtenerProductoIdDeOrden(idOrdenLotes, idProductor);
                     
                     if (productoId == 0) {
-                        response.getWriter().write("{\"success\": false, \"message\": \"No se pudo obtener el producto de la orden\"}");
+                        response.getWriter().write("{\"success\": false, \"message\": \"No se pudo obtener el producto de la orden o la orden no te pertenece\"}");
                         return;
                     }
                     
-                    // Obtener los lotes disponibles para este producto
+                    // Obtener los lotes disponibles para este producto, SOLO si pertenece al productor logueado
                     LoteDao loteDao2 = new LoteDao();
-                    List<Object[]> lotes = loteDao2.obtenerLotesDisponiblesParaProducto(productoId);
+                    List<Object[]> lotes = loteDao2.obtenerLotesDisponiblesParaProducto(productoId, idProductor);
                     
                     System.out.println("✓ Producto ID: " + productoId);
                     System.out.println("✓ Lotes encontrados: " + lotes.size());
@@ -364,13 +366,19 @@ public class ProductorServlet extends HttpServlet {
     }
     
     /**
-     * Método auxiliar para obtener el producto_id de una orden
+     * Método auxiliar para obtener el producto_id de una orden.
+     * SOLO si el producto de la orden pertenece al productor especificado.
+     * Esto previene que un productor obtenga información de órdenes de productos de otros productores.
      */
-    private int obtenerProductoIdDeOrden(int idOrden) {
-        String sql = "SELECT producto_id FROM ordenes_compra WHERE id_orden_compra = ?";
+    private int obtenerProductoIdDeOrden(int idOrden, int productorId) {
+        String sql = "SELECT oc.producto_id " +
+                     "FROM ordenes_compra oc " +
+                     "INNER JOIN productos p ON oc.producto_id = p.id_producto " +
+                     "WHERE oc.id_orden_compra = ? AND p.productor_id = ? AND p.activo = 1";
         try (Connection conn = com.example.telito.util.DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, idOrden);
+            pstmt.setInt(2, productorId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("producto_id");
@@ -449,11 +457,19 @@ public class ProductorServlet extends HttpServlet {
                 break;
 
             case "actualizarPrecio":
-                // Actualiza el precio del producto y redirige al formulario con el SKU
+                // Actualiza el precio del producto SOLO si pertenece al productor logueado
                 int idProductoUpdate = Integer.parseInt(request.getParameter("idProducto"));
                 double nuevoPrecio = Double.parseDouble(request.getParameter("nuevoPrecio"));
 
-                productoDao.actualizarPrecio(idProductoUpdate, nuevoPrecio);
+                boolean precioActualizado = productoDao.actualizarPrecio(idProductoUpdate, nuevoPrecio, idProductor);
+                
+                if (!precioActualizado) {
+                    session.setAttribute("mensaje", "No se pudo actualizar el precio. El producto no existe o no te pertenece.");
+                    session.setAttribute("tipoMensaje", "danger");
+                } else {
+                    session.setAttribute("mensaje", "Precio actualizado correctamente.");
+                    session.setAttribute("tipoMensaje", "success");
+                }
 
                 // Opcional: volver al formulario de actualización manteniendo contexto
                 // Si conoces el SKU, podrías reenviarlo; aquí solo volvemos a listar productos
@@ -461,9 +477,9 @@ public class ProductorServlet extends HttpServlet {
                 break;
 
             case "desactivarProducto":
-                // Desactiva un producto (soft delete) y recarga la lista
+                // Desactiva un producto (soft delete) SOLO si pertenece al productor logueado
                 int idProductoDesactivar = Integer.parseInt(request.getParameter("idProducto"));
-                boolean desactivado = productoDao.desactivarProducto(idProductoDesactivar);
+                boolean desactivado = productoDao.desactivarProducto(idProductoDesactivar, idProductor);
                 
                 // Recargar la lista de productos después de desactivar (tanto si fue exitoso como si falló)
                 ArrayList<Producto> listaProductosActualizada = productoDao.listarProductosPorProductor(idProductor);
@@ -484,10 +500,10 @@ public class ProductorServlet extends HttpServlet {
                     request.setAttribute("alertType", "success");
                     request.setAttribute("alertMessage", "Producto eliminado correctamente.");
                 } else {
-                    session.setAttribute("mensaje", "No se pudo eliminar el producto.");
+                    session.setAttribute("mensaje", "No se pudo eliminar el producto. El producto no existe o no te pertenece.");
                     session.setAttribute("tipoMensaje", "danger");
                     request.setAttribute("alertType", "danger");
-                    request.setAttribute("alertMessage", "No se pudo eliminar el producto.");
+                    request.setAttribute("alertMessage", "No se pudo eliminar el producto. El producto no existe o no te pertenece.");
                 }
                 
                 // Forward a la lista de productos con mensaje
@@ -501,12 +517,13 @@ public class ProductorServlet extends HttpServlet {
                 String skuProducto = request.getParameter("skuProducto");
                 String cantidadStockStr = request.getParameter("cantidadStock");
                 String fechaCaducidad = request.getParameter("fechaCaducidad"); // opcional
+                String costoProduccionStr = request.getParameter("costoProduccion"); // opcional
 
                 // GENERAR CÓDIGO DE LOTE AUTOMÁTICAMENTE
                 String codigoLote = loteDaoPost.generarNuevoCodigoLote();
                 
-                // Usar distrito por defecto
-                String distrito = "Cercado";
+                // Usar distrito por defecto (Cercado de Lima está en la zona Oeste)
+                String distrito = "Cercado de Lima";
 
                 int cantidadStock = 0;
                 try {
@@ -514,11 +531,20 @@ public class ProductorServlet extends HttpServlet {
                 } catch (NumberFormatException e) {
                     cantidadStock = 0;
                 }
+                
+                Double costoProduccion = null;
+                try {
+                    if (costoProduccionStr != null && !costoProduccionStr.trim().isEmpty()) {
+                        costoProduccion = Double.parseDouble(costoProduccionStr.trim());
+                    }
+                } catch (NumberFormatException e) {
+                    costoProduccion = null;
+                }
 
                 boolean ok = false;
                 if (codigoLote != null && skuProducto != null && cantidadStock > 0) {
                     ok = loteDaoPost.registrarLote(codigoLote.trim(), skuProducto.trim(), cantidadStock,
-                            (fechaCaducidad != null ? fechaCaducidad.trim() : null), distrito.trim());
+                            (fechaCaducidad != null ? fechaCaducidad.trim() : null), distrito.trim(), costoProduccion);
                 }
 
                 request.setAttribute("alertType", ok ? "success" : "danger");
@@ -530,6 +556,7 @@ public class ProductorServlet extends HttpServlet {
                     request.setAttribute("form_skuProducto", skuProducto);
                     request.setAttribute("form_cantidadStock", cantidadStockStr);
                     request.setAttribute("form_fechaCaducidad", fechaCaducidad);
+                    request.setAttribute("form_costoProduccion", costoProduccionStr);
                 }
 
                 RequestDispatcher rd = request.getRequestDispatcher("productor/registrarLotes.jsp");
@@ -562,9 +589,10 @@ public class ProductorServlet extends HttpServlet {
                     System.out.println("=== DEBUG SERVLET - CAMBIAR ESTADO ORDEN ===");
                     System.out.println("ID Orden: " + idOrden);
                     System.out.println("Nuevo Estado: " + nuevoEstado);
+                    System.out.println("ID Productor: " + idProductor);
                     
                     OrdenCompraDao ordenCompraDao = new OrdenCompraDao();
-                    boolean actualizado = ordenCompraDao.actualizarEstadoOrden(idOrden, nuevoEstado);
+                    boolean actualizado = ordenCompraDao.actualizarEstadoOrden(idOrden, nuevoEstado, idProductor);
                     
                     if (actualizado) {
                         System.out.println("✓ Estado actualizado correctamente");
@@ -578,9 +606,9 @@ public class ProductorServlet extends HttpServlet {
                         if ("En Proceso".equals(nuevoEstado)) {
                             System.out.println("✓ El estado es 'En Proceso', procediendo a enviar correo...");
                             try {
-                                // Obtener datos de la orden
-                                System.out.println("Obteniendo datos básicos de la orden ID: " + idOrden);
-                                Object[] datosOrden = ordenCompraDao.obtenerDatosBasicosOrden(idOrden);
+                    // Obtener datos de la orden, SOLO si pertenece al productor logueado
+                    System.out.println("Obteniendo datos básicos de la orden ID: " + idOrden);
+                    Object[] datosOrden = ordenCompraDao.obtenerDatosBasicosOrden(idOrden, idProductor);
                                 
                                 if (datosOrden != null) {
                                     System.out.println("✓ Datos de orden obtenidos correctamente");
@@ -682,9 +710,9 @@ public class ProductorServlet extends HttpServlet {
                     System.out.println("ID Orden: " + idOrden2);
                     System.out.println("ID Lote: " + idLote);
                     
-                    // Obtener los detalles de la orden para saber la cantidad
+                    // Obtener los detalles de la orden para saber la cantidad, SOLO si pertenece al productor logueado
                     OrdenCompraDao ordenCompraDao3 = new OrdenCompraDao();
-                    Object[] detalleOrden = ordenCompraDao3.obtenerDetalleOrden(idOrden2);
+                    Object[] detalleOrden = ordenCompraDao3.obtenerDetalleOrden(idOrden2, idProductor);
                     
                     if (detalleOrden == null) {
                         System.err.println("❌ No se encontró la orden");
@@ -696,12 +724,13 @@ public class ProductorServlet extends HttpServlet {
                     int cantidadOrdenPaquetes = (Integer) detalleOrden[5];
                     
                     // Obtener el lote para saber su stock actual y unidades por paquete
+                    // SOLO si el lote pertenece a un producto del productor logueado
                     LoteDao loteDao = new LoteDao();
-                    Object[] loteInfo = loteDao.buscarLotePorId(idLote);
+                    Object[] loteInfo = loteDao.buscarLotePorId(idLote, idProductor);
                     
                     if (loteInfo == null) {
-                        System.err.println("❌ No se encontró el lote");
-                        response.getWriter().write("{\"success\": false, \"message\": \"Lote no encontrado\"}");
+                        System.err.println("❌ No se encontró el lote o no pertenece al productor");
+                        response.getWriter().write("{\"success\": false, \"message\": \"Lote no encontrado o no te pertenece\"}");
                         return;
                     }
                     
@@ -732,12 +761,12 @@ public class ProductorServlet extends HttpServlet {
                     System.out.println("Stock después del descuento: " + nuevoStock + " unidades (" + nuevoStockPaquetes + " paquetes)");
                     System.out.println("El lote debe mantenerse con stock > 0: " + (nuevoStock > 0));
                     
-                    // Actualizar el stock del lote
-                    boolean stockActualizado = loteDao.actualizarStock(idLote, nuevoStock);
+                    // Actualizar el stock del lote, SOLO si pertenece al productor logueado
+                    boolean stockActualizado = loteDao.actualizarStock(idLote, nuevoStock, idProductor);
                     
                     if (!stockActualizado) {
-                        System.err.println("❌ No se pudo actualizar el stock del lote");
-                        response.getWriter().write("{\"success\": false, \"message\": \"Error al actualizar el stock del lote\"}");
+                        System.err.println("❌ No se pudo actualizar el stock del lote o no pertenece al productor");
+                        response.getWriter().write("{\"success\": false, \"message\": \"Error al actualizar el stock del lote o el lote no te pertenece\"}");
                         return;
                     }
                     
@@ -762,8 +791,8 @@ public class ProductorServlet extends HttpServlet {
                         // Continuamos aunque falle el registro del movimiento
                     }
                     
-                    // Actualizar la orden con el lote asignado
-                    boolean asignado = ordenCompraDao3.completarOrden(idOrden2, idLote);
+                    // Actualizar la orden con el lote asignado, SOLO si pertenece al productor logueado
+                    boolean asignado = ordenCompraDao3.completarOrden(idOrden2, idLote, idProductor);
                     
                     System.out.println("=== RESULTADO ASIGNACIÓN LOTE ===");
                     System.out.println("¿Asignado exitosamente? " + asignado);
@@ -778,9 +807,9 @@ public class ProductorServlet extends HttpServlet {
                         System.out.println("ID Orden para correo: " + idOrden2);
                         System.out.println("ID Lote asignado: " + idLote);
                         try {
-                            // Obtener datos de la orden
-                            System.out.println("Obteniendo datos básicos de la orden ID: " + idOrden2);
-                            Object[] datosOrdenEmail = ordenCompraDao3.obtenerDatosBasicosOrden(idOrden2);
+                    // Obtener datos de la orden, SOLO si pertenece al productor logueado
+                    System.out.println("Obteniendo datos básicos de la orden ID: " + idOrden2);
+                    Object[] datosOrdenEmail = ordenCompraDao3.obtenerDatosBasicosOrden(idOrden2, idProductor);
                             
                             if (datosOrdenEmail != null) {
                                 System.out.println("✓ Datos de orden obtenidos correctamente");
@@ -856,7 +885,7 @@ public class ProductorServlet extends HttpServlet {
                     } else {
                         System.err.println("❌ No se pudo asignar el lote a la orden");
                         // Revertir el cambio de stock si falla la asignación
-                        loteDao.actualizarStock(idLote, stockActualLote);
+                        loteDao.actualizarStock(idLote, stockActualLote, idProductor);
                         response.getWriter().write("{\"success\": false, \"message\": \"No se pudo asignar el lote\"}");
                     }
                     

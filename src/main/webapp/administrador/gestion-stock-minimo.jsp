@@ -25,16 +25,16 @@
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
             <div class="container-fluid px-4">
-                <div class="page-header mb-4 d-flex justify-content-between align-items-center">
+                <div class="page-header mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div>
                         <h2 class="pageheader-title"><i class="fas fa-triangle-exclamation me-2"></i>Gestión de Stock Mínimo</h2>
                         <p class="pageheader-text">Configura los umbrales de stock mínimo y crítico para cada producto.</p>
                     </div>
-                    <div class="d-flex gap-2">
-                        <a href="${pageContext.request.contextPath}/StockMinimoReporteServlet?action=exportar" class="btn btn-success">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="${pageContext.request.contextPath}/StockMinimoReporteServlet?action=exportar" class="btn btn-success shadow-sm">
                             <i class="fas fa-file-excel me-2"></i>Exportar a Excel
                         </a>
-                        <a href="${pageContext.request.contextPath}/StockMinimoReporteServlet?action=formEnviar" class="btn btn-info text-white">
+                        <a href="${pageContext.request.contextPath}/StockMinimoReporteServlet?action=formEnviar" class="btn btn-info text-white shadow-sm">
                             <i class="fas fa-envelope me-2"></i>Enviar por Correo
                         </a>
                     </div>
@@ -53,34 +53,41 @@
                 <!-- Botón para agregar nueva configuración -->
                 <div class="row mb-4">
                     <div class="col-12">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalStockMinimo">
-                            <i class="fas fa-plus me-2"></i>Nueva Configuración
-                        </button>
-                        <button type="button" class="btn btn-info ms-2" onclick="aplicarConfiguracionGlobal()">
-                            <i class="fas fa-cogs me-2"></i>Aplicar Configuración Global
-                        </button>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalStockMinimo">
+                                <i class="fas fa-plus me-2"></i>Nueva Configuración
+                            </button>
+                            <button type="button" class="btn btn-info shadow-sm" onclick="aplicarConfiguracionGlobal()">
+                                <i class="fas fa-cogs me-2"></i>Aplicar Configuración Global
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Tabla de configuraciones -->
-                <div class="card">
+                <div class="table-card shadow-sm">
                     <div class="card-header">
-                        <h5 class="card-title mb-0"><i class="fas fa-list me-2"></i>Configuraciones de Stock Mínimo</h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0 fw-semibold"><i class="fas fa-list me-2"></i>Configuraciones de Stock Mínimo</h5>
+                                <small class="text-white-50">Gestiona los umbrales de stock para cada producto</small>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="bg-light">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
                                 <tr>
-                                    <th>Producto</th>
-                                    <th>Código</th>
-                                    <th>Stock Mín. Lote</th>
-                                    <th>Stock Crít. Lote</th>
-                                    <th>Stock Mín. Total</th>
-                                    <th>Stock Crít. Total</th>
-                                    <th>Estado</th>
-                                    <th>Última Actualización</th>
-                                    <th>Acciones</th>
+                                    <th><i class="fas fa-box me-1"></i>Producto</th>
+                                    <th><i class="fas fa-barcode me-1"></i>Código</th>
+                                    <th><i class="fas fa-warehouse me-1"></i>Stock Mín. Lote</th>
+                                    <th><i class="fas fa-exclamation-triangle me-1"></i>Stock Crít. Lote</th>
+                                    <th><i class="fas fa-chart-line me-1"></i>Stock Mín. Total</th>
+                                    <th><i class="fas fa-exclamation-circle me-1"></i>Stock Crít. Total</th>
+                                    <th><i class="fas fa-toggle-on me-1"></i>Estado</th>
+                                    <th><i class="fas fa-calendar me-1"></i>Última Actualización</th>
+                                    <th class="text-end" style="width: 120px;"><i class="fas fa-cog me-1"></i>Acciones</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -89,44 +96,52 @@
                                         <td>${config.producto.nombre}</td>
                                         <td><span class="badge bg-secondary">${config.producto.codigoSku}</span></td>
                                         <td>
-                                            <span class="badge bg-info">${config.stockMinimoLote}</span>
+                                            <span class="badge bg-info px-3 py-2 shadow-sm">${config.stockMinimoLote}</span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-warning">${config.stockCriticoLote}</span>
+                                            <span class="badge bg-warning text-dark px-3 py-2 shadow-sm">${config.stockCriticoLote}</span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-primary">${config.stockMinimoProducto}</span>
+                                            <span class="badge bg-primary px-3 py-2 shadow-sm">${config.stockMinimoProducto}</span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-danger">${config.stockCriticoProducto}</span>
+                                            <span class="badge bg-danger px-3 py-2 shadow-sm">${config.stockCriticoProducto}</span>
                                         </td>
                                         <td>
                                             <c:choose>
                                                 <c:when test="${config.activo}">
-                                                    <span class="badge bg-success">Activo</span>
+                                                    <span class="badge bg-success px-3 py-2 shadow-sm">
+                                                        <i class="fas fa-check-circle me-1"></i>Activo
+                                                    </span>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <span class="badge bg-secondary">Inactivo</span>
+                                                    <span class="badge bg-secondary px-3 py-2 shadow-sm">
+                                                        <i class="fas fa-times-circle me-1"></i>Inactivo
+                                                    </span>
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
-                                        <td>${config.fechaActualizacion}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-outline-primary"
-                                                    data-id="${config.idStockMinimo}"
-                                                    data-nombre="${config.producto.nombre}"
-                                                    data-stockminimolote="${config.stockMinimoLote}"
-                                                    data-stockcriticolote="${config.stockCriticoLote}"
-                                                    data-stockminimoproducto="${config.stockMinimoProducto}"
-                                                    data-stockcriticoproducto="${config.stockCriticoProducto}"
-                                                    data-activo="${config.activo}"
-                                                    onclick="editarConfiguracionFromButton(this)">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger"
-                                                    onclick="eliminarConfiguracion(${config.idStockMinimo})">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                        <td><small class="text-muted">${config.fechaActualizacion}</small></td>
+                                        <td class="text-end">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary shadow-sm"
+                                                        data-id="${config.idStockMinimo}"
+                                                        data-nombre="${config.producto.nombre}"
+                                                        data-stockminimolote="${config.stockMinimoLote}"
+                                                        data-stockcriticolote="${config.stockCriticoLote}"
+                                                        data-stockminimoproducto="${config.stockMinimoProducto}"
+                                                        data-stockcriticoproducto="${config.stockCriticoProducto}"
+                                                        data-activo="${config.activo}"
+                                                        onclick="editarConfiguracionFromButton(this)"
+                                                        title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger shadow-sm"
+                                                        onclick="eliminarConfiguracion(${config.idStockMinimo})"
+                                                        title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 </c:forEach>

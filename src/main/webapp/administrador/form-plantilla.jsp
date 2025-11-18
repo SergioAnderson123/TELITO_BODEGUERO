@@ -6,13 +6,14 @@
 <%
     PlantillaConfig plantilla = (PlantillaConfig) request.getAttribute("plantilla");
     boolean modoEditar = (plantilla != null);
+    String pageTitle = modoEditar ? "Editar Plantilla" : "Crear Plantilla";
 %>
 
 <!doctype html>
 <html lang="es">
 <head>
     <jsp:include page="/administrador/layouts/head.jsp">
-        <jsp:param name="pageTitle" value="<%= modoEditar ? \"Editar\" : \"Crear\" %> Plantilla"/>
+        <jsp:param name="pageTitle" value="<%= pageTitle %>"/>
     </jsp:include>
 </head>
 <body>
@@ -25,27 +26,35 @@
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
             <div class="page-header mb-4">
-                <h2 class="pageheader-title" style="font-weight: 700;"><%= modoEditar ? "Editar" : "Crear" %> Plantilla</h2>
+                <h2 class="pageheader-title"><i class="fas fa-file-excel me-2"></i><%= modoEditar ? "Editar" : "Crear" %> Plantilla</h2>
                 <p class="pageheader-text">Define la estructura para la carga masiva de datos desde Excel.</p>
             </div>
 
             <div class="row">
                 <div class="col-xl-8 col-lg-10 col-md-12 col-sm-12 col-12 mx-auto">
-                    <div class="form-card">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-gradient-primary text-white mb-4" style="background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%); border-radius: 12px 12px 0 0; margin: -30px -30px 30px -30px; padding: 25px 30px;">
+                            <h5 class="mb-0"><i class="fas fa-file-excel me-2"></i>Datos de la Plantilla</h5>
+                            <small class="text-white-50">Complete todos los campos obligatorios</small>
+                        </div>
                         <div class="card-body">
                             <form action="<%= request.getContextPath() %>/PlantillaServlet?action=<%= modoEditar ? "actualizar" : "guardar" %>" method="POST">
                                 <% if (modoEditar) { %>
                                 <input type="hidden" name="id_plantilla" value="<%= plantilla.getIdPlantilla() %>">
                                 <% } %>
 
-                                <div class="mb-3">
-                                    <label for="nombre" class="form-label">Nombre de la Plantilla</label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" value="<%= modoEditar ? plantilla.getNombre() : "" %>" placeholder="Ej: Carga de Stock Semanal" required>
+                                <div class="mb-4">
+                                    <label for="nombre" class="form-label fw-semibold">
+                                        <i class="fas fa-tag text-primary me-2"></i>Nombre de la Plantilla <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control shadow-sm" id="nombre" name="nombre" value="<%= modoEditar ? plantilla.getNombre() : "" %>" placeholder="Ej: Carga de Stock Semanal" required>
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="tipo_carga" class="form-label">Tipo de Carga</label>
-                                    <select id="tipo_carga" name="tipo_carga" class="form-select" required>
+                                    <label for="tipo_carga" class="form-label fw-semibold">
+                                        <i class="fas fa-filter text-primary me-2"></i>Tipo de Carga <span class="text-danger">*</span>
+                                    </label>
+                                    <select id="tipo_carga" name="tipo_carga" class="form-select shadow-sm" required>
                                         <option value="STOCK" <%= (modoEditar && "STOCK".equals(plantilla.getTipoCarga())) ? "selected" : "" %>>Carga de Stock</option>
                                         <option value="PRODUCTOS" <%= (modoEditar && "PRODUCTOS".equals(plantilla.getTipoCarga())) ? "selected" : "" %>>Creación de Productos</option>
                                     </select>
@@ -87,16 +96,19 @@
                                     <label class="form-check-label" for="activo">Plantilla Activa</label>
                                 </div>
 
-                                <div class="mt-4 pt-3 border-top d-flex justify-content-end">
-                                    <a href="<%= request.getContextPath() %>/PlantillaServlet" class="btn btn-light me-2">Cancelar</a>
-                                    <button type="submit" class="btn btn-primary">Guardar Plantilla</button>
+                                <div class="mt-5 pt-4 border-top d-flex justify-content-between align-items-center">
+                                    <a href="<%= request.getContextPath() %>/PlantillaServlet" class="btn btn-outline-secondary shadow-sm">
+                                        <i class="fas fa-times me-2"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary shadow-sm px-4">
+                                        <i class="fas fa-save me-2"></i>Guardar Plantilla
+                                    </button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-            </main>
 
             <!-- Plantilla para clonar nuevas filas de mapeo -->
             <template id="mapeo-template">

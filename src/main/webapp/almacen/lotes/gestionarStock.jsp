@@ -77,7 +77,7 @@
                                             <th scope="col">Ubicación</th>
                                             <th scope="col">Fecha de Vencimiento</th>
                                             <th scope="col">Estado</th>
-                                            <th scope="col">Ajustar stock</th>
+                                            <th scope="col">Acciones</th>
                                         </tr>
                                         </thead>
                                         <tbody id="productTableBody">
@@ -113,8 +113,18 @@
                                                     </c:choose>
                                                 </td>
                                                 <td>
-                                                    <a type="button" class="btn btn-sm btn-info"
-                                                       href="LoteServlet?action=ajustar&id=${lote.idLote}">Ajustar</a>
+                                                    <div class="btn-group" role="group">
+                                                        <a type="button" class="btn btn-sm btn-info"
+                                                           href="LoteServlet?action=ajustar&id=${lote.idLote}" 
+                                                           title="Ajustar inventario">
+                                                            <i class="fas fa-edit"></i> Ajustar
+                                                        </a>
+                                                        <a type="button" class="btn btn-sm btn-warning"
+                                                           href="IncidenciaServlet?action=formReportar&idLote=${lote.idLote}" 
+                                                           title="Reportar incidencia">
+                                                            <i class="fas fa-exclamation-triangle"></i> Incidencia
+                                                        </a>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </c:forEach>

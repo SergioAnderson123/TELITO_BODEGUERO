@@ -65,12 +65,17 @@ public class LoteServlet extends HttpServlet {
                 break;
 
             case "ajustar":
-                // Esta parte no necesita cambios
                 int idLote = Integer.parseInt(request.getParameter("id"));
                 Lote lote = loteDao.buscarLotePorId(idLote);
 
                 if (lote != null) {
+                    // Obtener historial de ajustes para este lote
+                    MovimientoDao movimientoDao = new MovimientoDao();
+                    ArrayList<com.example.telito.almacen.beans.Movimiento> historialAjustes = 
+                        movimientoDao.listarAjustesPorLote(idLote);
+                    
                     request.setAttribute("lote", lote);
+                    request.setAttribute("historialAjustes", historialAjustes);
                     RequestDispatcher dispatcher = request.getRequestDispatcher("/almacen/lotes/ajustarInventario.jsp");
                     dispatcher.forward(request, response);
                 } else {

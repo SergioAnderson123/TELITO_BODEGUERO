@@ -3,9 +3,11 @@ package com.example.telito.administrador.servlets;
 import com.example.telito.administrador.beans.Usuario;
 import com.example.telito.administrador.beans.Rol;
 import com.example.telito.administrador.daos.UsuarioDAO;
+import com.example.telito.administrador.services.AuditoriaService;
 import com.example.telito.administrador.services.UsuarioService;
 import com.example.telito.administrador.validators.UsuarioValidator;
 import com.example.telito.util.AuthorizationHelper;
+import com.google.gson.Gson;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -137,11 +139,12 @@ public class UsuarioServlet extends HttpServlet {
                 String sortBy = request.getParameter("sortBy");
                 String sortOrder = request.getParameter("sortOrder");
             
-                // Paginación
+                // Paginación - máximo 5 usuarios por página
             int page = parseInteger(request.getParameter("page"), 1);
-            int size = parseInteger(request.getParameter("size"), 10);
+            int size = parseInteger(request.getParameter("size"), 5);
                 if (page < 1) page = 1;
-                if (size < 1) size = 10;
+                if (size < 1) size = 5;
+                if (size > 5) size = 5; // Limitar máximo a 5
 
             // Obtener datos
                 int totalRows = usuarioDAO.contarUsuarios(busqueda, rolId, estado);
@@ -244,8 +247,24 @@ public class UsuarioServlet extends HttpServlet {
                 return;
             }
             
+                    // Obtener datos del usuario antes de deshabilitarlo para auditoría
+                    Usuario usuarioDeshabilitar = usuarioDAO.obtenerUsuarioPorId(idADeshabilitar);
+                    
                     usuarioDAO.deshabilitarUsuario(idADeshabilitar);
             logger.info("Usuario ID {} deshabilitado exitosamente", idADeshabilitar);
+                    
+                    // Registrar en auditoría
+                    Usuario usuarioActual = (Usuario) session.getAttribute("usuario");
+                    if (usuarioActual != null && usuarioDeshabilitar != null) {
+                        AuditoriaService.registrarAccion(
+                            usuarioActual,
+                            AuditoriaService.ACCION_BANEAR_USUARIO,
+                            AuditoriaService.MODULO_USUARIOS,
+                            "Usuario deshabilitado: " + usuarioDeshabilitar.getEmail() + " (ID: " + idADeshabilitar + ")",
+                            request
+                        );
+                    }
+                    
                     session.setAttribute("successMsg", "Usuario deshabilitado con éxito.");
             
                 } catch (NumberFormatException e) {
@@ -303,11 +322,28 @@ public class UsuarioServlet extends HttpServlet {
         
         // Crear usuario usando el servicio
         UsuarioService.ResultadoCreacionUsuario resultado = usuarioService.crearOReactivarUsuario(
-            usuarioNuevo, passwordOriginal, request.getContextPath());
+            usuarioNuevo, passwordOriginal, request.getContextPath(), request);
         
         if (resultado.isExito()) {
             logger.info("Usuario creado exitosamente. ID: {}, Email: {}", 
                        resultado.getUsuario().getIdUsuario(), resultado.getUsuario().getEmail());
+            
+            // Registrar en auditoría
+            Usuario usuarioActual = (Usuario) session.getAttribute("usuario");
+            if (usuarioActual != null) {
+                String datosNuevos = new Gson().toJson(resultado.getUsuario());
+                AuditoriaService.registrarAccion(
+                    usuarioActual,
+                    AuditoriaService.ACCION_CREAR_USUARIO,
+                    AuditoriaService.MODULO_USUARIOS,
+                    "Usuario creado: " + resultado.getUsuario().getEmail() + " (ID: " + resultado.getUsuario().getIdUsuario() + "), Rol: " + 
+                    (resultado.getUsuario().getRol() != null ? resultado.getUsuario().getRol().getNombre() : "N/A"),
+                    null,
+                    datosNuevos,
+                    request
+                );
+            }
+            
                         session.setAttribute("successMsg", "Usuario creado con éxito.");
                         response.sendRedirect(request.getContextPath() + "/UsuarioServlet");
                     } else {
@@ -360,12 +396,35 @@ public class UsuarioServlet extends HttpServlet {
             
             String passwordNueva = request.getParameter("password");
             
+            // Obtener datos anteriores ANTES de actualizar para auditoría
+            Usuario usuarioAnterior = usuarioDAO.obtenerUsuarioPorId(usuarioActualizado.getIdUsuario());
+            String datosAnteriores = usuarioAnterior != null ? new Gson().toJson(usuarioAnterior) : null;
+            
             // Actualizar usuario usando el servicio
             boolean actualizado = usuarioService.actualizarUsuario(
                 usuarioActualizado, passwordNueva, request.getContextPath());
             
             if (actualizado) {
                 logger.info("Usuario actualizado exitosamente. ID: {}", usuarioActualizado.getIdUsuario());
+                
+                // Registrar en auditoría
+                Usuario usuarioActual = (Usuario) session.getAttribute("usuario");
+                if (usuarioActual != null) {
+                    // Obtener datos actualizados después de la actualización
+                    Usuario usuarioActualizadoCompleto = usuarioDAO.obtenerUsuarioPorId(usuarioActualizado.getIdUsuario());
+                    String datosNuevos = usuarioActualizadoCompleto != null ? new Gson().toJson(usuarioActualizadoCompleto) : null;
+                    
+                    AuditoriaService.registrarAccion(
+                        usuarioActual,
+                        AuditoriaService.ACCION_EDITAR_USUARIO,
+                        AuditoriaService.MODULO_USUARIOS,
+                        "Usuario actualizado: " + usuarioActualizado.getEmail() + " (ID: " + usuarioActualizado.getIdUsuario() + ")",
+                        datosAnteriores,
+                        datosNuevos,
+                        request
+                    );
+                }
+                
                 session.setAttribute("successMsg", "Usuario actualizado con éxito.");
                                 } else {
                 logger.error("Error al actualizar usuario ID {}", usuarioActualizado.getIdUsuario());
@@ -397,6 +456,12 @@ public class UsuarioServlet extends HttpServlet {
         usuario.setNombres(request.getParameter("nombres"));
         usuario.setApellidos(request.getParameter("apellidos"));
         usuario.setEmail(request.getParameter("email"));
+        
+        // Código de productor (solo para usuarios con rol Productor)
+        String codigoProductor = request.getParameter("codigo_productor");
+        if (codigoProductor != null && !codigoProductor.trim().isEmpty()) {
+            usuario.setCodigoProductor(codigoProductor.trim());
+        }
 
         String password = request.getParameter("password");
         if (password != null && !password.trim().isEmpty()) {

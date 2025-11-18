@@ -13,7 +13,7 @@ public class UsuarioDAO extends DAOBase {
 
         ArrayList<Usuario> listaUsuarios = new ArrayList<>();
         // La consulta base une usuarios con roles para mostrar el nombre del rol.
-        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
+        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.codigo_productor, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
                 "INNER JOIN roles r ON u.rol_id = r.id_rol WHERE 1=1";
 
         // Voy añadiendo a la consulta los filtros que el usuario haya usado.
@@ -30,8 +30,9 @@ public class UsuarioDAO extends DAOBase {
         }
 
         // Lógica para ordenar la tabla según la columna que se elija.
+        // Por defecto, ordenar por ID descendente para que los usuarios más recientes aparezcan primero
         String columnaOrden = "u.id_usuario";
-        String direccionOrden = "ASC";
+        String direccionOrden = "DESC";
 
         if (sortBy != null && !sortBy.trim().isEmpty()) {
             switch (sortBy) {
@@ -83,6 +84,13 @@ public class UsuarioDAO extends DAOBase {
                 usuario.setApellidos(rs.getString("apellidos"));
                 usuario.setEmail(rs.getString("email"));
                 usuario.setActivo(rs.getBoolean("activo"));
+
+                // Intentar obtener codigo_productor si existe la columna
+                try {
+                    usuario.setCodigoProductor(rs.getString("codigo_productor"));
+                } catch (SQLException e) {
+                    usuario.setCodigoProductor(null);
+                }
 
                 // Intentar obtener foto_perfil si existe la columna
                 try {
@@ -159,22 +167,40 @@ public class UsuarioDAO extends DAOBase {
     }
 
     // Para el formulario de crear un usuario nuevo.
+    // NOTA: La cuenta NO se activa automáticamente. Se debe enviar email de activación.
     public boolean crearUsuario(Usuario usuario) {
         // Encripto el password con SHA2 para no guardarlo en texto plano.
-        String sql = "INSERT INTO usuarios (nombres, apellidos, email, password, activo, rol_id) VALUES (?, ?, ?, SHA2(?, 256), 1, ?)";
-        int filasAfectadas = executeUpdate(sql,
-            usuario.getNombres(),
-            usuario.getApellidos(),
-            usuario.getEmail(),
-            usuario.getPassword(),
-            usuario.getRol().getIdRol());
-        return filasAfectadas > 0;
+        // Si es productor y tiene código, incluirlo; si no, el trigger lo generará automáticamente
+        // cuenta_activada se establece en FALSE por defecto (requiere activación por email)
+        String sql;
+        if (usuario.getRol().getIdRol() == 3 && usuario.getCodigoProductor() != null && !usuario.getCodigoProductor().trim().isEmpty()) {
+            // Productor con código específico
+            sql = "INSERT INTO usuarios (nombres, apellidos, email, codigo_productor, password, activo, rol_id, cuenta_activada) VALUES (?, ?, ?, ?, SHA2(?, 256), 1, ?, 0)";
+            int filasAfectadas = executeUpdate(sql,
+                usuario.getNombres(),
+                usuario.getApellidos(),
+                usuario.getEmail(),
+                usuario.getCodigoProductor(),
+                usuario.getPassword(),
+                usuario.getRol().getIdRol());
+            return filasAfectadas > 0;
+        } else {
+            // Usuario normal o productor sin código (el trigger generará el código)
+            sql = "INSERT INTO usuarios (nombres, apellidos, email, password, activo, rol_id, cuenta_activada) VALUES (?, ?, ?, SHA2(?, 256), 1, ?, 0)";
+            int filasAfectadas = executeUpdate(sql,
+                usuario.getNombres(),
+                usuario.getApellidos(),
+                usuario.getEmail(),
+                usuario.getPassword(),
+                usuario.getRol().getIdRol());
+            return filasAfectadas > 0;
+        }
     }
 
     // Para cargar los datos de un usuario en el formulario de edición.
     public Usuario obtenerUsuarioPorId(int id) {
         Usuario usuario = null;
-        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
+        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.codigo_productor, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
                 "INNER JOIN roles r ON u.rol_id = r.id_rol WHERE u.id_usuario = ?";
 
         Connection conn = null;
@@ -194,6 +220,13 @@ public class UsuarioDAO extends DAOBase {
                 usuario.setApellidos(rs.getString("apellidos"));
                 usuario.setEmail(rs.getString("email"));
                 usuario.setActivo(rs.getBoolean("activo"));
+                
+                // Intentar obtener codigo_productor si existe la columna
+                try {
+                    usuario.setCodigoProductor(rs.getString("codigo_productor"));
+                } catch (SQLException e) {
+                    usuario.setCodigoProductor(null);
+                }
                 
                 // Intentar obtener foto_perfil si existe la columna
                 try {
@@ -231,14 +264,28 @@ public class UsuarioDAO extends DAOBase {
 
     // Actualiza los datos del usuario desde el formulario de edición.
     public void actualizarUsuario(Usuario usuario) {
-        String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, rol_id = ?, activo = ? WHERE id_usuario = ?";
-        executeUpdate(sql,
-            usuario.getNombres(),
-            usuario.getApellidos(),
-            usuario.getEmail(),
-            usuario.getRol().getIdRol(),
-            usuario.isActivo(),
-            usuario.getIdUsuario());
+        // Si es productor, actualizar también el código de productor
+        if (usuario.getRol().getIdRol() == 3 && usuario.getCodigoProductor() != null) {
+            String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, codigo_productor = ?, rol_id = ?, activo = ? WHERE id_usuario = ?";
+            executeUpdate(sql,
+                usuario.getNombres(),
+                usuario.getApellidos(),
+                usuario.getEmail(),
+                usuario.getCodigoProductor(),
+                usuario.getRol().getIdRol(),
+                usuario.isActivo(),
+                usuario.getIdUsuario());
+        } else {
+            // Si cambia de productor a otro rol, limpiar el código de productor
+            String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, codigo_productor = NULL, rol_id = ?, activo = ? WHERE id_usuario = ?";
+            executeUpdate(sql,
+                usuario.getNombres(),
+                usuario.getApellidos(),
+                usuario.getEmail(),
+                usuario.getRol().getIdRol(),
+                usuario.isActivo(),
+                usuario.getIdUsuario());
+        }
     }
     
     /**
@@ -295,15 +342,15 @@ public class UsuarioDAO extends DAOBase {
         return null;
     }
 
-    // Método para autenticar usuarios en el login (por email o nombre de usuario)
+    // Método para autenticar usuarios en el login (por email, nombre de usuario o código de productor)
     public Usuario autenticarUsuario(String emailOUsuario, String password) {
         Usuario usuario = null;
-        // Autenticar por email O por nombre de usuario (combinando nombres y apellidos)
+        // Autenticar por email, nombre de usuario (combinando nombres y apellidos), solo nombres, O código de productor
         String sql = """
             SELECT u.*, r.nombre AS nombre_rol 
             FROM usuarios u 
             INNER JOIN roles r ON u.rol_id = r.id_rol 
-            WHERE (u.email = ? OR CONCAT(u.nombres, ' ', u.apellidos) = ? OR u.nombres = ?)
+            WHERE (u.email = ? OR CONCAT(u.nombres, ' ', u.apellidos) = ? OR u.nombres = ? OR u.codigo_productor = ?)
             AND u.password = SHA2(?, 256) 
             AND u.activo = 1
             """;
@@ -318,7 +365,8 @@ public class UsuarioDAO extends DAOBase {
             pstmt.setString(1, emailOUsuario);  // Email
             pstmt.setString(2, emailOUsuario);  // Nombre completo (nombres + apellidos)
             pstmt.setString(3, emailOUsuario);  // Solo nombres
-            pstmt.setString(4, password);
+            pstmt.setString(4, emailOUsuario);  // Código de productor
+            pstmt.setString(5, password);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
@@ -329,12 +377,42 @@ public class UsuarioDAO extends DAOBase {
                 usuario.setEmail(rs.getString("email"));
                 usuario.setActivo(rs.getBoolean("activo"));
                 
+                // Intentar obtener codigo_productor si existe la columna
+                try {
+                    usuario.setCodigoProductor(rs.getString("codigo_productor"));
+                } catch (SQLException e) {
+                    usuario.setCodigoProductor(null);
+                }
+                
                 // Intentar obtener foto_perfil si existe la columna
                 try {
                     usuario.setFotoPerfil(rs.getString("foto_perfil"));
                 } catch (SQLException e) {
                     // Columna foto_perfil no existe, usar valor por defecto
                     usuario.setFotoPerfil(null);
+                }
+                
+                // Intentar obtener cuenta_activada y fecha_activacion si existen las columnas
+                try {
+                    // Si el valor es NULL, considerarlo como activado (usuarios antiguos)
+                    boolean cuentaActivada = rs.getBoolean("cuenta_activada");
+                    boolean wasNull = rs.wasNull();
+                    if (wasNull) {
+                        // Si era NULL, activar la cuenta automáticamente (compatibilidad con usuarios antiguos)
+                        cuentaActivada = true;
+                    }
+                    usuario.setCuentaActivada(cuentaActivada);
+                    
+                    // Obtener fecha_activacion
+                    try {
+                        usuario.setFechaActivacion(rs.getTimestamp("fecha_activacion"));
+                    } catch (SQLException e) {
+                        usuario.setFechaActivacion(null);
+                    }
+                } catch (SQLException e) {
+                    // Columna cuenta_activada no existe, asumir que está activada (compatibilidad)
+                    usuario.setCuentaActivada(true);
+                    usuario.setFechaActivacion(null);
                 }
 
                 Rol rol = new Rol();
@@ -349,6 +427,127 @@ public class UsuarioDAO extends DAOBase {
             closeResources(conn, pstmt, rs);
         }
         return usuario;
+    }
+    
+    /**
+     * Obtiene un usuario por su email.
+     * 
+     * @param email Email del usuario
+     * @return Usuario o null si no existe
+     */
+    public Usuario obtenerUsuarioPorEmail(String email) {
+        Usuario usuario = null;
+        String sql = "SELECT u.*, r.nombre AS nombre_rol FROM usuarios u " +
+                    "INNER JOIN roles r ON u.rol_id = r.id_rol WHERE u.email = ?";
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, email);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                usuario = new Usuario();
+                usuario.setIdUsuario(rs.getInt("id_usuario"));
+                usuario.setNombres(rs.getString("nombres"));
+                usuario.setApellidos(rs.getString("apellidos"));
+                usuario.setEmail(rs.getString("email"));
+                usuario.setActivo(rs.getBoolean("activo"));
+                
+                try {
+                    // Si el valor es NULL, considerarlo como activado (usuarios antiguos)
+                    boolean cuentaActivada = rs.getBoolean("cuenta_activada");
+                    if (rs.wasNull()) {
+                        // Si era NULL, activar la cuenta automáticamente (compatibilidad con usuarios antiguos)
+                        cuentaActivada = true;
+                    }
+                    usuario.setCuentaActivada(cuentaActivada);
+                } catch (SQLException e) {
+                    // Columna cuenta_activada no existe, asumir que está activada (compatibilidad)
+                    usuario.setCuentaActivada(true);
+                }
+                
+                try {
+                    usuario.setFechaActivacion(rs.getTimestamp("fecha_activacion"));
+                } catch (SQLException e) {
+                    // Columna fecha_activacion no existe o es NULL
+                    usuario.setFechaActivacion(null);
+                }
+                
+                try {
+                    usuario.setCodigoProductor(rs.getString("codigo_productor"));
+                } catch (SQLException e) {
+                    usuario.setCodigoProductor(null);
+                }
+                
+                try {
+                    usuario.setFotoPerfil(rs.getString("foto_perfil"));
+                } catch (SQLException e) {
+                    usuario.setFotoPerfil(null);
+                }
+                
+                Rol rol = new Rol();
+                rol.setIdRol(rs.getInt("rol_id"));
+                rol.setNombre(rs.getString("nombre_rol"));
+                usuario.setRol(rol);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al obtener usuario por email: " + email, e);
+            throw new RuntimeException("Error al obtener usuario", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return usuario;
+    }
+    
+    /**
+     * Actualiza la contraseña de un usuario.
+     * 
+     * @param usuarioId ID del usuario
+     * @param contrasenaHash Contraseña hasheada (SHA-256)
+     * @return true si se actualizó correctamente
+     */
+    public boolean actualizarContrasena(int usuarioId, String contrasenaHash) {
+        String sql = "UPDATE usuarios SET password = ? WHERE id_usuario = ?";
+        int filasAfectadas = executeUpdate(sql, contrasenaHash, usuarioId);
+        return filasAfectadas > 0;
+    }
+    
+    /**
+     * Actualiza el estado de activación de una cuenta.
+     * 
+     * @param usuarioId ID del usuario
+     * @param activado true para activar, false para desactivar
+     * @return true si se actualizó correctamente
+     */
+    public boolean actualizarEstadoActivacion(int usuarioId, boolean activado) {
+        String sql = "UPDATE usuarios SET cuenta_activada = ?, fecha_activacion = NOW() WHERE id_usuario = ?";
+        int filasAfectadas = executeUpdate(sql, activado ? 1 : 0, usuarioId);
+        return filasAfectadas > 0;
+    }
+    
+    /**
+     * Incrementa el contador de intentos de activación fallidos.
+     * 
+     * @param usuarioId ID del usuario
+     */
+    public void incrementarIntentosActivacion(int usuarioId) {
+        String sql = "UPDATE usuarios SET intentos_activacion = intentos_activacion + 1, ultimo_intento_activacion = NOW() WHERE id_usuario = ?";
+        executeUpdate(sql, usuarioId);
+    }
+    
+    /**
+     * Resetea el contador de intentos de activación.
+     * 
+     * @param usuarioId ID del usuario
+     */
+    public void resetearIntentosActivacion(int usuarioId) {
+        String sql = "UPDATE usuarios SET intentos_activacion = 0, ultimo_intento_activacion = NULL WHERE id_usuario = ?";
+        executeUpdate(sql, usuarioId);
     }
 
     // Para la tarjeta de estadísticas del menú principal.
@@ -439,7 +638,7 @@ public class UsuarioDAO extends DAOBase {
      */
     public ArrayList<Usuario> listarTodosUsuarios(String busqueda, String rolId, String estado, String sortBy, String sortOrder) {
         ArrayList<Usuario> listaUsuarios = new ArrayList<>();
-        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
+        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.codigo_productor, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
                 "INNER JOIN roles r ON u.rol_id = r.id_rol WHERE 1=1";
 
         // Aplicar filtros
@@ -455,9 +654,9 @@ public class UsuarioDAO extends DAOBase {
             sql += " AND u.activo = 1"; // Por defecto, solo activos
         }
 
-        // Ordenamiento
+        // Ordenamiento - por defecto DESC para que los más recientes aparezcan primero
         String columnaOrden = "u.id_usuario";
-        String direccionOrden = "ASC";
+        String direccionOrden = "DESC";
 
         if (sortBy != null && !sortBy.trim().isEmpty()) {
             switch (sortBy) {
@@ -502,6 +701,12 @@ public class UsuarioDAO extends DAOBase {
                 usuario.setApellidos(rs.getString("apellidos"));
                 usuario.setEmail(rs.getString("email"));
                 usuario.setActivo(rs.getBoolean("activo"));
+
+                try {
+                    usuario.setCodigoProductor(rs.getString("codigo_productor"));
+                } catch (SQLException e) {
+                    usuario.setCodigoProductor(null);
+                }
 
                 try {
                     usuario.setFotoPerfil(rs.getString("foto_perfil"));

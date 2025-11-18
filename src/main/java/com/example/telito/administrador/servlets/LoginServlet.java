@@ -2,6 +2,7 @@ package com.example.telito.administrador.servlets;
 
 import com.example.telito.administrador.beans.Usuario;
 import com.example.telito.administrador.daos.UsuarioDAO;
+import com.example.telito.administrador.services.AuditoriaService;
 import com.example.telito.util.SecurityManager;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -12,9 +13,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebServlet(name = "LoginServlet", value = "/acceso/login")
 public class LoginServlet extends HttpServlet {
+    
+    private static final String RECAPTCHA_SECRET_KEY = "6LdmmuwrAAAAALqItgI0K57xTnkT_nOZdBM7kTq7";
+    private static final String RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -28,6 +38,15 @@ public class LoginServlet extends HttpServlet {
                     String sessionId = session.getId();
                     SecurityManager.eliminarSesion(usuario.getIdUsuario(), sessionId);
                     System.out.println("✓ Logout: Usuario ID " + usuario.getIdUsuario() + " cerró sesión");
+                    
+                    // Registrar logout en auditoría
+                    AuditoriaService.registrarAccion(
+                        usuario,
+                        AuditoriaService.ACCION_LOGOUT,
+                        AuditoriaService.MODULO_SEGURIDAD,
+                        "Logout exitoso desde IP: " + request.getRemoteAddr(),
+                        request
+                    );
                 }
                 session.invalidate();
             }
@@ -82,6 +101,7 @@ public class LoginServlet extends HttpServlet {
         String emailOUsuario = request.getParameter("email"); // Puede ser email o nombre de usuario
         String password = request.getParameter("password");
         String csrfToken = request.getParameter("csrfToken");
+        String recaptchaResponse = request.getParameter("g-recaptcha-response");
 
         // ========== VALIDACIONES DE SEGURIDAD ==========
         
@@ -92,7 +112,22 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-        // 2. Validar token CSRF
+        // 2. Validar reCAPTCHA
+        if (recaptchaResponse == null || recaptchaResponse.trim().isEmpty()) {
+            System.err.println("🚨 SEGURIDAD: Intento de login sin reCAPTCHA desde: " + request.getRemoteAddr());
+            request.setAttribute("errorMsg", "Por favor, completa la verificación reCAPTCHA.");
+            generarTokenYMostrarLogin(request, response);
+            return;
+        }
+        
+        if (!verificarRecaptcha(recaptchaResponse)) {
+            System.err.println("🚨 SEGURIDAD: Intento de login con reCAPTCHA inválido desde: " + request.getRemoteAddr());
+            request.setAttribute("errorMsg", "La verificación reCAPTCHA falló. Por favor, intente nuevamente.");
+            generarTokenYMostrarLogin(request, response);
+            return;
+        }
+        
+        // 3. Validar token CSRF
         HttpSession sessionActual = request.getSession(false);
         if (!SecurityManager.validarTokenCSRF(sessionActual, csrfToken)) {
             System.err.println("🚨 SEGURIDAD: Intento de login con token CSRF inválido desde: " + 
@@ -102,7 +137,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-        // 3. Verificar si la cuenta está bloqueada por múltiples intentos fallidos
+        // 4. Verificar si la cuenta está bloqueada por múltiples intentos fallidos
         if (SecurityManager.estaBloqueada(emailOUsuario)) {
             int minutosRestantes = SecurityManager.obtenerTiempoBloqueoRestante(emailOUsuario);
             System.err.println("🚨 SEGURIDAD: Intento de login con cuenta bloqueada: " + emailOUsuario);
@@ -119,6 +154,31 @@ public class LoginServlet extends HttpServlet {
         Usuario usuario = usuarioDAO.autenticarUsuario(emailOUsuario.trim(), password.trim());
 
         if (usuario != null && usuario.isActivo()) {
+            // ========== VALIDAR ACTIVACIÓN DE CUENTA ==========
+            // Solo validar activación si la cuenta fue creada después de implementar el sistema de activación
+            // Si cuenta_activada es false pero el usuario es antiguo (sin fecha_activacion), permitir login
+            if (!usuario.isCuentaActivada()) {
+                // Verificar si es un usuario antiguo (creado antes del sistema de activación)
+                // Si fecha_activacion es NULL, es un usuario antiguo y se permite el login
+                java.sql.Timestamp fechaActivacion = usuario.getFechaActivacion();
+                if (fechaActivacion == null) {
+                    // Usuario antiguo sin fecha_activacion - activar automáticamente y permitir login
+                    System.out.println("ℹ Usuario antiguo detectado - activando cuenta automáticamente: " + usuario.getEmail());
+                    usuarioDAO.actualizarEstadoActivacion(usuario.getIdUsuario(), true);
+                    // Continuar con el login normalmente
+                } else {
+                    // Usuario nuevo con fecha_activacion pero cuenta no activada - bloquear
+                    System.err.println("⚠ SEGURIDAD: Intento de login con cuenta no activada - Usuario ID " + 
+                                     usuario.getIdUsuario() + " desde " + request.getRemoteAddr());
+                    
+                    request.setAttribute("errorMsg", 
+                        "Tu cuenta no ha sido activada. Por favor, revisa tu correo electrónico y haz clic en el enlace de activación. " +
+                        "Si no recibiste el correo, contacta al administrador.");
+                    generarTokenYMostrarLogin(request, response);
+                    return;
+                }
+            }
+            
             // ========== LOGIN EXITOSO ==========
             
             // Verificar ANTES de crear sesión si el usuario ya tiene una sesión activa
@@ -185,6 +245,15 @@ public class LoginServlet extends HttpServlet {
             System.out.println("✓ Login exitoso: Usuario ID " + usuario.getIdUsuario() + 
                              " (" + usuario.getEmail() + ") desde " + request.getRemoteAddr());
             
+            // Registrar login exitoso en auditoría
+            AuditoriaService.registrarAccion(
+                usuario,
+                AuditoriaService.ACCION_LOGIN,
+                AuditoriaService.MODULO_SEGURIDAD,
+                "Login exitoso desde IP: " + request.getRemoteAddr(),
+                request
+            );
+            
             redirigirSegunRol(request, response, usuario.getRol().getNombre());
         } else {
             // ========== LOGIN FALLIDO ==========
@@ -205,6 +274,19 @@ public class LoginServlet extends HttpServlet {
             
             System.err.println("⚠ SEGURIDAD: Intento de login fallido para: " + emailOUsuario + 
                              " desde " + request.getRemoteAddr());
+            
+            // Registrar intento de login fallido en auditoría (sin usuario, ya que no se autenticó)
+            AuditoriaService.registrarAccion(
+                null, // Usuario no autenticado
+                AuditoriaService.ACCION_LOGIN,
+                AuditoriaService.MODULO_SEGURIDAD,
+                "Intento de login fallido para: " + emailOUsuario + " desde IP: " + request.getRemoteAddr(),
+                null,
+                null,
+                "FALLIDO",
+                "Credenciales incorrectas o usuario inactivo",
+                request
+            );
             
             request.setAttribute("errorMsg", mensajeError);
             generarTokenYMostrarLogin(request, response);
@@ -233,18 +315,98 @@ public class LoginServlet extends HttpServlet {
                 break;
             case "logística":
             case "logistica":
-                // Corregido: Redirigir al servlet de inventario, que es la página principal de logística
-                response.sendRedirect(contextPath + "/InventarioServlet");
+                // Redirigir al dashboard logístico
+                response.sendRedirect(contextPath + "/logistica/DashboardLogisticaServlet");
                 break;
             case "almacenero":
                 response.sendRedirect(contextPath + "/almacen/index.jsp");
                 break;
             case "productor":
-                response.sendRedirect(contextPath + "/productor/index.jsp");
+                response.sendRedirect(contextPath + "/productor/DashboardProductorServlet");
                 break;
             default:
                 response.sendRedirect(contextPath + "/acceso/login");
                 break;
+        }
+    }
+    
+    /**
+     * Verifica el token de reCAPTCHA con Google.
+     * 
+     * @param recaptchaResponse Token de respuesta de reCAPTCHA
+     * @return true si el token es válido, false en caso contrario
+     */
+    private boolean verificarRecaptcha(String recaptchaResponse) {
+        if (recaptchaResponse == null || recaptchaResponse.isEmpty()) {
+            return false;
+        }
+        
+        try {
+            HttpClient client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(10))
+                    .build();
+            
+            String params = "secret=" + RECAPTCHA_SECRET_KEY + "&response=" + recaptchaResponse;
+            
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(RECAPTCHA_VERIFY_URL))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString(params))
+                    .build();
+            
+            HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            
+            ObjectMapper mapper = new ObjectMapper();
+            RecaptchaResponse jsonResponse = mapper.readValue(httpResponse.body(), RecaptchaResponse.class);
+            
+            return jsonResponse.isSuccess();
+            
+        } catch (Exception e) {
+            System.err.println("Error al verificar reCAPTCHA: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Clase interna para mapear la respuesta de reCAPTCHA.
+     */
+    public static class RecaptchaResponse {
+        private boolean success;
+        private String challenge_ts;
+        private String hostname;
+        private String[] errorCodes;
+        
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
+        public String getChallenge_ts() {
+            return challenge_ts;
+        }
+        
+        public void setChallenge_ts(String challenge_ts) {
+            this.challenge_ts = challenge_ts;
+        }
+        
+        public String getHostname() {
+            return hostname;
+        }
+        
+        public void setHostname(String hostname) {
+            this.hostname = hostname;
+        }
+        
+        public String[] getErrorCodes() {
+            return errorCodes;
+        }
+        
+        public void setErrorCodes(String[] errorCodes) {
+            this.errorCodes = errorCodes;
         }
     }
 }

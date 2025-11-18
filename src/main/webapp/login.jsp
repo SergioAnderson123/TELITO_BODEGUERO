@@ -42,12 +42,14 @@
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 40px;
+            padding: 45px 50px;
             width: 100%;
-            max-width: 450px;
+            max-width: 520px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             position: relative;
             z-index: 2;
+            transform: scale(0.9);
+            transform-origin: center center;
         }
 
         .login-header {
@@ -94,21 +96,86 @@
         .form-floating .form-control {
             border: 2px solid #e9ecef;
             border-radius: 12px;
-            padding: 1rem 0.75rem;
+            padding: 0.875rem 1rem 0.875rem 3rem;
             font-size: 1rem;
             transition: all 0.3s ease;
             box-sizing: border-box;
             width: 100%;
+            min-height: 58px;
+            line-height: 1.5;
+            vertical-align: middle;
         }
+        
 
         .form-floating .form-control:focus {
             border-color: var(--secondary-color);
             box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
         }
 
+        .form-floating {
+            position: relative;
+        }
+        
         .form-floating label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding: 0.875rem 1rem 0.875rem 3rem;
+            pointer-events: none;
+            border: 2px solid transparent;
+            transform-origin: 0 0;
+            transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
             color: #6c757d;
             font-weight: 500;
+            opacity: 0.65;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-floating .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            z-index: 3;
+            pointer-events: none;
+            transition: color 0.3s ease;
+            font-size: 1rem;
+            line-height: 1;
+            margin-top: 0;
+        }
+        
+        .form-floating .form-control:focus ~ .input-icon,
+        .form-floating.focused .input-icon {
+            color: var(--secondary-color);
+        }
+        
+        /* Ocultar label cuando hay placeholder visible o cuando el input tiene valor */
+        .form-floating .form-control:focus ~ label,
+        .form-floating .form-control:not(:placeholder-shown) ~ label {
+            opacity: 0;
+            transform: scale(1) translateY(0) translateX(0);
+        }
+        
+        /* Mostrar placeholder solo cuando el input está vacío */
+        .form-floating .form-control::placeholder {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .form-floating .form-control:placeholder-shown::placeholder {
+            opacity: 0.7;
+        }
+        
+        .form-floating .form-control:not(:placeholder-shown)::placeholder {
+            opacity: 0;
         }
 
         .btn-login {
@@ -225,8 +292,9 @@
         /* Responsive */
         @media (max-width: 576px) {
             .login-card {
-                padding: 30px 20px;
+                padding: 35px 25px;
                 margin: 10px;
+                max-width: 100%;
             }
 
             .login-header .logo {
@@ -240,12 +308,26 @@
             /* Ajustar inputs para móvil */
             .form-floating .form-control {
                 font-size: 16px; /* Previene zoom en iOS */
-                padding: 0.75rem 0.5rem;
+                padding: 0.875rem 0.75rem 0.875rem 2.75rem;
+                min-height: 54px;
+                line-height: 1.5;
+                vertical-align: middle;
+            }
+            
+            .form-floating label {
+                padding: 0.875rem 0.75rem 0.875rem 2.75rem;
+                line-height: 54px;
+                display: block;
+            }
+            
+            .form-floating .input-icon {
+                left: 0.75rem;
             }
             
             .form-floating label {
                 font-size: 0.85rem;
-                padding: 0.75rem 0.5rem;
+                padding: 0.875rem 0.75rem 0.875rem 2.75rem;
+                max-width: 100%;
             }
             
             /* Asegurar que el texto no se salga */
@@ -254,12 +336,36 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
+            
+            small.text-muted {
+                font-size: 0.8rem !important;
+            }
+        }
+        
+        @media (min-width: 577px) and (max-width: 768px) {
+            .login-card {
+                max-width: 480px;
+                padding: 40px 35px;
+            }
         }
     </style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        .recaptcha-center {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .recaptcha-center .g-recaptcha {
+            display: inline-block;
+        }
+    </style>
+    
+    <script src="https://www.google.com/recaptcha/api.js?hl=es" async defer></script>
 </head>
 <body>
 
@@ -297,13 +403,31 @@
             <input type="hidden" name="csrfToken" value="<%= request.getAttribute("csrfToken") != null ? request.getAttribute("csrfToken") : "" %>">
 
             <div class="form-floating">
-                <input type="text" class="form-control" id="email" name="email" placeholder="Correo electrónico o nombre de usuario" required autocomplete="username">
-                <label for="email"><i class="fas fa-user me-2"></i>Correo electrónico o nombre de usuario</label>
+                <i class="fas fa-user input-icon"></i>
+                <input type="text" class="form-control" id="email" name="email" placeholder="Usuario, email o código productor" required autocomplete="username">
+                <label for="email">Usuario, email o código productor</label>
             </div>
+            <small class="text-muted d-block mb-3" style="font-size: 0.85rem; line-height: 1.4;">
+                <i class="fas fa-info-circle me-1"></i>
+                Los productores pueden usar su código (ej: PROD-0001) para iniciar sesión
+            </small>
 
             <div class="form-floating">
+                <i class="fas fa-lock input-icon"></i>
                 <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required autocomplete="current-password">
-                <label for="password"><i class="fas fa-lock me-2"></i>Contraseña</label>
+                <label for="password">Contraseña</label>
+            </div>
+            
+            <div class="text-end mb-3">
+                <a href="<%= request.getContextPath() %>/acceso/recuperar?action=solicitar" 
+                   style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem;">
+                    <i class="fas fa-key me-1"></i>¿Olvidaste tu contraseña?
+                </a>
+            </div>
+            
+            <!-- reCAPTCHA -->
+            <div class="recaptcha-center mb-3">
+                <div class="g-recaptcha" data-sitekey="6LdmmuwrAAAAAPw7fxE3ytKndbsfpk-Fx17seA-G"></div>
             </div>
 
             <button type="submit" class="btn btn-login" id="btnLogin">
@@ -357,13 +481,27 @@
                 passwordInput.classList.add('is-invalid');
                 isValid = false;
             }
-
-            if (!isValid) {
-                e.preventDefault();
+            
+            // Validar reCAPTCHA
+            const recaptchaResponse = grecaptcha.getResponse();
+            if (!recaptchaResponse || recaptchaResponse.length === 0) {
+                isValid = false;
                 if (errorAlert) {
                     const errorMessageText = document.getElementById('errorMessageText');
                     if (errorMessageText) {
-                        errorMessageText.textContent = 'Por favor, complete todos los campos.';
+                        errorMessageText.textContent = 'Por favor, completa la verificación reCAPTCHA.';
+                    }
+                    errorAlert.style.display = 'block';
+                    errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                if (errorAlert && !errorAlert.style.display || errorAlert.style.display === 'none') {
+                    const errorMessageText = document.getElementById('errorMessageText');
+                    if (errorMessageText && !errorMessageText.textContent) {
+                        errorMessageText.textContent = 'Por favor, complete todos los campos y la verificación reCAPTCHA.';
                     }
                     errorAlert.style.display = 'block';
                     errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -383,6 +521,11 @@
                     this.parentElement.classList.remove('focused');
                 }
             });
+            
+            // Manejar el estado cuando hay valor
+            if (input.value) {
+                input.parentElement.classList.add('focused');
+            }
         });
 
         // --- 2. CÓDIGO DE PARTÍCULAS (Limpio) ---

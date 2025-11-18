@@ -35,4 +35,35 @@ public class UbicacionDao extends DAOBase {
         }
         return lista;
     }
+    
+    /**
+     * Verifica si existe una ubicación con el nombre especificado.
+     * @param nombre Nombre de la ubicación
+     * @return true si existe, false en caso contrario
+     */
+    public boolean existeUbicacionPorNombre(String nombre) {
+        String sql = "SELECT COUNT(*) FROM ubicaciones WHERE nombre = ?";
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, nombre);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            logger.error("Error al verificar existencia de ubicación por nombre: " + nombre, e);
+            throw new RuntimeException("Error al verificar existencia de ubicación", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return false;
+    }
 }

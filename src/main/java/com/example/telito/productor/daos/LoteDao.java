@@ -63,11 +63,11 @@ public class LoteDao extends DAOBase {
      * Ahora requiere los IDs de ubicación y distrito.
      */
     public boolean registrarLote(String codigoLote, int productoId, int cantidadStock,
-                                 String fechaCaducidad, int ubicacionId, int distritoId) {
+                                 String fechaCaducidad, int ubicacionId, int distritoId, Double costoProduccion) {
 
-        // Se añaden las columnas 'distrito_id' y 'estado' al INSERT
-        String sql = "INSERT INTO lotes (codigo_lote, producto_id, stock_actual, fecha_vencimiento, ubicacion_id, distrito_id, estado) " +
-                "VALUES (?, ?, ?, ?, ?, ?, 'No Registrado')";
+        // Se añaden las columnas 'distrito_id', 'estado' y 'costo_produccion' al INSERT
+        String sql = "INSERT INTO lotes (codigo_lote, producto_id, stock_actual, fecha_vencimiento, ubicacion_id, distrito_id, estado, costo_produccion) " +
+                "VALUES (?, ?, ?, ?, ?, ?, 'No Registrado', ?)";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -87,6 +87,12 @@ public class LoteDao extends DAOBase {
 
             pstmt.setInt(5, ubicacionId);
             pstmt.setInt(6, distritoId);
+            
+            if (costoProduccion != null) {
+                pstmt.setDouble(7, costoProduccion);
+            } else {
+                pstmt.setNull(7, java.sql.Types.DECIMAL);
+            }
 
             int filasAfectadas = pstmt.executeUpdate();
             return filasAfectadas > 0;
@@ -105,7 +111,7 @@ public class LoteDao extends DAOBase {
      * resuelve los IDs internamente y registra el lote.
      */
     public boolean registrarLote(String codigoLote, String skuProducto, int cantidadStock,
-                                 String fechaCaducidad, String distritoNombre) {
+                                 String fechaCaducidad, String distritoNombre, Double costoProduccion) {
         
         int productoId = obtenerIdProductoPorSKU(skuProducto);
         if (productoId == 0) {
@@ -132,7 +138,7 @@ public class LoteDao extends DAOBase {
             return false;
         }
 
-        String sql = "INSERT INTO lotes (codigo_lote, producto_id, ubicacion_id, stock_actual, fecha_vencimiento, estado, distrito_id) VALUES (?, ?, ?, ?, ?, 'No Registrado', ?)";
+        String sql = "INSERT INTO lotes (codigo_lote, producto_id, ubicacion_id, stock_actual, fecha_vencimiento, estado, distrito_id, costo_produccion) VALUES (?, ?, ?, ?, ?, 'No Registrado', ?, ?)";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -167,6 +173,12 @@ public class LoteDao extends DAOBase {
                 pstmt.setNull(5, java.sql.Types.DATE);
             }
             pstmt.setInt(6, distritoId);
+            
+            if (costoProduccion != null) {
+                pstmt.setDouble(7, costoProduccion);
+            } else {
+                pstmt.setNull(7, java.sql.Types.DECIMAL);
+            }
 
             int rowsAffected = pstmt.executeUpdate();
             logger.info("Lote registrado: {} filas insertadas", rowsAffected);
@@ -206,25 +218,35 @@ public class LoteDao extends DAOBase {
         }
 
         if (distritoId == 0) {
-            // Si no existe, usar zona_id = 5 (Centro) por defecto
-            String sqlInsert = "INSERT INTO distritos (nombre, zona_id) VALUES (?, 5)";
-            conn = null;
-            pstmt = null;
-            rs = null;
-
+            // Si no existe, intentar usar "Cercado de Lima" como fallback (zona Oeste = 4)
+            // Si el nombre solicitado es "Cercado", buscar "Cercado de Lima" en su lugar
+            String distritoFallback = "Cercado".equalsIgnoreCase(nombreDistrito) ? "Cercado de Lima" : nombreDistrito;
+            
+            String sqlSelectFallback = "SELECT idDistrito FROM distritos WHERE nombre = ?";
             try {
                 conn = getConnection();
-                pstmt = conn.prepareStatement(sqlInsert, PreparedStatement.RETURN_GENERATED_KEYS);
-                pstmt.setString(1, nombreDistrito);
-                if (pstmt.executeUpdate() > 0) {
-                    rs = pstmt.getGeneratedKeys();
+                pstmt = conn.prepareStatement(sqlSelectFallback);
+                pstmt.setString(1, distritoFallback);
+                rs = pstmt.executeQuery();
+                
+                if (rs.next()) {
+                    distritoId = rs.getInt("idDistrito");
+                    logger.info("Distrito fallback encontrado: {} (ID: {}) en lugar de {}", distritoFallback, distritoId, nombreDistrito);
+                } else {
+                    // Si tampoco existe el fallback, usar "Cercado de Lima" como último recurso (zona Oeste = 4)
+                    String sqlSelectDefault = "SELECT idDistrito FROM distritos WHERE nombre = 'Cercado de Lima'";
+                    pstmt = conn.prepareStatement(sqlSelectDefault);
+                    rs = pstmt.executeQuery();
+                    
                     if (rs.next()) {
-                        distritoId = rs.getInt(1);
-                        logger.info("Distrito creado: {} (ID: {}, zona_id: 5)", nombreDistrito, distritoId);
+                        distritoId = rs.getInt("idDistrito");
+                        logger.warn("Distrito '{}' no encontrado. Usando 'Cercado de Lima' (ID: {}) como distrito por defecto", nombreDistrito, distritoId);
+                    } else {
+                        logger.error("No se pudo encontrar ningún distrito válido. '{}' no existe y 'Cercado de Lima' tampoco está disponible.", nombreDistrito);
                     }
                 }
             } catch (SQLException e) {
-                logger.error("Error al crear distrito: " + nombreDistrito, e);
+                logger.error("Error al buscar distrito fallback: " + nombreDistrito, e);
             } finally {
                 closeResultSet(rs);
                 closePreparedStatement(pstmt);
@@ -355,9 +377,16 @@ public class LoteDao extends DAOBase {
 
     // --- EL RESTO DE MÉTODOS NO NECESITAN CAMBIOS ---
 
-    public String obtenerNombreProductoPorSKU(String sku) {
+    /**
+     * Obtiene el nombre de un producto por SKU, pero SOLO si pertenece al productor especificado.
+     * Esto previene que un productor vea productos de otros productores.
+     * @param sku Código SKU del producto
+     * @param productorId ID del productor (debe ser el dueño del producto)
+     * @return Nombre del producto si existe y pertenece al productor, null en caso contrario
+     */
+    public String obtenerNombreProductoPorSKU(String sku, int productorId) {
         String nombreProducto = null;
-        String sql = "SELECT nombre FROM productos WHERE UPPER(codigo_sku) = UPPER(?)";
+        String sql = "SELECT nombre FROM productos WHERE UPPER(codigo_sku) = UPPER(?) AND productor_id = ? AND activo = 1";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -367,6 +396,7 @@ public class LoteDao extends DAOBase {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, (sku == null) ? null : sku.trim());
+            pstmt.setInt(2, productorId);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
@@ -453,13 +483,20 @@ public class LoteDao extends DAOBase {
      * @param productoId ID del producto
      * @return Lista de arrays con los datos de cada lote
      */
-    public List<Object[]> obtenerLotesDisponiblesParaProducto(int productoId) {
+    /**
+     * Obtiene los lotes disponibles para un producto, pero SOLO si el producto pertenece al productor especificado.
+     * Esto previene que un productor vea o modifique lotes de productos de otros productores.
+     * @param productoId ID del producto
+     * @param productorId ID del productor (debe ser el dueño del producto)
+     * @return Lista de lotes disponibles si el producto pertenece al productor, lista vacía en caso contrario
+     */
+    public List<Object[]> obtenerLotesDisponiblesParaProducto(int productoId, int productorId) {
         List<Object[]> lotes = new ArrayList<>();
         String sql = "SELECT l.id_lote, l.codigo_lote, p.codigo_sku, p.nombre AS producto_nombre, " +
                      "l.stock_actual, p.unidades_por_paquete, l.fecha_vencimiento " +
                      "FROM lotes l " +
                      "INNER JOIN productos p ON l.producto_id = p.id_producto " +
-                     "WHERE l.producto_id = ? AND l.stock_actual > 0 " +
+                     "WHERE l.producto_id = ? AND p.productor_id = ? AND p.activo = 1 AND l.stock_actual > 0 " +
                      "ORDER BY l.fecha_vencimiento ASC";
 
         Connection conn = null;
@@ -470,6 +507,7 @@ public class LoteDao extends DAOBase {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, productoId);
+            pstmt.setInt(2, productorId);
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -500,15 +538,17 @@ public class LoteDao extends DAOBase {
     }
     
     /**
-     * Busca un lote por su ID y retorna su información
+     * Busca un lote por su ID y retorna su información, pero SOLO si el lote pertenece a un producto del productor especificado.
+     * Esto previene que un productor vea o modifique lotes de productos de otros productores.
      * @param idLote ID del lote
-     * @return Array con [id_lote, codigo_lote, producto_id, stock_actual, unidades_por_paquete] o null si no existe
+     * @param productorId ID del productor (debe ser el dueño del producto al que pertenece el lote)
+     * @return Array con [id_lote, codigo_lote, producto_id, stock_actual, unidades_por_paquete] o null si no existe o no pertenece al productor
      */
-    public Object[] buscarLotePorId(int idLote) {
+    public Object[] buscarLotePorId(int idLote, int productorId) {
         String sql = "SELECT l.id_lote, l.codigo_lote, l.producto_id, l.stock_actual, p.unidades_por_paquete " +
                      "FROM lotes l " +
                      "INNER JOIN productos p ON l.producto_id = p.id_producto " +
-                     "WHERE l.id_lote = ?";
+                     "WHERE l.id_lote = ? AND p.productor_id = ? AND p.activo = 1";
         
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -518,6 +558,7 @@ public class LoteDao extends DAOBase {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, idLote);
+            pstmt.setInt(2, productorId);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
@@ -539,16 +580,21 @@ public class LoteDao extends DAOBase {
     }
     
     /**
-     * Actualiza el stock de un lote
+     * Actualiza el stock de un lote, pero SOLO si el lote pertenece a un producto del productor especificado.
+     * Esto previene que un productor modifique lotes de productos de otros productores.
      * @param idLote ID del lote
      * @param nuevoStock Nuevo stock (en unidades)
-     * @return true si se actualizó correctamente
+     * @param productorId ID del productor (debe ser el dueño del producto al que pertenece el lote)
+     * @return true si se actualizó correctamente, false si el lote no pertenece al productor
      */
-    public boolean actualizarStock(int idLote, int nuevoStock) {
-        String sql = "UPDATE lotes SET stock_actual = ? WHERE id_lote = ?";
+    public boolean actualizarStock(int idLote, int nuevoStock, int productorId) {
+        String sql = "UPDATE lotes l " +
+                     "INNER JOIN productos p ON l.producto_id = p.id_producto " +
+                     "SET l.stock_actual = ? " +
+                     "WHERE l.id_lote = ? AND p.productor_id = ? AND p.activo = 1";
         
-        int filasAfectadas = executeUpdate(sql, nuevoStock, idLote);
-        logger.info("Stock del lote {} actualizado a {} unidades", idLote, nuevoStock);
+        int filasAfectadas = executeUpdate(sql, nuevoStock, idLote, productorId);
+        logger.info("Stock del lote {} actualizado a {} unidades (productor: {})", idLote, nuevoStock, productorId);
         return filasAfectadas > 0;
     }
     

@@ -22,54 +22,62 @@
                 <!-- Encabezado -->
                 <div class="row">
                     <div class="col-12">
-                        <div class="page-header">
-                            <h2><i class="fas fa-truck-loading me-2"></i>Crear Nuevo Vehículo</h2>
-                            <p class="text-muted">Ingresa los datos del vehículo.</p>
+                        <div class="page-header mb-4">
+                            <h2 class="pageheader-title"><i class="fas fa-truck-loading me-2"></i>Crear Nuevo Vehículo</h2>
+                            <p class="pageheader-text">Ingresa los datos del vehículo.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Formulario -->
                 <div class="row">
-                    <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Datos del Vehículo</h5>
+                    <div class="col-xl-8 col-lg-10 col-md-12 col-sm-12 col-12 mx-auto">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-gradient-primary text-white mb-4" style="background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%); border-radius: 12px 12px 0 0; margin: -30px -30px 30px -30px; padding: 25px 30px;">
+                                <h5 class="mb-0"><i class="fas fa-truck me-2"></i>Datos del Vehículo</h5>
+                                <small class="text-white-50">Complete todos los campos obligatorios marcados con <span class="text-white">*</span></small>
                             </div>
                             <div class="card-body">
                                 <form method="POST" action="${pageContext.request.contextPath}/administrador/VehiculoServlet">
                                     <input type="hidden" name="action" value="guardar">
 
-                                    <div class="mb-3">
-                                        <label for="placa" class="form-label">Placa <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="placa" name="placa" required 
+                                    <div class="mb-4">
+                                        <label for="placa" class="form-label fw-semibold">
+                                            <i class="fas fa-id-card text-primary me-2"></i>Placa <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control shadow-sm" id="placa" name="placa" required 
                                                placeholder="Ej: ABC123">
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label for="marca" class="form-label">Marca</label>
-                                        <input type="text" class="form-control" id="marca" name="marca" 
+                                    <div class="mb-4">
+                                        <label for="marca" class="form-label fw-semibold">
+                                            <i class="fas fa-industry text-primary me-2"></i>Marca
+                                        </label>
+                                        <input type="text" class="form-control shadow-sm" id="marca" name="marca" 
                                                placeholder="Ej: Toyota, Nissan">
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label for="modelo" class="form-label">Modelo</label>
-                                        <input type="text" class="form-control" id="modelo" name="modelo" 
+                                    <div class="mb-4">
+                                        <label for="modelo" class="form-label fw-semibold">
+                                            <i class="fas fa-car text-primary me-2"></i>Modelo
+                                        </label>
+                                        <input type="text" class="form-control shadow-sm" id="modelo" name="modelo" 
                                                placeholder="Ej: Hiace, NV350">
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label for="capacidadKg" class="form-label">Capacidad (Kg) <span class="text-danger">*</span></label>
-                                        <input type="number" class="form-control" id="capacidadKg" name="capacidadKg" required 
+                                    <div class="mb-4">
+                                        <label for="capacidadKg" class="form-label fw-semibold">
+                                            <i class="fas fa-weight text-primary me-2"></i>Capacidad (Kg) <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="number" class="form-control shadow-sm" id="capacidadKg" name="capacidadKg" required 
                                                min="0" placeholder="Ej: 2500">
                                     </div>
 
-                                    <hr>
-                                    <div class="d-flex justify-content-end">
-                                        <a href="${pageContext.request.contextPath}/administrador/VehiculoServlet" class="btn btn-secondary me-2">
-                                            Cancelar
+                                    <div class="mt-5 pt-4 border-top d-flex justify-content-between align-items-center">
+                                        <a href="${pageContext.request.contextPath}/administrador/VehiculoServlet" class="btn btn-outline-secondary shadow-sm">
+                                            <i class="fas fa-times me-2"></i>Cancelar
                                         </a>
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary shadow-sm px-4">
                                             <i class="fas fa-save me-2"></i>Guardar Vehículo
                                         </button>
                                     </div>

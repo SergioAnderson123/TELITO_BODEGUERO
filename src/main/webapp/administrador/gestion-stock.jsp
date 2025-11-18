@@ -39,22 +39,31 @@
 
   <main class="content" id="content">
       <div class="page-header mb-4">
-        <h2 class="pageheader-title" style="font-weight: 700;">Configurar Stock Mínimo</h2>
+        <h2 class="pageheader-title"><i class="fas fa-triangle-exclamation me-2"></i>Configurar Stock Mínimo</h2>
         <p class="pageheader-text">Define el umbral de stock para generar alertas de inventario.</p>
       </div>
 
       <div class="row">
           <div class="col-12">
-              <div class="table-card">
+              <div class="table-card shadow-sm">
                   <div class="card-header">
-                      <h5 class="mb-0 fw-semibold">Stock Mínimo por Producto</h5>
+                      <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                              <h5 class="mb-0 fw-semibold"><i class="fas fa-list me-2"></i>Stock Mínimo por Producto</h5>
+                              <small class="text-white-50">Configura los umbrales de stock mínimo</small>
+                          </div>
+                      </div>
                   </div>
                   <div class="card-body">
                       <form action="<%= request.getContextPath() %>/ProductoServlet?action=guardarStock" method="POST">
                           <div class="table-responsive">
-                              <table class="table table-hover align-middle">
-                                  <thead>
-                                      <tr><th>SKU</th><th>Nombre del Producto</th><th style="width: 150px;">Stock Mínimo</th></tr>
+                              <table class="table table-hover align-middle mb-0">
+                                  <thead class="table-light">
+                                      <tr>
+                                          <th><i class="fas fa-barcode me-1"></i>SKU</th>
+                                          <th><i class="fas fa-box me-1"></i>Nombre del Producto</th>
+                                          <th style="width: 200px;"><i class="fas fa-exclamation-triangle me-1"></i>Stock Mínimo</th>
+                                      </tr>
                                   </thead>
                                   <tbody>
                                   <% if (listaProductos != null && !listaProductos.isEmpty()) { %>
@@ -64,7 +73,7 @@
                                           <td><%= producto.getNombre() %></td>
                                           <td>
                                               <input type="hidden" name="productoId" value="<%= producto.getIdProducto() %>">
-                                              <input type="number" class="form-control form-control-sm stock-input"
+                                              <input type="number" class="form-control form-control-sm shadow-sm stock-input"
                                                      name="stockMinimo_<%= producto.getIdProducto() %>"
                                                      value="<%= producto.getStockMinimo() %>"
                                                      min="0">
@@ -77,8 +86,8 @@
                                   </tbody>
                               </table>
                           </div>
-                          <div class="d-flex justify-content-end mt-3">
-                              <button type="submit" class="btn btn-primary">
+                          <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                              <button type="submit" class="btn btn-primary shadow-sm px-4">
                                   <i class="fas fa-save me-2"></i>Guardar Todos los Cambios
                               </button>
                           </div>

@@ -180,6 +180,49 @@ public class LoteDao extends DAOBase {
         }
         return lote;
     }
+    
+    /**
+     * Busca un lote por su código.
+     */
+    public Lote buscarLotePorCodigo(String codigoLote) {
+        Lote lote = null;
+        String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, l.estado, " +
+                "l.producto_id, l.ubicacion_id, l.distrito_id, " +
+                "p.nombre AS nombre_producto " +
+                "FROM lotes l " +
+                "INNER JOIN productos p ON l.producto_id = p.id_producto " +
+                "WHERE l.codigo_lote = ?";
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, codigoLote);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                lote = new Lote();
+                lote.setIdLote(rs.getInt("id_lote"));
+                lote.setCodigoLote(rs.getString("codigo_lote"));
+                lote.setStockActual(rs.getInt("stock_actual"));
+                lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
+                lote.setEstado(rs.getString("estado"));
+                lote.setProductoId(rs.getInt("producto_id"));
+                lote.setUbicacionId(rs.getInt("ubicacion_id"));
+                lote.setDistritoId(rs.getInt("distrito_id"));
+                lote.setNombreProducto(rs.getString("nombre_producto"));
+            }
+        } catch (SQLException e) {
+            logger.error("Error al buscar lote por código: " + codigoLote, e);
+            throw new RuntimeException("Error al buscar lote por código", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return lote;
+    }
 
     public int crearLote(Lote lote) {
         // CORRECCIÓN: Se añade la columna 'estado' a la consulta

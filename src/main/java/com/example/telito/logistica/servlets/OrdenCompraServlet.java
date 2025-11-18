@@ -8,23 +8,28 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import com.example.telito.logistica.beans.DistritoBean;
 import com.example.telito.logistica.beans.OrdenCompraBean;
 import com.example.telito.logistica.beans.ProductoBean;
-import com.example.telito.logistica.beans.DistritoBean;
+import com.example.telito.logistica.beans.ProveedorBean;
+import com.example.telito.logistica.beans.ZonaBean;
+import com.example.telito.logistica.daos.DistritoDao;
 import com.example.telito.logistica.daos.OrdenCompraDao;
 import com.example.telito.logistica.daos.ProductoDao;
 import com.example.telito.logistica.daos.ProveedorDao;
 import com.example.telito.logistica.daos.ZonaDao;
-import com.example.telito.logistica.daos.DistritoDao;
 import com.example.telito.administrador.daos.UsuarioDAO;
 import com.example.telito.administrador.daos.AlertaDAO;
 import com.example.telito.util.EmailUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 @WebServlet(name = "OrdenCompraServlet", value = "/orden-compra")
 public class OrdenCompraServlet extends HttpServlet {
+    private static final Logger logger = Logger.getLogger(OrdenCompraServlet.class.getName());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -108,7 +113,7 @@ public class OrdenCompraServlet extends HttpServlet {
                 break;
                 
             case "obtenerProductosPorProductor":
-                // Endpoint JSON: obtener productos de un productor
+                // Endpoint JSON: obtener productos de un productor (mantener para compatibilidad)
                 int productorId = Integer.parseInt(request.getParameter("productorId"));
                 ArrayList<ProductoBean> productos = productoDao.listarProductosPorProductor(productorId);
                 
@@ -130,6 +135,155 @@ public class OrdenCompraServlet extends HttpServlet {
                 json.append("]");
                 
                 response.getWriter().write(json.toString());
+                return;
+                
+            case "buscarProductos":
+                // Endpoint JSON: buscar productos de un productor con autocompletado
+                try {
+                    int productorIdBusqueda = Integer.parseInt(request.getParameter("productorId"));
+                    String busquedaProducto = request.getParameter("busqueda");
+                    
+                    if (productorIdBusqueda <= 0) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"error\":\"ID de productor inválido\"}");
+                        return;
+                    }
+                    
+                    ArrayList<ProductoBean> productosBusqueda = productoDao.buscarProductosPorProductor(
+                        productorIdBusqueda, 
+                        busquedaProducto != null ? busquedaProducto : "", 
+                        20
+                    );
+                    
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    
+                    // Construir JSON manualmente
+                    StringBuilder jsonBusqueda = new StringBuilder("[");
+                    for (int i = 0; i < productosBusqueda.size(); i++) {
+                        ProductoBean p = productosBusqueda.get(i);
+                        if (i > 0) jsonBusqueda.append(",");
+                        double precio = p.getPrecio() != null ? p.getPrecio().doubleValue() : 0.0;
+                        jsonBusqueda.append("{")
+                            .append("\"id\":").append(p.getId()).append(",")
+                            .append("\"codigo\":\"").append(p.getCodigo() != null ? p.getCodigo().replace("\"", "\\\"").replace("\\", "\\\\") : "").append("\",")
+                            .append("\"nombre\":\"").append(p.getNombre() != null ? p.getNombre().replace("\"", "\\\"").replace("\\", "\\\\") : "").append("\",")
+                            .append("\"precio\":").append(precio).append(",")
+                            .append("\"unidades_por_paquete\":").append(p.getUnidadesPorPaquete())
+                            .append("}");
+                    }
+                    jsonBusqueda.append("]");
+                    
+                    response.getWriter().write(jsonBusqueda.toString());
+                } catch (NumberFormatException e) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"ID de productor inválido\"}");
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Error al buscar productos", e);
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"Error al buscar productos: " + e.getMessage().replace("\"", "\\\"") + "\"}");
+                }
+                return;
+                
+            case "buscarProductores":
+                // Endpoint JSON: buscar productores con autocompletado
+                try {
+                    String busquedaProductor = request.getParameter("busqueda");
+                    ArrayList<ProveedorBean> productoresBusqueda = proveedorDao.buscarProductores(
+                        busquedaProductor != null ? busquedaProductor : "", 
+                        20
+                    );
+                    
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    
+                    StringBuilder jsonProductores = new StringBuilder("[");
+                    for (int i = 0; i < productoresBusqueda.size(); i++) {
+                        ProveedorBean p = productoresBusqueda.get(i);
+                        if (i > 0) jsonProductores.append(",");
+                        jsonProductores.append("{")
+                            .append("\"id\":").append(p.getId()).append(",")
+                            .append("\"nombre\":\"").append(p.getNombre() != null ? p.getNombre().replace("\"", "\\\"").replace("\\", "\\\\") : "").append("\"")
+                            .append("}");
+                    }
+                    jsonProductores.append("]");
+                    
+                    response.getWriter().write(jsonProductores.toString());
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Error al buscar productores", e);
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"Error al buscar productores: " + e.getMessage().replace("\"", "\\\"") + "\"}");
+                }
+                return;
+                
+            case "buscarZonas":
+                // Endpoint JSON: buscar zonas con autocompletado
+                try {
+                    String busquedaZona = request.getParameter("busqueda");
+                    ZonaDao zonaDaoBusqueda = new ZonaDao();
+                    ArrayList<ZonaBean> zonasBusqueda = zonaDaoBusqueda.buscarZonas(
+                        busquedaZona != null ? busquedaZona : "", 
+                        10
+                    );
+                    
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    
+                    StringBuilder jsonZonas = new StringBuilder("[");
+                    for (int i = 0; i < zonasBusqueda.size(); i++) {
+                        ZonaBean z = zonasBusqueda.get(i);
+                        if (i > 0) jsonZonas.append(",");
+                        jsonZonas.append("{")
+                            .append("\"id\":").append(z.getId()).append(",")
+                            .append("\"nombre\":\"").append(z.getNombre() != null ? z.getNombre().replace("\"", "\\\"").replace("\\", "\\\\") : "").append("\"")
+                            .append("}");
+                    }
+                    jsonZonas.append("]");
+                    
+                    response.getWriter().write(jsonZonas.toString());
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Error al buscar zonas", e);
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"Error al buscar zonas: " + e.getMessage().replace("\"", "\\\"") + "\"}");
+                }
+                return;
+                
+            case "buscarDistritos":
+                // Endpoint JSON: buscar distritos con autocompletado
+                try {
+                    String busquedaDistrito = request.getParameter("busqueda");
+                    DistritoDao distritoDao = new DistritoDao();
+                    ArrayList<DistritoBean> distritosBusqueda = distritoDao.buscarDistritos(
+                        busquedaDistrito != null ? busquedaDistrito : "", 
+                        20
+                    );
+                    
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    
+                    StringBuilder jsonDistritos = new StringBuilder("[");
+                    for (int i = 0; i < distritosBusqueda.size(); i++) {
+                        DistritoBean d = distritosBusqueda.get(i);
+                        if (i > 0) jsonDistritos.append(",");
+                        jsonDistritos.append("{")
+                            .append("\"id\":").append(d.getId()).append(",")
+                            .append("\"nombre\":\"").append(d.getNombre() != null ? d.getNombre().replace("\"", "\\\"").replace("\\", "\\\\") : "").append("\"")
+                            .append("}");
+                    }
+                    jsonDistritos.append("]");
+                    
+                    response.getWriter().write(jsonDistritos.toString());
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Error al buscar distritos", e);
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"Error al buscar distritos: " + e.getMessage().replace("\"", "\\\"") + "\"}");
+                }
                 return;
                 
             case "obtenerDistritosPorZona":
