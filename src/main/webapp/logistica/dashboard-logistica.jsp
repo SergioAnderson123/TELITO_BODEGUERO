@@ -53,15 +53,15 @@
                 <!-- Primera fila: Órdenes de Compra -->
                 <div class="row g-2 mb-3">
                     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-warning border-3">
-                            <div class="card-body p-2">
+                        <div class="card stat-card shadow-sm border-start border-warning border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Órdenes Pendientes</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getOrdenesPendientes() %></h2>
-                                        <small class="text-muted">Requieren atención</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Órdenes Pendientes</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getOrdenesPendientes() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Requieren atención</small>
                                     </div>
-                                    <div class="stat-icon text-warning ms-2">
+                                    <div class="stat-icon text-warning ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-file-invoice-dollar"></i>
                                     </div>
                                 </div>
@@ -69,15 +69,15 @@
                         </div>
                     </div>
                     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-info border-3">
-                            <div class="card-body p-2">
+                        <div class="card stat-card shadow-sm border-start border-info border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">En Proceso</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getOrdenesEnProceso() %></h2>
-                                        <small class="text-muted">Órdenes activas</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">En Proceso</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getOrdenesEnProceso() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Órdenes activas</small>
                                     </div>
-                                    <div class="stat-icon text-info ms-2">
+                                    <div class="stat-icon text-info ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-cog"></i>
                                     </div>
                                 </div>
@@ -85,15 +85,15 @@
                         </div>
                     </div>
                     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-success border-3">
-                            <div class="card-body p-2">
+                        <div class="card stat-card shadow-sm border-start border-success border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Recibidas</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getOrdenesRecibidas() %></h2>
-                                        <small class="text-muted">Total: <%= metricas.getTotalOrdenes() %></small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Recibidas</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getOrdenesRecibidas() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Total: <%= metricas.getTotalOrdenes() %></small>
                                     </div>
-                                    <div class="stat-icon text-success ms-2">
+                                    <div class="stat-icon text-success ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-check-circle"></i>
                                     </div>
                                 </div>
@@ -101,15 +101,15 @@
                         </div>
                     </div>
                     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-primary border-3">
-                            <div class="card-body p-2">
+                        <div class="card stat-card shadow-sm border-start border-primary border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Total Órdenes</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getTotalOrdenes() %></h2>
-                                        <small class="text-muted">Todas las órdenes</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Total Órdenes</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getTotalOrdenes() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Todas las órdenes</small>
                                     </div>
-                                    <div class="stat-icon text-primary ms-2">
+                                    <div class="stat-icon text-primary ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-list"></i>
                                     </div>
                                 </div>
@@ -118,18 +118,18 @@
                     </div>
                 </div>
 
-                <!-- Segunda fila: Planes de Transporte -->
+                <!-- Segunda fila: Planes de Transporte y Alertas -->
                 <div class="row g-2 mb-3">
                     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-warning border-3">
-                            <div class="card-body p-2">
+                        <div class="card stat-card shadow-sm border-start border-warning border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Planes Pendientes</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getPlanesPendientes() %></h2>
-                                        <small class="text-muted">Por iniciar</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Planes Pendientes</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getPlanesPendientes() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Por iniciar</small>
                                     </div>
-                                    <div class="stat-icon text-warning ms-2">
+                                    <div class="stat-icon text-warning ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-clock"></i>
                                     </div>
                                 </div>
@@ -137,15 +137,15 @@
                         </div>
                     </div>
                     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-info border-3">
-                            <div class="card-body p-2">
+                        <div class="card stat-card shadow-sm border-start border-info border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">En Ruta</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getPlanesActivos() %></h2>
-                                        <small class="text-muted">Activos ahora</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">En Ruta</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getPlanesActivos() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Activos ahora</small>
                                     </div>
-                                    <div class="stat-icon text-info ms-2">
+                                    <div class="stat-icon text-info ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-truck"></i>
                                     </div>
                                 </div>
@@ -153,15 +153,15 @@
                         </div>
                     </div>
                     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-success border-3">
-                            <div class="card-body p-2">
+                        <div class="card stat-card shadow-sm border-start border-success border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Completados</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getPlanesCompletados() %></h2>
-                                        <small class="text-muted">Total: <%= metricas.getTotalPlanes() %></small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Completados</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getPlanesCompletados() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Total: <%= metricas.getTotalPlanes() %></small>
                                     </div>
-                                    <div class="stat-icon text-success ms-2">
+                                    <div class="stat-icon text-success ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-check-double"></i>
                                     </div>
                                 </div>
@@ -169,67 +169,15 @@
                         </div>
                     </div>
                     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-primary border-3">
-                            <div class="card-body p-2">
+                        <div class="card stat-card shadow-sm border-start border-danger border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Eficiencia</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= String.format("%.1f", metricas.getEficienciaEntregas()) %>%</h2>
-                                        <small class="text-muted">Entregas a tiempo</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Alertas Críticas</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getAlertasCriticas() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Requieren atención</small>
                                     </div>
-                                    <div class="stat-icon text-primary ms-2">
-                                        <i class="fas fa-chart-line"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tercera fila: Movimientos y Alertas -->
-                <div class="row g-2 mb-3">
-                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-info border-3">
-                            <div class="card-body p-2">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Movimientos Hoy</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getMovimientosHoy() %></h2>
-                                        <small class="text-muted">Últimas 24 horas</small>
-                                    </div>
-                                    <div class="stat-icon text-info ms-2">
-                                        <i class="fas fa-exchange-alt"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-primary border-3">
-                            <div class="card-body p-2">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Movimientos Semana</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getMovimientosSemana() %></h2>
-                                        <small class="text-muted">Últimos 7 días</small>
-                                    </div>
-                                    <div class="stat-icon text-primary ms-2">
-                                        <i class="fas fa-calendar-week"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-danger border-3">
-                            <div class="card-body p-2">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Alertas Críticas</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getAlertasCriticas() %></h2>
-                                        <small class="text-muted">Requieren atención</small>
-                                    </div>
-                                    <div class="stat-icon text-danger ms-2">
+                                    <div class="stat-icon text-danger ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-exclamation-triangle"></i>
                                     </div>
                                 </div>
@@ -239,53 +187,55 @@
                 </div>
 
                 <!-- Accesos rápidos -->
-                <div class="row mt-2">
+                <div class="row mt-2 mb-4">
                     <div class="col-12">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-white">
-                                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Accesos Rápidos</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-lg-3 col-md-6">
-                                        <a href="<%= request.getContextPath() %>/orden-compra" class="card quick-link-card shadow-sm text-decoration-none">
-                                            <div class="card-body text-center p-3">
-                                                <div class="mb-2" style="color: #006d77;"><i class="fas fa-file-invoice-dollar" style="font-size: 2rem;"></i></div>
-                                                <h6 class="text-dark fw-semibold mb-0">Órdenes de Compra</h6>
-                                                <span class="text-muted small">Gestionar órdenes</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-3 col-md-6">
-                                        <a href="<%= request.getContextPath() %>/planes-transporte" class="card quick-link-card shadow-sm text-decoration-none">
-                                            <div class="card-body text-center p-3">
-                                                <div class="mb-2" style="color: #006d77;"><i class="fas fa-truck" style="font-size: 2rem;"></i></div>
-                                                <h6 class="text-dark fw-semibold mb-0">Planes de Transporte</h6>
-                                                <span class="text-muted small">Distribución</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-3 col-md-6">
-                                        <a href="<%= request.getContextPath() %>/InventarioServlet" class="card quick-link-card shadow-sm text-decoration-none">
-                                            <div class="card-body text-center p-3">
-                                                <div class="mb-2" style="color: #006d77;"><i class="fas fa-warehouse" style="font-size: 2rem;"></i></div>
-                                                <h6 class="text-dark fw-semibold mb-0">Inventario</h6>
-                                                <span class="text-muted small">Gestionar stock</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-3 col-md-6">
-                                        <a href="<%= request.getContextPath() %>/MovimientoProductoServlet" class="card quick-link-card shadow-sm text-decoration-none">
-                                            <div class="card-body text-center p-3">
-                                                <div class="mb-2" style="color: #006d77;"><i class="fas fa-exchange-alt" style="font-size: 2rem;"></i></div>
-                                                <h6 class="text-dark fw-semibold mb-0">Movimientos</h6>
-                                                <span class="text-muted small">Ver historial</span>
-                                            </div>
-                                        </a>
-                                    </div>
+                        <h5 class="mb-3 pageheader-title" style="font-size: 1.15rem;">
+                            <i class="fas fa-bolt text-primary me-2"></i>Accesos rápidos
+                        </h5>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-2">
+                        <a href="<%= request.getContextPath() %>/orden-compra" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
+                                <div class="mb-1" style="color: #006d77;">
+                                    <i class="fas fa-file-invoice-dollar" style="font-size: 1.9rem;"></i>
                                 </div>
+                                <h6 class="fw-semibold mb-0" style="font-size: 0.95rem; color: #000000;">Órdenes de Compra</h6>
+                                <span style="font-size: 0.8rem; color: #4a4a4a;">Gestionar órdenes</span>
                             </div>
-                        </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-2">
+                        <a href="<%= request.getContextPath() %>/planes-transporte" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
+                                <div class="mb-1" style="color: #006d77;">
+                                    <i class="fas fa-truck" style="font-size: 1.9rem;"></i>
+                                </div>
+                                <h6 class="fw-semibold mb-0" style="font-size: 0.95rem; color: #000000;">Planes de Transporte</h6>
+                                <span style="font-size: 0.8rem; color: #4a4a4a;">Distribución</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-2">
+                        <a href="<%= request.getContextPath() %>/InventarioServlet" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
+                                <div class="mb-1" style="color: #006d77;">
+                                    <i class="fas fa-warehouse" style="font-size: 1.9rem;"></i>
+                                </div>
+                                <h6 class="fw-semibold mb-0" style="font-size: 0.95rem; color: #000000;">Inventario</h6>
+                                <span style="font-size: 0.8rem; color: #4a4a4a;">Gestionar stock</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-2">
+                        <a href="<%= request.getContextPath() %>/MovimientoProductoServlet" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
+                                <div class="mb-1" style="color: #006d77;">
+                                    <i class="fas fa-exchange-alt" style="font-size: 1.9rem;"></i>
+                                </div>
+                                <h6 class="fw-semibold mb-0" style="font-size: 0.95rem; color: #000000;">Movimientos</h6>
+                                <span style="font-size: 0.8rem; color: #4a4a4a;">Ver historial</span>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>

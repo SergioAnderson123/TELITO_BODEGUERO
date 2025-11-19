@@ -148,7 +148,7 @@ public class ProductorServlet extends HttpServlet {
             case "ordenesCompra":
                 // Paginación
                 int pageOrdenes = 1;
-                int sizeOrdenes = 10;
+                int sizeOrdenes = 5;
                 try {
                     String pageParamOrdenes = request.getParameter("page");
                     if (pageParamOrdenes != null && !pageParamOrdenes.isEmpty()) {

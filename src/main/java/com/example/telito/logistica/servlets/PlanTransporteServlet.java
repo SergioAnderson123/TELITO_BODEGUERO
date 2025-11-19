@@ -54,11 +54,11 @@ public class PlanTransporteServlet extends HttpServlet {
 
                 // Paginación
                 int page = 1;
-                int size = 10;
+                int size = 5;
                 try { page = Integer.parseInt(request.getParameter("page")); } catch (Exception ignored) {}
                 try { size = Integer.parseInt(request.getParameter("size")); } catch (Exception ignored) {}
                 if (page < 1) page = 1;
-                if (size < 1) size = 10;
+                if (size < 1) size = 5;
 
                 int totalRows = planTransporteDao.contarPlanes(busqueda, conductorId, estado, fechaDesde, fechaHasta);
                 int totalPages = (int) Math.ceil(totalRows / (double) size);

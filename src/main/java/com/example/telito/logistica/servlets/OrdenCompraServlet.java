@@ -65,7 +65,7 @@ public class OrdenCompraServlet extends HttpServlet {
 
                 // 2. Parámetros de paginación
                 int page = 1;
-                int size = 10;
+                int size = 5;
                 try { 
                     page = Integer.parseInt(request.getParameter("page")); 
                 } catch (Exception ignored) {}
@@ -73,7 +73,7 @@ public class OrdenCompraServlet extends HttpServlet {
                     size = Integer.parseInt(request.getParameter("size")); 
                 } catch (Exception ignored) {}
                 if (page < 1) page = 1;
-                if (size < 1) size = 10;
+                if (size < 1) size = 5;
 
                 // 3. Obtenemos el total y calculamos páginas
                 int totalRows = ordenCompraDao.contarOrdenes(busqueda, proveedorId, estado);

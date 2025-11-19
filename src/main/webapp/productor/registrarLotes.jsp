@@ -53,7 +53,7 @@
             position: fixed; top: 0; right: 0; left: 250px; z-index: 999;
             height: 70px; border-bottom: 1px solid var(--border);
         }
-        .dashboard-content { margin-top: 70px; padding: 30px; }
+        .dashboard-content { margin-top: 70px; padding: 20px; }
         .nav-link {
             color: rgba(255,255,255,0.9) !important;
             padding: 12px 20px; border-radius: 8px; margin: 5px 15px;
@@ -69,23 +69,24 @@
         .card:hover { transform: translateY(-2px); }
         .card-header {
             background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
-            color: white; border-radius: 15px 15px 0 0 !important; border: none; font-weight: 600;
+            color: white; border-radius: 15px 15px 0 0 !important; border: none; font-weight: 600; padding: 12px 20px;
         }
+        .card-header h5 { font-size: 1rem; margin: 0; }
         .btn-primary {
             background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
             border: none; border-radius: 8px; padding: 12px 25px; font-weight: 500; transition: all 0.3s ease;
         }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 109, 119, 0.35); }
         .btn-secondary { background-color: #8d99ae; border: none; }
-        .form-control, .form-select { border-radius: 8px; border: 2px solid var(--border); padding: 12px 15px; transition: all 0.3s ease; }
+        .form-control, .form-select { border-radius: 8px; border: 2px solid var(--border); padding: 8px 12px; transition: all 0.3s ease; font-size: 0.9rem; }
         .form-control:focus, .form-select:focus { border-color: var(--seafoam); box-shadow: 0 0 0 0.2rem rgba(131, 197, 190, 0.35); }
-        .form-label { font-weight: 600; color: var(--text-dark); margin-bottom: 8px; }
-        .form-text { color: var(--text-muted); font-size: 0.875rem; }
+        .form-label { font-weight: 600; color: var(--text-dark); margin-bottom: 4px; font-size: 0.9rem; }
+        .form-text { color: var(--text-muted); font-size: 0.75rem; margin-top: 2px; }
         .invalid-feedback { font-size: 0.875rem; }
-        .page-header { margin-bottom: 30px; }
-        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 10px; }
-        .page-header p { color: var(--text-muted); font-size: 1.05rem; }
-        .section-title { color: var(--turquoise-dark); font-weight: 600; font-size: 1.1rem; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+        .page-header { margin-bottom: 15px; }
+        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 5px; font-size: 1.3rem; }
+        .page-header p { color: var(--text-muted); font-size: 0.9rem; }
+        .section-title { color: var(--turquoise-dark); font-weight: 600; font-size: 0.95rem; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid var(--border); }
         .footer { background-color: #fff; border-top: 1px solid var(--border); margin-top: 50px; padding: 20px 0; }
         .footer-links a { color: var(--text-muted); text-decoration: none; margin: 0 10px; }
         .footer-links a:hover { color: var(--turquoise-dark); }
@@ -292,7 +293,7 @@
                             <div class="card-header">
                                 <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Formulario de Registro de Lotes</h5>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body" style="padding: 20px;">
                                 <form id="registrarLoteForm" class="needs-validation" novalidate method="POST" action="<%= request.getContextPath() %>/ProductorServlet">
                                     <input type="hidden" name="action" value="registrarLote">
                                     
@@ -303,7 +304,7 @@
                                             </h6>
                                             
                                             <!-- SKU del producto: al salir del campo se autocompleta el nombre vía fetch JSON -->
-                                            <div class="mb-3">
+                                            <div class="mb-2">
                                                 <label for="skuProducto" class="form-label">SKU del Producto</label>
                                                 <input type="text" class="form-control" id="skuProducto" name="skuProducto" placeholder="Ej: BOD-0001" required value="<%= request.getAttribute("form_skuProducto") != null ? request.getAttribute("form_skuProducto") : "" %>">
                                                 <div class="form-text">
@@ -313,16 +314,16 @@
                                             </div>
                                             
                                             <!-- Nombre de producto autocompletado (solo lectura) -->
-                                            <div class="mb-3">
+                                            <div class="mb-2">
                                                 <label for="nombreProducto" class="form-label">Nombre del Producto</label>
                                                 <input type="text" class="form-control" id="nombreProducto" placeholder="Se completará automáticamente" readonly>
                                             </div>
                                             
                                             <!-- Código de lote (generado automáticamente) -->
-                                            <div class="mb-3">
+                                            <div class="mb-2">
                                                 <label for="codigoLote" class="form-label">Código de Lote (generado automáticamente)</label>
-                                                <input type="text" class="form-control" id="codigoLote" name="codigoLote" readonly style="background-color: #f0f0f0; cursor: not-allowed; font-weight: bold; color: #28a745;" placeholder="Cargando...">
-                                                <small class="text-muted">
+                                                <input type="text" class="form-control" id="codigoLote" name="codigoLote" readonly style="background-color: #f0f0f0; cursor: not-allowed; font-weight: bold; color: #28a745; font-size: 0.9rem;" placeholder="Cargando...">
+                                                <small class="form-text text-muted">
                                                     <i class="fas fa-info-circle"></i> El código de lote se genera automáticamente (ej: L--0031)
                                                 </small>
                                             </div>
@@ -334,7 +335,7 @@
                                             </h6>
                                             
                                             <!-- Cantidad de paquetes. El stock real se calcula automáticamente multiplicando por unidades_por_paquete -->
-                                            <div class="mb-3">
+                                            <div class="mb-2">
                                                 <label for="cantidadStock" class="form-label">Cantidad de Paquetes/Cajas</label>
                                                 <input type="number" class="form-control" id="cantidadStock" name="cantidadStock" min="1" placeholder="Ej: 10 (cajas)" required value="<%= request.getAttribute("form_cantidadStock") != null ? request.getAttribute("form_cantidadStock") : "" %>">
                                                 <small class="form-text text-muted">
@@ -344,7 +345,7 @@
                                             </div>
                                             
                                             <!-- Selección de distrito/ubicación -->
-                                            <div class="mb-3">
+                                            <div class="mb-2">
                                                 <label for="fechaCaducidad" class="form-label">Fecha de Caducidad (Opcional)</label>
                                                 <input type="date" class="form-control" id="fechaCaducidad" name="fechaCaducidad" value="<%= request.getAttribute("form_fechaCaducidad") != null ? request.getAttribute("form_fechaCaducidad") : "" %>">
                                                 <div class="form-text">
@@ -353,10 +354,10 @@
                                             </div>
                                             
                                             <!-- Costo de producción -->
-                                            <div class="mb-3">
+                                            <div class="mb-2">
                                                 <label for="costoProduccion" class="form-label">Costo de Producción por Unidad (Opcional)</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text">S/</span>
+                                                    <span class="input-group-text" style="font-size: 0.9rem; padding: 8px 12px;">S/</span>
                                                     <input type="number" class="form-control" id="costoProduccion" name="costoProduccion" 
                                                            step="0.01" min="0" placeholder="Ej: 2.50" 
                                                            value="<%= request.getAttribute("form_costoProduccion") != null ? request.getAttribute("form_costoProduccion") : "" %>">
@@ -368,12 +369,12 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="d-flex justify-content-end mt-4">
-                                        <button type="button" class="btn btn-secondary me-3" onclick="limpiarFormulario()">
+                                    <div class="d-flex justify-content-end mt-3">
+                                        <button type="button" class="btn btn-secondary me-3" style="padding: 8px 16px; font-size: 0.9rem;" onclick="limpiarFormulario()">
                                             <i class="fas fa-eraser me-1"></i>Limpiar
                                         </button>
                                         <span id="tooltipSubmitWrapper" data-bs-toggle="tooltip" data-bs-placement="top" title="">
-                                            <button id="submitRegistrarLote" class="btn btn-primary" type="submit">
+                                            <button id="submitRegistrarLote" class="btn btn-primary" type="submit" style="padding: 8px 16px; font-size: 0.9rem;">
                                                 <i class="fas fa-save me-1"></i>Registrar Lote
                                             </button>
                                         </span>

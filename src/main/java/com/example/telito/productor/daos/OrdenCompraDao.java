@@ -53,11 +53,11 @@ public class OrdenCompraDao extends DAOBase {
                 logger.info("Órdenes actualizadas de Pendiente a Recibido: {}", updated);
             }
             
-            // Luego obtener todas las órdenes
+            // Luego obtener todas las órdenes con paginación
             selectStmt = conn.prepareStatement(selectSql);
             selectStmt.setInt(1, productorId);
-            selectStmt.setInt(2, limit);
-            selectStmt.setInt(3, offset);
+            selectStmt.setInt(2, limit);  // LIMIT primero
+            selectStmt.setInt(3, offset); // OFFSET segundo
             rs = selectStmt.executeQuery();
 
             while (rs.next()) {

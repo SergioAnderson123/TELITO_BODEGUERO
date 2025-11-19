@@ -41,6 +41,9 @@
         }
         .dashboard-wrapper { margin-left: 250px; width: calc(100% - 250px); min-height: 100vh; }
         .dashboard-content { margin-top: 70px; padding: 30px; padding-bottom: 100px !important; }
+        .page-header { margin-bottom: 30px; }
+        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 10px; }
+        .page-header p { color: var(--text-muted); font-size: 1.05rem; }
         .nav-left-sidebar {
             width: 250px;
             background: linear-gradient(160deg, var(--turquoise-dark) 0%, #055e68 100%);
@@ -91,6 +94,25 @@
             .dashboard-wrapper { margin-left: 0; width: 100%; }
             .dashboard-content { padding: 20px; }
         }
+        
+        /* Animación suave para las tarjetas de estadísticas (igual que administrador) */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .stat-card {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
     </style>
 </head>
 <body>
@@ -274,7 +296,7 @@
 
             <!-- Segunda fila: Órdenes -->
             <div class="row g-2 mb-3">
-                <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12">
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                     <div class="card stat-card shadow-sm border-start border-warning border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                         <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                             <div class="d-flex justify-content-between align-items-center">
@@ -290,7 +312,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12">
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                     <div class="card stat-card shadow-sm border-start border-info border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                         <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                             <div class="d-flex justify-content-between align-items-center">
@@ -306,7 +328,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12">
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                     <div class="card stat-card shadow-sm border-start border-primary border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                         <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                             <div class="d-flex justify-content-between align-items-center">

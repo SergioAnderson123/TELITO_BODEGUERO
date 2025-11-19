@@ -91,10 +91,10 @@
             height: 70px; border-bottom: 1px solid var(--border-color);
         }
         .dashboard-wrapper { margin-left: 250px; width: calc(100% - 250px); min-height: 100vh; }
-        .dashboard-content { margin-top: 70px; padding: 30px; }
-        .page-header { margin-bottom: 30px; }
-        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 10px; }
-        .page-header p { color: var(--text-muted); font-size: 1.05rem; }
+        .dashboard-content { margin-top: 70px; padding: 20px; }
+        .page-header { margin-bottom: 0.5rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 0; font-size: 1.4rem; line-height: 1.2; }
+        .page-header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem; margin-bottom: 0; }
 
         /* =====================
            Sidebar
@@ -114,15 +114,15 @@
         /* =====================
            Tarjetas/Tabla/Formularios
         ====================== */
-        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
+        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
         .stat-card {
             background-color: var(--white);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            padding: 12px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
-        .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: var(--text-muted); font-weight: 600; }
-        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: var(--turquoise-dark); }
+        .stat-card h3 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+        .stat-card p { margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--turquoise-dark); }
 
         /* Card principal */
         .card {
@@ -160,32 +160,70 @@
         button.btn-secondary { background: #8d99ae; }
         button:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 109, 119, 0.25); }
 
-        /* Tabla */
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        thead th { background-color: var(--seafoam-light); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; }
-        tbody tr:hover { background-color: var(--seafoam-light); }
-
-        /* Botones de acción */
-        .btn-view {
-            background: linear-gradient(160deg, #28a745 0%, #20c997 100%);
-            color: white;
+        /* Table card - igual a gestión de usuarios y mis productos */
+        .table-card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.06);
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
         }
-        .btn-view:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-            color: white;
-            text-decoration: none;
+        .table-card .card-header {
+            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
+            color: #fff;
+            border-radius: 12px 12px 0 0;
+            padding: 0.5rem 0.75rem;
+            margin: 0;
+        }
+        .table-card .card-body {
+            padding: 0.75rem;
+        }
+        
+        /* Tabla - Estilo igual a gestión de usuarios y mis productos */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 0.9rem; 
+            margin-bottom: 0 !important; 
+            table-layout: auto;
+        }
+        th, td { 
+            padding: 0.4rem 0.5rem; 
+            text-align: left; 
+            border-bottom: 1px solid var(--border-color); 
+            font-size: 0.85rem;
+        }
+        tbody td {
+            padding: 0.35rem 0.5rem;
+        }
+        thead th { 
+            background-color: #f8f9fa; 
+            font-weight: 600; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            font-size: 0.85rem; 
+            vertical-align: middle;
+        }
+        tbody tr:hover { background-color: #f8f9fa; }
+        tbody tr { vertical-align: middle; }
+
+        /* Botón Ver Lotes/Editar - Estilo teal/verde agua igual a mis productos */
+        .btn-ver-lotes {
+            background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%) !important;
+            border: none !important;
+            color: white !important;
+            font-size: 0.8rem !important;
+            padding: 0.35rem 0.6rem !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease !important;
+            border-radius: 6px !important;
+        }
+        .btn-ver-lotes:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 8px rgba(32, 201, 151, 0.3) !important;
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+        }
+        .btn-ver-lotes:focus {
+            box-shadow: 0 0 0 0.2rem rgba(32, 201, 151, 0.25) !important;
         }
 
         /* Badges de estado */
@@ -428,18 +466,20 @@
     <!-- ===================== Contenido principal ===================== -->
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
-            <div class="page-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h2><i class="fas fa-chart-pie me-2"></i>Órdenes de Compra</h2>
-                    <p class="text-muted mb-0">Gestiona y monitorea las órdenes de compra de tus productos.</p>
-                </div>
-                <div class="d-flex gap-2">
-                    <a href="<%= request.getContextPath() %>/productor/OrdenCompraReporteServlet?action=exportar" class="btn btn-sm" style="background: linear-gradient(160deg, #28a745 0%, #20c997 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
-                        <i class="fas fa-file-excel me-2"></i>Exportar a Excel
-                    </a>
-                    <a href="<%= request.getContextPath() %>/productor/OrdenCompraReporteServlet?action=formEnviar" class="btn btn-sm" style="background: linear-gradient(160deg, #17a2b8 0%, #138496 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
-                        <i class="fas fa-envelope me-2"></i>Enviar por Correo
-                    </a>
+            <div class="page-header mb-1" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h2 class="pageheader-title mb-0" style="font-size: 1.4rem; line-height: 1.2;"><i class="fas fa-chart-pie me-2"></i>Órdenes de Compra</h2>
+                        <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Gestiona y monitorea las órdenes de compra de tus productos.</p>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="<%= request.getContextPath() %>/productor/OrdenCompraReporteServlet?action=exportar" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <i class="fas fa-file-excel me-1"></i>Exportar a Excel
+                        </a>
+                        <a href="<%= request.getContextPath() %>/productor/OrdenCompraReporteServlet?action=formEnviar" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <i class="fas fa-envelope me-1"></i>Enviar por Correo
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -459,19 +499,21 @@
                 </div>
             </div>
 
-            <!-- ===================== Card: Filtros y búsqueda ===================== -->
-            <div class="card" style="padding: 20px; margin-top: -10px;">
-                <div class="row g-3 align-items-center">
-                    <div class="col-lg-4 col-md-12">
+            <!-- ===================== Card: Búsqueda y filtros ===================== -->
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+                <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                         <div class="input-group">
-                            <input id="searchInput" type="text" class="form-control" placeholder="Buscar por código de orden o producto...">
-                            <button class="btn" type="button" style="background: var(--seafoam); color: #fff;">
+                            <input id="searchInput" type="text" class="form-control form-control-sm shadow-sm" placeholder="Código de orden o producto..." style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                            <button class="btn btn-sm btn-primary shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <select id="statusFilter" class="form-select">
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-filter me-1"></i>Estado</label>
+                        <select id="statusFilter" class="form-select form-select-sm shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                             <option value="">Todos los estados</option>
                             <option value="Pendiente">Pendiente</option>
                             <option value="Aprobado">Aprobado</option>
@@ -480,30 +522,38 @@
                             <option value="En Proceso">En Proceso</option>
                         </select>
                     </div>
-                    <div class="col-lg-2 col-md-12">
-                        <button class="btn w-100" onclick="limpiarFiltros()">
-                            <i class="fas fa-eraser me-1"></i>Limpiar
-                        </button>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <a href="<%= request.getContextPath() %>/ProductorServlet?action=ordenesCompra" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                            <i class="fas fa-sync-alt me-1"></i>Limpiar
+                        </a>
                     </div>
                 </div>
             </div>
 
             <!-- ===================== Card: Tabla de órdenes ===================== -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>Órdenes de Compra</h2>
-                </div>
-                <table id="ordenesTable">
-                    <thead>
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-card shadow-sm">
+                        <div class="card-header" style="padding: 0.5rem 0.75rem;">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div>
+                                    <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-chart-pie me-2"></i>Órdenes de Compra</h5>
+                                    <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todas tus órdenes de compra</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body" style="padding: 0.75rem;">
+                            <table id="ordenesTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
+                    <thead class="table-light">
                         <tr>
-                            <th>#</th>
-                            <th>Código de Orden</th>
-                            <th>Nombre del Producto</th>
-                            <th>Cantidad de Paquetes</th>
-                            <th>Precio</th>
-                            <th>Solicitante de compra</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
+                            <th class="fw-semibold" style="width: 5%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">#</th>
+                            <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">CÓDIGO DE ORDEN</th>
+                            <th class="fw-semibold" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">NOMBRE DEL PRODUCTO</th>
+                            <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">CANTIDAD DE PAQUETES</th>
+                            <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">PRECIO</th>
+                            <th class="fw-semibold" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">SOLICITANTE DE COMPRA</th>
+                            <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">ESTADO</th>
+                            <th class="text-end fw-semibold" style="width: 9%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">ACCIONES</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -511,21 +561,22 @@
                             Integer currentPageObj = (Integer) request.getAttribute("currentPage");
                             Integer sizeObj = (Integer) request.getAttribute("size");
                             int currentPage = (currentPageObj != null) ? currentPageObj : 1;
-                            int size = (sizeObj != null) ? sizeObj : 10;
+                            int size = (sizeObj != null) ? sizeObj : 5;
                             int i = (currentPage - 1) * size + 1;
                         %>
                         <% for (Object orden : listaOrdenes) { %>
                             <% Object[] ordenData = (Object[]) orden; %>
-                            <tr data-codigo="<%= ordenData[1] %>" 
+                            <tr class="align-middle" data-codigo="<%= ordenData[1] %>" 
                                 data-producto="<%= ordenData[2] %>" 
                                 data-estado="<%= ordenData[6] %>" 
-                                data-destino="<%= ordenData[5] %>">
-                                <td><%= i++ %></td>
-                                <td><strong><%= ordenData[1] %></strong></td>
-                                <td><%= ordenData[2] %></td>
-                                <td><%= ordenData[3] %> paquetes</td>
-                                <td><strong>S/ <%= String.format("%.2f", (Double) ordenData[4]) %></strong></td>
-                                <td><%= ordenData[5] %></td>
+                                data-destino="<%= ordenData[5] %>"
+                                style="padding: 0;">
+                                <td class="text-muted" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= i++ %></td>
+                                <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong><%= ordenData[1] %></strong></td>
+                                <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= ordenData[2] %></td>
+                                <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= ordenData[3] %> paquetes</td>
+                                <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong>S/ <%= String.format("%.2f", (Double) ordenData[4]) %></strong></td>
+                                <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= ordenData[5] %></td>
                                 <td>
                                     <% 
                                         String estadoOrden = (String) ordenData[6];
@@ -556,11 +607,13 @@
                                         </span>
                                     <% } %>
                                 </td>
-                                <td>
+                                <td class="text-end" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                     <% if ("En Proceso".equals(estadoOrden)) { %>
-                                        <a href="#" class="btn-view" onclick="editarOrden('<%= ordenData[0] %>')">
-                                            <i class="fas fa-edit"></i>Editar
-                                    </a>
+                                        <button type="button" class="btn btn-sm shadow-sm btn-ver-lotes" 
+                                                onclick="editarOrden('<%= ordenData[0] %>')"
+                                                title="Editar orden">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </button>
                                     <% } %>
                                 </td>
                             </tr>
@@ -570,6 +623,9 @@
                 
                 <%-- Incluir componente de paginación --%>
                 <jsp:include page="/WEB-INF/includes/pagination.jsp" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -671,6 +727,8 @@
         searchInput.value = '';
         statusFilter.value = '';
         applyFilters();
+        // Redirigir para limpiar filtros del servidor también
+        window.location.href = '<%= request.getContextPath() %>/ProductorServlet?action=ordenesCompra';
     }
 
     // Event listeners
