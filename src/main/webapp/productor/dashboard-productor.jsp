@@ -45,7 +45,7 @@
             position: fixed; top: 0; right: 0; left: 250px; z-index: 999;
             height: 70px; border-bottom: 1px solid var(--border);
         }
-        .dashboard-content { margin-top: 70px; padding: 30px; }
+        .dashboard-content { margin-top: 70px; padding: 30px; padding-bottom: 100px !important; }
         .nav-link {
             color: rgba(255,255,255,0.9) !important;
             padding: 12px 20px; border-radius: 8px; margin: 5px 15px;
@@ -60,6 +60,13 @@
         .page-header { margin-bottom: 30px; }
         .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 10px; }
         .page-header p { color: var(--text-muted); font-size: 1.05rem; }
+        .pageheader-title {
+            color: var(--turquoise-dark);
+            font-weight: 700;
+        }
+        .pageheader-title i {
+            color: var(--seafoam);
+        }
         .stat-card {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             min-height: auto;
@@ -223,7 +230,7 @@
     </div>
 
     <div class="dashboard-wrapper">
-        <div class="dashboard-content">
+        <div class="dashboard-content" style="padding-bottom: 100px !important;">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
@@ -251,64 +258,64 @@
 
                 <!-- Primera fila: Productos y Lotes -->
                 <div class="row g-2 mb-3">
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-primary border-3">
-                            <div class="card-body p-2">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+                        <div class="card stat-card shadow-sm border-start border-primary border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Productos Activos</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getProductosActivos() %></h2>
-                                        <small class="text-muted">En tu catálogo</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Productos Activos</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getProductosActivos() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">En tu catálogo</small>
                                     </div>
-                                    <div class="stat-icon text-primary ms-2">
+                                    <div class="stat-icon text-primary ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-box"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-success border-3">
-                            <div class="card-body p-2">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+                        <div class="card stat-card shadow-sm border-start border-success border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Lotes Este Mes</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getLotesEsteMes() %></h2>
-                                        <small class="text-muted">Registrados este mes</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Lotes Este Mes</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getLotesEsteMes() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Registrados este mes</small>
                                     </div>
-                                    <div class="stat-icon text-success ms-2">
+                                    <div class="stat-icon text-success ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-boxes"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-info border-3">
-                            <div class="card-body p-2">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+                        <div class="card stat-card shadow-sm border-start border-info border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Stock Total</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getStockTotal() %></h2>
-                                        <small class="text-muted">Unidades disponibles</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Stock Total</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getStockTotal() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Unidades disponibles</small>
                                     </div>
-                                    <div class="stat-icon text-info ms-2">
+                                    <div class="stat-icon text-info ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-warehouse"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-warning border-3">
-                            <div class="card-body p-2">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+                        <div class="card stat-card shadow-sm border-start border-warning border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Lotes Próximos a Vencer</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getLotesProximosVencer() %></h2>
-                                        <small class="text-muted">Próximos 30 días</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Lotes Próximos a Vencer</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getLotesProximosVencer() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Próximos 30 días</small>
                                     </div>
-                                    <div class="stat-icon text-warning ms-2">
+                                    <div class="stat-icon text-warning ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-calendar-times"></i>
                                     </div>
                                 </div>
@@ -319,48 +326,48 @@
 
                 <!-- Segunda fila: Órdenes -->
                 <div class="row g-2 mb-3">
-                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-warning border-3">
-                            <div class="card-body p-2">
+                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12">
+                        <div class="card stat-card shadow-sm border-start border-warning border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Órdenes Pendientes</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getOrdenesPendientes() %></h2>
-                                        <small class="text-muted">Requieren atención</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Órdenes Pendientes</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getOrdenesPendientes() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Requieren atención</small>
                                     </div>
-                                    <div class="stat-icon text-warning ms-2">
+                                    <div class="stat-icon text-warning ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-clock"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-info border-3">
-                            <div class="card-body p-2">
+                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12">
+                        <div class="card stat-card shadow-sm border-start border-info border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Órdenes en Proceso</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getOrdenesEnProceso() %></h2>
-                                        <small class="text-muted">En preparación</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Órdenes en Proceso</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getOrdenesEnProceso() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">En preparación</small>
                                     </div>
-                                    <div class="stat-icon text-info ms-2">
+                                    <div class="stat-icon text-info ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-cog"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card stat-card shadow-sm border-start border-primary border-3">
-                            <div class="card-body p-2">
+                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12">
+                        <div class="card stat-card shadow-sm border-start border-primary border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-1 text-uppercase">Total Órdenes</h6>
-                                        <h2 class="mb-0 fw-bold text-dark"><%= metricas.getTotalOrdenes() %></h2>
-                                        <small class="text-muted">Todas las órdenes</small>
+                                        <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Total Órdenes</h6>
+                                        <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= metricas.getTotalOrdenes() %></h2>
+                                        <small style="font-size: 0.8rem; color: #4a4a4a;">Todas las órdenes</small>
                                     </div>
-                                    <div class="stat-icon text-primary ms-2">
+                                    <div class="stat-icon text-primary ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                                         <i class="fas fa-list"></i>
                                     </div>
                                 </div>
@@ -370,54 +377,61 @@
                 </div>
 
                 <!-- Accesos rápidos -->
-                <div class="row mt-2">
+                <div class="row mt-2 mb-4">
                     <div class="col-12">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-white">
-                                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Accesos Rápidos</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-lg-3 col-md-6">
-                                        <a href="<%= request.getContextPath() %>/ProductorServlet?action=listarProductos" class="card quick-link-card shadow-sm text-decoration-none">
-                                            <div class="card-body text-center p-3">
-                                                <div class="mb-2" style="color: #006d77;"><i class="fas fa-shopping-cart" style="font-size: 2rem;"></i></div>
-                                                <h6 class="text-dark fw-semibold mb-0">Mis Productos</h6>
-                                                <span class="text-muted small">Ver catálogo</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-3 col-md-6">
-                                        <a href="<%= request.getContextPath() %>/ProductorServlet?action=formRegistrarLote" class="card quick-link-card shadow-sm text-decoration-none">
-                                            <div class="card-body text-center p-3">
-                                                <div class="mb-2" style="color: #006d77;"><i class="fas fa-boxes" style="font-size: 2rem;"></i></div>
-                                                <h6 class="text-dark fw-semibold mb-0">Registrar Lotes</h6>
-                                                <span class="text-muted small">Nuevo lote</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-3 col-md-6">
-                                        <a href="<%= request.getContextPath() %>/ProductorServlet?action=ordenesCompra" class="card quick-link-card shadow-sm text-decoration-none">
-                                            <div class="card-body text-center p-3">
-                                                <div class="mb-2" style="color: #006d77;"><i class="fas fa-chart-pie" style="font-size: 2rem;"></i></div>
-                                                <h6 class="text-dark fw-semibold mb-0">Órdenes de Compra</h6>
-                                                <span class="text-muted small">Gestionar órdenes</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-3 col-md-6">
-                                        <a href="<%= request.getContextPath() %>/ProductorServlet?action=formActualizarPrecios" class="card quick-link-card shadow-sm text-decoration-none">
-                                            <div class="card-body text-center p-3">
-                                                <div class="mb-2" style="color: #006d77;"><i class="fas fa-tags" style="font-size: 2rem;"></i></div>
-                                                <h6 class="text-dark fw-semibold mb-0">Actualizar Precios</h6>
-                                                <span class="text-muted small">Modificar precios</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <h5 class="mb-3 pageheader-title" style="font-size: 1.15rem;">
+                            <i class="fas fa-bolt text-primary me-2"></i>Accesos rápidos
+                        </h5>
                     </div>
+                    <div class="col-lg-3 col-md-6 mb-2">
+                        <a href="<%= request.getContextPath() %>/ProductorServlet?action=listarProductos" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
+                                <div class="mb-1" style="color: #006d77;">
+                                    <i class="fas fa-shopping-cart" style="font-size: 1.9rem;"></i>
+                                </div>
+                                <h6 class="fw-semibold mb-0" style="font-size: 0.95rem; color: #000000;">Mis Productos</h6>
+                                <span style="font-size: 0.8rem; color: #4a4a4a;">Ver catálogo</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-2">
+                        <a href="<%= request.getContextPath() %>/ProductorServlet?action=formRegistrarLote" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
+                                <div class="mb-1" style="color: #006d77;">
+                                    <i class="fas fa-boxes" style="font-size: 1.9rem;"></i>
+                                </div>
+                                <h6 class="fw-semibold mb-0" style="font-size: 0.95rem; color: #000000;">Registrar Lotes</h6>
+                                <span style="font-size: 0.8rem; color: #4a4a4a;">Nuevo lote</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-2">
+                        <a href="<%= request.getContextPath() %>/ProductorServlet?action=ordenesCompra" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
+                                <div class="mb-1" style="color: #006d77;">
+                                    <i class="fas fa-chart-pie" style="font-size: 1.9rem;"></i>
+                                </div>
+                                <h6 class="fw-semibold mb-0" style="font-size: 0.95rem; color: #000000;">Órdenes de Compra</h6>
+                                <span style="font-size: 0.8rem; color: #4a4a4a;">Gestionar órdenes</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-2">
+                        <a href="<%= request.getContextPath() %>/ProductorServlet?action=formActualizarPrecios" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                            <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
+                                <div class="mb-1" style="color: #006d77;">
+                                    <i class="fas fa-tags" style="font-size: 1.9rem;"></i>
+                                </div>
+                                <h6 class="fw-semibold mb-0" style="font-size: 0.95rem; color: #000000;">Actualizar Precios</h6>
+                                <span style="font-size: 0.8rem; color: #4a4a4a;">Modificar precios</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Espacio adicional al final para evitar que se corten los accesos rápidos -->
+                <div class="row" style="margin-bottom: 80px; padding-bottom: 40px;">
+                    <div class="col-12"></div>
                 </div>
             </div>
         </div>

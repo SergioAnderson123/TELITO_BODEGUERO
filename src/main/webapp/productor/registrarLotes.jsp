@@ -209,6 +209,12 @@
                 <nav class="navbar navbar-expand">
                     <ul class="navbar-nav flex-column w-100">
                         <li class="nav-divider"><i class="fas fa-bars me-2"></i>Menú</li>
+                        <!-- Inicio -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="<%= request.getContextPath() %>/ProductorServlet?action=inicio">
+                                <i class="fas fa-home"></i>Inicio
+                            </a>
+                        </li>
                         <!-- Mis productos -->
                         <li class="nav-item">
                             <a class="nav-link" href="<%= request.getContextPath() %>/ProductorServlet?action=listarProductos">

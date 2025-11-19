@@ -63,12 +63,21 @@ public class ProductorServlet extends HttpServlet {
         
         ProductoDao productoDao = new ProductoDao();
         LoteDao loteDao = new LoteDao();
+        OrdenCompraDao ordenCompraDao = new OrdenCompraDao();
+        RequestDispatcher view;
 
         switch (action) {
+            case "inicio":
+                // Obtener métricas del dashboard usando la misma lógica que DashboardProductorServlet
+                DashboardProductorServlet.MetricasProductor metricas = obtenerMetricasProductor(idProductor, productoDao, loteDao, ordenCompraDao);
+                request.setAttribute("metricas", metricas);
+                view = request.getRequestDispatcher("productor/inicio-productor.jsp");
+                view.forward(request, response);
+                break;
             case "listarProductos":
                 // Paginación
                 int pageProductos = 1;
-                int sizeProductos = 10;
+                int sizeProductos = 5;
                 try {
                     String pageParamProductos = request.getParameter("page");
                     if (pageParamProductos != null && !pageParamProductos.isEmpty()) {
@@ -111,7 +120,7 @@ public class ProductorServlet extends HttpServlet {
                 request.setAttribute("param1Value", "listarProductos");
                 request.setAttribute("itemName", "productos");
 
-                RequestDispatcher view = request.getRequestDispatcher("productor/misProductos.jsp");
+                view = request.getRequestDispatcher("productor/misProductos.jsp");
                 view.forward(request, response);
                 break;
 
@@ -153,7 +162,6 @@ public class ProductorServlet extends HttpServlet {
                 int offsetOrdenes = (pageOrdenes - 1) * sizeOrdenes;
                 
                 // Cargar las órdenes de compra del productor logueado con paginación
-                OrdenCompraDao ordenCompraDao = new OrdenCompraDao();
                 List<Object[]> listaOrdenes = ordenCompraDao.listarOrdenesPorProductor(idProductor, offsetOrdenes, sizeOrdenes);
                 int totalOrdenes = ordenCompraDao.contarOrdenesPorProductor(idProductor);
                 
@@ -902,6 +910,97 @@ public class ProductorServlet extends HttpServlet {
             // Aquí irían otros 'cases' para guardar otros formularios
 
         }
+    }
+    
+    /**
+     * Obtiene todas las métricas para el dashboard del productor.
+     * Reutiliza la lógica de DashboardProductorServlet.
+     */
+    private DashboardProductorServlet.MetricasProductor obtenerMetricasProductor(
+            int idProductor, ProductoDao productoDao, LoteDao loteDao, OrdenCompraDao ordenCompraDao) {
+        DashboardProductorServlet.MetricasProductor metricas = new DashboardProductorServlet.MetricasProductor();
+        
+        // Productos activos
+        metricas.productosActivos = productoDao.contarProductosPorProductor(idProductor);
+        
+        // Lotes registrados este mes - usando SQL similar a DashboardProductorServlet
+        String sqlLotes = """
+            SELECT COUNT(*) as total
+            FROM lotes l
+            INNER JOIN productos p ON l.producto_id = p.id_producto
+            WHERE p.productor_id = ?
+            AND l.id_lote >= (
+                SELECT COALESCE(MAX(id_lote) - 100, 1)
+                FROM lotes l2
+                INNER JOIN productos p2 ON l2.producto_id = p2.id_producto
+                WHERE p2.productor_id = ?
+            )
+            """;
+        try (Connection conn = com.example.telito.util.DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sqlLotes)) {
+            pstmt.setInt(1, idProductor);
+            pstmt.setInt(2, idProductor);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    metricas.lotesEsteMes = rs.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            metricas.lotesEsteMes = 0;
+        }
+        
+        // Órdenes pendientes
+        String sqlPendientes = "SELECT COUNT(*) as total FROM ordenes_compra WHERE productor_id = ? AND estado = 'Pendiente'";
+        metricas.ordenesPendientes = ejecutarCountSQL(sqlPendientes, idProductor);
+        
+        // Órdenes en proceso
+        String sqlEnProceso = "SELECT COUNT(*) as total FROM ordenes_compra WHERE productor_id = ? AND estado = 'En Proceso'";
+        metricas.ordenesEnProceso = ejecutarCountSQL(sqlEnProceso, idProductor);
+        
+        // Total de órdenes
+        String sqlTotal = "SELECT COUNT(*) as total FROM ordenes_compra WHERE productor_id = ?";
+        metricas.totalOrdenes = ejecutarCountSQL(sqlTotal, idProductor);
+        
+        // Stock total
+        String sqlStock = """
+            SELECT COALESCE(SUM(l.stock_actual), 0) as total
+            FROM lotes l
+            INNER JOIN productos p ON l.producto_id = p.id_producto
+            WHERE p.productor_id = ?
+            """;
+        metricas.stockTotal = ejecutarCountSQL(sqlStock, idProductor);
+        
+        // Lotes próximos a vencer
+        String sqlVencer = """
+            SELECT COUNT(*) as total
+            FROM lotes l
+            INNER JOIN productos p ON l.producto_id = p.id_producto
+            WHERE p.productor_id = ?
+            AND l.fecha_vencimiento IS NOT NULL
+            AND l.fecha_vencimiento BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+            """;
+        metricas.lotesProximosVencer = ejecutarCountSQL(sqlVencer, idProductor);
+        
+        return metricas;
+    }
+    
+    /**
+     * Ejecuta una consulta COUNT/SUM y retorna el resultado.
+     */
+    private int ejecutarCountSQL(String sql, int idProductor) {
+        try (Connection conn = com.example.telito.util.DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, idProductor);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
 

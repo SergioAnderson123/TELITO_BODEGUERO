@@ -67,10 +67,10 @@
             height: 70px; border-bottom: 1px solid var(--border-color);
         }
         .dashboard-wrapper { margin-left: 250px; width: calc(100% - 250px); min-height: 100vh; }
-        .dashboard-content { margin-top: 70px; padding: 30px; }
-        .page-header { margin-bottom: 30px; }
-        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 10px; }
-        .page-header p { color: var(--text-muted); font-size: 1.05rem; }
+        .dashboard-content { margin-top: 70px; padding: 20px; }
+        .page-header { margin-bottom: 0.5rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 0; font-size: 1.4rem; line-height: 1.2; }
+        .page-header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem; margin-bottom: 0; }
 
         /* =====================
            Sidebar (idéntico a registrarLotes)
@@ -90,15 +90,15 @@
         /* =====================
            Tarjetas/Tabla/Formularios
         ====================== */
-        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
+        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
         .stat-card {
             background-color: var(--white);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            padding: 12px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
-        .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: var(--text-muted); font-weight: 600; }
-        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: var(--turquoise-dark); }
+        .stat-card h3 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+        .stat-card p { margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--turquoise-dark); }
 
         /* Card principal */
         .card {
@@ -123,6 +123,33 @@
         .card-header h2, .card-header h5 { margin: 0; color: white; }
         .card-body { padding: 0; }
         #openModalBtn { background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%); border: none; }
+        
+        /* Table card - igual a gestión de usuarios */
+        .table-card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.06);
+            border: none;
+        }
+        .table-card .card-header {
+            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
+            color: #fff;
+            border-radius: 12px 12px 0 0;
+            padding: 0.5rem 0.75rem;
+            margin: 0;
+        }
+        .table-card .card-body {
+            padding: 0.75rem;
+        }
+        
+        /* Botón Agregar Producto */
+        .btn-agregar-producto {
+            transition: all 0.3s ease;
+        }
+        .btn-agregar-producto:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4) !important;
+        }
 
         /* Formularios y Botones */
         form label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark); }
@@ -137,11 +164,52 @@
         button.btn-secondary { background: #8d99ae; }
         button:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 109, 119, 0.25); }
 
-        /* Tabla */
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        thead th { background-color: var(--seafoam-light); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; }
-        tbody tr:hover { background-color: var(--seafoam-light); }
+        /* Tabla - Estilo igual a gestión de usuarios */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 0.9rem; 
+            margin-bottom: 0 !important; 
+            table-layout: auto;
+        }
+        th, td { 
+            padding: 0.4rem 0.5rem; 
+            text-align: left; 
+            border-bottom: 1px solid var(--border-color); 
+            font-size: 0.85rem;
+        }
+        tbody td {
+            padding: 0.35rem 0.5rem;
+        }
+        thead th { 
+            background-color: #f8f9fa; 
+            font-weight: 600; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            font-size: 0.85rem; 
+        }
+        tbody tr:hover { background-color: #f8f9fa; }
+        tbody tr { vertical-align: middle; }
+
+        /* Botón Ver Lotes - Estilo teal/verde agua */
+        .btn-ver-lotes {
+            background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%) !important;
+            border: none !important;
+            color: white !important;
+            font-size: 0.8rem !important;
+            padding: 0.35rem 0.6rem !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease !important;
+            border-radius: 6px !important;
+        }
+        .btn-ver-lotes:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 8px rgba(32, 201, 151, 0.3) !important;
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+        }
+        .btn-ver-lotes:focus {
+            box-shadow: 0 0 0 0.2rem rgba(32, 201, 151, 0.25) !important;
+        }
 
         /* Paginación */
         .pagination .page-link {
@@ -344,6 +412,12 @@
             <nav class="navbar navbar-expand">
                 <ul class="navbar-nav flex-column w-100">
                     <li class="nav-divider"><i class="fas fa-bars me-2"></i>Menú</li>
+                    <!-- Inicio -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="<%= request.getContextPath() %>/ProductorServlet?action=inicio">
+                            <i class="fas fa-home"></i>Inicio
+                        </a>
+                    </li>
                     <!-- Mis productos -->
                     <li class="nav-item">
                         <a class="nav-link active" href="<%= request.getContextPath() %>/ProductorServlet?action=listarProductos">
@@ -376,18 +450,18 @@
     <!-- ===================== Contenido principal ===================== -->
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
-            <div class="page-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h2><i class="fas fa-shopping-cart me-2"></i>Mis Productos</h2>
-                    <p class="text-muted mb-0">Vista general de tu inventario y herramientas de gestión.</p>
-                </div>
-                <div class="d-flex gap-2 flex-wrap">
-                    <div class="btn-group">
-                        <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=exportar" class="btn btn-sm" style="background: linear-gradient(160deg, #28a745 0%, #20c997 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
-                            <i class="fas fa-file-excel me-2"></i>Exportar Productos
+            <div class="page-header mb-1" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h2 class="pageheader-title mb-0" style="font-size: 1.4rem; line-height: 1.2;"><i class="fas fa-shopping-cart me-2"></i>Mis Productos</h2>
+                        <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Vista general de tu inventario y herramientas de gestión.</p>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=exportar" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <i class="fas fa-file-excel me-1"></i>Exportar Productos
                         </a>
-                        <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=formEnviar" class="btn btn-sm" style="background: linear-gradient(160deg, #17a2b8 0%, #138496 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
-                            <i class="fas fa-envelope me-2"></i>Enviar Productos
+                        <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=formEnviar" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <i class="fas fa-envelope me-1"></i>Enviar Productos
                         </a>
                     </div>
                 </div>
@@ -399,9 +473,10 @@
                 String alertMessage = (String) request.getAttribute("alertMessage");
                 if (alertType != null && alertMessage != null) {
             %>
-            <div class="alert alert-<%= alertType %>" role="alert" style="border-radius: 10px;">
+            <div class="alert alert-<%= alertType %> alert-dismissible fade show" role="alert" style="padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; font-size: 0.85rem; border-radius: 6px;">
                 <i class="fas <%= "success".equals(alertType) ? "fa-check-circle" : "fa-exclamation-triangle" %> me-2"></i>
                 <%= alertMessage %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.7rem;"></button>
             </div>
             <%
                 }
@@ -410,10 +485,10 @@
                 String tipoMensaje = (String) session.getAttribute("tipoMensaje");
                 if (mensaje != null) {
             %>
-            <div class="alert alert-<%= tipoMensaje != null ? tipoMensaje : "info" %> alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+            <div class="alert alert-<%= tipoMensaje != null ? tipoMensaje : "info" %> alert-dismissible fade show" role="alert" style="padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; font-size: 0.85rem; border-radius: 6px;">
                 <i class="fas <%= "success".equals(tipoMensaje) ? "fa-check-circle" : "info".equals(tipoMensaje) ? "fa-info-circle" : "fa-exclamation-triangle" %> me-2"></i>
                 <%= mensaje %>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.7rem;"></button>
             </div>
             <%
                     session.removeAttribute("mensaje");
@@ -422,30 +497,38 @@
             %>
 
             <!-- ===================== Card: Búsqueda y filtros de productos ===================== -->
-            <div class="card" style="padding: 20px; margin-top: -10px;">
-                <div class="row g-3 align-items-center">
-                    <div class="col-lg-5 col-md-12">
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+                <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                         <div class="input-group">
-                            <input id="searchInput" type="text" class="form-control" placeholder="Busca productos por nombre o SKU...">
-                            <button class="btn" type="button" style="background: var(--seafoam); color: #fff;">
+                            <input id="searchInput" type="text" class="form-control form-control-sm shadow-sm" placeholder="Nombre o SKU..." style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                            <button class="btn btn-sm btn-primary shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <select id="categoryFilter" class="form-select">
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-tags me-1"></i>Categoría</label>
+                        <select id="categoryFilter" class="form-select form-select-sm shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                             <option value="">Todas las categorías</option>
                             <% if (todasLasCategorias != null) { for (Categoria categoria : todasLasCategorias) { %>
                                 <option value="<%= categoria.getNombre() %>"><%= categoria.getNombre() %></option>
                             <% } } %>
                         </select>
                     </div>
-                    <div class="col-lg-4 col-md-6">
-                        <select id="priceOrder" class="form-select">
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-sort-amount-down me-1"></i>Precio</label>
+                        <select id="priceOrder" class="form-select form-select-sm shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                             <option value="">Todos los precios</option>
-                            <option value="asc">Precio: Menor a Mayor</option>
-                            <option value="desc">Precio: Mayor a Menor</option>
+                            <option value="asc">Menor a Mayor</option>
+                            <option value="desc">Mayor a Menor</option>
                         </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <a href="<%= request.getContextPath() %>/ProductorServlet?action=listarProductos" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                            <i class="fas fa-sync-alt me-1"></i>Limpiar
+                        </a>
                     </div>
                 </div>
             </div>
@@ -458,59 +541,79 @@
     </div>
 
     <!-- ===================== Card: Inventario actual (tabla) ===================== -->
-    <div class="card">
-        <div class="card-header">
-            <h2>Inventario Actual</h2>
-            <button id="openModalBtn">Agregar Producto</button>
-        </div>
-        <table id="productsTable">
-            <thead>
-            <tr><th>#</th><th>SKU</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Lotes</th><th>Acciones</th></tr>
-            </thead>
-            <tbody>
-            <% 
-                Integer currentPageObj = (Integer) request.getAttribute("currentPage");
-                Integer sizeObj = (Integer) request.getAttribute("size");
-                int currentPage = (currentPageObj != null) ? currentPageObj : 1;
-                int size = (sizeObj != null) ? sizeObj : 10;
-                int i = (currentPage - 1) * size + 1;
-            %>
-            <% for (Producto p : listaProductos) { %>
-            <tr data-category="<%= p.getCategoria().getNombre() %>" data-price="<%= String.format(java.util.Locale.US, "%.2f", p.getPrecioActual()) %>" data-sku="<%= p.getCodigoSKU() %>" data-name="<%= p.getNombre() %>">
-                <td><%= i++ %></td>
-                <td><%= p.getCodigoSKU() %></td>
-                <td><%= p.getNombre() %></td>
-                <td><%= p.getCategoria().getNombre() %></td>
-                <td>S/ <%= String.format("%.2f", p.getPrecioActual()) %></td>
-                <td>
-                    <% int lotes = p.getNumeroLotes(); %>
-                    <span class="badge <%= (lotes > 0) ? "bg-success" : "bg-danger" %> me-2"><%= lotes %></span>
-                    <% if (lotes > 0) { %>
-                        <button type="button" 
-                                class="btn btn-sm btn-outline-primary" 
-                                onclick="mostrarResumenLotesProducto(<%= p.getIdProducto() %>, '<%= p.getNombre() %>')"
-                                title="Ver detalles de lotes">
-                            <i class="fas fa-eye"></i> Ver
+    <div class="row">
+        <div class="col-12">
+            <div class="table-card shadow-sm">
+                <div class="card-header" style="padding: 0.5rem 0.75rem;">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-boxes me-2"></i>Inventario Actual</h5>
+                            <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todos tus productos</small>
+                        </div>
+                        <button id="openModalBtn" class="btn btn-sm shadow-sm btn-agregar-producto" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
+                            <i class="fas fa-plus me-1"></i>Agregar Producto
                         </button>
-                    <% } %>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-sm"
-                            style="background-color: #ff6b6b; color: white; border: none; padding: 6px 12px; border-radius: 6px;"
-                            onclick="confirmarEliminacion(<%= p.getIdProducto() %>, '<%= p.getNombre() %>')"
-                            title="Eliminar producto"
-                            onmouseover="this.style.backgroundColor='#ff5252'"
-                            onmouseout="this.style.backgroundColor='#ff6b6b'">
-                        <i class="fas fa-trash me-1"></i>Borrar
-                    </button>
-                </td>
-            </tr>
-            <% } %>
-            </tbody>
-        </table>
-        
-        <%-- Incluir componente de paginación --%>
-        <jsp:include page="/WEB-INF/includes/pagination.jsp" />
+                    </div>
+                </div>
+        <div class="card-body" style="padding: 0.75rem;">
+            <table id="productsTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
+                <thead class="table-light">
+                <tr>
+                    <th class="fw-semibold" style="width: 5%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">#</th>
+                    <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">SKU</th>
+                    <th class="fw-semibold" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">NOMBRE</th>
+                    <th class="fw-semibold" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">CATEGORÍA</th>
+                    <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">PRECIO</th>
+                    <th class="fw-semibold" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">LOTES</th>
+                    <th class="text-end fw-semibold" style="width: 13%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">ACCIONES</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% 
+                    Integer currentPageObj = (Integer) request.getAttribute("currentPage");
+                    Integer sizeObj = (Integer) request.getAttribute("size");
+                    int currentPage = (currentPageObj != null) ? currentPageObj : 1;
+                    int size = (sizeObj != null) ? sizeObj : 10;
+                    int i = (currentPage - 1) * size + 1;
+                %>
+                <% for (Producto p : listaProductos) { %>
+                <tr class="align-middle" data-category="<%= p.getCategoria().getNombre() %>" data-price="<%= String.format(java.util.Locale.US, "%.2f", p.getPrecioActual()) %>" data-sku="<%= p.getCodigoSKU() %>" data-name="<%= p.getNombre() %>" style="padding: 0;">
+                    <td class="text-muted" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= i++ %></td>
+                    <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= p.getCodigoSKU() %></td>
+                    <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= p.getNombre() %></td>
+                    <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= p.getCategoria().getNombre() %></td>
+                    <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">S/ <%= String.format("%.2f", p.getPrecioActual()) %></td>
+                    <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                        <% int lotes = p.getNumeroLotes(); %>
+                        <span class="badge <%= (lotes > 0) ? "bg-success" : "bg-danger" %> shadow-sm me-2" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;"><%= lotes %></span>
+                        <% if (lotes > 0) { %>
+                            <button type="button" 
+                                    class="btn btn-sm shadow-sm btn-ver-lotes" 
+                                    onclick="mostrarResumenLotesProducto(<%= p.getIdProducto() %>, '<%= p.getNombre() %>')"
+                                    title="Ver detalles de lotes">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                        <% } %>
+                    </td>
+                    <td class="text-end" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                        <button type="button" class="btn btn-sm shadow-sm"
+                                style="background-color: #ff6b6b; color: white; border: none; font-size: 0.8rem; padding: 0.35rem 0.6rem; border-radius: 6px; transition: all 0.2s ease;"
+                                onclick="confirmarEliminacion(<%= p.getIdProducto() %>, '<%= p.getNombre() %>')"
+                                title="Eliminar producto"
+                                onmouseover="this.style.backgroundColor='#ff5252'; this.style.transform='translateY(-1px)';"
+                                onmouseout="this.style.backgroundColor='#ff6b6b'; this.style.transform='translateY(0)';">
+                            <i class="fas fa-trash me-1"></i>Borrar
+                        </button>
+                    </td>
+                </tr>
+                <% } %>
+                </tbody>
+            </table>
+            
+                <%-- Incluir componente de paginación --%>
+                <jsp:include page="/WEB-INF/includes/pagination.jsp" />
+            </div>
+        </div>
     </div>
     </div>
     </div>
@@ -667,9 +770,19 @@
         rows.forEach(r => tbody.appendChild(r));
     }
 
+    // Event listeners para búsqueda y filtros
     searchInput.addEventListener('input', applyFilters);
     categoryFilter.addEventListener('change', applyFilters);
     priceOrder.addEventListener('change', () => { applySort(); });
+    
+    // Botón de búsqueda
+    const searchButton = document.querySelector('.btn-primary.shadow-sm');
+    if (searchButton) {
+        searchButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            applyFilters();
+        });
+    }
 
     // Inicializar
     applyFilters();

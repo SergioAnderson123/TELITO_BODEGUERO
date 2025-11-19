@@ -208,15 +208,25 @@
             <nav class="navbar navbar-expand">
                 <ul class="navbar-nav flex-column w-100">
                     <li class="nav-divider"><i class="fas fa-bars me-2"></i>Menú</li>
+                    <!-- Inicio -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="<%= request.getContextPath() %>/ProductorServlet?action=inicio">
+                            <i class="fas fa-home"></i>Inicio
+                        </a>
+                    </li>
+                    <!-- Mis productos -->
                     <li class="nav-item">
                         <a class="nav-link" href="<%= request.getContextPath() %>/ProductorServlet?action=listarProductos"><i class="fas fa-shopping-cart"></i>Mis Productos</a>
                     </li>
+                    <!-- Órdenes de Compra -->
                     <li class="nav-item">
                         <a class="nav-link" href="<%= request.getContextPath() %>/ProductorServlet?action=ordenesCompra"><i class="fas fa-chart-pie"></i>Órdenes de Compra</a>
                     </li>
+                    <!-- Registrar lotes -->
                     <li class="nav-item">
                         <a class="nav-link" href="<%= request.getContextPath() %>/ProductorServlet?action=formRegistrarLote"><i class="fas fa-boxes"></i>Registrar Lotes</a>
                     </li>
+                    <!-- Actualizar precios -->
                     <li class="nav-item">
                         <a class="nav-link active" href="<%= request.getContextPath() %>/ProductorServlet?action=formActualizarPrecios"><i class="fas fa-tags"></i>Actualizar Precios</a>
                     </li>
