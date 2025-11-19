@@ -13,18 +13,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebServlet(name = "LoginServlet", value = "/acceso/login")
 public class LoginServlet extends HttpServlet {
-    
-    private static final String RECAPTCHA_SECRET_KEY = "6LdmmuwrAAAAALqItgI0K57xTnkT_nOZdBM7kTq7";
-    private static final String RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -101,7 +92,6 @@ public class LoginServlet extends HttpServlet {
         String emailOUsuario = request.getParameter("email"); // Puede ser email o nombre de usuario
         String password = request.getParameter("password");
         String csrfToken = request.getParameter("csrfToken");
-        String recaptchaResponse = request.getParameter("g-recaptcha-response");
 
         // ========== VALIDACIONES DE SEGURIDAD ==========
         
@@ -112,22 +102,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-        // 2. Validar reCAPTCHA
-        if (recaptchaResponse == null || recaptchaResponse.trim().isEmpty()) {
-            System.err.println("🚨 SEGURIDAD: Intento de login sin reCAPTCHA desde: " + request.getRemoteAddr());
-            request.setAttribute("errorMsg", "Por favor, completa la verificación reCAPTCHA.");
-            generarTokenYMostrarLogin(request, response);
-            return;
-        }
-        
-        if (!verificarRecaptcha(recaptchaResponse)) {
-            System.err.println("🚨 SEGURIDAD: Intento de login con reCAPTCHA inválido desde: " + request.getRemoteAddr());
-            request.setAttribute("errorMsg", "La verificación reCAPTCHA falló. Por favor, intente nuevamente.");
-            generarTokenYMostrarLogin(request, response);
-            return;
-        }
-        
-        // 3. Validar token CSRF
+        // 2. Validar token CSRF
         HttpSession sessionActual = request.getSession(false);
         if (!SecurityManager.validarTokenCSRF(sessionActual, csrfToken)) {
             System.err.println("🚨 SEGURIDAD: Intento de login con token CSRF inválido desde: " + 
@@ -137,7 +112,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-        // 4. Verificar si la cuenta está bloqueada por múltiples intentos fallidos
+        // 3. Verificar si la cuenta está bloqueada por múltiples intentos fallidos
         if (SecurityManager.estaBloqueada(emailOUsuario)) {
             int minutosRestantes = SecurityManager.obtenerTiempoBloqueoRestante(emailOUsuario);
             System.err.println("🚨 SEGURIDAD: Intento de login con cuenta bloqueada: " + emailOUsuario);
@@ -327,86 +302,6 @@ public class LoginServlet extends HttpServlet {
             default:
                 response.sendRedirect(contextPath + "/acceso/login");
                 break;
-        }
-    }
-    
-    /**
-     * Verifica el token de reCAPTCHA con Google.
-     * 
-     * @param recaptchaResponse Token de respuesta de reCAPTCHA
-     * @return true si el token es válido, false en caso contrario
-     */
-    private boolean verificarRecaptcha(String recaptchaResponse) {
-        if (recaptchaResponse == null || recaptchaResponse.isEmpty()) {
-            return false;
-        }
-        
-        try {
-            HttpClient client = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(10))
-                    .build();
-            
-            String params = "secret=" + RECAPTCHA_SECRET_KEY + "&response=" + recaptchaResponse;
-            
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(RECAPTCHA_VERIFY_URL))
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublishers.ofString(params))
-                    .build();
-            
-            HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
-            
-            ObjectMapper mapper = new ObjectMapper();
-            RecaptchaResponse jsonResponse = mapper.readValue(httpResponse.body(), RecaptchaResponse.class);
-            
-            return jsonResponse.isSuccess();
-            
-        } catch (Exception e) {
-            System.err.println("Error al verificar reCAPTCHA: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
-    /**
-     * Clase interna para mapear la respuesta de reCAPTCHA.
-     */
-    public static class RecaptchaResponse {
-        private boolean success;
-        private String challenge_ts;
-        private String hostname;
-        private String[] errorCodes;
-        
-        public boolean isSuccess() {
-            return success;
-        }
-        
-        public void setSuccess(boolean success) {
-            this.success = success;
-        }
-        
-        public String getChallenge_ts() {
-            return challenge_ts;
-        }
-        
-        public void setChallenge_ts(String challenge_ts) {
-            this.challenge_ts = challenge_ts;
-        }
-        
-        public String getHostname() {
-            return hostname;
-        }
-        
-        public void setHostname(String hostname) {
-            this.hostname = hostname;
-        }
-        
-        public String[] getErrorCodes() {
-            return errorCodes;
-        }
-        
-        public void setErrorCodes(String[] errorCodes) {
-            this.errorCodes = errorCodes;
         }
     }
 }

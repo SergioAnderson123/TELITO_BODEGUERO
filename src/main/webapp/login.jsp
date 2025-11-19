@@ -353,19 +353,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        .recaptcha-center {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        
-        .recaptcha-center .g-recaptcha {
-            display: inline-block;
-        }
-    </style>
-    
-    <script src="https://www.google.com/recaptcha/api.js?hl=es" async defer></script>
 </head>
 <body>
 
@@ -424,11 +411,6 @@
                     <i class="fas fa-key me-1"></i>¿Olvidaste tu contraseña?
                 </a>
             </div>
-            
-            <!-- reCAPTCHA -->
-            <div class="recaptcha-center mb-3">
-                <div class="g-recaptcha" data-sitekey="6LdmmuwrAAAAAPw7fxE3ytKndbsfpk-Fx17seA-G"></div>
-            </div>
 
             <button type="submit" class="btn btn-login" id="btnLogin">
                 <i class="fas fa-sign-in-alt me-2"></i>
@@ -481,27 +463,13 @@
                 passwordInput.classList.add('is-invalid');
                 isValid = false;
             }
-            
-            // Validar reCAPTCHA
-            const recaptchaResponse = grecaptcha.getResponse();
-            if (!recaptchaResponse || recaptchaResponse.length === 0) {
-                isValid = false;
-                if (errorAlert) {
-                    const errorMessageText = document.getElementById('errorMessageText');
-                    if (errorMessageText) {
-                        errorMessageText.textContent = 'Por favor, completa la verificación reCAPTCHA.';
-                    }
-                    errorAlert.style.display = 'block';
-                    errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            }
 
             if (!isValid) {
                 e.preventDefault();
-                if (errorAlert && !errorAlert.style.display || errorAlert.style.display === 'none') {
+                if (errorAlert && (!errorAlert.style.display || errorAlert.style.display === 'none')) {
                     const errorMessageText = document.getElementById('errorMessageText');
                     if (errorMessageText && !errorMessageText.textContent) {
-                        errorMessageText.textContent = 'Por favor, complete todos los campos y la verificación reCAPTCHA.';
+                        errorMessageText.textContent = 'Por favor, complete todos los campos.';
                     }
                     errorAlert.style.display = 'block';
                     errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
