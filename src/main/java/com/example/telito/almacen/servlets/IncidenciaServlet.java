@@ -131,35 +131,50 @@ public class IncidenciaServlet extends HttpServlet {
                                    IncidenciaDAO incidenciaDAO, boolean esAdministrador)
             throws ServletException, IOException {
         
-        String estado = request.getParameter("estado");
-        String tipo = request.getParameter("tipo");
-        
-        int page = 1;
-        int size = 10;
         try {
-            String pageParam = request.getParameter("page");
-            if (pageParam != null && !pageParam.isEmpty()) {
-                page = Integer.parseInt(pageParam);
+            String estado = request.getParameter("estado");
+            String tipo = request.getParameter("tipo");
+            String busqueda = request.getParameter("busqueda");
+            
+            int page = 1;
+            int size = 10;
+            try {
+                String pageParam = request.getParameter("page");
+                if (pageParam != null && !pageParam.isEmpty()) {
+                    page = Integer.parseInt(pageParam);
+                }
+            } catch (NumberFormatException e) {
+                // Usar valor por defecto
             }
-        } catch (NumberFormatException e) {
-            // Usar valor por defecto
+            if (page < 1) page = 1;
+            
+            ArrayList<Incidencia> incidencias = incidenciaDAO.listarIncidencias(estado, tipo, busqueda, page, size);
+            int totalRegistros = incidenciaDAO.contarIncidencias(estado, tipo, busqueda);
+            int totalPages = (int) Math.ceil((double) totalRegistros / size);
+            if (totalPages == 0) totalPages = 1;
+            if (page > totalPages) page = totalPages;
+            
+            request.setAttribute("incidencias", incidencias);
+            request.setAttribute("totalRegistros", totalRegistros);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("page", page);
+            request.setAttribute("size", size);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalRows", totalRegistros);
+            request.setAttribute("estado", estado);
+            request.setAttribute("tipo", tipo);
+            request.setAttribute("busqueda", busqueda);
+            request.setAttribute("esAdministrador", esAdministrador);
+            request.setAttribute("baseUrl", request.getContextPath() + "/almacen/IncidenciaServlet");
+            request.setAttribute("itemName", "incidencias");
+            
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/almacen/incidencias/listaIncidencias.jsp");
+            dispatcher.forward(request, response);
+        } catch (Exception e) {
+            System.err.println("Error en IncidenciaServlet - listarIncidencias: " + e.getMessage());
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al cargar la lista de incidencias: " + e.getMessage());
         }
-        
-        ArrayList<Incidencia> incidencias = incidenciaDAO.listarIncidencias(estado, tipo, page, size);
-        int totalRegistros = incidenciaDAO.contarIncidencias(estado, tipo);
-        int totalPages = (int) Math.ceil((double) totalRegistros / size);
-        
-        request.setAttribute("incidencias", incidencias);
-        request.setAttribute("totalRegistros", totalRegistros);
-        request.setAttribute("page", page);
-        request.setAttribute("size", size);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("estado", estado);
-        request.setAttribute("tipo", tipo);
-        request.setAttribute("esAdministrador", esAdministrador);
-        
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/almacen/incidencias/listaIncidencias.jsp");
-        dispatcher.forward(request, response);
     }
     
     private void mostrarFormularioReporte(HttpServletRequest request, HttpServletResponse response)

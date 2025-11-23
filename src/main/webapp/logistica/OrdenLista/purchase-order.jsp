@@ -123,29 +123,28 @@
                                 <table id="purchaseTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                     <thead class="table-light">
                                     <tr>
-                                        <th style="width: 5%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">#</th>
-                                        <th style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(0)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-hashtag me-1"></i>N° de Orden
                                         </th>
-                                        <th style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(1)" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-truck me-1"></i>Proveedor
                                         </th>
-                                        <th style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(2)" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-box me-1"></i>Producto
                                         </th>
-                                        <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(3)" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-cubes me-1"></i>Cantidad
                                         </th>
-                                        <th style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(4)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-user me-1"></i>Personal Responsable
                                         </th>
-                                        <th style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(5)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-toggle-on me-1"></i>Estado
                                         </th>
-                                        <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(6)" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-dollar-sign me-1"></i>Monto
                                         </th>
-                                        <th class="text-end fw-semibold text-success" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                                        <th class="text-center fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
                                             <i class="fas fa-cog me-1"></i>Acciones
                                         </th>
                                     </tr>
@@ -158,13 +157,11 @@
                                         Integer sizeObj = (Integer) request.getAttribute("size");
                                         int currentPageInt = (currentPageObj != null) ? currentPageObj : 1;
                                         int sizeInt = (sizeObj != null) ? sizeObj : 5;
-                                        int contador = (currentPageInt - 1) * sizeInt + 1;
                                         
                                         if (listaOrdenes != null && !listaOrdenes.isEmpty()) {
                                             for (OrdenCompraBean orden : listaOrdenes) {
                                     %>
                                     <tr class="align-middle" style="padding: 0;">
-                                        <td class="text-muted" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= contador++ %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong><%= orden.getNumeroOrden() %></strong></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= orden.getNombreProveedor() %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= orden.getNombreProducto() %></td>
@@ -194,10 +191,10 @@
                                             <% } %>
                                         </td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong><%= orden.getMontoTotal() %></strong></td>
-                                        <td class="text-end" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                        <td class="text-center" style="font-size: 0.85rem; padding: 0.5rem;">
                                             <% if ("Recibido".equals(orden.getEstado())) { %>
-                                            <button class="btn btn-sm btn-outline-success shadow-sm" onclick="editarOrden('<%= orden.getNumeroOrden() %>')" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; border-color: #28a745; color: #28a745; transition: all 0.2s ease;" onmouseover="this.style.background='#28a745'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#28a745';">
-                                                <i class="fas fa-edit me-1"></i>Ver
+                                            <button class="btn btn-sm shadow-sm" onclick="editarOrden('<%= orden.getNumeroOrden() %>')" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; border: 1px solid #6c757d; color: #212529; background-color: #f8f9fa; transition: all 0.2s ease; white-space: nowrap;" onmouseover="this.style.backgroundColor='#e9ecef'; this.style.borderColor='#6c757d';" onmouseout="this.style.backgroundColor='#f8f9fa'; this.style.borderColor='#6c757d';">
+                                                <i class="fas fa-eye me-1"></i>Ver
                                             </button>
                                             <% } else { %>
                                             <span class="text-muted" style="font-size: 0.75rem;">-</span>
@@ -209,7 +206,7 @@
                                         } else {
                                     %>
                                     <tr>
-                                        <td colspan="9" class="text-center py-5">
+                                        <td colspan="8" class="text-center py-5">
                                             <div class="text-muted">
                                                 <i class="fas fa-file-invoice fa-3x mb-3 d-block" style="opacity: 0.3;"></i>
                                                 <p class="mb-0">No se encontraron órdenes con los filtros aplicados.</p>
@@ -353,6 +350,54 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Función para ordenar la tabla
+    let sortDirection = {}; // Almacena la dirección de ordenamiento para cada columna
+    
+    function sortTable(columnIndex) {
+        const table = document.getElementById('purchaseTable');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // Determinar dirección de ordenamiento
+        if (!sortDirection[columnIndex]) {
+            sortDirection[columnIndex] = 'asc';
+        } else {
+            sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+        }
+        
+        // Ordenar las filas
+        rows.sort((a, b) => {
+            const aText = a.cells[columnIndex].textContent.trim();
+            const bText = b.cells[columnIndex].textContent.trim();
+            
+            // Intentar comparar como números si es posible
+            const aNum = parseFloat(aText.replace(/[^\d.-]/g, ''));
+            const bNum = parseFloat(bText.replace(/[^\d.-]/g, ''));
+            
+            let comparison = 0;
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                comparison = aNum - bNum;
+            } else {
+                // Comparar como texto
+                comparison = aText.localeCompare(bText, 'es', { numeric: true, sensitivity: 'base' });
+            }
+            
+            return sortDirection[columnIndex] === 'asc' ? comparison : -comparison;
+        });
+        
+        // Reordenar las filas en el DOM
+        rows.forEach(row => tbody.appendChild(row));
+        
+        // Actualizar indicadores visuales en los encabezados
+        const headers = table.querySelectorAll('thead th');
+        headers.forEach((header, index) => {
+            header.classList.remove('sort-asc', 'sort-desc');
+            if (index === columnIndex) {
+                header.classList.add(sortDirection[columnIndex] === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+        });
+    }
+    
     // Función para limpiar backdrops múltiples (overlays oscuros)
     function limpiarBackdrops() {
         const backdrops = document.querySelectorAll('.modal-backdrop');
@@ -517,5 +562,26 @@
         }, { once: true });
     }
 </script>
+
+<style>
+    thead th {
+        position: relative;
+        user-select: none;
+    }
+    thead th:hover {
+        background-color: var(--seafoam) !important;
+    }
+    thead th.sort-asc::after {
+        content: ' ▲';
+        font-size: 0.7em;
+        color: var(--turquoise-dark);
+    }
+    thead th.sort-desc::after {
+        content: ' ▼';
+        font-size: 0.7em;
+        color: var(--turquoise-dark);
+    }
+</style>
+
 </body>
 </html>

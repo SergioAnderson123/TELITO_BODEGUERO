@@ -50,40 +50,65 @@ public class MovimientoServlet extends HttpServlet {
 
         switch (action) {
             case "listar":
-                int registrosPorPagina = 10;
-                String pageStr = request.getParameter("page");
-                int paginaActual = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
-                if (paginaActual < 1) paginaActual = 1;
+                try {
+                    int registrosPorPagina = 10;
+                    String pageStr = request.getParameter("page");
+                    int paginaActual = 1;
+                    try {
+                        if (pageStr != null && !pageStr.isEmpty()) {
+                            paginaActual = Integer.parseInt(pageStr);
+                        }
+                    } catch (NumberFormatException e) {
+                        paginaActual = 1;
+                    }
+                    if (paginaActual < 1) paginaActual = 1;
 
-                String filtro = request.getParameter("filtro");
-                int totalRegistros;
-                ArrayList<Movimiento> listaMovimientos;
+                    // Parámetros de filtros
+                    String filtro = request.getParameter("filtro");
+                    String busqueda = request.getParameter("busqueda");
+                    String tipoMovimiento = request.getParameter("tipo");
 
-                if ("mios".equals(filtro) && usuarioLogueado != null) {
-                    int usuarioId = usuarioLogueado.getIdUsuario();
-                    totalRegistros = movimientoDao.contarMovimientosPorUsuario(usuarioId);
-                    int offset = (paginaActual - 1) * registrosPorPagina;
-                    listaMovimientos = movimientoDao.listarMovimientosPorUsuarioPaginado(usuarioId, registrosPorPagina, offset);
-                } else {
-                    totalRegistros = movimientoDao.contarTotalMovimientos();
-                    int offset = (paginaActual - 1) * registrosPorPagina;
-                    listaMovimientos = movimientoDao.listarMovimientosPaginado(registrosPorPagina, offset);
+                    int totalRegistros;
+                    ArrayList<Movimiento> listaMovimientos;
+
+                    if ("mios".equals(filtro) && usuarioLogueado != null) {
+                        int usuarioId = usuarioLogueado.getIdUsuario();
+                        totalRegistros = movimientoDao.contarMovimientosPorUsuario(usuarioId, busqueda, tipoMovimiento);
+                        int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
+                        if (totalPaginas == 0) totalPaginas = 1;
+                        if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+                        int offset = (paginaActual - 1) * registrosPorPagina;
+                        listaMovimientos = movimientoDao.listarMovimientosPorUsuarioPaginado(usuarioId, registrosPorPagina, offset, busqueda, tipoMovimiento);
+                    } else {
+                        totalRegistros = movimientoDao.contarTotalMovimientos(busqueda, tipoMovimiento, filtro);
+                        int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
+                        if (totalPaginas == 0) totalPaginas = 1;
+                        if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+                        int offset = (paginaActual - 1) * registrosPorPagina;
+                        listaMovimientos = movimientoDao.listarMovimientosPaginado(registrosPorPagina, offset, busqueda, tipoMovimiento);
+                    }
+
+                    int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
+                    if (totalPaginas == 0) totalPaginas = 1;
+
+                    request.setAttribute("listaMovimientos", listaMovimientos);
+                    request.setAttribute("filtroActual", filtro);
+                    request.setAttribute("currentPage", paginaActual);
+                    request.setAttribute("size", registrosPorPagina);
+                    request.setAttribute("totalPages", totalPaginas);
+                    request.setAttribute("totalRows", totalRegistros);
+                    request.setAttribute("baseUrl", request.getContextPath() + "/almacen/MovimientoServlet");
+                    request.setAttribute("itemName", "movimientos");
+                    request.setAttribute("busqueda", busqueda);
+                    request.setAttribute("tipoFiltro", tipoMovimiento);
+
+                    RequestDispatcher view = request.getRequestDispatcher("/almacen/movimientos/historialMovimientos.jsp");
+                    view.forward(request, response);
+                } catch (Exception e) {
+                    System.err.println("Error en MovimientoServlet - case listar: " + e.getMessage());
+                    e.printStackTrace();
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al cargar el historial de movimientos: " + e.getMessage());
                 }
-
-                int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
-                if (totalPaginas == 0) totalPaginas = 1;
-
-                request.setAttribute("listaMovimientos", listaMovimientos);
-                request.setAttribute("filtroActual", filtro);
-                request.setAttribute("currentPage", paginaActual);
-                request.setAttribute("size", registrosPorPagina);
-                request.setAttribute("totalPages", totalPaginas);
-                request.setAttribute("totalRows", totalRegistros);
-                request.setAttribute("baseUrl", request.getContextPath() + "/almacen/MovimientoServlet");
-                request.setAttribute("itemName", "movimientos");
-
-                RequestDispatcher view = request.getRequestDispatcher("/almacen/movimientos/historialMovimientos.jsp");
-                view.forward(request, response);
                 break;
         }
     }

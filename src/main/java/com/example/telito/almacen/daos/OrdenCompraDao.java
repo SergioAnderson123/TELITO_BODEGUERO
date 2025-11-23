@@ -8,15 +8,73 @@ import java.util.ArrayList;
 public class OrdenCompraDao extends DAOBase {
 
     public int contarOrdenesPendientes() {
-        String sql = "SELECT COUNT(*) FROM ordenes_compra WHERE estado = 'Aprobado'";
-        return count(sql);
+        return contarOrdenesPendientes(null, null);
+    }
+    
+    public int contarOrdenesPendientes(String busqueda, String proveedorId) {
+        String sql = "SELECT COUNT(*) FROM ordenes_compra oc " +
+                "INNER JOIN productos prod ON (oc.producto_id = prod.id_producto) " +
+                "INNER JOIN usuarios productor ON (oc.productor_id = productor.id_usuario) " +
+                "WHERE oc.estado = 'Aprobado'";
+        
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (prod.nombre LIKE ? OR oc.numero_Orden LIKE ?";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+            
+            // Si el usuario ingresa algo como OC001 o 001, intentamos filtrar por id
+            String digits = busqueda.replaceAll("\\D", "");
+            if (!digits.isEmpty()) {
+                try {
+                    sql += " OR oc.id_orden_compra = ?";
+                    params.add(Integer.parseInt(digits));
+                } catch (NumberFormatException e) {
+                    // Ignorar si no es un número válido
+                }
+            }
+            sql += ")";
+        }
+        
+        if (proveedorId != null && !proveedorId.trim().isEmpty()) {
+            sql += " AND productor.id_usuario = ?";
+            params.add(Integer.parseInt(proveedorId));
+        }
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar órdenes pendientes", e);
+            throw new RuntimeException("Error al contar órdenes pendientes", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
     }
 
     public ArrayList<OrdenCompra> listarOrdenesPaginadas(int offset, int limit) {
+        return listarOrdenesPaginadas(offset, limit, null, null);
+    }
+    
+    public ArrayList<OrdenCompra> listarOrdenesPaginadas(int offset, int limit, String busqueda, String proveedorId) {
         ArrayList<OrdenCompra> lista = new ArrayList<>();
         String sql = "SELECT oc.id_orden_compra, " +
                 "IFNULL(oc.numero_Orden, CONCAT('OC', LPAD(oc.id_orden_compra, 3, '0'))) AS numero_orden, " +
-                "prod.nombre, " +
+                "prod.nombre AS producto_nombre, " +
                 "CONCAT(productor.nombres, ' ', productor.apellidos) AS nombre_productor, " +
                 "oc.cantidad, " +
                 "CASE " +
@@ -27,7 +85,35 @@ public class OrdenCompraDao extends DAOBase {
                 "FROM ordenes_compra oc " +
                 "INNER JOIN productos prod ON (oc.producto_id = prod.id_producto) " +
                 "INNER JOIN usuarios productor ON (oc.productor_id = productor.id_usuario) " +
-                "WHERE oc.estado = 'Aprobado' LIMIT ? OFFSET ?";
+                "WHERE oc.estado = 'Aprobado'";
+
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (prod.nombre LIKE ? OR oc.numero_Orden LIKE ?";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+            
+            // Si el usuario ingresa algo como OC001 o 001, intentamos filtrar por id
+            String digits = busqueda.replaceAll("\\D", "");
+            if (!digits.isEmpty()) {
+                try {
+                    sql += " OR oc.id_orden_compra = ?";
+                    params.add(Integer.parseInt(digits));
+                } catch (NumberFormatException e) {
+                    // Ignorar si no es un número válido
+                }
+            }
+            sql += ")";
+        }
+        
+        if (proveedorId != null && !proveedorId.trim().isEmpty()) {
+            sql += " AND productor.id_usuario = ?";
+            params.add(Integer.parseInt(proveedorId));
+        }
+        
+        sql += " ORDER BY oc.id_orden_compra DESC LIMIT ? OFFSET ?";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -36,15 +122,21 @@ public class OrdenCompraDao extends DAOBase {
         try {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, limit);
-            pstmt.setInt(2, offset);
+            
+            int paramIndex = 1;
+            for (Object param : params) {
+                pstmt.setObject(paramIndex++, param);
+            }
+            
+            pstmt.setInt(paramIndex++, limit);
+            pstmt.setInt(paramIndex, offset);
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 OrdenCompra oc = new OrdenCompra();
                 oc.setIdOrdenCompra(rs.getInt("id_orden_compra"));
                 oc.setNumeroOrden(rs.getString("numero_orden"));
-                oc.setNombreProducto(rs.getString("prod.nombre"));
+                oc.setNombreProducto(rs.getString("producto_nombre"));
                 oc.setNombreProveedor(rs.getString("nombre_productor"));
                 oc.setCantidad(rs.getInt("cantidad"));
                 oc.setEstado(rs.getString("estado"));
@@ -72,7 +164,7 @@ public class OrdenCompraDao extends DAOBase {
                 "oc.lote_id, " +
                 "oc.cantidad, " +
                 "oc.estado, " +
-                "prod.nombre, " +
+                "prod.nombre AS producto_nombre, " +
                 "CONCAT(productor.nombres, ' ', productor.apellidos) AS nombre_productor " +
                 "FROM ordenes_compra oc " +
                 "INNER JOIN productos prod ON (oc.producto_id = prod.id_producto) " +
@@ -98,7 +190,7 @@ public class OrdenCompraDao extends DAOBase {
                 oc.setLoteId(rs.getInt("lote_id"));
                 oc.setCantidad(rs.getInt("cantidad"));
                 oc.setEstado(rs.getString("estado"));
-                oc.setNombreProducto(rs.getString("prod.nombre"));
+                oc.setNombreProducto(rs.getString("producto_nombre"));
                 oc.setNombreProveedor(rs.getString("nombre_productor"));
             }
         } catch (SQLException e) {
@@ -115,6 +207,46 @@ public class OrdenCompraDao extends DAOBase {
         executeUpdate(sql, nuevoEstado, idOrden);
     }
 
+    /**
+     * Lista los productores (usuarios con rol Productor) para usar en filtros.
+     * Retorna lista vacía si hay error en lugar de lanzar excepción.
+     */
+    public ArrayList<java.util.Map<String, Object>> listarProductores() {
+        ArrayList<java.util.Map<String, Object>> lista = new ArrayList<>();
+        String sql = "SELECT u.id_usuario, CONCAT(u.nombres, ' ', u.apellidos) as nombre_completo " +
+                     "FROM usuarios u " +
+                     "INNER JOIN roles r ON u.rol_id = r.id_rol " +
+                     "WHERE r.nombre = 'Productor' AND u.activo = 1 " +
+                     "ORDER BY u.nombres ASC";
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                java.util.Map<String, Object> productor = new java.util.HashMap<>();
+                productor.put("id", rs.getInt("id_usuario"));
+                productor.put("nombre", rs.getString("nombre_completo"));
+                lista.add(productor);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al listar productores", e);
+            // Retornar lista vacía en lugar de lanzar excepción para no romper la página
+            return new ArrayList<>();
+        } catch (Exception e) {
+            logger.error("Error inesperado al listar productores", e);
+            return new ArrayList<>();
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return lista;
+    }
+    
     /**
      * Obtiene el usuario_id de logística que creó la orden de compra.
      * Útil para enviar notificaciones por correo.

@@ -13,13 +13,80 @@ import java.util.ArrayList;
 public class PedidoDao extends DAOBase {
 
     public int contarPedidos() {
-        String sql = "SELECT COUNT(*) FROM pedidos";
-        return count(sql);
+        return contarPedidos(null, null);
     }
+    
+    public int contarPedidos(String busqueda, String estado) {
+        String sql = "SELECT COUNT(*) FROM pedidos p " +
+                "LEFT JOIN clientes c ON p.cliente_id = c.id_cliente " +
+                "WHERE 1=1";
+        
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (p.numero_pedido LIKE ? OR p.destino LIKE ? OR c.nombre LIKE ?)";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+        
+        if (estado != null && !estado.trim().isEmpty()) {
+            sql += " AND p.estado_preparacion = ?";
+            params.add(estado.trim());
+        }
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar pedidos", e);
+            throw new RuntimeException("Error al contar pedidos", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
+    }
+    
     public ArrayList<Pedido> listarPedidosPaginados(int offset, int limit) {
+        return listarPedidosPaginados(offset, limit, null, null);
+    }
+    
+    public ArrayList<Pedido> listarPedidosPaginados(int offset, int limit, String busqueda, String estado) {
         ArrayList<Pedido> listaPedidos = new ArrayList<>();
-        String sql = "SELECT p.id_pedido, p.numero_pedido, p.destino, p.estado_preparacion " +
-                " FROM pedidos p LIMIT ? OFFSET ?";
+        String sql = "SELECT p.id_pedido, p.numero_pedido, p.destino, p.estado_preparacion, " +
+                "c.nombre AS nombre_cliente, c.id_cliente " +
+                "FROM pedidos p " +
+                "LEFT JOIN clientes c ON p.cliente_id = c.id_cliente " +
+                "WHERE 1=1";
+
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (p.numero_pedido LIKE ? OR p.destino LIKE ? OR c.nombre LIKE ?)";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+        
+        if (estado != null && !estado.trim().isEmpty()) {
+            sql += " AND p.estado_preparacion = ?";
+            params.add(estado.trim());
+        }
+        
+        sql += " ORDER BY p.id_pedido DESC LIMIT ? OFFSET ?";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -28,8 +95,14 @@ public class PedidoDao extends DAOBase {
         try {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, limit);
-            pstmt.setInt(2, offset);
+            
+            int paramIndex = 1;
+            for (Object param : params) {
+                pstmt.setObject(paramIndex++, param);
+            }
+            
+            pstmt.setInt(paramIndex++, limit);
+            pstmt.setInt(paramIndex, offset);
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -38,6 +111,13 @@ public class PedidoDao extends DAOBase {
                 pedido.setNumeroPedido(rs.getString("numero_pedido"));
                 pedido.setDestino(rs.getString("destino"));
                 pedido.setEstadoPreparacion(rs.getString("estado_preparacion"));
+                
+                // Agregar cliente si existe
+                Cliente cliente = new Cliente();
+                cliente.setIdCliente(rs.getInt("id_cliente"));
+                cliente.setNombre(rs.getString("nombre_cliente"));
+                pedido.setCliente(cliente);
+                
                 listaPedidos.add(pedido);
             }
         } catch (SQLException e) {

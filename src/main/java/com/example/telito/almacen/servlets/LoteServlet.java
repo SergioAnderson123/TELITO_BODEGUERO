@@ -39,18 +39,23 @@ public class LoteServlet extends HttpServlet {
 
         switch (action) {
             case "lista":
-                // --- INICIO DE LA MODIFICACIÓN ---
+                // Parámetros de paginación
                 String pageStr = request.getParameter("page");
                 int page = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
+                if (page < 1) page = 1;
 
-                // Se llaman a los nuevos métodos del DAO que filtran por estado "Registrado"
-                ArrayList<Lote> listaLotes = loteDao.listarLotesRegistrados(page);
-                int totalRegistros = loteDao.contarTotalLotesRegistrados();
-                // --- FIN DE LA MODIFICACIÓN ---
+                // Parámetros de filtros
+                String busqueda = request.getParameter("busqueda");
+                String estado = request.getParameter("estado");
+
+                // Se llaman a los métodos del DAO con filtros
+                ArrayList<Lote> listaLotes = loteDao.listarLotesRegistrados(page, busqueda, estado);
+                int totalRegistros = loteDao.contarTotalLotesRegistrados(busqueda, estado);
 
                 int registrosPorPagina = 10;
                 int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
                 if (totalPaginas == 0) totalPaginas = 1;
+                if (page > totalPaginas) page = totalPaginas;
 
                 request.setAttribute("listaLotes", listaLotes);
                 request.setAttribute("currentPage", page);
@@ -59,6 +64,8 @@ public class LoteServlet extends HttpServlet {
                 request.setAttribute("totalRows", totalRegistros);
                 request.setAttribute("baseUrl", request.getContextPath() + "/almacen/LoteServlet");
                 request.setAttribute("itemName", "lotes");
+                request.setAttribute("busqueda", busqueda);
+                request.setAttribute("estadoFiltro", estado);
 
                 RequestDispatcher view = request.getRequestDispatcher("/almacen/lotes/gestionarStock.jsp");
                 view.forward(request, response);

@@ -44,26 +44,53 @@ public class EntradaServlet extends HttpServlet {
 
         switch (action) {
             case "lista":
-                int registrosPorPagina = 10;
-                String pageStr = request.getParameter("page");
-                int paginaActual = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
-                if (paginaActual < 1) paginaActual = 1;
-                int totalRegistros = ordenCompraDao.contarOrdenesPendientes();
-                int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
-                if (totalPaginas == 0) totalPaginas = 1;
-                int offset = (paginaActual - 1) * registrosPorPagina;
-                ArrayList<OrdenCompra> listaPaginada = ordenCompraDao.listarOrdenesPaginadas(offset, registrosPorPagina);
+                try {
+                    // Parámetros de paginación
+                    int registrosPorPagina = 10;
+                    String pageStr = request.getParameter("page");
+                    int paginaActual = 1;
+                    try {
+                        if (pageStr != null && !pageStr.isEmpty()) {
+                            paginaActual = Integer.parseInt(pageStr);
+                        }
+                    } catch (NumberFormatException e) {
+                        paginaActual = 1;
+                    }
+                    if (paginaActual < 1) paginaActual = 1;
 
-                request.setAttribute("listaOrdenes", listaPaginada);
-                request.setAttribute("currentPage", paginaActual);
-                request.setAttribute("size", registrosPorPagina);
-                request.setAttribute("totalPages", totalPaginas);
-                request.setAttribute("totalRows", totalRegistros);
-                request.setAttribute("baseUrl", request.getContextPath() + "/almacen/EntradaServlet");
-                request.setAttribute("itemName", "órdenes");
+                    // Parámetros de filtros
+                    String busqueda = request.getParameter("busqueda");
+                    String proveedorId = request.getParameter("proveedor");
 
-                view = request.getRequestDispatcher("/almacen/entradas/listaOrdenes.jsp");
-                view.forward(request, response);
+                    // Contar total con filtros
+                    int totalRegistros = ordenCompraDao.contarOrdenesPendientes(busqueda, proveedorId);
+                    int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
+                    if (totalPaginas == 0) totalPaginas = 1;
+                    if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+                    
+                    int offset = (paginaActual - 1) * registrosPorPagina;
+                    ArrayList<OrdenCompra> listaPaginada = ordenCompraDao.listarOrdenesPaginadas(offset, registrosPorPagina, busqueda, proveedorId);
+
+                    // Obtener lista de productores para el filtro
+                    request.setAttribute("listaProductores", ordenCompraDao.listarProductores());
+
+                    request.setAttribute("listaOrdenes", listaPaginada);
+                    request.setAttribute("currentPage", paginaActual);
+                    request.setAttribute("size", registrosPorPagina);
+                    request.setAttribute("totalPages", totalPaginas);
+                    request.setAttribute("totalRows", totalRegistros);
+                    request.setAttribute("baseUrl", request.getContextPath() + "/almacen/EntradaServlet");
+                    request.setAttribute("itemName", "órdenes");
+                    request.setAttribute("busqueda", busqueda);
+                    request.setAttribute("proveedorFiltro", proveedorId);
+
+                    view = request.getRequestDispatcher("/almacen/entradas/listaOrdenes.jsp");
+                    view.forward(request, response);
+                } catch (Exception e) {
+                    System.err.println("Error en EntradaServlet - case lista: " + e.getMessage());
+                    e.printStackTrace();
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al cargar la lista de órdenes: " + e.getMessage());
+                }
                 break;
 
             case "recibir":

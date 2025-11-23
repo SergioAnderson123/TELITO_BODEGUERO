@@ -45,31 +45,53 @@ public class PedidoServlet extends HttpServlet {
 
         switch (action) {
             case "lista":
-                int registrosPorPagina = 10;
-                String pageStr = request.getParameter("page");
-                int paginaActual = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
-                if (paginaActual < 1) paginaActual = 1;
-                int totalRegistros = pedidoDao.contarPedidos();
-                int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
-                if (totalPaginas == 0) totalPaginas = 1;
-                int offset = (paginaActual - 1) * registrosPorPagina;
-                ArrayList<Pedido> listaPaginada = pedidoDao.listarPedidosPaginados(offset, registrosPorPagina);
+                try {
+                    int registrosPorPagina = 10;
+                    String pageStr = request.getParameter("page");
+                    int paginaActual = 1;
+                    try {
+                        if (pageStr != null && !pageStr.isEmpty()) {
+                            paginaActual = Integer.parseInt(pageStr);
+                        }
+                    } catch (NumberFormatException e) {
+                        paginaActual = 1;
+                    }
+                    if (paginaActual < 1) paginaActual = 1;
 
-                // También traemos los planes de transporte pendientes
-                PlanTransporteDao planTransporteDao = new PlanTransporteDao();
-                ArrayList<PlanTransporte> listaPlanes = planTransporteDao.listarPlanesPendientes();
+                    // Parámetros de filtros
+                    String busqueda = request.getParameter("busqueda");
+                    String estado = request.getParameter("estado");
 
-                request.setAttribute("listaPedidos", listaPaginada);
-                request.setAttribute("listaPlanes", listaPlanes);
-                request.setAttribute("currentPage", paginaActual);
-                request.setAttribute("size", registrosPorPagina);
-                request.setAttribute("totalPages", totalPaginas);
-                request.setAttribute("totalRows", totalRegistros);
-                request.setAttribute("baseUrl", request.getContextPath() + "/almacen/PedidoServlet");
-                request.setAttribute("itemName", "pedidos");
+                    int totalRegistros = pedidoDao.contarPedidos(busqueda, estado);
+                    int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
+                    if (totalPaginas == 0) totalPaginas = 1;
+                    if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+                    
+                    int offset = (paginaActual - 1) * registrosPorPagina;
+                    ArrayList<Pedido> listaPaginada = pedidoDao.listarPedidosPaginados(offset, registrosPorPagina, busqueda, estado);
 
-                view = request.getRequestDispatcher("/almacen/pedidos/listaPedidos.jsp");
-                view.forward(request, response);
+                    // También traemos los planes de transporte pendientes
+                    PlanTransporteDao planTransporteDao = new PlanTransporteDao();
+                    ArrayList<PlanTransporte> listaPlanes = planTransporteDao.listarPlanesPendientes();
+
+                    request.setAttribute("listaPedidos", listaPaginada);
+                    request.setAttribute("listaPlanes", listaPlanes);
+                    request.setAttribute("currentPage", paginaActual);
+                    request.setAttribute("size", registrosPorPagina);
+                    request.setAttribute("totalPages", totalPaginas);
+                    request.setAttribute("totalRows", totalRegistros);
+                    request.setAttribute("baseUrl", request.getContextPath() + "/almacen/PedidoServlet");
+                    request.setAttribute("itemName", "pedidos");
+                    request.setAttribute("busqueda", busqueda);
+                    request.setAttribute("estadoFiltro", estado);
+
+                    view = request.getRequestDispatcher("/almacen/pedidos/listaPedidos.jsp");
+                    view.forward(request, response);
+                } catch (Exception e) {
+                    System.err.println("Error en PedidoServlet - case lista: " + e.getMessage());
+                    e.printStackTrace();
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al cargar la lista de pedidos: " + e.getMessage());
+                }
                 break;
 
             case "preparar":

@@ -10,15 +10,20 @@ public class LoteDao extends DAOBase {
     /**
      * MÉTODO MODIFICADO: Renombrado y filtrado.
      * Lista únicamente los lotes que ya han sido marcados como "Registrado" en el almacén.
+     * Ahora soporta filtros de búsqueda y estado de stock.
      */
     public ArrayList<Lote> listarLotesRegistrados(int pagina) {
+        return listarLotesRegistrados(pagina, null, null);
+    }
+    
+    /**
+     * Lista lotes registrados con filtros opcionales.
+     */
+    public ArrayList<Lote> listarLotesRegistrados(int pagina, String busqueda, String estadoStock) {
         ArrayList<Lote> lista = new ArrayList<>();
         int registrosPorPagina = 10;
         int offset = (pagina - 1) * registrosPorPagina;
 
-        // SE AÑADE LA CONDICIÓN WHERE para filtrar por el estado + cálculo de paquetes + estado de stock
-        // IMPORTANTE: Solo mostrar lotes del almacén (con ubicacion_id asignada, NO NULL)
-        // Los lotes del productor tienen ubicacion_id = NULL o no tienen ubicación del almacén
         String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, l.estado, " +
                 "l.producto_id, " +
                 "p.nombre AS nombre_producto, p.codigo_sku AS codigo_sku, p.unidades_por_paquete, " +
@@ -35,9 +40,42 @@ public class LoteDao extends DAOBase {
                 "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                 "INNER JOIN ubicaciones u ON l.ubicacion_id = u.id_ubicacion " +
                 "LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1 " +
-                "WHERE l.estado = 'Registrado' " + // Lotes registrados en almacén
-                "AND l.ubicacion_id IS NOT NULL " + // Solo lotes con ubicación (del almacén, no del productor)
-                "LIMIT ? OFFSET ?";
+                "WHERE l.estado = 'Registrado' " +
+                "AND l.ubicacion_id IS NOT NULL ";
+
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        int paramIndex = 1;
+
+        // Filtro por búsqueda (SKU o Producto)
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += "AND (p.codigo_sku LIKE ? OR p.nombre LIKE ? OR l.codigo_lote LIKE ?) ";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+
+        sql += "ORDER BY p.codigo_sku ASC, l.codigo_lote ASC";
+
+        // Si hay filtro de estado, envolver en subconsulta
+        if (estadoStock != null && !estadoStock.trim().isEmpty()) {
+            String estadoFiltro = "";
+            if (estadoStock.equals("En stock")) {
+                estadoFiltro = "En Stock";
+            } else if (estadoStock.equals("Poco stock")) {
+                estadoFiltro = "Poco Stock";
+            } else if (estadoStock.equals("Sin stock")) {
+                estadoFiltro = "Sin Stock";
+            }
+            
+            if (!estadoFiltro.isEmpty()) {
+                sql = "SELECT * FROM (" + sql + ") AS subquery WHERE estado_stock = ? LIMIT ? OFFSET ?";
+            } else {
+                sql += " LIMIT ? OFFSET ?";
+            }
+        } else {
+            sql += " LIMIT ? OFFSET ?";
+        }
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -46,8 +84,29 @@ public class LoteDao extends DAOBase {
         try {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, registrosPorPagina);
-            pstmt.setInt(2, offset);
+            
+            // Establecer parámetros dinámicos
+            for (Object param : params) {
+                pstmt.setObject(paramIndex++, param);
+            }
+            
+            // Si hay filtro de estado, agregar el parámetro
+            if (estadoStock != null && !estadoStock.trim().isEmpty()) {
+                String estadoFiltro = "";
+                if (estadoStock.equals("En stock")) {
+                    estadoFiltro = "En Stock";
+                } else if (estadoStock.equals("Poco stock")) {
+                    estadoFiltro = "Poco Stock";
+                } else if (estadoStock.equals("Sin stock")) {
+                    estadoFiltro = "Sin Stock";
+                }
+                if (!estadoFiltro.isEmpty()) {
+                    pstmt.setString(paramIndex++, estadoFiltro);
+                }
+            }
+            
+            pstmt.setInt(paramIndex++, registrosPorPagina);
+            pstmt.setInt(paramIndex, offset);
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -60,9 +119,9 @@ public class LoteDao extends DAOBase {
                 lote.setEstado(rs.getString("estado"));
                 lote.setProductoId(rs.getInt("producto_id"));
                 lote.setNombreProducto(rs.getString("nombre_producto"));
-                lote.setCodigoSKU(rs.getString("codigo_sku")); // SKU del producto
+                lote.setCodigoSKU(rs.getString("codigo_sku"));
                 lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
-                lote.setEstadoStock(rs.getString("estado_stock")); // Estado del stock calculado
+                lote.setEstadoStock(rs.getString("estado_stock"));
                 lista.add(lote);
             }
         } catch (SQLException e) {
@@ -79,9 +138,79 @@ public class LoteDao extends DAOBase {
      * Cuenta el total de lotes que están marcados como "Registrado".
      */
     public int contarTotalLotesRegistrados() {
-        // Solo contar lotes del almacén (con ubicacion_id asignada)
-        String sql = "SELECT COUNT(*) FROM lotes WHERE estado = 'Registrado' AND ubicacion_id IS NOT NULL";
-        return count(sql);
+        return contarTotalLotesRegistrados(null, null);
+    }
+    
+    /**
+     * Cuenta lotes registrados con filtros opcionales.
+     */
+    public int contarTotalLotesRegistrados(String busqueda, String estadoStock) {
+        String sql = """
+            SELECT COUNT(*) as total
+            FROM (
+                SELECT l.id_lote,
+                CASE 
+                    WHEN smc.id_stock_minimo IS NULL THEN 'No configurado' 
+                    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) = 0 THEN 'Sin Stock' 
+                    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_critico_lote THEN 'Sin Stock' 
+                    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_minimo_lote THEN 'Poco Stock' 
+                    ELSE 'En Stock' 
+                END AS estado_stock
+                FROM lotes l 
+                INNER JOIN productos p ON l.producto_id = p.id_producto 
+                INNER JOIN ubicaciones u ON l.ubicacion_id = u.id_ubicacion 
+                LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1 
+                WHERE l.estado = 'Registrado' 
+                AND l.ubicacion_id IS NOT NULL
+            """;
+        
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        
+        // Filtro por búsqueda
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (p.codigo_sku LIKE ? OR p.nombre LIKE ? OR l.codigo_lote LIKE ?)";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+        
+        sql += ") as subquery";
+        
+        // Filtro por estado de stock
+        if (estadoStock != null && !estadoStock.trim().isEmpty()) {
+            if (estadoStock.equals("En stock")) {
+                sql += " WHERE estado_stock = 'En Stock'";
+            } else if (estadoStock.equals("Poco stock")) {
+                sql += " WHERE estado_stock = 'Poco Stock'";
+            } else if (estadoStock.equals("Sin stock")) {
+                sql += " WHERE estado_stock = 'Sin Stock'";
+            }
+        }
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+            
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar lotes registrados", e);
+            throw new RuntimeException("Error al contar lotes registrados", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
     }
 
     /**

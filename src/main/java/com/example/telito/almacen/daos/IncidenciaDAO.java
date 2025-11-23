@@ -56,6 +56,13 @@ public class IncidenciaDAO extends DAOBase {
      * Lista todas las incidencias con información detallada.
      */
     public ArrayList<Incidencia> listarIncidencias(String estado, String tipo, int page, int size) {
+        return listarIncidencias(estado, tipo, null, page, size);
+    }
+    
+    /**
+     * Lista todas las incidencias con información detallada y búsqueda.
+     */
+    public ArrayList<Incidencia> listarIncidencias(String estado, String tipo, String busqueda, int page, int size) {
         ArrayList<Incidencia> incidencias = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
             "SELECT i.*, " +
@@ -72,6 +79,13 @@ public class IncidenciaDAO extends DAOBase {
         );
         
         ArrayList<Object> params = new ArrayList<>();
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql.append(" AND (p.nombre LIKE ? OR l.codigo_lote LIKE ?)");
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
         
         if (estado != null && !estado.trim().isEmpty()) {
             sql.append(" AND i.estado = ?");
@@ -94,7 +108,12 @@ public class IncidenciaDAO extends DAOBase {
         try {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql.toString());
-            setParameters(pstmt, params.toArray());
+            
+            int paramIndex = 1;
+            for (Object param : params) {
+                pstmt.setObject(paramIndex++, param);
+            }
+            
             rs = pstmt.executeQuery();
             
             while (rs.next()) {
@@ -115,16 +134,33 @@ public class IncidenciaDAO extends DAOBase {
      * Cuenta el total de incidencias con filtros.
      */
     public int contarIncidencias(String estado, String tipo) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM incidencias_almacen WHERE 1=1");
+        return contarIncidencias(estado, tipo, null);
+    }
+    
+    /**
+     * Cuenta el total de incidencias con filtros y búsqueda.
+     */
+    public int contarIncidencias(String estado, String tipo, String busqueda) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM incidencias_almacen i " +
+                "INNER JOIN lotes l ON i.lote_id = l.id_lote " +
+                "INNER JOIN productos p ON i.producto_id = p.id_producto " +
+                "WHERE 1=1");
         ArrayList<Object> params = new ArrayList<>();
         
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql.append(" AND (p.nombre LIKE ? OR l.codigo_lote LIKE ?)");
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+        
         if (estado != null && !estado.trim().isEmpty()) {
-            sql.append(" AND estado = ?");
+            sql.append(" AND i.estado = ?");
             params.add(estado);
         }
         
         if (tipo != null && !tipo.trim().isEmpty()) {
-            sql.append(" AND tipo_incidencia = ?");
+            sql.append(" AND i.tipo_incidencia = ?");
             params.add(tipo);
         }
         

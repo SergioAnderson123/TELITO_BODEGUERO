@@ -106,22 +106,22 @@
                                 <table id="inventoryTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                     <thead class="table-light">
                                     <tr>
-                                        <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(0)" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-barcode me-1"></i>SKU
                                         </th>
-                                        <th style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(1)" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-box me-1"></i>Nombre Producto
                                         </th>
-                                        <th style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(2)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-cubes me-1"></i>Cantidad Disponible
                                         </th>
-                                        <th style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(3)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-dollar-sign me-1"></i>Precio por Paquete
                                         </th>
-                                        <th style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(4)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-coins me-1"></i>Costo por Unidad
                                         </th>
-                                        <th style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(5)" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-toggle-on me-1"></i>Estado
                                         </th>
                                     </tr>
@@ -140,11 +140,7 @@
                                             for (InventarioBean inventario : listaInventario) {
                                     %>
                                     <tr class="align-middle" style="padding: 0;">
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                            <span class="badge text-bg-secondary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                                <%= inventario.getCodigoSKU() %>
-                                            </span>
-                                        </td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= inventario.getCodigoSKU() %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= inventario.getNombreProducto() %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= inventario.getPaquetesDisponibles() %> paquetes</td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong>S/. <%= String.format("%.2f", inventario.getPrecioPorPaquete()) %></strong></td>
@@ -210,6 +206,76 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Función para ordenar la tabla
+    let sortDirection = {}; // Almacena la dirección de ordenamiento para cada columna
+    
+    function sortTable(columnIndex) {
+        const table = document.getElementById('inventoryTable');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // Determinar dirección de ordenamiento
+        if (!sortDirection[columnIndex]) {
+            sortDirection[columnIndex] = 'asc';
+        } else {
+            sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+        }
+        
+        // Ordenar las filas
+        rows.sort((a, b) => {
+            const aText = a.cells[columnIndex].textContent.trim();
+            const bText = b.cells[columnIndex].textContent.trim();
+            
+            // Intentar comparar como números si es posible
+            const aNum = parseFloat(aText.replace(/[^\d.-]/g, ''));
+            const bNum = parseFloat(bText.replace(/[^\d.-]/g, ''));
+            
+            let comparison = 0;
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                comparison = aNum - bNum;
+            } else {
+                // Comparar como texto
+                comparison = aText.localeCompare(bText, 'es', { numeric: true, sensitivity: 'base' });
+            }
+            
+            return sortDirection[columnIndex] === 'asc' ? comparison : -comparison;
+        });
+        
+        // Reordenar las filas en el DOM
+        rows.forEach(row => tbody.appendChild(row));
+        
+        // Actualizar indicadores visuales en los encabezados
+        const headers = table.querySelectorAll('thead th');
+        headers.forEach((header, index) => {
+            header.classList.remove('sort-asc', 'sort-desc');
+            if (index === columnIndex) {
+                header.classList.add(sortDirection[columnIndex] === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+        });
+    }
+</script>
+
+<style>
+    thead th {
+        position: relative;
+        user-select: none;
+    }
+    thead th:hover {
+        background-color: var(--seafoam) !important;
+    }
+    thead th.sort-asc::after {
+        content: ' ▲';
+        font-size: 0.7em;
+        color: var(--turquoise-dark);
+    }
+    thead th.sort-desc::after {
+        content: ' ▼';
+        font-size: 0.7em;
+        color: var(--turquoise-dark);
+    }
+</style>
 
 </body>
 </html>

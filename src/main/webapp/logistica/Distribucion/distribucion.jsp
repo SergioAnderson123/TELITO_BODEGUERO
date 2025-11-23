@@ -84,7 +84,7 @@
                             <form action="${pageContext.request.contextPath}/planes-transporte" method="GET">
                                 <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                                 <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                                         <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" placeholder="N° Viaje, Placa, Lote..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                     </div>
@@ -126,9 +126,7 @@
                                             <i class="fas fa-search me-1"></i>Buscar
                                         </button>
                                     </div>
-                                </div>
-                                <div class="row g-2 mb-2">
-                                    <div class="col-md-2 d-flex align-items-end">
+                                    <div class="col-md-1 d-flex align-items-end">
                                         <a href="${pageContext.request.contextPath}/planes-transporte" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                             <i class="fas fa-sync-alt me-1"></i>Limpiar
                                         </a>
@@ -140,29 +138,28 @@
                                 <table id="distribucionTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                     <thead class="table-light">
                                     <tr>
-                                        <th style="width: 5%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">#</th>
-                                        <th style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(0)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-hashtag me-1"></i>N° de Viaje
                                         </th>
-                                        <th style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(1)" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-box me-1"></i>Producto
                                         </th>
-                                        <th style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(2)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-barcode me-1"></i>Lote
                                         </th>
-                                        <th style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(3)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-toggle-on me-1"></i>Estado
                                         </th>
-                                        <th style="width: 13%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(4)" style="width: 13%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-user me-1"></i>Conductor
                                         </th>
-                                        <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(5)" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-car me-1"></i>Placa
                                         </th>
-                                        <th style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(6)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-calendar me-1"></i>Fecha de Entrega
                                         </th>
-                                        <th style="width: 14%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(7)" style="width: 14%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-map-marker-alt me-1"></i>Destino
                                         </th>
                                     </tr>
@@ -175,13 +172,11 @@
                                         Integer sizeObj = (Integer) request.getAttribute("size");
                                         int currentPageInt = (currentPageObj != null) ? currentPageObj : 1;
                                         int sizeInt = (sizeObj != null) ? sizeObj : 5;
-                                        int contador = (currentPageInt - 1) * sizeInt + 1;
                                         
                                         if (listaPlanes != null && !listaPlanes.isEmpty()) {
                                             for (PlanTransporteBean plan : listaPlanes) {
                                     %>
                                     <tr class="align-middle" style="padding: 0;">
-                                        <td class="text-muted" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= contador++ %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong><%= plan.getNumeroViaje() %></strong></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= plan.getNombreProducto() %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= plan.getCodigoLote() %></td>
@@ -222,7 +217,7 @@
                                         } else {
                                     %>
                                     <tr>
-                                        <td colspan="9" class="text-center py-5">
+                                        <td colspan="8" class="text-center py-5">
                                             <div class="text-muted">
                                                 <i class="fas fa-road fa-3x mb-3 d-block" style="opacity: 0.3;"></i>
                                                 <p class="mb-0">No se encontraron planes con los filtros aplicados.</p>
@@ -261,5 +256,76 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Función para ordenar la tabla
+    let sortDirection = {}; // Almacena la dirección de ordenamiento para cada columna
+    
+    function sortTable(columnIndex) {
+        const table = document.getElementById('distribucionTable');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // Determinar dirección de ordenamiento
+        if (!sortDirection[columnIndex]) {
+            sortDirection[columnIndex] = 'asc';
+        } else {
+            sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+        }
+        
+        // Ordenar las filas
+        rows.sort((a, b) => {
+            const aText = a.cells[columnIndex].textContent.trim();
+            const bText = b.cells[columnIndex].textContent.trim();
+            
+            // Intentar comparar como números si es posible
+            const aNum = parseFloat(aText.replace(/[^\d.-]/g, ''));
+            const bNum = parseFloat(bText.replace(/[^\d.-]/g, ''));
+            
+            let comparison = 0;
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                comparison = aNum - bNum;
+            } else {
+                // Comparar como texto
+                comparison = aText.localeCompare(bText, 'es', { numeric: true, sensitivity: 'base' });
+            }
+            
+            return sortDirection[columnIndex] === 'asc' ? comparison : -comparison;
+        });
+        
+        // Reordenar las filas en el DOM
+        rows.forEach(row => tbody.appendChild(row));
+        
+        // Actualizar indicadores visuales en los encabezados
+        const headers = table.querySelectorAll('thead th');
+        headers.forEach((header, index) => {
+            header.classList.remove('sort-asc', 'sort-desc');
+            if (index === columnIndex) {
+                header.classList.add(sortDirection[columnIndex] === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+        });
+    }
+</script>
+
+<style>
+    thead th {
+        position: relative;
+        user-select: none;
+    }
+    thead th:hover {
+        background-color: var(--seafoam) !important;
+    }
+    thead th.sort-asc::after {
+        content: ' ▲';
+        font-size: 0.7em;
+        color: var(--turquoise-dark);
+    }
+    thead th.sort-desc::after {
+        content: ' ▼';
+        font-size: 0.7em;
+        color: var(--turquoise-dark);
+    }
+</style>
+
 </body>
 </html>

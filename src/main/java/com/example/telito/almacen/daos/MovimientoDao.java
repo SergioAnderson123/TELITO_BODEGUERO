@@ -8,8 +8,112 @@ import java.util.ArrayList;
 public class MovimientoDao extends DAOBase {
 
     public int contarTotalMovimientos() {
-        String sql = "SELECT COUNT(*) FROM movimientos_inventario";
-        return count(sql);
+        return contarTotalMovimientos(null, null, null);
+    }
+    
+    public int contarTotalMovimientos(String busqueda, String tipoMovimiento, String filtroUsuario) {
+        String sql = "SELECT COUNT(*) FROM movimientos_inventario m " +
+                "INNER JOIN lotes l ON (m.lote_id = l.id_lote) " +
+                "INNER JOIN productos p ON (l.producto_id = p.id_producto) " +
+                "INNER JOIN usuarios u ON (m.usuario_id = u.id_usuario) " +
+                "WHERE 1=1";
+        
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (p.nombre LIKE ? OR l.codigo_lote LIKE ?)";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+        
+        if (tipoMovimiento != null && !tipoMovimiento.trim().isEmpty()) {
+            if ("Ajuste".equals(tipoMovimiento)) {
+                sql += " AND m.motivo LIKE 'Ajuste de inventario%'";
+            } else {
+                sql += " AND m.tipo = ?";
+                params.add(tipoMovimiento.trim());
+            }
+        }
+        
+        if ("mios".equals(filtroUsuario)) {
+            // Este filtro se maneja en el servlet pasando el usuarioId
+        }
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar movimientos", e);
+            throw new RuntimeException("Error al contar movimientos", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
+    }
+    
+    public int contarMovimientosPorUsuario(int usuarioId) {
+        return contarMovimientosPorUsuario(usuarioId, null, null);
+    }
+    
+    public int contarMovimientosPorUsuario(int usuarioId, String busqueda, String tipoMovimiento) {
+        String sql = "SELECT COUNT(*) FROM movimientos_inventario m " +
+                "INNER JOIN lotes l ON (m.lote_id = l.id_lote) " +
+                "INNER JOIN productos p ON (l.producto_id = p.id_producto) " +
+                "INNER JOIN usuarios u ON (m.usuario_id = u.id_usuario) " +
+                "WHERE m.usuario_id = ?";
+        
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        params.add(usuarioId);
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (p.nombre LIKE ? OR l.codigo_lote LIKE ?)";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+        
+        if (tipoMovimiento != null && !tipoMovimiento.trim().isEmpty()) {
+            if ("Ajuste".equals(tipoMovimiento)) {
+                sql += " AND m.motivo LIKE 'Ajuste de inventario%'";
+            } else {
+                sql += " AND m.tipo = ?";
+                params.add(tipoMovimiento.trim());
+            }
+        }
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar movimientos por usuario", e);
+            throw new RuntimeException("Error al contar movimientos por usuario", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
     }
 
     public void registrarMovimiento(Movimiento movimiento) {
@@ -31,9 +135,12 @@ public class MovimientoDao extends DAOBase {
     }
 
     public ArrayList<Movimiento> listarMovimientosPorUsuarioPaginado(int usuarioId, int limit, int offset) {
+        return listarMovimientosPorUsuarioPaginado(usuarioId, limit, offset, null, null);
+    }
+    
+    public ArrayList<Movimiento> listarMovimientosPorUsuarioPaginado(int usuarioId, int limit, int offset, String busqueda, String tipoMovimiento) {
         ArrayList<Movimiento> listaMovimientos = new ArrayList<>();
 
-        // La consulta es casi idéntica a la anterior, solo se añade un WHERE
         String sql = "SELECT " +
                 "m.id_movimiento, m.tipo, m.cantidad, m.motivo, m.fecha, " +
                 "l.codigo_lote, " +
@@ -47,9 +154,28 @@ public class MovimientoDao extends DAOBase {
                 "INNER JOIN usuarios u ON (m.usuario_id = u.id_usuario) " +
                 "LEFT JOIN pedidos ped ON (m.pedido_id = ped.id_pedido) " +
                 "LEFT JOIN ordenes_compra oc ON (m.orden_compra_id = oc.id_orden_compra) " +
-                "WHERE m.usuario_id = ? " + // <-- El filtro principal
-                "ORDER BY m.fecha DESC " +
-                "LIMIT ? OFFSET ?";
+                "WHERE m.usuario_id = ?";
+
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        params.add(usuarioId);
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (p.nombre LIKE ? OR l.codigo_lote LIKE ?)";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+        
+        if (tipoMovimiento != null && !tipoMovimiento.trim().isEmpty()) {
+            if ("Ajuste".equals(tipoMovimiento)) {
+                sql += " AND m.motivo LIKE 'Ajuste de inventario%'";
+            } else {
+                sql += " AND m.tipo = ?";
+                params.add(tipoMovimiento.trim());
+            }
+        }
+        
+        sql += " ORDER BY m.fecha DESC LIMIT ? OFFSET ?";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -58,9 +184,14 @@ public class MovimientoDao extends DAOBase {
         try {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, usuarioId);
-            pstmt.setInt(2, limit);
-            pstmt.setInt(3, offset);
+            
+            int paramIndex = 1;
+            for (Object param : params) {
+                pstmt.setObject(paramIndex++, param);
+            }
+            
+            pstmt.setInt(paramIndex++, limit);
+            pstmt.setInt(paramIndex, offset);
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -93,6 +224,10 @@ public class MovimientoDao extends DAOBase {
      * @return ArrayList de objetos Movimiento, cada uno con información detallada.
      */
     public ArrayList<Movimiento> listarMovimientosPaginado(int limit, int offset) {
+        return listarMovimientosPaginado(limit, offset, null, null);
+    }
+    
+    public ArrayList<Movimiento> listarMovimientosPaginado(int limit, int offset, String busqueda, String tipoMovimiento) {
         ArrayList<Movimiento> listaMovimientos = new ArrayList<>();
 
         String sql = "SELECT " +
@@ -108,8 +243,27 @@ public class MovimientoDao extends DAOBase {
                 "INNER JOIN usuarios u ON (m.usuario_id = u.id_usuario) " +
                 "LEFT JOIN pedidos ped ON (m.pedido_id = ped.id_pedido) " +
                 "LEFT JOIN ordenes_compra oc ON (m.orden_compra_id = oc.id_orden_compra) " +
-                "ORDER BY m.fecha DESC " + // Ordenamos por fecha, del más reciente al más antiguo
-                "LIMIT ? OFFSET ?";       // <-- Añadimos límite y offset para paginación
+                "WHERE 1=1";
+
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (p.nombre LIKE ? OR l.codigo_lote LIKE ?)";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+        
+        if (tipoMovimiento != null && !tipoMovimiento.trim().isEmpty()) {
+            if ("Ajuste".equals(tipoMovimiento)) {
+                sql += " AND m.motivo LIKE 'Ajuste de inventario%'";
+            } else {
+                sql += " AND m.tipo = ?";
+                params.add(tipoMovimiento.trim());
+            }
+        }
+        
+        sql += " ORDER BY m.fecha DESC LIMIT ? OFFSET ?";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -118,8 +272,14 @@ public class MovimientoDao extends DAOBase {
         try {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, limit);
-            pstmt.setInt(2, offset);
+            
+            int paramIndex = 1;
+            for (Object param : params) {
+                pstmt.setObject(paramIndex++, param);
+            }
+            
+            pstmt.setInt(paramIndex++, limit);
+            pstmt.setInt(paramIndex, offset);
             rs = pstmt.executeQuery();
 
             while (rs.next()) {

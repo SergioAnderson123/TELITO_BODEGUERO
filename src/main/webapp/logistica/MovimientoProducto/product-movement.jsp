@@ -72,7 +72,7 @@
                             <form action="<%= request.getContextPath() %>/MovimientoProductoServlet" method="GET">
                                 <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                                 <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                                         <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" placeholder="Producto o lote..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                     </div>
@@ -94,7 +94,7 @@
                                             <option value="90" ${param.periodo == '90' ? 'selected' : ''}>Últimos 90 días</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-2 d-flex align-items-end">
+                                    <div class="col-md-1 d-flex align-items-end">
                                         <button type="submit" class="btn btn-sm btn-primary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                             <i class="fas fa-search me-1"></i>Buscar
                                         </button>
@@ -111,26 +111,25 @@
                                 <table id="movementTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                     <thead class="table-light">
                                     <tr>
-                                        <th style="width: 5%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">#</th>
-                                        <th style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
-                                            <i class="fas fa-calendar me-1"></i>Fecha
+                                        <th onclick="sortTable(0)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                            <i class="fas fa-calendar-alt me-1"></i>Fecha
                                         </th>
-                                        <th style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(1)" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-box me-1"></i>Producto
                                         </th>
-                                        <th style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(2)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-exchange-alt me-1"></i>Tipo
                                         </th>
-                                        <th style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(3)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-map-marker-alt me-1"></i>Destino
                                         </th>
-                                        <th style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(4)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-barcode me-1"></i>Lote
                                         </th>
-                                        <th style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(5)" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-user me-1"></i>Personal Responsable
                                         </th>
-                                        <th style="width: 11%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold">
+                                        <th onclick="sortTable(6)" style="width: 11%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-comment me-1"></i>Observaciones
                                         </th>
                                     </tr>
@@ -139,18 +138,11 @@
                                     <%
                                         ArrayList<MovimientoInventarioBean> listaMovimientos =
                                                 (ArrayList<MovimientoInventarioBean>) request.getAttribute("listaMovimientos");
-                                        
-                                        Integer currentPageObj = (Integer) request.getAttribute("currentPage");
-                                        Integer sizeObj = (Integer) request.getAttribute("size");
-                                        int currentPageInt = (currentPageObj != null) ? currentPageObj : 1;
-                                        int sizeInt = (sizeObj != null) ? sizeObj : 5;
-                                        int contador = (currentPageInt - 1) * sizeInt + 1;
 
                                         if (listaMovimientos != null && !listaMovimientos.isEmpty()) {
                                             for (MovimientoInventarioBean movimiento : listaMovimientos) {
                                     %>
                                     <tr class="align-middle" style="padding: 0;">
-                                        <td class="text-muted" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= contador++ %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getFechaFormateada() %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getNombreProducto() %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
@@ -169,16 +161,20 @@
                                             <% } %>
                                         </td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getDestino() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getCodigoLote() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                            <span class="badge text-bg-secondary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                                <%= movimiento.getCodigoLote() %>
+                                            </span>
+                                        </td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getResponsable() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getObservaciones() != null ? movimiento.getObservaciones() : "-" %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getObservaciones() %></td>
                                     </tr>
                                     <%
                                             }
                                         } else {
                                     %>
                                     <tr>
-                                        <td colspan="8" class="text-center py-5">
+                                        <td colspan="7" class="text-center py-5">
                                             <div class="text-muted">
                                                 <i class="fas fa-inbox fa-3x mb-3 d-block" style="opacity: 0.3;"></i>
                                                 <p class="mb-0">No se encontraron movimientos con los filtros aplicados.</p>
@@ -213,6 +209,76 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Función para ordenar la tabla
+    let sortDirection = {}; // Almacena la dirección de ordenamiento para cada columna
+    
+    function sortTable(columnIndex) {
+        const table = document.getElementById('movementTable');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // Determinar dirección de ordenamiento
+        if (!sortDirection[columnIndex]) {
+            sortDirection[columnIndex] = 'asc';
+        } else {
+            sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+        }
+        
+        // Ordenar las filas
+        rows.sort((a, b) => {
+            const aText = a.cells[columnIndex].textContent.trim();
+            const bText = b.cells[columnIndex].textContent.trim();
+            
+            // Intentar comparar como números si es posible
+            const aNum = parseFloat(aText);
+            const bNum = parseFloat(bText);
+            
+            let comparison = 0;
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                comparison = aNum - bNum;
+            } else {
+                // Comparar como texto
+                comparison = aText.localeCompare(bText, 'es', { numeric: true, sensitivity: 'base' });
+            }
+            
+            return sortDirection[columnIndex] === 'asc' ? comparison : -comparison;
+        });
+        
+        // Reordenar las filas en el DOM
+        rows.forEach(row => tbody.appendChild(row));
+        
+        // Actualizar indicadores visuales en los encabezados
+        const headers = table.querySelectorAll('thead th');
+        headers.forEach((header, index) => {
+            header.classList.remove('sort-asc', 'sort-desc');
+            if (index === columnIndex) {
+                header.classList.add(sortDirection[columnIndex] === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+        });
+    }
+</script>
+
+<style>
+    thead th {
+        position: relative;
+        user-select: none;
+    }
+    thead th:hover {
+        background-color: var(--seafoam) !important;
+    }
+    thead th.sort-asc::after {
+        content: ' ▲';
+        font-size: 0.7em;
+        color: var(--turquoise-dark);
+    }
+    thead th.sort-desc::after {
+        content: ' ▼';
+        font-size: 0.7em;
+        color: var(--turquoise-dark);
+    }
+</style>
 
 </body>
 </html>
