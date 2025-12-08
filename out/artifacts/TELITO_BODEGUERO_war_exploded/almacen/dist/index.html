@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Gestión de inventario - Telito</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    
+    <!-- CSS -->
+    
+  <script async type="module" crossorigin src="./assets/js/main-DRVoywbx.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/css/style-CSLFZwYx.css">
+  <script type="module">import.meta.url;import("_").catch(()=>1);(async function*(){})().next();window.__vite_is_modern_browser=true</script>
+  <script type="module">!function(){if(window.__vite_is_modern_browser)return;console.warn("vite: loading legacy chunks, syntax error above and the same error below should be ignored");var e=document.getElementById("vite-legacy-polyfill"),n=document.createElement("script");n.src=e.src,n.onload=function(){System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))},document.body.appendChild(n)}();</script>
+</head>
+<body>
+    <div class="dashboard-main-wrapper">
+        <div class="dashboard-header">
+            <nav class="navbar navbar-expand fixed-top">
+                <div class="container-fluid">
+                    <!-- Mobile Sidebar Toggle -->
+                    <button class="navbar-toggler sidebar-toggler me-3 d-lg-none" type="button" aria-label="Toggle sidebar">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    
+                    <!-- Brand -->
+                    <a class="navbar-brand d-flex align-items-center ms-3" href="index.html">
+                        <!-- Icono (puedes cambiar el src por tu propio logo en /assets/images/) -->
+                        <img src="./assets/images/telito-CfoOZLNj.jpg" alt="Logo Telito" style="height:32px; width:auto;" class="me-2">
+                        <span class="fw-bold">Telito Bodeguero</span>
+                    </a>
+        
+                    
+                    
+                    
+                    <!-- Right Side Items - Always visible -->
+                    <ul class="navbar-nav ms-auto navbar-right-top">
+                        <!-- Mobile Search Toggle -->
+                        <li class="nav-item d-md-none">
+                            <a class="nav-link nav-icons" href="#" data-bs-toggle="modal" data-bs-target="#searchModal">
+                                <i class="fas fa-search"></i>
+                            </a>
+                        </li>
+                        
+                        
+                        <!-- User Profile -->
+                        <li class="nav-item dropdown nav-user ms-2">
+                            <a class="nav-link p-0" href="#" id="navbarUser" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://ui-avatars.com/api/?name=John+Abraham&background=5969ff&color=fff" alt="User" class="user-avatar-md rounded-circle">
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end nav-user-dropdown" aria-labelledby="navbarUser">
+                                <div class="nav-user-info">
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://ui-avatars.com/api/?name=John+Abraham&background=5969ff&color=fff" alt="User" class="rounded-circle me-3" width="50">
+                                        <div>
+                                            <h6 class="mb-0">Eduardo Rodas</h6>
+                                            <small class="text-muted">eduardo@example.com</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a class="dropdown-item text-danger" href="#"><i class="fas fa-power-off me-2"></i>Logout</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>        <div class="nav-left-sidebar sidebar-dark">
+            <div class="menu-list">
+                <nav class="navbar navbar-expand navbar-light">
+                    <ul class="navbar-nav flex-column w-100">
+                        <li class="nav-divider">
+                            Menu
+                        </li>
+        
+                        <li class="nav-item">
+                            <a class="nav-link active" href="index.html">
+                                <i class="fas fa-fw fa-box"></i>Gestión de inventario
+                            </a>
+                        </li>  
+        
+                        <li class="nav-item">
+                            <a class="nav-link " href="pages/misc/Registrar-entradas.html">
+                                <i class="fas fa-fw fa-arrow-down"></i>Registrar entradas
+                            </a>
+                        </li>  
+                        <li class="nav-item">
+                            <a class="nav-link " href="pages/misc/Registrar-salidas.html">
+                                <i class="fas fa-fw fa-arrow-up"></i>Registrar salidas
+                            </a>
+                        </li>                     
+                    </ul>
+                </nav>
+            </div>
+        </div>        <div class="dashboard-wrapper">
+            <div class="dashboard-content">
+                <div class="container-fluid">
+
+                    <!-- ENCABEZADO -->
+                    <div class="row ">
+                        <div class="col-12">
+                            <div class="page-header ">
+                                <h2 class="pageheader-title fs-1">Gestión de inventario</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BUSCADOR -->
+                    <div class="mx-auto d-none d-md-block">
+                        <div class="top-search-bar">
+                            <i class="fas fa-search search-icon"></i>
+                            <input class="form-control" type="search" placeholder="Nombre del producto, codigo..." aria-label="Search" id ="searchInput">
+                        </div>
+                    </div>                    
+
+                    <!-- Complex Table Example -->
+                    <div class="row mt-4">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                            <div class="card">
+                                <h5 class="card-header">Tabla de Productos</h5>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th scope="col">SKU</th>
+                                                    <th scope="col">Nombre</th>
+                                                    <th scope="col">Lote</th>
+                                                    <th scope="col">Cantidad disponible</th>
+                                                    <th scope="col">Ubicación</th>
+                                                    <th scope="col">Fecha de Vencimiento</th>
+                                                    <th scope="col">Estado</th>
+                                                    <th scope="col">Ajustar stock</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>AR-001</td>
+                                                    <td>Arroz</td>
+                                                    <td>CACSA</td>
+                                                    <td>150</td>
+                                                    <td>A-12</td>
+                                                    <td>20/12/2025</td>
+                                                    <td><span class="badge bg-success">En Stock</span></td>
+                                                    <td>
+                                                        <a type="button" class="btn btn-sm btn-info" href="pages/misc/Ajustar-stock.html">Ajustar</a>
+
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>AZ-005</td>
+                                                    <td>Azúcar</td>
+                                                    <td>UJHSG</td>
+                                                    <td>200</td>
+                                                    <td>B-05</td>
+                                                    <td>15/11/2026</td>
+                                                    <td><span class="badge bg-success">En Stock</span></td>
+                                                    <td>
+                                                        <a type="button" class="btn btn-sm btn-info" href="pages/misc/Ajustar-stock.html">Ajustar</a>
+
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>SF-003</td>
+                                                    <td>Fideos</td>
+                                                    <td>CDSAA</td>
+                                                    <td>50</td>
+                                                    <td>C-02</td>
+                                                    <td>02/05/2025</td>
+                                                    <td><span class="badge bg-warning text-dark">Poco Stock</span></td>
+                                                    <td>
+                                                        <a type="button" class="btn btn-sm btn-info" href="pages/misc/Ajustar-stock.html">Ajustar</a>
+
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>HJ-010</td>
+                                                    <td>Aceite</td>
+                                                    <td>CFDSU</td>
+                                                    <td>0</td>
+                                                    <td>D-01</td>
+                                                    <td>N/A</td>
+                                                    <td><span class="badge bg-danger">Sin Stock</span></td>
+                                                    <td>
+                                                        <a type="button" class="btn btn-sm btn-info" href="pages/misc/Ajustar-stock.html">Ajustar</a>
+
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>LM-002</td>
+                                                    <td>Leche</td>
+                                                    <td>RSDAD</td>
+                                                    <td>80</td>
+                                                    <td>A-15</td>
+                                                    <td>30/10/2025</td>
+                                                    <td><span class="badge bg-success">En Stock</span></td>
+                                                    <td>
+                                                        <a type="button" class="btn btn-sm btn-info" href="pages/misc/Ajustar-stock.html">Ajustar</a>
+
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="container-fluid px-4">
+                    <div class="row">
+            
+                    </div>
+                </div>
+            </div>        </div>
+    </div> 
+
+
+<script>
+// Se asegura que el script se ejecute cuando la página haya cargado por completo
+document.addEventListener('DOMContentLoaded', function() {
+
+    // 1. Se guarda una referencia a la barra de búsqueda y al cuerpo de la tabla
+    const searchInput = document.getElementById('searchInput');
+    const tableBody = document.getElementById('productTableBody');
+    const tableRows = tableBody.getElementsByTagName('tr'); // Obtenemos todas las filas
+
+    // 2. Se "escucha" cada vez que el usuario teclea algo en la barra de búsqueda
+    searchInput.addEventListener('keyup', function() {
+        
+        // 3. Se convierte lo que el usuario escribe a minúsculas para una búsqueda sin distinción
+        const searchTerm = searchInput.value.toLowerCase();
+
+        // 4. Se recorre cada una de las filas de la tabla
+        for (let i = 0; i < tableRows.length; i++) {
+            const row = tableRows[i];
+            
+            // 5. Se obtiene todo el texto de la fila actual y lo convertimos a minúsculas
+            const rowText = row.textContent.toLowerCase();
+
+            // 6. Se compara si el texto de la fila contiene el término de búsqueda
+            if (rowText.includes(searchTerm)) {
+                // Si coincide, se asegura de que la fila sea visible
+                row.style.display = ''; 
+            } else {
+                // Si no coincide, se ocutla la fila
+                row.style.display = 'none'; 
+            }
+        }
+    });
+});
+</script>
+
+  <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
+  <script nomodule crossorigin id="vite-legacy-polyfill" src="./assets/js/polyfills-legacy-1usy8bJY.js"></script>
+  <script nomodule crossorigin id="vite-legacy-entry" data-src="./assets/js/main-legacy-B6TEORp_.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
+</body>
+</html>

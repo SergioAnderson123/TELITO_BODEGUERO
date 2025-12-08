@@ -1,0 +1,171 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<!doctype html>
+<html lang="es">
+<head>
+    <jsp:include page="/administrador/layouts/head.jsp">
+        <jsp:param name="pageTitle" value="Reporte de Almacén"/>
+    </jsp:include>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="dashboard-main-wrapper">
+    <jsp:include page="/administrador/layouts/sidebar_admin.jsp">
+        <jsp:param name="activeMenu" value="Reportes"/>
+    </jsp:include>
+    <jsp:include page="/administrador/layouts/header_admin.jsp" />
+    <div class="dashboard-wrapper">
+        <div class="dashboard-content">
+    <h1 class="page-title"><i class="fas fa-pallet"></i> Reporte de Almacén</h1>
+    <div class="charts-grid">
+      <div class="card">
+        <h5 class="card-title">Movimientos últimos 7 días</h5>
+        <div class="chart-container">
+            <canvas id="movimientos7dChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h5 class="card-title">Top 5 Productos con Más Stock</h5>
+        <div class="chart-container">
+            <canvas id="topProductosStockChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h5 class="card-title">Motivos de Ajuste de Inventario</h5>
+        <div class="chart-container">
+            <canvas id="ajustesChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h5 class="card-title">Actividad de Inventario (Últimos 30 días)</h5>
+        <div class="chart-container">
+            <canvas id="actividadDiariaChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+        <jsp:include page="/administrador/layouts/footer.jsp" />
+    </div>
+</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebarToggle = document.getElementById('sidebar-toggle');
+      const sidebar = document.getElementById('sidebar');
+      const content = document.getElementById('content');
+      const header = document.getElementById('header');
+
+      if (sidebarToggle && sidebar && content && header) {
+        sidebarToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('hidden');
+          content.classList.toggle('full-width');
+          header.classList.toggle('full-width');
+        });
+      }
+      
+      // --- Paleta de Colores Profesional ---
+      const TELITO_COLORS = {
+          blue: 'rgba(54, 162, 235, 0.8)',
+          green: 'rgba(75, 192, 192, 0.8)',
+          yellow: 'rgba(255, 206, 86, 0.8)',
+          red: 'rgba(255, 99, 132, 0.8)',
+          purple: 'rgba(153, 102, 255, 0.8)',
+          orange: 'rgba(255, 159, 64, 0.8)',
+          grey: 'rgba(201, 203, 207, 0.8)'
+      };
+
+      // --- GRÁFICO 1: Últimos 7 días (barras apiladas) ---
+      try {
+        const m7Labels = JSON.parse('<%= request.getAttribute("mov7dLabelsJson") != null ? request.getAttribute("mov7dLabelsJson") : "[]" %>');
+        const m7Entradas = JSON.parse('<%= request.getAttribute("mov7dEntradasJson") != null ? request.getAttribute("mov7dEntradasJson") : "[]" %>');
+        const m7Salidas = JSON.parse('<%= request.getAttribute("mov7dSalidasJson") != null ? request.getAttribute("mov7dSalidasJson") : "[]" %>');
+        const m7Ajustes = JSON.parse('<%= request.getAttribute("mov7dAjustesJson") != null ? request.getAttribute("mov7dAjustesJson") : "[]" %>');
+        const ctx1 = document.getElementById('movimientos7dChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: m7Labels,
+                datasets: [
+                    { label: 'Entradas', data: m7Entradas, backgroundColor: TELITO_COLORS.green, stack: 'stack1' },
+                    { label: 'Salidas', data: m7Salidas, backgroundColor: TELITO_COLORS.red, stack: 'stack1' },
+                    { label: 'Ajustes', data: m7Ajustes, backgroundColor: TELITO_COLORS.yellow, stack: 'stack1' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: { stacked: true, beginAtZero: true, grid: { color: '#e9e9e9', drawBorder: false } }
+                }
+            }
+        });
+      } catch (e) { console.error("Error al renderizar el Gráfico 1 (Almacén 7d):", e); }
+
+      // --- GRÁFICO 2 MEJORADO ---
+      try {
+        const topProductosLabels = JSON.parse('<%= request.getAttribute("topProductosLabelsJson") != null ? request.getAttribute("topProductosLabelsJson") : "[]" %>');
+        const topProductosData = JSON.parse('<%= request.getAttribute("topProductosDataJson") != null ? request.getAttribute("topProductosDataJson") : "[]" %>');
+        const ctx2 = document.getElementById('topProductosStockChart').getContext('2d');
+        const gradientGreen = ctx2.createLinearGradient(0, 0, ctx2.canvas.clientWidth, 0);
+        gradientGreen.addColorStop(0, 'rgba(75, 192, 192, 0.7)');
+        gradientGreen.addColorStop(1, 'rgba(75, 192, 192, 0.9)');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: { labels: topProductosLabels, datasets: [{ label: 'Unidades en Stock', data: topProductosData, backgroundColor: gradientGreen, borderColor: 'rgba(75, 192, 192, 1)', borderWidth: 1, borderRadius: 4, borderSkipped: false }] },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.7)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 }, padding: 12, cornerRadius: 4, callbacks: { label: function(context) { return context.raw + ' Unidades'; } } } }, scales: { x: { grid: { color: '#e9e9e9', drawBorder: false } }, y: { grid: { display: false } } } }
+        });
+      } catch (e) { console.error("Error al renderizar el Gráfico 2 (Almacén):", e); }
+      
+      // --- GRÁFICO 3 MEJORADO ---
+      try {
+        const ajustesLabels = JSON.parse('<%= request.getAttribute("ajustesLabelsJson") != null ? request.getAttribute("ajustesLabelsJson") : "[]" %>');
+        const ajustesData = JSON.parse('<%= request.getAttribute("ajustesDataJson") != null ? request.getAttribute("ajustesDataJson") : "[]" %>');
+        new Chart(document.getElementById('ajustesChart'), {
+            type: 'doughnut',
+            data: { labels: ajustesLabels, datasets: [{ data: ajustesData, backgroundColor: [ TELITO_COLORS.orange, TELITO_COLORS.yellow, TELITO_COLORS.purple, TELITO_COLORS.grey ], borderColor: '#fff', borderWidth: 2, hoverOffset: 8 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { font: { size: 13, family: "\'Segoe UI\', \'Roboto\', \'Helvetica Neue\', \'Arial\', sans-serif" }, padding: 20, usePointStyle: true, pointStyle: 'circle' } }, tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.7)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 }, padding: 12, cornerRadius: 4, callbacks: { label: function(context) { let label = context.label || ''; if (label) { label += ': '; } if (context.parsed !== null) { label += context.parsed + ' Ajustes'; } return label; } } } }, animation: { animateScale: true, animateRotate: true } }
+        });
+      } catch (e) { console.error("Error al renderizar el Gráfico 3 (Almacén):", e); }
+      
+      // --- GRÁFICO 4 MEJORADO ---
+      try {
+        const actividadLabels = JSON.parse('<%= request.getAttribute("actividadLabelsJson") != null ? request.getAttribute("actividadLabelsJson") : "[]" %>');
+        const actividadEntradas = JSON.parse('<%= request.getAttribute("actividadEntradasJson") != null ? request.getAttribute("actividadEntradasJson") : "[]" %>');
+        const actividadSalidas = JSON.parse('<%= request.getAttribute("actividadSalidasJson") != null ? request.getAttribute("actividadSalidasJson") : "[]" %>');
+        const ctx4 = document.getElementById('actividadDiariaChart').getContext('2d');
+        const gradientGreenLine = ctx4.createLinearGradient(0, 0, 0, ctx4.canvas.clientHeight);
+        gradientGreenLine.addColorStop(0, 'rgba(75, 192, 192, 0.6)');
+        gradientGreenLine.addColorStop(1, 'rgba(75, 192, 192, 0.1)');
+        const gradientRedLine = ctx4.createLinearGradient(0, 0, 0, ctx4.canvas.clientHeight);
+        gradientRedLine.addColorStop(0, 'rgba(255, 99, 132, 0.6)');
+        gradientRedLine.addColorStop(1, 'rgba(255, 99, 132, 0.1)');
+        new Chart(ctx4, {
+            type: 'line',
+            data: {
+                labels: actividadLabels,
+                datasets: [
+                    { label: 'Entradas', data: actividadEntradas, fill: true, backgroundColor: gradientGreenLine, borderColor: 'rgba(75, 192, 192, 1)', borderWidth: 2, tension: 0.4, pointBackgroundColor: 'rgba(75, 192, 192, 1)', pointRadius: 3, pointHoverRadius: 6 },
+                    { label: 'Salidas', data: actividadSalidas, fill: true, backgroundColor: gradientRedLine, borderColor: 'rgba(255, 99, 132, 1)', borderWidth: 2, tension: 0.4, pointBackgroundColor: 'rgba(255, 99, 132, 1)', pointRadius: 3, pointHoverRadius: 6 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', align: 'end', labels: { font: { size: 13, family: "\'Segoe UI\', \'Roboto\', \'Helvetica Neue\', \'Arial\', sans-serif" }, usePointStyle: true, pointStyle: 'circle' } },
+                    tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(0, 0, 0, 0.7)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 }, padding: 12, cornerRadius: 4 }
+                },
+                scales: { y: { beginAtZero: true, grid: { color: '#e9e9e9', drawBorder: false } }, x: { grid: { display: false } } }
+            }
+        });
+      } catch (e) { console.error("Error al renderizar el Gráfico 4 (Almacén):", e); }
+
+    });
+  </script>
+</body>
+</html>
