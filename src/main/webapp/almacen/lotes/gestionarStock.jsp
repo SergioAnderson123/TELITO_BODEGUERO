@@ -125,9 +125,9 @@
                                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong>${lote.codigoLote}</strong></td>
                                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                                     <button type="button" 
-                                                            class="btn btn-link p-0 text-decoration-none fw-bold" 
+                                                            class="btn btn-link text-decoration-none fw-bold" 
                                                             onclick="mostrarResumenLotes(${lote.productoId}, '${lote.nombreProducto}')"
-                                                                    style="cursor: pointer; color: #2c3e50 !important; font-size: 0.85rem;">
+                                                                    style="cursor: pointer; color: #ffffff !important; font-size: 0.85rem; padding: 0.4rem 0.8rem !important; background-color: #28a745; border-radius: 6px; border: none;">
                                                         ${lote.paquetesDisponibles} paquetes
                                                     </button>
                                                 </td>
@@ -146,7 +146,7 @@
                                                                     </span>
                                                         </c:when>
                                                         <c:when test="${lote.estadoStock == 'En Stock'}">
-                                                                    <span class="badge text-bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                                                    <span class="badge text-bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.4rem 0.9rem;">
                                                                         <i class="fas fa-check-circle me-1"></i>En Stock
                                                                     </span>
                                                         </c:when>

@@ -158,6 +158,11 @@
             border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s;
         }
         button.btn-secondary { background: #8d99ae; }
+        .btn-info, a.btn-info, button.btn-info {
+            background: linear-gradient(160deg, #17a2b8 0%, #20c997 100%) !important;
+            background-image: linear-gradient(160deg, #17a2b8 0%, #20c997 100%) !important;
+            border: none !important;
+        }
         button:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 109, 119, 0.25); }
 
         /* Table card - igual a gestión de usuarios y mis productos */
@@ -188,7 +193,7 @@
         }
         th, td { 
             padding: 0.4rem 0.5rem; 
-            text-align: left; 
+            text-align: center; 
             border-bottom: 1px solid var(--border-color); 
             font-size: 0.85rem;
         }
@@ -546,14 +551,27 @@
                             <table id="ordenesTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                     <thead class="table-light">
                         <tr>
-                            <th class="fw-semibold" style="width: 5%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">#</th>
-                            <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">CÓDIGO DE ORDEN</th>
-                            <th class="fw-semibold" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">NOMBRE DEL PRODUCTO</th>
-                            <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">CANTIDAD DE PAQUETES</th>
-                            <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">PRECIO</th>
-                            <th class="fw-semibold" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">SOLICITANTE DE COMPRA</th>
-                            <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">ESTADO</th>
-                            <th class="text-end fw-semibold" style="width: 9%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">ACCIONES</th>
+                            <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                                <i class="fas fa-hashtag me-1"></i>CÓDIGO DE ORDEN
+                            </th>
+                            <th class="fw-semibold" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                                <i class="fas fa-box me-1"></i>NOMBRE DEL PRODUCTO
+                            </th>
+                            <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                                <i class="fas fa-boxes me-1"></i>CANTIDAD DE PAQUETES
+                            </th>
+                            <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                                <i class="fas fa-dollar-sign me-1"></i>PRECIO
+                            </th>
+                            <th class="fw-semibold" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                                <i class="fas fa-user me-1"></i>SOLICITANTE DE COMPRA
+                            </th>
+                            <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                                <i class="fas fa-info-circle me-1"></i>ESTADO
+                            </th>
+                            <th class="fw-semibold" style="width: 9%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                                <i class="fas fa-cog me-1"></i>ACCIONES
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -562,7 +580,6 @@
                             Integer sizeObj = (Integer) request.getAttribute("size");
                             int currentPage = (currentPageObj != null) ? currentPageObj : 1;
                             int size = (sizeObj != null) ? sizeObj : 5;
-                            int i = (currentPage - 1) * size + 1;
                         %>
                         <% for (Object orden : listaOrdenes) { %>
                             <% Object[] ordenData = (Object[]) orden; %>
@@ -571,7 +588,6 @@
                                 data-estado="<%= ordenData[6] %>" 
                                 data-destino="<%= ordenData[5] %>"
                                 style="padding: 0;">
-                                <td class="text-muted" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= i++ %></td>
                                 <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong><%= ordenData[1] %></strong></td>
                                 <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= ordenData[2] %></td>
                                 <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= ordenData[3] %> paquetes</td>
@@ -607,7 +623,7 @@
                                         </span>
                                     <% } %>
                                 </td>
-                                <td class="text-end" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                     <% if ("En Proceso".equals(estadoOrden)) { %>
                                         <button type="button" class="btn btn-sm shadow-sm btn-ver-lotes" 
                                                 onclick="editarOrden('<%= ordenData[0] %>')"

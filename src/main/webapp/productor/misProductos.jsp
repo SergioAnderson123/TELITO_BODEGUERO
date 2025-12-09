@@ -162,6 +162,11 @@
             border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s;
         }
         button.btn-secondary { background: #8d99ae; }
+        .btn-info, a.btn-info, button.btn-info {
+            background: linear-gradient(160deg, #17a2b8 0%, #20c997 100%) !important;
+            background-image: linear-gradient(160deg, #17a2b8 0%, #20c997 100%) !important;
+            border: none !important;
+        }
         button:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 109, 119, 0.25); }
 
         /* Tabla - Estilo igual a gestión de usuarios */
@@ -174,7 +179,7 @@
         }
         th, td { 
             padding: 0.4rem 0.5rem; 
-            text-align: left; 
+            text-align: center; 
             border-bottom: 1px solid var(--border-color); 
             font-size: 0.85rem;
         }
@@ -233,12 +238,13 @@
            Modal personalizado (solo para addProductModal)
         ====================== */
         #addProductModal.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-        #addProductModal .modal-content { background-color: var(--white); margin: 8% auto; padding: 30px; border: none; width: 60%; max-width: 700px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: slide-down 0.3s ease-out; }
+        #addProductModal .modal-content { background-color: var(--white); margin: 5% auto; padding: 20px; border: none; width: 60%; max-width: 700px; max-height: 90vh; overflow-y: auto; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: slide-down 0.3s ease-out; }
         @keyframes slide-down { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        #addProductModal .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 25px; }
-        #addProductModal .modal-header h2 { margin: 0; color: var(--turquoise-dark); }
-        #addProductModal .modal-close { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
-        #addProductModal .modal-footer { display: flex; justify-content: flex-end; gap: 15px; padding-top: 15px; margin-top: 25px; border-top: 1px solid var(--border-color); }
+        #addProductModal .modal-header { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%); padding: 15px 20px; margin: -20px -20px 15px -20px; border-radius: 12px 12px 0 0; }
+        #addProductModal .modal-header h2 { margin: 0; color: white; }
+        #addProductModal .modal-close { color: white; font-size: 28px; font-weight: bold; cursor: pointer; opacity: 0.9; }
+        #addProductModal .modal-close:hover { opacity: 1; }
+        #addProductModal .modal-footer { display: flex; justify-content: flex-end; gap: 15px; padding-top: 15px; margin-top: 15px; border-top: 1px solid var(--border-color); }
         
         /* Asegurar que los modales Bootstrap tengan z-index correcto */
         #resumenLotesProductoModal {
@@ -496,6 +502,13 @@
                 }
             %>
 
+            <!-- ===================== Tarjetas de estadísticas ===================== -->
+            <div class="stats-container">
+                <div class="stat-card"><h3>Total de Productos</h3><p><%= totalProductos %></p></div>
+                <div class="stat-card"><h3>Fuera de Stock</h3><p><%= fueraDeStock %></p></div>
+                <div class="stat-card"><h3>Categorías Activas</h3><p><%= totalCategorias %></p></div>
+            </div>
+
             <!-- ===================== Card: Búsqueda y filtros de productos ===================== -->
             <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
                 <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
@@ -533,13 +546,6 @@
                 </div>
             </div>
 
-    <!-- ===================== Tarjetas de estadísticas ===================== -->
-    <div class="stats-container">
-        <div class="stat-card"><h3>Total de Productos</h3><p><%= totalProductos %></p></div>
-        <div class="stat-card"><h3>Fuera de Stock</h3><p><%= fueraDeStock %></p></div>
-        <div class="stat-card"><h3>Categorías Activas</h3><p><%= totalCategorias %></p></div>
-    </div>
-
     <!-- ===================== Card: Inventario actual (tabla) ===================== -->
     <div class="row">
         <div class="col-12">
@@ -559,13 +565,24 @@
             <table id="productsTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                 <thead class="table-light">
                 <tr>
-                    <th class="fw-semibold" style="width: 5%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">#</th>
-                    <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">SKU</th>
-                    <th class="fw-semibold" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">NOMBRE</th>
-                    <th class="fw-semibold" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">CATEGORÍA</th>
-                    <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">PRECIO</th>
-                    <th class="fw-semibold" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">LOTES</th>
-                    <th class="text-end fw-semibold" style="width: 13%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">ACCIONES</th>
+                    <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                        <i class="fas fa-barcode me-1"></i>SKU
+                    </th>
+                    <th class="fw-semibold" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                        <i class="fas fa-box me-1"></i>NOMBRE
+                    </th>
+                    <th class="fw-semibold" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                        <i class="fas fa-folder me-1"></i>CATEGORÍA
+                    </th>
+                    <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                        <i class="fas fa-dollar-sign me-1"></i>PRECIO
+                    </th>
+                    <th class="fw-semibold" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                        <i class="fas fa-boxes me-1"></i>LOTES
+                    </th>
+                    <th class="fw-semibold" style="width: 13%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                        <i class="fas fa-cog me-1"></i>ACCIONES
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -578,7 +595,6 @@
                 %>
                 <% for (Producto p : listaProductos) { %>
                 <tr class="align-middle" data-category="<%= p.getCategoria().getNombre() %>" data-price="<%= String.format(java.util.Locale.US, "%.2f", p.getPrecioActual()) %>" data-sku="<%= p.getCodigoSKU() %>" data-name="<%= p.getNombre() %>" style="padding: 0;">
-                    <td class="text-muted" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= i++ %></td>
                     <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= p.getCodigoSKU() %></td>
                     <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= p.getNombre() %></td>
                     <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= p.getCategoria().getNombre() %></td>
@@ -595,7 +611,7 @@
                             </button>
                         <% } %>
                     </td>
-                    <td class="text-end" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                    <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                         <button type="button" class="btn btn-sm shadow-sm"
                                 style="background-color: #ff6b6b; color: white; border: none; font-size: 0.8rem; padding: 0.35rem 0.6rem; border-radius: 6px; transition: all 0.2s ease;"
                                 onclick="confirmarEliminacion(<%= p.getIdProducto() %>, '<%= p.getNombre() %>')"
@@ -629,7 +645,7 @@
             <span class="modal-close">&times;</span>
         </div>
         <form method="POST" action="<%= request.getContextPath() %>/ProductorServlet?action=crearProducto" id="formAgregarProducto">
-            <div style="display: flex; gap: 20px;">
+            <div style="display: flex; gap: 15px;">
                 <div style="flex: 1;"><label for="productName">Nombre del producto</label><input type="text" name="productName" id="productName" required></div>
                 <div style="flex: 1;"><label for="productCategory">Categoría</label>
                     <select name="productCategory" id="productCategory" required>
@@ -642,27 +658,27 @@
                     </select>
                 </div>
             </div>
-            <div style="display: flex; gap: 20px; margin-top: 15px;">
+            <div style="display: flex; gap: 15px; margin-top: 10px;">
                 <div style="flex: 1;">
                     <label for="productSKUDisplay">SKU (generado automáticamente)</label>
                     <input type="text" id="productSKUDisplay" readonly style="background-color: #f0f0f0; cursor: not-allowed;" placeholder="Cargando...">
-                    <small style="color: var(--text-muted); display: block; margin-top: 5px;">
+                    <small style="color: var(--text-muted); display: block; margin-top: 3px; font-size: 0.85rem;">
                         <i class="fas fa-info-circle"></i> El SKU se genera automáticamente
                     </small>
                 </div>
                 <div style="flex: 1;"><label for="productPrice">Precio por Paquete (S/)</label><input type="number" name="productPrice" id="productPrice" step="0.01" required></div>
             </div>
-            <div style="display: flex; gap: 20px; margin-top: 15px;">
+            <div style="display: flex; gap: 15px; margin-top: 10px;">
                 <div style="flex: 1;">
                     <label for="productUnits">Unidades por Paquete</label>
                     <input type="number" name="productUnits" id="productUnits" min="1" value="1" required>
-                    <small style="color: var(--text-muted); display: block; margin-top: 5px;">
+                    <small style="color: var(--text-muted); display: block; margin-top: 3px; font-size: 0.85rem;">
                         <i class="fas fa-box"></i> Ej: Si vende cerveza en cajas de 12, ingrese 12
                     </small>
                 </div>
                 <div style="flex: 1;"></div>
             </div>
-            <div style="margin-top: 15px;"><label for="productDescription">Descripción</label><textarea name="productDescription" id="productDescription" rows="3"></textarea></div>
+            <div style="margin-top: 10px;"><label for="productDescription">Descripción</label><textarea name="productDescription" id="productDescription" rows="2"></textarea></div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary modal-cancel">Cancelar</button>
                 <button type="submit" id="btnGuardarProducto">Guardar Producto</button>
