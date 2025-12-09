@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    
+    <!-- Listener para el scheduler de alertas automáticas -->
+    <listener>
+        <listener-class>com.example.telito.util.AlertaScheduler</listener-class>
+    </listener>
+
+    <!-- ========== CONFIGURACIÓN DE FILTROS ========== -->
+    <!-- IMPORTANTE: El orden de los filtros es crítico para la seguridad -->
+    <!-- AuthFilter debe ejecutarse PRIMERO para validar sesiones antes de que otros filtros creen sesiones -->
+    
+    <!-- 1. AuthFilter: Validación de autenticación (DEBE EJECUTARSE PRIMERO) -->
+    <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>com.example.telito.administrador.filters.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/administrador/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/almacen/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/logistica/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/productor/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/MovimientoProductoServlet</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/InventarioServlet</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/orden-compra</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/planes-transporte</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/UsuarioServlet</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/ProductoServlet</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/AlertaServlet</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/ProductorServlet</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/StockMinimoServlet</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/perfil</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/administrador/reportes</url-pattern>
+    </filter-mapping>
+
+    <!-- 2. AlertCountFilter: Actualización de contador de alertas (SEGUNDO) -->
+    <!-- Este filtro ya está configurado con @WebFilter, pero podemos asegurarnos aquí -->
+    
+    <!-- 3. ReadOnlyModeFilter: Modo solo lectura (TERCERO) -->
+    <!-- Este filtro ya está configurado con @WebFilter -->
+
+    <!-- ========== CONFIGURACIÓN DE SERVLETS ========== -->
+    <!-- Registro explícito de servlets de reportes para asegurar su carga -->
+    <!-- Nota: Se registra explícitamente para evitar conflictos con otros servlets del mismo nombre -->
+    <servlet>
+        <servlet-name>ProductorLoteReporteServlet</servlet-name>
+        <servlet-class>com.example.telito.productor.servlets.LoteReporteServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProductorLoteReporteServlet</servlet-name>
+        <url-pattern>/productor/LoteReporteServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ProductorOrdenCompraReporteServlet</servlet-name>
+        <servlet-class>com.example.telito.productor.servlets.OrdenCompraReporteServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProductorOrdenCompraReporteServlet</servlet-name>
+        <url-pattern>/productor/OrdenCompraReporteServlet</url-pattern>
+    </servlet-mapping>
+
+</web-app>

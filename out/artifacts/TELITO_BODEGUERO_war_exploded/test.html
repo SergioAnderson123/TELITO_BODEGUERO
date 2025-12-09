@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba - Telito Bodeguero</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .success {
+            color: #27ae60;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        .info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 ¡Proyecto TELITO_BODEGUERO Funcionando!</h1>
+        
+        <div class="success">
+            ✅ Servidor Tomcat funcionando correctamente
+        </div>
+        
+        <div class="info">
+            <h3>Estado del Sistema:</h3>
+            <p><strong>Servidor:</strong> Apache Tomcat 10.1.46</p>
+            <p><strong>Puerto:</strong> 8080</p>
+            <p><strong>Contexto:</strong> /TELITO_BODEGUERO</p>
+            <p><strong>Estado:</strong> ✅ Activo</p>
+        </div>
+        
+        <h3>Enlaces de Prueba:</h3>
+        <a href="LoginServlet" class="btn">🔐 Ir al Login</a>
+        <a href="welcome.jsp" class="btn">🏠 Página de Bienvenida</a>
+        <a href="index.jsp" class="btn">📋 Página Principal</a>
+        
+        <div class="info">
+            <h3>Próximos Pasos:</h3>
+            <ol style="text-align: left;">
+                <li>Probar el sistema de login</li>
+                <li>Verificar la base de datos</li>
+                <li>Probar la redirección por roles</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
+
