@@ -41,12 +41,12 @@ public class VehiculoServlet extends HttpServlet {
         switch (action) {
             case "listar":
                 int page = 1;
-                int size = 10;
+                int size = 5;
                 String busqueda = request.getParameter("busqueda");
                 try { page = Integer.parseInt(request.getParameter("page")); } catch (Exception ignored) {}
                 try { size = Integer.parseInt(request.getParameter("size")); } catch (Exception ignored) {}
                 if (page < 1) page = 1;
-                if (size < 1) size = 10;
+                if (size < 1) size = 5;
 
                 int totalRows = vehiculoDAO.contarVehiculos(busqueda);
                 int totalPages = (int) Math.ceil(totalRows / (double) size);

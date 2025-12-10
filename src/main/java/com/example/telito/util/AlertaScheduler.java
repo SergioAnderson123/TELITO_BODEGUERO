@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Scheduler que ejecuta alertas automáticas de forma programada.
@@ -20,13 +22,14 @@ import java.util.concurrent.TimeUnit;
 @WebListener
 public class AlertaScheduler implements ServletContextListener {
 
+    private static final Logger logger = LoggerFactory.getLogger(AlertaScheduler.class);
     private ScheduledExecutorService scheduler;
     private static final int HORA_EJECUCION = 8; // 8:00 AM
     private static final int INTERVALO_HORAS = 24; // Diariamente
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        System.out.println("=== INICIANDO SCHEDULER DE ALERTAS AUTOMÁTICAS ===");
+        logger.info("=== INICIANDO SCHEDULER DE ALERTAS AUTOMÁTICAS ===");
         
         scheduler = Executors.newScheduledThreadPool(1);
         
@@ -44,15 +47,15 @@ public class AlertaScheduler implements ServletContextListener {
             TimeUnit.MILLISECONDS
         );
         
-        System.out.println("✓ Scheduler de alertas iniciado. Ejecutará alertas diariamente a las " + HORA_EJECUCION + ":00 AM");
+        logger.info("Scheduler de alertas iniciado correctamente. Ejecutara alertas diariamente a las {}:00 AM", HORA_EJECUCION);
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        System.out.println("=== DETENIENDO SCHEDULER DE ALERTAS ===");
+        logger.info("=== DETENIENDO SCHEDULER DE ALERTAS ===");
         if (scheduler != null && !scheduler.isShutdown()) {
             scheduler.shutdownNow();
-            System.out.println("✓ Scheduler de alertas detenido");
+            logger.info("Scheduler de alertas detenido correctamente");
         }
     }
 
