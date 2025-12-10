@@ -202,7 +202,11 @@ public class ConfiguracionSistemaDAO extends DAOBase {
         
         Object usuarioActualizacion = rs.getObject("usuario_actualizacion");
         if (usuarioActualizacion != null) {
-            config.setUsuarioActualizacion((Integer) usuarioActualizacion);
+            if (usuarioActualizacion instanceof Long) {
+                config.setUsuarioActualizacion(((Long) usuarioActualizacion).intValue());
+            } else if (usuarioActualizacion instanceof Integer) {
+                config.setUsuarioActualizacion((Integer) usuarioActualizacion);
+            }
         }
         
         return config;

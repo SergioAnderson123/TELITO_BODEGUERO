@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Created-By: IntelliJ IDEA
-Built-By: Sergio
-Build-Jdk: Microsoft OpenJDK 17.0.16
-Implementation-Title: TELITO_BODEGUERO
-Implementation-Version: 1.0-SNAPSHOT
-Implementation-Vendor-Id: org.example
-Main-Class: ${start-class}
-
