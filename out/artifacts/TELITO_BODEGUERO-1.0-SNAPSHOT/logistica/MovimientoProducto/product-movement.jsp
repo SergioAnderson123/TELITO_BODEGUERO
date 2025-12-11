@@ -11,10 +11,10 @@
     <style>
         /* Estilo para el encabezado de la tabla igual que en productor */
         .table-card .card-header {
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
+            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
             color: #fff;
             border-radius: 12px 12px 0 0;
-            padding: 0.5rem 0.75rem;
+            padding: 20px 30px;
             margin: 0;
         }
         .table-card .card-header h5,
