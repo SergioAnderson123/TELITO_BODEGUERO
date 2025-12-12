@@ -129,6 +129,10 @@ public class MovimientoDao extends DAOBase {
             movimiento.getCantidad(),
             movimiento.getMotivo());
     }
+    public int contarMovimientosPorUsuario(int usuarioId) {
+        String sql = "SELECT COUNT(*) FROM movimientos_inventario WHERE usuario_id = ?";
+        return count(sql, usuarioId);
+    }
 
     public ArrayList<Movimiento> listarMovimientosPorUsuarioPaginado(int usuarioId, int limit, int offset) {
         return listarMovimientosPorUsuarioPaginado(usuarioId, limit, offset, null, null);

@@ -9,6 +9,39 @@
     <jsp:include page="/logistica/layouts/head.jsp">
         <jsp:param name="pageTitle" value="Distribucion y Transporte"/>
     </jsp:include>
+    <style>
+        /* Estilo para el encabezado de la tabla igual que en productor */
+        .table-card .card-header {
+            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
+            color: #fff;
+            border-radius: 12px 12px 0 0;
+            padding: 0.5rem 0.75rem;
+            margin: 0;
+        }
+        .table-card .card-header h5,
+        .table-card .card-header small {
+            color: white !important;
+        }
+        /* Estilo para el botón Limpiar igual que en productor - sobrescribir estilos globales */
+        .btn-outline-secondary {
+            color: #6c757d !important;
+            border: 1px solid #6c757d !important;
+            background-color: transparent !important;
+            background-image: none !important;
+        }
+        .btn-outline-secondary:hover {
+            color: #fff !important;
+            background-color: #6c757d !important;
+            border: 1px solid #6c757d !important;
+            background-image: none !important;
+        }
+        .btn-outline-secondary:focus {
+            color: #fff !important;
+            background-color: #6c757d !important;
+            border: 1px solid #6c757d !important;
+            box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.5) !important;
+        }
+    </style>
 </head>
 <body>
 <div class="dashboard-main-wrapper">
@@ -29,10 +62,148 @@
             </c:if>
 
             <div class="page-header mb-1" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
-                <h2 class="pageheader-title mb-0" style="font-size: 1.4rem; line-height: 1.2;"><i class="fas fa-truck me-2"></i>Planes de Transporte</h2>
-                <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Seguimiento de entregas y análisis de rutas.</p>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h2 class="pageheader-title mb-0" style="font-size: 1.4rem; line-height: 1.2;"><i class="fas fa-truck me-2"></i>Planes de Transporte</h2>
+                        <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Seguimiento de entregas y análisis de rutas.</p>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <%
+                            String busquedaParam = request.getParameter("busqueda");
+                            String conductorParam = request.getParameter("conductor");
+                            String estadoParam = request.getParameter("estado");
+                            String fechaDesdeParam = request.getParameter("fecha_desde");
+                            String fechaHastaParam = request.getParameter("fecha_hasta");
+                            StringBuilder urlParams = new StringBuilder();
+                            if (busquedaParam != null && !busquedaParam.trim().isEmpty()) {
+                                urlParams.append("&busqueda=").append(java.net.URLEncoder.encode(busquedaParam, "UTF-8"));
+                            }
+                            if (conductorParam != null && !conductorParam.trim().isEmpty()) {
+                                urlParams.append("&conductor=").append(java.net.URLEncoder.encode(conductorParam, "UTF-8"));
+                            }
+                            if (estadoParam != null && !estadoParam.trim().isEmpty()) {
+                                urlParams.append("&estado=").append(java.net.URLEncoder.encode(estadoParam, "UTF-8"));
+                            }
+                            if (fechaDesdeParam != null && !fechaDesdeParam.trim().isEmpty()) {
+                                urlParams.append("&fecha_desde=").append(java.net.URLEncoder.encode(fechaDesdeParam, "UTF-8"));
+                            }
+                            if (fechaHastaParam != null && !fechaHastaParam.trim().isEmpty()) {
+                                urlParams.append("&fecha_hasta=").append(java.net.URLEncoder.encode(fechaHastaParam, "UTF-8"));
+                            }
+                            String urlBase = request.getContextPath() + "/logistica/DistribucionTransporteReporteServlet?action=exportar" + urlParams.toString();
+                            String urlEnviar = request.getContextPath() + "/logistica/DistribucionTransporteReporteServlet?action=formEnviar" + urlParams.toString();
+                        %>
+                        <a href="<%= urlBase %>" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <i class="fas fa-file-excel me-1"></i>Exportar a Excel
+                        </a>
+                        <a href="<%= urlEnviar %>" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <i class="fas fa-envelope me-1"></i>Enviar por Correo
+                        </a>
+                        <a href="${pageContext.request.contextPath}/planes-transporte?action=crear" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
+                            <i class="fas fa-plus me-1"></i>Agregar Plan
+                        </a>
+                    </div>
+                </div>
             </div>
 
+            <%
+                // Calcular estadísticas desde la lista de planes
+                ArrayList<PlanTransporteBean> listaPlanesStats = 
+                    (ArrayList<PlanTransporteBean>) request.getAttribute("listaPlanes");
+                int totalPlanes = 0;
+                int planesEnRuta = 0;
+                int planesEntregados = 0;
+                
+                Integer totalRowsAttr = (Integer) request.getAttribute("totalRows");
+                if (totalRowsAttr != null) {
+                    totalPlanes = totalRowsAttr;
+                }
+                
+                if (listaPlanesStats != null) {
+                    for (PlanTransporteBean plan : listaPlanesStats) {
+                        String estado = plan.getEstado();
+                        if ("En Ruta".equalsIgnoreCase(estado)) {
+                            planesEnRuta++;
+                        } else if ("Entregado".equalsIgnoreCase(estado)) {
+                            planesEntregados++;
+                        }
+                    }
+                }
+            %>
+
+            <!-- ===================== Tarjetas de estadísticas ===================== -->
+            <div class="stats-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
+                <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                    <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Planes</h3>
+                    <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalPlanes %></p>
+                </div>
+                <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                    <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">En Ruta</h3>
+                    <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= planesEnRuta %></p>
+                </div>
+                <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                    <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Entregados</h3>
+                    <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= planesEntregados %></p>
+                </div>
+            </div>
+
+            <!-- ===================== Card: Búsqueda y filtros ===================== -->
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+                <form action="${pageContext.request.contextPath}/planes-transporte" method="GET">
+                    <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
+                    <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" id="searchInput" placeholder="N° Viaje, Placa, Lote..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <button class="btn btn-sm btn-primary shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-user me-1"></i>Conductor</label>
+                            <select class="form-select form-select-sm shadow-sm" name="conductor" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <option value="">Todos</option>
+                                <% ArrayList<ConductorBean> listaConductores = (ArrayList<ConductorBean>) request.getAttribute("listaConductores");
+                                    if(listaConductores != null){
+                                        for(ConductorBean conductor : listaConductores){ %>
+                                <option value="<%= conductor.getId() %>" ${param.conductor == conductor.getId() ? 'selected' : ''} >
+                                    <%= conductor.getNombreCompleto() %>
+                                </option>
+                                <%  }
+                                } %>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-toggle-on me-1"></i>Estado</label>
+                            <select class="form-select form-select-sm shadow-sm" name="estado" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <option value="" ${param.estado == '' ? 'selected' : ''}>Todos</option>
+                                <option value="Pendiente" ${param.estado == 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                                <option value="Salida" ${param.estado == 'Salida' ? 'selected' : ''}>Salida</option>
+                                <option value="En Ruta" ${param.estado == 'En Ruta' ? 'selected' : ''}>En Ruta</option>
+                                <option value="Entregado" ${param.estado == 'Entregado' ? 'selected' : ''}>Entregado</option>
+                                <option value="Cancelado" ${param.estado == 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-calendar me-1"></i>Fecha Desde</label>
+                            <input type="date" class="form-control form-control-sm shadow-sm" name="fecha_desde" value="${param.fecha_desde}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-calendar me-1"></i>Fecha Hasta</label>
+                            <input type="date" class="form-control form-control-sm shadow-sm" name="fecha_hasta" value="${param.fecha_hasta}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <a href="${pageContext.request.contextPath}/planes-transporte" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <i class="fas fa-sync-alt me-1"></i>Limpiar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ===================== Card: Tabla de planes ===================== -->
             <div class="row">
                 <div class="col-12">
                     <div class="table-card shadow-sm">
@@ -42,98 +213,9 @@
                                     <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-truck me-2"></i>Tabla de Transportes</h5>
                                     <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todos los planes de transporte</small>
                                 </div>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <%
-                                        String busquedaParam = request.getParameter("busqueda");
-                                        String conductorParam = request.getParameter("conductor");
-                                        String estadoParam = request.getParameter("estado");
-                                        String fechaDesdeParam = request.getParameter("fecha_desde");
-                                        String fechaHastaParam = request.getParameter("fecha_hasta");
-                                        StringBuilder urlParams = new StringBuilder();
-                                        if (busquedaParam != null && !busquedaParam.trim().isEmpty()) {
-                                            urlParams.append("&busqueda=").append(java.net.URLEncoder.encode(busquedaParam, "UTF-8"));
-                                        }
-                                        if (conductorParam != null && !conductorParam.trim().isEmpty()) {
-                                            urlParams.append("&conductor=").append(java.net.URLEncoder.encode(conductorParam, "UTF-8"));
-                                        }
-                                        if (estadoParam != null && !estadoParam.trim().isEmpty()) {
-                                            urlParams.append("&estado=").append(java.net.URLEncoder.encode(estadoParam, "UTF-8"));
-                                        }
-                                        if (fechaDesdeParam != null && !fechaDesdeParam.trim().isEmpty()) {
-                                            urlParams.append("&fecha_desde=").append(java.net.URLEncoder.encode(fechaDesdeParam, "UTF-8"));
-                                        }
-                                        if (fechaHastaParam != null && !fechaHastaParam.trim().isEmpty()) {
-                                            urlParams.append("&fecha_hasta=").append(java.net.URLEncoder.encode(fechaHastaParam, "UTF-8"));
-                                        }
-                                        String urlBase = request.getContextPath() + "/logistica/DistribucionTransporteReporteServlet?action=exportar" + urlParams.toString();
-                                        String urlEnviar = request.getContextPath() + "/logistica/DistribucionTransporteReporteServlet?action=formEnviar" + urlParams.toString();
-                                    %>
-                                    <a href="<%= urlBase %>" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                        <i class="fas fa-file-excel me-1"></i>Exportar a Excel
-                                    </a>
-                                    <a href="<%= urlEnviar %>" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                        <i class="fas fa-envelope me-1"></i>Enviar por Correo
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/planes-transporte?action=crear" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
-                                        <i class="fas fa-plus me-1"></i>Agregar Plan
-                                    </a>
-                                </div>
                             </div>
                         </div>
                         <div class="card-body" style="padding: 0.75rem;">
-                            <form action="${pageContext.request.contextPath}/planes-transporte" method="GET">
-                                <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
-                                <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
-                                    <div class="col-md-2">
-                                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
-                                        <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" placeholder="N° Viaje, Placa, Lote..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-user me-1"></i>Conductor</label>
-                                        <select class="form-select form-select-sm shadow-sm" name="conductor" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                            <option value="">Todos</option>
-                                            <% ArrayList<ConductorBean> listaConductores = (ArrayList<ConductorBean>) request.getAttribute("listaConductores");
-                                                if(listaConductores != null){
-                                                    for(ConductorBean conductor : listaConductores){ %>
-                                            <option value="<%= conductor.getId() %>" ${param.conductor == conductor.getId() ? 'selected' : ''} >
-                                                <%= conductor.getNombreCompleto() %>
-                                            </option>
-                                            <%  }
-                                            } %>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-toggle-on me-1"></i>Estado</label>
-                                        <select class="form-select form-select-sm shadow-sm" name="estado" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                            <option value="" ${param.estado == '' ? 'selected' : ''}>Todos</option>
-                                            <option value="Pendiente" ${param.estado == 'Pendiente' ? 'selected' : ''}>Pendiente</option>
-                                            <option value="Salida" ${param.estado == 'Salida' ? 'selected' : ''}>Salida</option>
-                                            <option value="En Ruta" ${param.estado == 'En Ruta' ? 'selected' : ''}>En Ruta</option>
-                                            <option value="Entregado" ${param.estado == 'Entregado' ? 'selected' : ''}>Entregado</option>
-                                            <option value="Cancelado" ${param.estado == 'Cancelado' ? 'selected' : ''}>Cancelado</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-calendar me-1"></i>Fecha Desde</label>
-                                        <input type="date" class="form-control form-control-sm shadow-sm" name="fecha_desde" value="${param.fecha_desde}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-calendar me-1"></i>Fecha Hasta</label>
-                                        <input type="date" class="form-control form-control-sm shadow-sm" name="fecha_hasta" value="${param.fecha_hasta}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                    </div>
-                                    <div class="col-md-1 d-flex align-items-end">
-                                        <button type="submit" class="btn btn-sm btn-primary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                            <i class="fas fa-search me-1"></i>Buscar
-                                        </button>
-                                    </div>
-                                    <div class="col-md-1 d-flex align-items-end">
-                                        <a href="${pageContext.request.contextPath}/planes-transporte" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                            <i class="fas fa-sync-alt me-1"></i>Limpiar
-                                        </a>
-                                    </div>
-                                </div>
-                            </form>
-
                             <div style="width: 100%; position: relative;">
                                 <table id="distribucionTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                     <thead class="table-light">
@@ -258,6 +340,61 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // Aplicar filtros automáticamente al cambiar valores
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form[action*="planes-transporte"]');
+        const busquedaInput = form ? form.querySelector('input[name="busqueda"]') : null;
+        const conductorSelect = form ? form.querySelector('select[name="conductor"]') : null;
+        const estadoSelect = form ? form.querySelector('select[name="estado"]') : null;
+        const fechaDesdeInput = form ? form.querySelector('input[name="fecha_desde"]') : null;
+        const fechaHastaInput = form ? form.querySelector('input[name="fecha_hasta"]') : null;
+        
+        // Aplicar filtros cuando cambien los selects
+        if (conductorSelect) {
+            conductorSelect.addEventListener('change', function() {
+                form.submit();
+            });
+        }
+        
+        if (estadoSelect) {
+            estadoSelect.addEventListener('change', function() {
+                form.submit();
+            });
+        }
+        
+        // Aplicar filtros cuando cambien las fechas
+        if (fechaDesdeInput) {
+            fechaDesdeInput.addEventListener('change', function() {
+                form.submit();
+            });
+        }
+        
+        if (fechaHastaInput) {
+            fechaHastaInput.addEventListener('change', function() {
+                form.submit();
+            });
+        }
+        
+        // Aplicar filtros al presionar Enter en el campo de búsqueda
+        if (busquedaInput) {
+            busquedaInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    form.submit();
+                }
+            });
+        }
+        
+        // Botón de búsqueda
+        const searchButton = form ? form.querySelector('.btn-primary.shadow-sm') : null;
+        if (searchButton) {
+            searchButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                form.submit();
+            });
+        }
+    });
+    
     // Función para ordenar la tabla
     let sortDirection = {}; // Almacena la dirección de ordenamiento para cada columna
     
