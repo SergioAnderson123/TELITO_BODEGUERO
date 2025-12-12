@@ -12,10 +12,11 @@
 <!-- Custom CSS (turquesa/verde agua) -->
 <style>
     /* =====================
-       Paleta y tokens
+       Paleta y tokens (IDÉNTICA AL ADMINISTRADOR)
     ====================== */
     :root {
-        --turquoise-dark: #006d77;
+        --turquoise-dark: #00a896;
+        --turquoise-medium: #028f80;
         --seafoam: #83c5be;
         --seafoam-light: #edf6f9;
         --white: #ffffff;
@@ -51,19 +52,63 @@
     .page-header p { color: var(--text-muted); font-size: 1.05rem; }
 
     /* =====================
-       Sidebar
+       Sidebar (IDÉNTICO AL ADMINISTRADOR)
     ====================== */
     .nav-left-sidebar {
         width: 250px;
-        background: linear-gradient(160deg, var(--turquoise-dark) 0%, #055e68 100%);
-        min-height: 100vh; position: fixed; left: 0; top: 0; z-index: 1000;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+        min-height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 3px 0 15px rgba(0,0,0,.12);
     }
     .navbar-brand { font-weight: 700; color: var(--turquoise-dark); }
-    .nav-link { color: rgba(255,255,255,0.9) !important; padding: 12px 20px; border-radius: 8px; margin: 5px 15px; transition: all 0.3s ease; display: flex; align-items: center; }
-    .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.18); color: #fff !important; transform: translateX(5px); }
-    .nav-link i { margin-right: 10px; width: 20px; }
-    .nav-divider { color: rgba(255,255,255,0.8); font-weight: 600; padding: 15px 20px 5px; margin-top: 20px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-link {
+        color: rgba(255,255,255,.95) !important;
+        padding: 13px 20px;
+        border-radius: 10px;
+        margin: 6px 15px;
+        transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        position: relative;
+        overflow: hidden;
+    }
+    .nav-link::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: #fff;
+        transform: scaleY(0);
+        transition: transform .3s ease;
+        border-radius: 0 4px 4px 0;
+    }
+    .nav-link:hover, .nav-link.active {
+        background-color: rgba(255,255,255,.25);
+        color: #fff !important;
+        transform: translateX(8px);
+        box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    }
+    .nav-link:hover::before, .nav-link.active::before {
+        transform: scaleY(1);
+    }
+    .nav-link i { margin-right: 12px; width: 22px; font-size: 1.1rem; }
+    .nav-divider {
+        color: rgba(255,255,255,.95);
+        font-weight: 700;
+        padding: 18px 20px 8px;
+        margin-top: 25px;
+        font-size: .8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        border-top: 1px solid rgba(255,255,255,.15);
+    }
 
     /* =====================
        Tarjetas/Tabla/Formularios
@@ -137,6 +182,29 @@
     thead th { background-color: var(--seafoam-light); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; }
     tbody tr:hover { background-color: var(--seafoam-light); }
     .table-responsive { border-radius: 8px; overflow: hidden; }
+    
+    /* Estilos de table-card (igual al administrador) */
+    .table-card { background: var(--white); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.06); border: none; overflow:hidden; }
+    .table-card .card-header { background: linear-gradient(135deg, #00a896 0%, #028f80 100%); color: #fff; border-radius: 12px 12px 0 0; padding: 20px 30px; margin: 0; box-shadow:0 4px 12px rgba(0,168,150,.25); }
+    .table-card .card-body { padding: 30px; }
+    .table { margin-bottom: 0; }
+    .table th { border-top: none; font-weight: 600; color: #00a896; padding: 15px; background-color:rgba(0,168,150,.06); }
+    .table td { padding: 15px; vertical-align: middle; }
+    .badge { font-size: 0.8rem; padding: 6px 12px; }
+    .bg-success-soft { background-color: rgba(40, 167, 69, 0.1) !important; color: #28a745 !important; }
+    .bg-warning-soft { background-color: rgba(255, 193, 7, 0.1) !important; color: #ffc107 !important; }
+    .bg-danger-soft { background-color: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important; }
+    .bg-secondary-soft { background-color: rgba(108, 117, 125, 0.1) !important; color: #6c757d !important; }
+    
+    /* Mejoras visuales adicionales */
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+    .table tbody tr:hover {
+        background-color: rgba(0, 168, 150, 0.08);
+        transform: scale(1.005);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
 
     /* Badges */
     .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
@@ -145,6 +213,26 @@
     .bg-danger { background: linear-gradient(160deg, #dc3545 0%, #e74c3c 100%) !important; }
     .bg-info { background: linear-gradient(160deg, #17a2b8 0%, #20c997 100%) !important; }
     .bg-primary { background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%) !important; }
+
+    /* Estilos de botones mejorados */
+    .btn {
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    .btn:active {
+        transform: translateY(0);
+    }
+    
+    .card {
+        transition: box-shadow 0.3s ease;
+    }
+    .card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,.1);
+    }
 
     /* Paginación */
     .pagination .page-link {

@@ -102,7 +102,7 @@
                                             } %>
                                         </select>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-xl-2 col-lg-3 col-md-6 col-sm-12">
                                         <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-toggle-on me-1"></i>Estado</label>
                                         <select class="form-select form-select-sm shadow-sm" name="estado" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                             <option value="" ${param.estado == '' ? 'selected' : ''}>Todos</option>
@@ -113,11 +113,11 @@
                                             <option value="Cancelado" ${param.estado == 'Cancelado' ? 'selected' : ''}>Cancelado</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
                                         <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-calendar me-1"></i>Fecha Desde</label>
                                         <input type="date" class="form-control form-control-sm shadow-sm" name="fecha_desde" value="${param.fecha_desde}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
                                         <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-calendar me-1"></i>Fecha Hasta</label>
                                         <input type="date" class="form-control form-control-sm shadow-sm" name="fecha_hasta" value="${param.fecha_hasta}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                     </div>
@@ -134,7 +134,7 @@
                                 </div>
                             </form>
 
-                            <div style="width: 100%; position: relative;">
+                            <div class="table-responsive">
                                 <table id="distribucionTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                     <thead class="table-light">
                                     <tr>

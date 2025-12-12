@@ -641,24 +641,15 @@ public class ProductorServlet extends HttpServlet {
                                         System.out.println("✓ Email obtenido: " + emailLogistica);
                                         
                                         String asunto = "TELITO BODEGUERO - Orden de Compra Aceptada por Productor";
-                                        String mensaje = """
-                                            <h2>¡Orden de Compra Aceptada!</h2>
-                                            <p>El productor ha aceptado la orden de compra y está en proceso de preparación.</p>
-                                            <p><strong>Número de Orden:</strong> %s</p>
-                                            <p><strong>Producto:</strong> %s</p>
-                                            <p><strong>Cantidad:</strong> %d paquetes</p>
-                                            <p><strong>Monto Total:</strong> S/. %.2f</p>
-                                            <p><strong>Fecha de Aceptación:</strong> %s</p>
-                                            <hr>
-                                            <p><strong>Estado actual:</strong> En Proceso</p>
-                                            <p>El productor está preparando la mercancía. Se te notificará cuando esté lista para ser recibida en el almacén.</p>
-                                            """.formatted(
-                                                numeroOrden,
-                                                nombreProducto,
-                                                cantidad,
-                                                montoTotal,
-                                                new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
-                                            );
+                                        
+                                        // Usar plantilla HTML profesional
+                                        String mensaje = com.example.telito.util.EmailTemplates.generarCorreoOrdenAceptadaLogistica(
+                                            numeroOrden,
+                                            nombreProducto,
+                                            cantidad,
+                                            montoTotal,
+                                            new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                                        );
                                         
                                         // Enviar correo HTML
                                         System.out.println("Enviando correo a: " + emailLogistica);

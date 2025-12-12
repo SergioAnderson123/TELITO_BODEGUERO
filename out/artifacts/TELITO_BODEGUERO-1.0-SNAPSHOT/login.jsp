@@ -1,5 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.UUID" %>
+<%@ page import="com.example.telito.util.SecurityManager" %>
+<%
+    // Generar token CSRF si no existe (fallback por si acceden directamente al JSP)
+    if (request.getAttribute("csrfToken") == null) {
+        String csrfToken = SecurityManager.generarTokenCSRF(request.getSession(true));
+        request.setAttribute("csrfToken", csrfToken);
+    }
+%>
 
 <!doctype html>
 <html lang="es">

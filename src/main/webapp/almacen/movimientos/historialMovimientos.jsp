@@ -61,7 +61,7 @@
                             <input type="hidden" name="action" value="listar">
                             <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 10 %>">
                             <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
-                                <div class="col-md-4">
+                                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
                                     <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                                     <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" id="searchInput" placeholder="Producto o lote..." value="<%= request.getParameter("busqueda") != null ? request.getParameter("busqueda") : "" %>" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                 </div>
@@ -74,26 +74,26 @@
                                         <option value="Ajuste" <%= "Ajuste".equals(request.getParameter("tipo")) ? "selected" : "" %>>Ajuste</option>
                                     </select>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6">
                                     <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-user me-1"></i>Vista</label>
                                     <select class="form-select form-select-sm shadow-sm" name="filtro" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                         <option value="todos" <%= !"mios".equals(request.getParameter("filtro")) ? "selected" : "" %>>Todos</option>
                                         <option value="mios" <%= "mios".equals(request.getParameter("filtro")) ? "selected" : "" %>>Mis Movimientos</option>
                                     </select>
                                 </div>
-                                <div class="col-md-1 d-flex align-items-end">
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3 d-flex align-items-end">
                                     <button type="submit" class="btn btn-sm btn-primary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                         <i class="fas fa-search me-1"></i>Buscar
                                     </button>
                                 </div>
-                                <div class="col-md-2 d-flex align-items-end">
+                                <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 d-flex align-items-end">
                                     <a href="<%= request.getContextPath() %>/almacen/MovimientoServlet?action=listar" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                         <i class="fas fa-sync-alt me-1"></i>Limpiar
                                     </a>
                                 </div>
                             </div>
                         </form>
-                        <div style="width: 100%; position: relative;">
+                        <div class="table-responsive">
                             <table id="movimientosTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                 <thead class="table-light">
                                 <tr>

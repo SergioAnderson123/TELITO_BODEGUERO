@@ -103,10 +103,22 @@ public class LoginServlet extends HttpServlet {
         }
         
         // 2. Validar token CSRF
+        // IMPORTANTE: Primero intentar obtener la sesión existente sin crear una nueva
         HttpSession sessionActual = request.getSession(false);
+        
+        // Si no hay sesión, significa que expiró - regenerar formulario con nuevo token
+        if (sessionActual == null) {
+            System.err.println("⚠ SEGURIDAD: Sesión expiró antes del login desde: " + request.getRemoteAddr());
+            request.setAttribute("errorMsg", "Su sesión ha expirado. Por favor, intente nuevamente.");
+            generarTokenYMostrarLogin(request, response);
+            return;
+        }
+        
+        // Validar que el token CSRF coincida con el de la sesión
         if (!SecurityManager.validarTokenCSRF(sessionActual, csrfToken)) {
-            System.err.println("🚨 SEGURIDAD: Intento de login con token CSRF inválido desde: " + 
-                             request.getRemoteAddr());
+            System.err.println("🚨 SEGURIDAD: Token CSRF inválido desde: " + request.getRemoteAddr() + 
+                             " - Token recibido: [" + (csrfToken != null ? csrfToken : "null") + 
+                             "] - Token esperado: [" + sessionActual.getAttribute("csrfToken") + "]");
             request.setAttribute("errorMsg", "Solicitud no válida. Por favor, intente nuevamente.");
             generarTokenYMostrarLogin(request, response);
             return;
@@ -156,26 +168,6 @@ public class LoginServlet extends HttpServlet {
             
             // ========== LOGIN EXITOSO ==========
             
-            // Verificar ANTES de crear sesión si el usuario ya tiene una sesión activa
-            String sessionIdTentativo = request.getSession(true).getId();
-            if (SecurityManager.tieneOtraSesionActiva(usuario.getIdUsuario(), sessionIdTentativo)) {
-                // Ya existe otra sesión activa para este usuario - RECHAZAR EL LOGIN
-                System.err.println("🚨 SEGURIDAD: Intento de login con sesión activa existente - Usuario ID " + 
-                                 usuario.getIdUsuario() + " desde " + request.getRemoteAddr());
-                
-                // Invalidar la sesión temporal que se creó
-                HttpSession tempSession = request.getSession(false);
-                if (tempSession != null) {
-                    tempSession.invalidate();
-                }
-                
-                request.setAttribute("errorMsg", 
-                    "Ya existe una sesión activa para este usuario en otro navegador o ventana. " +
-                    "Por favor, cierre la otra sesión primero desde el menú de usuario, o espere a que expire (30 minutos de inactividad).");
-                generarTokenYMostrarLogin(request, response);
-                return;
-            }
-            
             // Resetear intentos fallidos
             SecurityManager.resetearIntentosFallidos(emailOUsuario);
             
@@ -186,12 +178,28 @@ public class LoginServlet extends HttpServlet {
             
             // Crear nueva sesión
             HttpSession session = request.getSession(true);
+            String sessionId = session.getId();
+            
+            // Verificar si el usuario ya tiene otra sesión activa
+            if (SecurityManager.tieneOtraSesionActiva(usuario.getIdUsuario(), sessionId)) {
+                // Ya existe otra sesión activa para este usuario - RECHAZAR EL LOGIN
+                System.err.println("🚨 SEGURIDAD: Intento de login con sesión activa existente - Usuario ID " + 
+                                 usuario.getIdUsuario() + " desde " + request.getRemoteAddr());
+                
+                // Invalidar la sesión que acabamos de crear
+                session.invalidate();
+                
+                request.setAttribute("errorMsg", 
+                    "Ya existe una sesión activa para este usuario en otro navegador o ventana. " +
+                    "Por favor, cierre la otra sesión primero desde el menú de usuario, o espere a que expire (30 minutos de inactividad).");
+                generarTokenYMostrarLogin(request, response);
+                return;
+            }
             
             // Configurar timeout de sesión (30 minutos de inactividad)
             session.setMaxInactiveInterval(30 * 60);
             
             // Guardar información de seguridad en sesión
-            String sessionId = session.getId();
             session.setAttribute("usuario", usuario);
             session.setAttribute("usuarioNombre", usuario.getNombres() + " " + usuario.getApellidos());
             session.setAttribute("usuarioRol", usuario.getRol().getNombre());

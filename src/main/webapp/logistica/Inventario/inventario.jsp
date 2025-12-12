@@ -154,10 +154,16 @@
             %>
             
             <!-- ===================== Tarjetas de estadísticas ===================== -->
-            <div class="stats-container">
-                <div class="stat-card"><h3>Total de Productos</h3><p><%= totalProductos %></p></div>
-                <div class="stat-card"><h3>En Stock</h3><p><%= enStock %></p></div>
-                <div class="stat-card"><h3>Sin Stock</h3><p><%= sinStock %></p></div>
+            <div class="row g-2 mb-3">
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                    <div class="stat-card"><h3>Total de Productos</h3><p><%= totalProductos %></p></div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                    <div class="stat-card"><h3>En Stock</h3><p><%= enStock %></p></div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                    <div class="stat-card"><h3>Sin Stock</h3><p><%= sinStock %></p></div>
+                </div>
             </div>
 
             <!-- ===================== Card: Búsqueda y filtros ===================== -->
@@ -165,7 +171,7 @@
                 <form action="<%= request.getContextPath() %>/InventarioServlet" method="GET" id="filterForm">
                     <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                     <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
-                        <div class="col-md-6">
+                        <div class="col-xl-5 col-lg-5 col-md-12 col-sm-12">
                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                             <div class="input-group">
                                 <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" id="searchInput" placeholder="SKU o producto..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
@@ -174,7 +180,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-toggle-on me-1"></i>Estado de Stock</label>
                             <select class="form-select form-select-sm shadow-sm" name="estado" id="estadoFilter" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                 <option value="" ${param.estado == '' ? 'selected' : ''}>Todos</option>
@@ -183,7 +189,7 @@
                                 <option value="Sin stock" ${param.estado == 'Sin stock' ? 'selected' : ''}>Sin stock</option>
                             </select>
                         </div>
-                        <div class="col-md-3 d-flex align-items-end">
+                        <div class="col-xl-2 col-lg-2 col-md-3 col-sm-6 d-flex align-items-end">
                             <a href="<%= request.getContextPath() %>/InventarioServlet" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                 <i class="fas fa-sync-alt me-1"></i>Limpiar
                             </a>

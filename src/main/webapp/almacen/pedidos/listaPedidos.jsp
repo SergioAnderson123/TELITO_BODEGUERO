@@ -42,11 +42,11 @@
                             <input type="hidden" name="action" value="lista">
                             <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 10 %>">
                             <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
-                                <div class="col-md-4">
+                                <div class="col-xl-5 col-lg-5 col-md-12 col-sm-12">
                                     <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                                     <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" placeholder="N° Pedido, cliente o destino..." value="<%= request.getParameter("busqueda") != null ? request.getParameter("busqueda") : "" %>" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6">
                                     <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-toggle-on me-1"></i>Estado</label>
                                     <select class="form-select form-select-sm shadow-sm" name="estado" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                         <option value="" <%= (request.getParameter("estado") == null || request.getParameter("estado").isEmpty()) ? "selected" : "" %>>Todos</option>
@@ -54,19 +54,19 @@
                                         <option value="Despachado" <%= "Despachado".equals(request.getParameter("estado")) ? "selected" : "" %>>Despachado</option>
                                     </select>
                                 </div>
-                                <div class="col-md-1 d-flex align-items-end">
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3 d-flex align-items-end">
                                     <button type="submit" class="btn btn-sm btn-primary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                         <i class="fas fa-search me-1"></i>Buscar
                                     </button>
                                 </div>
-                                <div class="col-md-2 d-flex align-items-end">
+                                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 d-flex align-items-end">
                                     <a href="<%= request.getContextPath() %>/almacen/PedidoServlet?action=lista" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                         <i class="fas fa-sync-alt me-1"></i>Limpiar
                                     </a>
                                 </div>
                             </div>
                         </form>
-                        <div style="width: 100%; position: relative;">
+                        <div class="table-responsive">
                             <table id="pedidosTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                 <thead class="table-light">
                                 <tr>
@@ -159,7 +159,7 @@
                         </div>
                     </div>
                     <div class="card-body" style="padding: 0.75rem;">
-                        <div style="width: 100%; position: relative;">
+                        <div class="table-responsive">
                             <table id="planesTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                 <thead class="table-light">
                                 <tr>

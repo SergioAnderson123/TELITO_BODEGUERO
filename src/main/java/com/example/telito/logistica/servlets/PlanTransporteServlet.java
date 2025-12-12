@@ -192,24 +192,14 @@ public class PlanTransporteServlet extends HttpServlet {
                         }
                     }
                     
-                    String mensaje = """
-                        <h2>Nuevo Plan de Transporte Creado</h2>
-                        <p>Se ha creado un nuevo plan de transporte que requiere preparación en almacén.</p>
-                        <p><strong>Número de Plan:</strong> %s</p>
-                        <p><strong>Producto:</strong> %s</p>
-                        <p><strong>Lote:</strong> %s</p>
-                        <p><strong>Stock Disponible:</strong> %d paquetes</p>
-                        <p><strong>Fecha de Entrega:</strong> %s</p>
-                        <hr>
-                        <p>Por favor, prepara la mercancía según este plan de transporte.</p>
-                        <p>Puedes acceder a la preparación desde: <strong>Almacén → Registrar Salidas</strong></p>
-                        """.formatted(
-                            numeroPlan,
-                            nombreProducto,
-                            codigoLote,
-                            stock,
-                            fechaEntrega
-                        );
+                    // Usar plantilla profesional
+                    String mensaje = com.example.telito.util.EmailTemplates.generarCorreoNuevoPlanTransporte(
+                        numeroPlan,
+                        nombreProducto,
+                        codigoLote,
+                        stock,
+                        fechaEntrega
+                    );
                     
                     // Enviar correo a todos los usuarios de almacén
                     int correosEnviados = 0;

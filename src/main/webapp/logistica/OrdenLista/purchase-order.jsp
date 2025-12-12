@@ -78,11 +78,11 @@
                             <form action="${pageContext.request.contextPath}/orden-compra" method="GET">
                                 <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                                 <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
-                                    <div class="col-md-4">
+                                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
                                         <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                                         <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" placeholder="N° Orden o producto..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
                                         <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-truck me-1"></i>Proveedor</label>
                                         <select class="form-select form-select-sm shadow-sm" name="proveedor" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                             <option value="">Todos</option>
@@ -96,7 +96,7 @@
                                             } %>
                                         </select>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6">
                                         <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-toggle-on me-1"></i>Estado</label>
                                         <select class="form-select form-select-sm shadow-sm" name="estado" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                             <option value="" ${param.estado == '' ? 'selected' : ''}>Todos</option>
@@ -106,12 +106,12 @@
                                             <option value="Recibido" ${param.estado == 'Recibido' ? 'selected' : ''}>Recibido</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-1 d-flex align-items-end">
+                                    <div class="col-xl-1 col-lg-1 col-md-6 col-sm-6 d-flex align-items-end">
                                         <button type="submit" class="btn btn-sm btn-primary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                             <i class="fas fa-search me-1"></i>Buscar
                                         </button>
                                     </div>
-                                    <div class="col-md-2 d-flex align-items-end">
+                                    <div class="col-xl-2 col-lg-2 col-md-3 col-sm-6 d-flex align-items-end">
                                         <a href="${pageContext.request.contextPath}/orden-compra" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                             <i class="fas fa-sync-alt me-1"></i>Limpiar
                                         </a>
@@ -119,7 +119,7 @@
                                 </div>
                             </form>
 
-                            <div style="width: 100%; position: relative;">
+                            <div class="table-responsive">
                                 <table id="purchaseTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                     <thead class="table-light">
                                     <tr>

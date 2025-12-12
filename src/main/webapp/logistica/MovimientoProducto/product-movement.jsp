@@ -125,18 +125,24 @@
             %>
 
             <!-- ===================== Tarjetas de estadísticas ===================== -->
-            <div class="stats-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
-                <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                    <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Movimientos</h3>
-                    <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalMovimientos %></p>
+            <div class="row g-2 mb-3">
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Movimientos</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalMovimientos %></p>
+                    </div>
                 </div>
-                <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                    <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Entradas</h3>
-                    <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= movimientosEntrada %></p>
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Entradas</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= movimientosEntrada %></p>
+                    </div>
                 </div>
-                <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                    <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Salidas</h3>
-                    <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= movimientosSalida %></p>
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Salidas</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= movimientosSalida %></p>
+                    </div>
                 </div>
             </div>
 
@@ -145,7 +151,7 @@
                 <form action="<%= request.getContextPath() %>/MovimientoProductoServlet" method="GET">
                     <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                     <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
-                        <div class="col-md-5">
+                        <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                             <div class="input-group">
                                 <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" id="searchInput" placeholder="Producto o lote..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
@@ -194,7 +200,7 @@
                             </div>
                         </div>
                         <div class="card-body" style="padding: 0.75rem;">
-                            <div style="width: 100%; position: relative;">
+                            <div class="table-responsive">
                                 <table id="movementTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                     <thead class="table-light">
                                     <tr>

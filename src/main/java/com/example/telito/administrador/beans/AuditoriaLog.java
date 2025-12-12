@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 public class AuditoriaLog {
     
     private int idAuditoria;
-    private int usuarioId;
+    private Integer usuarioId; // Cambiado a Integer para permitir NULL
     private String usuarioNombre;
     private String accion;
     private String modulo;
@@ -25,7 +25,7 @@ public class AuditoriaLog {
     public AuditoriaLog() {
     }
     
-    public AuditoriaLog(int usuarioId, String usuarioNombre, String accion, String modulo, 
+    public AuditoriaLog(Integer usuarioId, String usuarioNombre, String accion, String modulo, 
                        String descripcion, String ipAddress, String userAgent) {
         this.usuarioId = usuarioId;
         this.usuarioNombre = usuarioNombre;
@@ -46,11 +46,11 @@ public class AuditoriaLog {
         this.idAuditoria = idAuditoria;
     }
     
-    public int getUsuarioId() {
+    public Integer getUsuarioId() {
         return usuarioId;
     }
     
-    public void setUsuarioId(int usuarioId) {
+    public void setUsuarioId(Integer usuarioId) {
         this.usuarioId = usuarioId;
     }
     

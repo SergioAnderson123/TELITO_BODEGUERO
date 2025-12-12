@@ -37,19 +37,19 @@ public class EmailTemplateHelper {
                     .content { background: #edf6f9; padding: 25px; border-radius: 0 0 8px 8px; }
                     .credentials { background: white; padding: 20px; border-radius: 5px; 
                                  margin: 15px 0; border-left: 4px solid #006d77; }
-                    .credential-item { padding: 8px 0; border-bottom: 1px solid #e9ecef; }
+                    .credential-item { padding: 12px 0; border-bottom: 1px solid #e9ecef; }
                     .credential-item:last-child { border-bottom: none; }
-                    .label { font-weight: bold; color: #006d77; }
+                    .label { font-weight: 600; color: #00a896; }
                     .value { color: #2b2d42; font-family: monospace; }
                     .warning { background: #fff3cd; padding: 15px; border-radius: 5px; 
                               border-left: 4px solid #ffc107; margin: 15px 0; }
                     .footer { margin-top: 20px; padding-top: 15px; border-top: 1px solid #e9ecef; 
                              font-size: 12px; color: #6c757d; text-align: center; }
-                    .button { display: inline-block; padding: 12px 30px; background: #ffffff; 
-                            color: #000000; text-decoration: none; border-radius: 5px; 
-                            margin: 15px 0; transition: background 0.3s; border: 2px solid #006d77; 
-                            font-weight: bold; }
-                    .button:hover { background: #f0f0f0; border-color: #055e68; }
+                    .button { display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #00a896 0%%, #028f80 100%%); 
+                            color: #ffffff; text-decoration: none; border-radius: 10px; 
+                            margin: 20px 0; transition: all 0.3s; border: none; 
+                            font-weight: 600; box-shadow: 0 6px 20px rgba(0,168,150,0.4); }
+                    .button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,168,150,0.5); }
                 </style>
             </head>
             <body>
@@ -142,8 +142,8 @@ public class EmailTemplateHelper {
                     .header { background: linear-gradient(160deg, #006d77 0%%, #055e68 100%%); 
                              color: white; padding: 25px; border-radius: 8px 8px 0 0; text-align: center; }
                     .content { background: #edf6f9; padding: 25px; border-radius: 0 0 8px 8px; }
-                    .changes { background: white; padding: 20px; border-radius: 5px; 
-                             margin: 15px 0; border-left: 4px solid #83c5be; }
+                    .changes { background: white; padding: 20px; border-radius: 8px; 
+                             margin: 15px 0; border-left: 4px solid #00a896; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
                     .warning { background: #fff3cd; padding: 15px; border-radius: 5px; 
                               border-left: 4px solid #ffc107; margin: 15px 0; }
                     .footer { margin-top: 20px; padding-top: 15px; border-top: 1px solid #e9ecef; 

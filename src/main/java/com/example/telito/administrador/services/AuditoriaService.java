@@ -77,8 +77,10 @@ public class AuditoriaService {
                 log.setUsuarioId(usuario.getIdUsuario());
                 log.setUsuarioNombre(usuario.getNombres() + " " + usuario.getApellidos());
             } else {
-                log.setUsuarioId(0);
-                log.setUsuarioNombre("Sistema");
+                // Para acciones sin usuario autenticado (ej: login fallido)
+                // usuario_id será NULL en la base de datos
+                log.setUsuarioId(null); // Cambiado de 0 a null
+                log.setUsuarioNombre("Usuario no autenticado");
             }
             
             log.setAccion(accion);

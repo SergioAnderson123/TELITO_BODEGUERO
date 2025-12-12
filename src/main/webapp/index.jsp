@@ -632,7 +632,7 @@
                     <a class="nav-link-custom" href="#contacto">Contacto</a>
                 </li>
                 <li class="nav-item ms-3">
-                    <a href="<%= request.getContextPath() %>/login.jsp" class="btn btn-login-custom">
+                    <a href="<%= request.getContextPath() %>/acceso/login" class="btn btn-login-custom">
                         <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
                     </a>
                 </li>
@@ -660,7 +660,7 @@
                 Preciso, rápido y siempre disponible en la nube.
             </p>
             <div class="hero-buttons">
-                <a href="<%= request.getContextPath() %>/login.jsp" class="btn btn-hero-primary">
+                <a href="<%= request.getContextPath() %>/acceso/login" class="btn btn-hero-primary">
                     <i class="fas fa-rocket me-2"></i>Comenzar Ahora
                 </a>
                 <a href="#caracteristicas" class="btn btn-hero-secondary">
@@ -916,7 +916,7 @@
                 Únete a cientos de empresas que ya optimizaron su gestión de inventarios
             </p>
             <div class="hero-buttons">
-                <a href="<%= request.getContextPath() %>/login.jsp" class="btn btn-hero-primary">
+                <a href="<%= request.getContextPath() %>/acceso/login" class="btn btn-hero-primary">
                     <i class="fas fa-user-plus me-2"></i>Crear Cuenta Gratis
                 </a>
                 <a href="#" class="btn btn-hero-secondary">

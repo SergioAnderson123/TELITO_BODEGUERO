@@ -581,29 +581,14 @@ public class OrdenCompraServlet extends HttpServlet {
                             String emailProductor = usuarioDAO.obtenerEmailPorId(productorIdOrd);
                             
                             if (emailProductor != null && !emailProductor.trim().isEmpty()) {
-                                String mensaje = """
-                                    <h2>Nueva Orden de Compra Pendiente de Revisión</h2>
-                                    <p>Se ha creado una nueva orden de compra que requiere tu revisión y respuesta.</p>
-                                    <p><strong>Número de Orden:</strong> %s</p>
-                                    <p><strong>Producto:</strong> %s</p>
-                                    <p><strong>Cantidad:</strong> %d paquetes</p>
-                                    <p><strong>Monto Total:</strong> S/. %.2f</p>
-                                    <p><strong>Fecha de Creación:</strong> %s</p>
-                                    <hr>
-                                    <p><strong>Acción requerida:</strong></p>
-                                    <ul>
-                                        <li>Por favor, revisa los detalles de la orden en tu panel de productor</li>
-                                        <li>Confirma si puedes cumplir con la orden o si necesitas hacer alguna observación</li>
-                                        <li>Una vez revisada, envía tu respuesta a logística</li>
-                                    </ul>
-                                    <p>Logística revisará tu respuesta y te notificará si la orden es aprobada o rechazada.</p>
-                                    """.formatted(
-                                        numeroOrden,
-                                        nombreProducto,
-                                        cantidadOrd,
-                                        montoTotalOrd,
-                                        new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
-                                    );
+                                // Usar plantilla HTML profesional
+                                String mensaje = com.example.telito.util.EmailTemplates.generarCorreoNuevaOrdenProductor(
+                                    numeroOrden,
+                                    nombreProducto,
+                                    cantidadOrd,
+                                    montoTotalOrd,
+                                    new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                                );
                                 
                                 boolean correoEnviado = EmailUtil.sendSystemAlertHTML(
                                     emailProductor,
