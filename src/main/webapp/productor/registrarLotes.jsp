@@ -41,10 +41,13 @@
         .dashboard-main-wrapper { display: flex; min-height: 100vh; }
         .nav-left-sidebar {
             width: 250px;
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, #055e68 100%);
+            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
             min-height: 100vh;
-            position: fixed; left: 0; top: 0; z-index: 1000;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 3px 0 15px rgba(0,0,0,.12);
         }
         .dashboard-wrapper { margin-left: 250px; width: calc(100% - 250px); min-height: 100vh; }
         .dashboard-header {
@@ -55,29 +58,117 @@
         }
         .dashboard-content { margin-top: 70px; padding: 20px; }
         .nav-link {
-            color: rgba(255,255,255,0.9) !important;
-            padding: 12px 20px; border-radius: 8px; margin: 5px 15px;
-            transition: all 0.3s ease; display: flex; align-items: center;
+            color: rgba(255,255,255,.95) !important;
+            padding: 13px 20px;
+            border-radius: 10px;
+            margin: 6px 15px;
+            transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
         }
-        .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.18); color: #fff !important; transform: translateX(5px); }
-        .nav-link i { margin-right: 10px; width: 20px; }
-        .nav-divider { color: rgba(255,255,255,0.8); font-weight: 600; padding: 15px 20px 5px; margin-top: 20px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #fff;
+            transform: scaleY(0);
+            transition: transform .3s ease;
+            border-radius: 0 4px 4px 0;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255,255,255,.25);
+            color: #fff !important;
+            transform: translateX(8px);
+            box-shadow: 0 4px 12px rgba(0,0,0,.15);
+        }
+        .nav-link:hover::before, .nav-link.active::before {
+            transform: scaleY(1);
+        }
+        .nav-link i { margin-right: 12px; width: 22px; font-size: 1.1rem; }
+        .nav-divider {
+            color: rgba(255,255,255,.95);
+            font-weight: 700;
+            padding: 18px 20px 8px;
+            margin-top: 25px;
+            font-size: .8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-top: 1px solid rgba(255,255,255,.15);
+        }
         .user-avatar-md { width: 40px; height: 40px; }
         .navbar-brand { font-weight: 700; color: var(--turquoise-dark); }
         .navbar-brand img { height: 35px; }
-        .card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.3s ease; }
-        .card:hover { transform: translateY(-2px); }
+        .card {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            margin-bottom: 40px;
+            border: none;
+            transition: box-shadow .3s ease;
+        }
+        .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); }
         .card-header {
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
-            color: white; border-radius: 15px 15px 0 0 !important; border: none; font-weight: 600; padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 20px 30px;
+            margin: -30px -30px 25px -30px;
+            box-shadow: 0 4px 12px rgba(0,168,150,.25);
         }
-        .card-header h5 { font-size: 1rem; margin: 0; }
+        .card-header h2, .card-header h5 { margin: 0; color: white; font-weight: 700; }
+        .card-body { padding: 0; }
+        button, .btn {
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .btn-secondary { background: #8d99ae; border: none; }
         .btn-primary {
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
-            border: none; border-radius: 8px; padding: 12px 25px; font-weight: 500; transition: all 0.3s ease;
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,168,150,.35);
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 109, 119, 0.35); }
-        .btn-secondary { background-color: #8d99ae; border: none; }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #00b8a3 0%, #02a190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,168,150,.45);
+        }
+        .btn-info {
+            background: linear-gradient(160deg, #17a2b8 0%, #20c997 100%);
+        }
+        .btn-success {
+            background: linear-gradient(160deg, #28a745 0%, #20c997 100%);
+        }
+        .btn-warning {
+            background: linear-gradient(160deg, #ffc107 0%, #fd7e14 100%);
+            color: #000;
+        }
+        .btn-danger {
+            background: linear-gradient(160deg, #dc3545 0%, #e74c3c 100%);
+        }
+        button:hover, .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 109, 119, 0.25);
+        }
         .form-control, .form-select { border-radius: 8px; border: 2px solid var(--border); padding: 8px 12px; transition: all 0.3s ease; font-size: 0.9rem; }
         .form-control:focus, .form-select:focus { border-color: var(--seafoam); box-shadow: 0 0 0 0.2rem rgba(131, 197, 190, 0.35); }
         .form-label { font-weight: 600; color: var(--text-dark); margin-bottom: 4px; font-size: 0.9rem; }
@@ -86,6 +177,15 @@
         .page-header { margin-bottom: 15px; }
         .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 5px; font-size: 1.3rem; }
         .page-header p { color: var(--text-muted); font-size: 0.9rem; }
+        .pageheader-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #00a896 !important;
+        }
+        .pageheader-title i {
+            color: var(--seafoam);
+        }
         .section-title { color: var(--turquoise-dark); font-weight: 600; font-size: 0.95rem; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid var(--border); }
         .footer { background-color: #fff; border-top: 1px solid var(--border); margin-top: 50px; padding: 20px 0; }
         .footer-links a { color: var(--text-muted); text-decoration: none; margin: 0 10px; }
@@ -251,7 +351,7 @@
                 <!-- Page Header -->
                 <div class="page-header d-flex justify-content-between align-items-center">
                     <div>
-                        <h2><i class="fas fa-boxes me-2"></i>Registrar Lotes</h2>
+                        <h2 class="pageheader-title mb-0"><i class="fas fa-boxes me-2"></i>Registrar Lotes</h2>
                         <p class="text-muted mb-0">Registra los nuevos lotes de productos distribuidos en diferentes ubicaciones.</p>
                     </div>
                     <div class="d-flex gap-2 flex-wrap">

@@ -53,6 +53,11 @@ public class ConductorServlet extends HttpServlet {
                 if (totalPages == 0) totalPages = 1;
                 if (page > totalPages) page = totalPages;
 
+                // Calcular estadísticas (sin filtros para obtener totales reales)
+                int totalConductores = conductorDAO.contarTotalConductores();
+                int conductoresConPlanes = conductorDAO.contarConductoresConPlanes();
+                int conductoresSinPlanes = conductorDAO.contarConductoresSinPlanes();
+
                 ArrayList<Conductor> listaConductores = conductorDAO.listarConductores(busqueda, page, size);
                 request.setAttribute("listaConductores", listaConductores);
                 request.setAttribute("currentPage", page);
@@ -60,6 +65,9 @@ public class ConductorServlet extends HttpServlet {
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("totalRows", totalRows);
                 request.setAttribute("busqueda", busqueda);
+                request.setAttribute("totalConductores", totalConductores);
+                request.setAttribute("conductoresConPlanes", conductoresConPlanes);
+                request.setAttribute("conductoresSinPlanes", conductoresSinPlanes);
                 request.setAttribute("baseUrl", request.getContextPath() + "/administrador/ConductorServlet");
                 request.setAttribute("param1Name", "action");
                 request.setAttribute("param1Value", "listar");

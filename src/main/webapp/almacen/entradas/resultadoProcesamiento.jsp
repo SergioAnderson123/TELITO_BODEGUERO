@@ -25,7 +25,7 @@
 <div class="dashboard-main-wrapper">
     <jsp:include page="/almacen/layouts/header_almacen.jsp"/>
     <jsp:include page="/almacen/layouts/sidebar_almacen.jsp">
-        <jsp:param name="activeMenu" value="Registrar entradas"/>
+        <jsp:param name="activeMenu" value="Cargar Excel"/>
     </jsp:include>
 
     <div class="dashboard-wrapper">

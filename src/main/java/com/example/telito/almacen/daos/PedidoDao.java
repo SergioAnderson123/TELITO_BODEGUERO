@@ -272,4 +272,20 @@ public class PedidoDao extends DAOBase {
         return count(sql);
     }
 
+    /**
+     * Cuenta todos los pedidos
+     */
+    public int contarTotalPedidos() {
+        String sql = "SELECT COUNT(*) FROM pedidos";
+        return count(sql);
+    }
+
+    /**
+     * Cuenta los pedidos despachados
+     */
+    public int contarPedidosDespachados() {
+        String sql = "SELECT COUNT(*) FROM pedidos WHERE estado_preparacion = 'Despachado'";
+        return count(sql);
+    }
+
 }

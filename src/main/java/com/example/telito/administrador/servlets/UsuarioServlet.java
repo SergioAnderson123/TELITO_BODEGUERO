@@ -152,6 +152,36 @@ public class UsuarioServlet extends HttpServlet {
                 if (totalPages == 0) totalPages = 1;
                 if (page > totalPages) page = totalPages;
             
+            // Calcular estadísticas (sin filtros para obtener totales reales)
+                int totalUsuarios = 0;
+                int usuariosActivos = 0;
+                int usuariosInactivos = 0;
+                
+                try {
+                    totalUsuarios = usuarioDAO.contarTotalUsuarios();
+                    logger.debug("Total usuarios calculado: {}", totalUsuarios);
+                } catch (Exception e) {
+                    logger.error("Error al contar total usuarios", e);
+                }
+                
+                try {
+                    usuariosActivos = usuarioDAO.contarUsuariosActivos();
+                    logger.debug("Usuarios activos calculado: {}", usuariosActivos);
+                } catch (Exception e) {
+                    logger.error("Error al contar usuarios activos", e);
+                }
+                
+                try {
+                    usuariosInactivos = usuarioDAO.contarUsuariosBaneados();
+                    logger.debug("Usuarios inactivos calculado: {}", usuariosInactivos);
+                } catch (Exception e) {
+                    logger.error("Error al contar usuarios inactivos", e);
+                }
+                
+                // Log para depuración
+                logger.info("Estadísticas de usuarios - Total: {}, Activos: {}, Inactivos: {}", 
+                    totalUsuarios, usuariosActivos, usuariosInactivos);
+            
             ArrayList<Usuario> listaUsuarios = usuarioDAO.listarUsuarios(
                 busqueda, rolId, estado, sortBy, sortOrder, page, size);
 
@@ -166,6 +196,9 @@ public class UsuarioServlet extends HttpServlet {
                 request.setAttribute("size", size);
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("totalRows", totalRows);
+                request.setAttribute("totalUsuarios", totalUsuarios);
+                request.setAttribute("usuariosActivos", usuariosActivos);
+                request.setAttribute("usuariosInactivos", usuariosInactivos);
                 
                 // Atributos para componente de paginación reutilizable
                 request.setAttribute("baseUrl", request.getContextPath() + "/UsuarioServlet");

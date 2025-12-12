@@ -71,34 +71,87 @@
         .page-header { margin-bottom: 0.5rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
         .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 0; font-size: 1.4rem; line-height: 1.2; }
         .page-header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem; margin-bottom: 0; }
+        .pageheader-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #00a896 !important;
+        }
+        .pageheader-title i {
+            color: var(--seafoam);
+        }
 
         /* =====================
-           Sidebar (idéntico a registrarLotes)
+           Sidebar (igual a logística y almacenero)
         ====================== */
         .nav-left-sidebar {
             width: 250px;
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, #055e68 100%);
-            min-height: 100vh; position: fixed; left: 0; top: 0; z-index: 1000;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 3px 0 15px rgba(0,0,0,.12);
         }
         .navbar-brand { font-weight: 700; color: var(--turquoise-dark); }
-        .nav-link { color: rgba(255,255,255,0.9) !important; padding: 12px 20px; border-radius: 8px; margin: 5px 15px; transition: all 0.3s ease; display: flex; align-items: center; }
-        .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.18); color: #fff !important; transform: translateX(5px); }
-        .nav-link i { margin-right: 10px; width: 20px; }
-        .nav-divider { color: rgba(255,255,255,0.8); font-weight: 600; padding: 15px 20px 5px; margin-top: 20px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-link {
+            color: rgba(255,255,255,.95) !important;
+            padding: 13px 20px;
+            border-radius: 10px;
+            margin: 6px 15px;
+            transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #fff;
+            transform: scaleY(0);
+            transition: transform .3s ease;
+            border-radius: 0 4px 4px 0;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255,255,255,.25);
+            color: #fff !important;
+            transform: translateX(8px);
+            box-shadow: 0 4px 12px rgba(0,0,0,.15);
+        }
+        .nav-link:hover::before, .nav-link.active::before {
+            transform: scaleY(1);
+        }
+        .nav-link i { margin-right: 12px; width: 22px; font-size: 1.1rem; }
+        .nav-divider {
+            color: rgba(255,255,255,.95);
+            font-weight: 700;
+            padding: 18px 20px 8px;
+            margin-top: 25px;
+            font-size: .8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-top: 1px solid rgba(255,255,255,.15);
+        }
 
         /* =====================
-           Tarjetas/Tabla/Formularios
+           Tarjetas/Tabla/Formularios (igual a logística y almacenero)
         ====================== */
-        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
         .stat-card {
             background-color: var(--white);
-            padding: 12px 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
-        .stat-card h3 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
-        .stat-card p { margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--turquoise-dark); }
+        .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: var(--text-muted); font-weight: 600; }
+        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: var(--turquoise-dark); }
 
         /* Card principal */
         .card {
@@ -108,38 +161,44 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
             margin-bottom: 40px;
             border: none;
+            transition: box-shadow .3s ease;
         }
+        .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); }
         .card-header { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             margin-bottom: 25px; 
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
+            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
             color: white;
             border-radius: 12px 12px 0 0;
             padding: 20px 30px;
             margin: -30px -30px 25px -30px;
+            box-shadow: 0 4px 12px rgba(0,168,150,.25);
         }
-        .card-header h2, .card-header h5 { margin: 0; color: white; }
+        .card-header h2, .card-header h5 { margin: 0; color: white; font-weight: 700; }
         .card-body { padding: 0; }
-        #openModalBtn { background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%); border: none; }
+        #openModalBtn { background: linear-gradient(135deg, #00a896 0%, #028f80 100%); border: none; }
         
-        /* Table card - igual a gestión de usuarios */
+        /* Table card - igual a logística y almacenero */
         .table-card {
             background: var(--white);
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,.06);
             border: none;
+            margin-bottom: 30px;
+            overflow: hidden;
         }
         .table-card .card-header {
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
+            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
             color: #fff;
             border-radius: 12px 12px 0 0;
-            padding: 0.5rem 0.75rem;
+            padding: 20px 30px;
             margin: 0;
         }
+        .table-card .card-header h5, .table-card .card-header small { color: #fff !important; }
         .table-card .card-body {
-            padding: 0.75rem;
+            padding: 0;
         }
         
         /* Botón Agregar Producto */
@@ -156,16 +215,47 @@
         form input, form select, form textarea {
             width: 100%; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-size: 1rem;
         }
-        button {
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
+        button, .btn {
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
             color: var(--white);
-            border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform .2s, box-shadow .2s;
         }
-        button.btn-secondary { background: #8d99ae; }
+        .btn-secondary { background: #8d99ae; }
+        .btn-primary {
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,168,150,.35);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #00b8a3 0%, #02a190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,168,150,.45);
+        }
         .btn-info, a.btn-info, button.btn-info {
             background: linear-gradient(160deg, #17a2b8 0%, #20c997 100%) !important;
-            background-image: linear-gradient(160deg, #17a2b8 0%, #20c997 100%) !important;
             border: none !important;
+        }
+        .btn-success {
+            background: linear-gradient(160deg, #28a745 0%, #20c997 100%);
+        }
+        .btn-warning {
+            background: linear-gradient(160deg, #ffc107 0%, #fd7e14 100%);
+            color: #000;
+        }
+        .btn-danger {
+            background: linear-gradient(160deg, #dc3545 0%, #e74c3c 100%);
+        }
+        button:hover, .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 109, 119, 0.25);
         }
         button:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 109, 119, 0.25); }
 
@@ -193,8 +283,20 @@
             text-transform: uppercase; 
             font-size: 0.85rem; 
         }
-        tbody tr:hover { background-color: #f8f9fa; }
-        tbody tr { vertical-align: middle; }
+        tbody tr { 
+            vertical-align: middle; 
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        tbody tr:hover { 
+            background-color: rgba(0, 168, 150, 0.1) !important; 
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        tbody tr:hover td {
+            color: var(--turquoise-dark);
+            font-weight: 500;
+        }
 
         /* Botón Ver Lotes - Estilo teal/verde agua */
         .btn-ver-lotes {
@@ -463,6 +565,9 @@
                         <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Vista general de tu inventario y herramientas de gestión.</p>
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
+                        <button id="openModalBtn" class="btn btn-sm shadow-sm btn-agregar-producto" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
+                            <i class="fas fa-plus me-1"></i>Agregar Producto
+                        </button>
                         <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=exportar" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                             <i class="fas fa-file-excel me-1"></i>Exportar Productos
                         </a>
@@ -556,9 +661,6 @@
                             <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-boxes me-2"></i>Inventario Actual</h5>
                             <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todos tus productos</small>
                         </div>
-                        <button id="openModalBtn" class="btn btn-sm shadow-sm btn-agregar-producto" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
-                            <i class="fas fa-plus me-1"></i>Agregar Producto
-                        </button>
                     </div>
                 </div>
         <div class="card-body" style="padding: 0.75rem;">

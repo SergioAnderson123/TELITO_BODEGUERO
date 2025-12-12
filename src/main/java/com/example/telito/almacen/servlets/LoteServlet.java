@@ -52,7 +52,12 @@ public class LoteServlet extends HttpServlet {
                 ArrayList<Lote> listaLotes = loteDao.listarLotesRegistrados(page, busqueda, estado);
                 int totalRegistros = loteDao.contarTotalLotesRegistrados(busqueda, estado);
 
-                int registrosPorPagina = 10;
+                // Calcular estadísticas (sin filtros para obtener totales reales)
+                int totalLotes = loteDao.contarTotalLotesRegistrados(null, null);
+                int enStock = loteDao.contarTotalLotesRegistrados(null, "En stock");
+                int sinStock = loteDao.contarTotalLotesRegistrados(null, "Sin stock");
+
+                int registrosPorPagina = 5;
                 int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
                 if (totalPaginas == 0) totalPaginas = 1;
                 if (page > totalPaginas) page = totalPaginas;
@@ -62,6 +67,9 @@ public class LoteServlet extends HttpServlet {
                 request.setAttribute("size", registrosPorPagina);
                 request.setAttribute("totalPages", totalPaginas);
                 request.setAttribute("totalRows", totalRegistros);
+                request.setAttribute("totalLotes", totalLotes);
+                request.setAttribute("enStock", enStock);
+                request.setAttribute("sinStock", sinStock);
                 request.setAttribute("baseUrl", request.getContextPath() + "/almacen/LoteServlet");
                 request.setAttribute("itemName", "lotes");
                 request.setAttribute("busqueda", busqueda);

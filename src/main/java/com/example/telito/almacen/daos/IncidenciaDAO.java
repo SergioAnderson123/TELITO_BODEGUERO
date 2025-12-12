@@ -263,6 +263,22 @@ public class IncidenciaDAO extends DAOBase {
     /**
      * Cuenta incidencias pendientes (para notificaciones).
      */
+    /**
+     * Cuenta todas las incidencias
+     */
+    public int contarTotalIncidencias() {
+        String sql = "SELECT COUNT(*) FROM incidencias_almacen";
+        return count(sql);
+    }
+
+    /**
+     * Cuenta las incidencias resueltas
+     */
+    public int contarIncidenciasResueltas() {
+        String sql = "SELECT COUNT(*) FROM incidencias_almacen WHERE estado = 'Resuelta'";
+        return count(sql);
+    }
+
     public int contarIncidenciasPendientes() {
         String sql = "SELECT COUNT(*) FROM incidencias_almacen WHERE estado = 'Pendiente'";
         return count(sql);

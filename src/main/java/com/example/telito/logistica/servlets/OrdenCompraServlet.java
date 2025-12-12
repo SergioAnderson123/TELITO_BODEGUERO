@@ -84,10 +84,15 @@ public class OrdenCompraServlet extends HttpServlet {
                 // 4. Obtenemos la lista de órdenes (ahora paginada)
                 ArrayList<OrdenCompraBean> listaOrdenes = ordenCompraDao.obtenerOrdenes(busqueda, proveedorId, estado, page, size);
 
-                // 5. Obtenemos la lista de proveedores para el menú del filtro
+                // 5. Calculamos estadísticas (sin filtros para obtener totales reales)
+                int totalOrdenes = ordenCompraDao.contarOrdenes(null, null, null);
+                int ordenesPendientes = ordenCompraDao.contarOrdenes(null, null, "Pendiente");
+                int ordenesAprobadas = ordenCompraDao.contarOrdenes(null, null, "Aprobado");
+
+                // 6. Obtenemos la lista de proveedores para el menú del filtro
                 request.setAttribute("listaProveedores", proveedorDao.listarProveedores());
 
-                // 6. Enviamos datos a la vista
+                // 7. Enviamos datos a la vista
                 request.setAttribute("listaOrdenes", listaOrdenes);
                 request.setAttribute("busqueda", busqueda);
                 request.setAttribute("proveedorFiltro", proveedorId);
@@ -96,6 +101,9 @@ public class OrdenCompraServlet extends HttpServlet {
                 request.setAttribute("size", size);
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("totalRows", totalRows);
+                request.setAttribute("totalOrdenes", totalOrdenes);
+                request.setAttribute("ordenesPendientes", ordenesPendientes);
+                request.setAttribute("ordenesAprobadas", ordenesAprobadas);
                 request.setAttribute("baseUrl", request.getContextPath() + "/orden-compra");
                 request.setAttribute("itemName", "órdenes");
 

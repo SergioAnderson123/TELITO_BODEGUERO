@@ -196,6 +196,90 @@ public class ConductorDAO extends DAOBase {
     }
 
     /**
+     * Cuenta el total de conductores
+     */
+    public int contarTotalConductores() {
+        String sql = "SELECT COUNT(*) FROM conductores";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        int count = 0;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar total conductores", e);
+            throw new RuntimeException("Error al contar total conductores", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return count;
+    }
+
+    /**
+     * Cuenta conductores con planes de transporte asignados
+     */
+    public int contarConductoresConPlanes() {
+        String sql = "SELECT COUNT(DISTINCT c.id_conductor) FROM conductores c " +
+                     "INNER JOIN planes_transporte pt ON c.id_conductor = pt.conductor_id";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        int count = 0;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar conductores con planes", e);
+            throw new RuntimeException("Error al contar conductores con planes", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return count;
+    }
+
+    /**
+     * Cuenta conductores sin planes de transporte asignados
+     */
+    public int contarConductoresSinPlanes() {
+        String sql = "SELECT COUNT(*) FROM conductores c " +
+                     "LEFT JOIN planes_transporte pt ON c.id_conductor = pt.conductor_id " +
+                     "WHERE pt.conductor_id IS NULL";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        int count = 0;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar conductores sin planes", e);
+            throw new RuntimeException("Error al contar conductores sin planes", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return count;
+    }
+
+    /**
      * Obtiene todos los conductores sin paginación.
      * Útil para exportar a Excel.
      * 

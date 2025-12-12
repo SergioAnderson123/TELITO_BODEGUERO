@@ -48,13 +48,6 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link <c:if test='${param.activeMenu == "Productos"}'>active</c:if>"
-                       href="${pageContext.request.contextPath}/almacen/ProductoAlmacenServlet">
-                        <i class="fas fa-boxes-stacked"></i>Productos (Solo Lectura)
-                    </a>
-                </li>
-
             </ul>
         </nav>
     </div>

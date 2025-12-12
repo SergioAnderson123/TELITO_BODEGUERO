@@ -166,14 +166,19 @@
     .bg-danger-soft { background-color: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important; }
     .bg-secondary-soft { background-color: rgba(108, 117, 125, 0.1) !important; color: #6c757d !important; }
     
-    /* Mejoras visuales adicionales */
+    /* Mejoras visuales adicionales - Animación hover mejorada */
     .table tbody tr {
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
+        cursor: pointer;
     }
     .table tbody tr:hover {
-        background-color: rgba(0, 168, 150, 0.08);
-        transform: scale(1.005);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        background-color: rgba(0, 168, 150, 0.1) !important;
+        transform: scale(1.01);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    .table tbody tr:hover td {
+        color: var(--turquoise-dark);
+        font-weight: 500;
     }
     
     .form-control:focus, .form-select:focus {

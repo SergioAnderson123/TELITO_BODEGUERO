@@ -8,6 +8,34 @@
         <jsp:param name="pageTitle" value="Gestión de Vehículos"/>
     </jsp:include>
     <style>
+        /* Estilos para stat-cards */
+        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
+        .stat-card {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+        .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: #6c757d; font-weight: 600; }
+        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #00a896; }
+        @media (max-width: 768px) {
+            .stats-container { grid-template-columns: 1fr; }
+        }
+        /* Estilo para el botón Limpiar */
+        .btn-outline-secondary {
+            color: #6c757d !important;
+            border: 1px solid #6c757d !important;
+            background-color: transparent !important;
+            background-image: none !important;
+        }
+        .btn-outline-secondary:hover {
+            color: #fff !important;
+            background-color: #6c757d !important;
+            border: 1px solid #6c757d !important;
+            background-image: none !important;
+        }
+    </style>
+    <style>
         /* Estilos mejorados para el dropdown de acciones */
         .dropdown-menu {
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
@@ -146,11 +174,76 @@
                 <!-- Encabezado -->
                 <div class="row">
                     <div class="col-12">
-                        <div class="page-header mb-4">
-                            <h2 class="pageheader-title"><i class="fas fa-truck me-2"></i>Gestión de Vehículos</h2>
-                            <p class="pageheader-text">Administra los vehículos del sistema de transporte.</p>
+                        <div class="page-header mb-1" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div>
+                                    <h2 class="pageheader-title mb-0" style="font-size: 1.4rem; line-height: 1.2;"><i class="fas fa-truck me-2"></i>Gestión de Vehículos</h2>
+                                    <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Administra los vehículos del sistema de transporte.</p>
+                                </div>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a href="${pageContext.request.contextPath}/administrador/VehiculoReporteServlet?action=exportar" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                        <i class="fas fa-file-excel me-1"></i>Exportar a Excel
+                                    </a>
+                                    <a href="${pageContext.request.contextPath}/administrador/VehiculoReporteServlet?action=formEnviar" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                        <i class="fas fa-envelope me-1"></i>Enviar por Correo
+                                    </a>
+                                    <a href="${pageContext.request.contextPath}/administrador/VehiculoServlet?action=crear" class="btn btn-sm shadow-sm btn-agregar-vehiculo" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
+                                        <i class="fas fa-plus me-1"></i>Agregar Vehículo
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <%
+                    // Obtener estadísticas del servlet
+                    Integer totalVehiculosAttr = (Integer) request.getAttribute("totalVehiculos");
+                    Integer vehiculosConPlanesAttr = (Integer) request.getAttribute("vehiculosConPlanes");
+                    Integer vehiculosSinPlanesAttr = (Integer) request.getAttribute("vehiculosSinPlanes");
+                    int totalVehiculos = (totalVehiculosAttr != null) ? totalVehiculosAttr : 0;
+                    int vehiculosConPlanes = (vehiculosConPlanesAttr != null) ? vehiculosConPlanesAttr : 0;
+                    int vehiculosSinPlanes = (vehiculosSinPlanesAttr != null) ? vehiculosSinPlanesAttr : 0;
+                %>
+
+                <!-- ===================== Tarjetas de estadísticas ===================== -->
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <h3>Total de Vehículos</h3>
+                        <p><%= totalVehiculos %></p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Con Planes Asignados</h3>
+                        <p><%= vehiculosConPlanes %></p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Sin Planes Asignados</h3>
+                        <p><%= vehiculosSinPlanes %></p>
+                    </div>
+                </div>
+
+                <!-- ===================== Card: Búsqueda y filtros ===================== -->
+                <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+                    <form action="${pageContext.request.contextPath}/administrador/VehiculoServlet" method="GET" id="filterForm">
+                        <input type="hidden" name="action" value="listar">
+                        <input type="hidden" name="size" value="${size != null ? size : 5}">
+                        <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
+                                <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" id="searchInput" placeholder="Placa, marca o modelo..." value="${busqueda != null ? busqueda : ''}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                    <button class="btn btn-sm btn-primary shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 d-flex align-items-end">
+                                <a href="${pageContext.request.contextPath}/administrador/VehiculoServlet" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                    <i class="fas fa-sync-alt me-1"></i>Limpiar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
                 </div>
 
                 <!-- Mensajes de alerta -->
@@ -163,7 +256,7 @@
                     <c:remove var="tipoMensaje" scope="session"/>
                 </c:if>
 
-                <!-- Tabla de vehículos -->
+                <!-- ===================== Card: Tabla de vehículos ===================== -->
                 <div class="row">
                     <div class="col-12">
                         <div class="table-card shadow-sm">
@@ -173,40 +266,9 @@
                                         <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-truck me-2"></i>Tabla de Vehículos</h5>
                                         <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todos los vehículos del sistema</small>
                                     </div>
-                                    <div class="d-flex gap-2 flex-wrap">
-                                        <a href="${pageContext.request.contextPath}/administrador/VehiculoReporteServlet?action=exportar" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                            <i class="fas fa-file-excel me-1"></i>Exportar a Excel
-                                        </a>
-                                        <a href="${pageContext.request.contextPath}/administrador/VehiculoReporteServlet?action=formEnviar" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                            <i class="fas fa-envelope me-1"></i>Enviar por Correo
-                                        </a>
-                                        <a href="${pageContext.request.contextPath}/administrador/VehiculoServlet?action=crear" class="btn btn-sm shadow-sm btn-agregar-vehiculo" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
-                                            <i class="fas fa-plus me-1"></i>Agregar Vehículo
-                                        </a>
-                                    </div>
                                 </div>
                             </div>
                             <div class="card-body" style="padding: 0.75rem;">
-                                <form action="${pageContext.request.contextPath}/administrador/VehiculoServlet" method="GET">
-                                    <input type="hidden" name="action" value="listar">
-                                    <input type="hidden" name="size" value="${size != null ? size : 10}">
-                                    <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
-                                        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
-                                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
-                                            <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" placeholder="Placa, marca o modelo..." value="${busqueda != null ? busqueda : ''}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                        </div>
-                                        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 d-flex align-items-end">
-                                            <button type="submit" class="btn btn-sm btn-primary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                                <i class="fas fa-search me-1"></i>Buscar
-                                            </button>
-                                        </div>
-                                        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 d-flex align-items-end">
-                                            <a href="${pageContext.request.contextPath}/administrador/VehiculoServlet" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                                <i class="fas fa-sync-alt me-1"></i>Limpiar
-                                            </a>
-                                        </div>
-                                    </div>
-                                </form>
                                 <div class="table-responsive">
                                     <table id="vehiculoTable" class="table table-hover align-middle mb-0 datatable-server-side" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                         <thead class="table-light">
@@ -224,7 +286,7 @@
                                             Integer currentPageObj = (Integer) request.getAttribute("currentPage");
                                             Integer sizeObj = (Integer) request.getAttribute("size");
                                             int currentPageInt = (currentPageObj != null) ? currentPageObj : 1;
-                                            int sizeInt = (sizeObj != null) ? sizeObj : 10;
+                                            int sizeInt = (sizeObj != null) ? sizeObj : 5;
                                             int contador = (currentPageInt - 1) * sizeInt + 1;
                                         %>
                                         <c:forEach var="vehiculo" items="${listaVehiculos}">
@@ -282,6 +344,22 @@
 </div>
 
 <script>
+    // Aplicar filtros automáticamente al cambiar valores
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterForm = document.getElementById('filterForm');
+        const searchInput = document.getElementById('searchInput');
+        
+        // Aplicar filtros al presionar Enter en el campo de búsqueda
+        if (searchInput && filterForm) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    filterForm.submit();
+                }
+            });
+        }
+    });
+
     function confirmarEliminacion(id, placa) {
         showConfirm(
             '¿Estás seguro de eliminar el vehículo con placa "' + placa + '"? Esta acción no se puede deshacer.',

@@ -66,6 +66,56 @@ public class OrdenCompraDao extends DAOBase {
         return 0;
     }
 
+    /**
+     * Cuenta todas las órdenes con estado 'Aprobado' (total de órdenes disponibles para recibir)
+     */
+    public int contarTotalOrdenes() {
+        String sql = "SELECT COUNT(*) FROM ordenes_compra WHERE estado = 'Aprobado'";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar total de órdenes", e);
+            throw new RuntimeException("Error al contar total de órdenes", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
+    }
+
+    /**
+     * Cuenta las órdenes que ya tienen movimientos de entrada registrados (ya fueron recibidas)
+     */
+    public int contarOrdenesRegistradas() {
+        String sql = "SELECT COUNT(DISTINCT oc.id_orden_compra) FROM ordenes_compra oc " +
+                "INNER JOIN movimientos_inventario mi ON mi.orden_compra_id = oc.id_orden_compra " +
+                "WHERE oc.estado = 'Aprobado' AND mi.tipo = 'Entrada'";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar órdenes registradas", e);
+            throw new RuntimeException("Error al contar órdenes registradas", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
+    }
+
     public ArrayList<OrdenCompra> listarOrdenesPaginadas(int offset, int limit) {
         return listarOrdenesPaginadas(offset, limit, null, null);
     }

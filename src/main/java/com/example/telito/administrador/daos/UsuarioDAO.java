@@ -553,13 +553,82 @@ public class UsuarioDAO extends DAOBase {
     // Para la tarjeta de estadísticas del menú principal.
     public int contarTotalUsuarios() {
         String sql = "SELECT COUNT(*) FROM usuarios";
-        return count(sql);
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        int count = 0;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+            logger.debug("contarTotalUsuarios() retornó: {}", count);
+        } catch (SQLException e) {
+            logger.error("Error al contar total usuarios", e);
+            throw new RuntimeException("Error al contar total usuarios", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return count;
     }
 
     // También para las estadísticas del menú.
     public int contarUsuariosBaneados() {
         String sql = "SELECT COUNT(*) FROM usuarios WHERE activo = 0";
-        return count(sql);
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        int count = 0;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+            logger.debug("contarUsuariosBaneados() retornó: {}", count);
+        } catch (SQLException e) {
+            logger.error("Error al contar usuarios baneados", e);
+            throw new RuntimeException("Error al contar usuarios baneados", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return count;
+    }
+
+    /**
+     * Cuenta los usuarios activos
+     */
+    public int contarUsuariosActivos() {
+        // Usar la misma lógica que contarUsuariosBaneados pero con activo = 1
+        String sql = "SELECT COUNT(*) FROM usuarios WHERE activo = 1";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        int count = 0;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+            logger.debug("contarUsuariosActivos() retornó: {}", count);
+        } catch (SQLException e) {
+            logger.error("Error al contar usuarios activos", e);
+            throw new RuntimeException("Error al contar usuarios activos", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return count;
     }
     
     // ========== MÉTODOS DE VALIDACIÓN ==========

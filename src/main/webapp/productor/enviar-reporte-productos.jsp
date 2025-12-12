@@ -73,6 +73,15 @@
         .page-header { margin-bottom: 30px; }
         .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 10px; }
         .page-header p { color: var(--text-muted); font-size: 1.05rem; }
+        .pageheader-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #00a896 !important;
+        }
+        .pageheader-title i {
+            color: var(--seafoam);
+        }
         .sidebar-toggle {
             display: none;
             background: none;

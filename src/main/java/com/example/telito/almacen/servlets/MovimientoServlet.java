@@ -51,7 +51,7 @@ public class MovimientoServlet extends HttpServlet {
         switch (action) {
             case "listar":
                 try {
-                    int registrosPorPagina = 10;
+                    int registrosPorPagina = 5;
                     String pageStr = request.getParameter("page");
                     int paginaActual = 1;
                     try {
@@ -91,12 +91,22 @@ public class MovimientoServlet extends HttpServlet {
                     int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
                     if (totalPaginas == 0) totalPaginas = 1;
 
+                    // Calcular estadísticas (sin filtros para obtener totales reales)
+                    int totalMovimientos = movimientoDao.contarTotalMovimientos(null, null, null);
+                    int movimientosEntrada = movimientoDao.contarMovimientosEntrada(null);
+                    int movimientosSalida = movimientoDao.contarMovimientosSalida(null);
+                    int movimientosAjuste = movimientoDao.contarMovimientosAjuste(null);
+
                     request.setAttribute("listaMovimientos", listaMovimientos);
                     request.setAttribute("filtroActual", filtro);
                     request.setAttribute("currentPage", paginaActual);
                     request.setAttribute("size", registrosPorPagina);
                     request.setAttribute("totalPages", totalPaginas);
                     request.setAttribute("totalRows", totalRegistros);
+                    request.setAttribute("totalMovimientos", totalMovimientos);
+                    request.setAttribute("movimientosEntrada", movimientosEntrada);
+                    request.setAttribute("movimientosSalida", movimientosSalida);
+                    request.setAttribute("movimientosAjuste", movimientosAjuste);
                     request.setAttribute("baseUrl", request.getContextPath() + "/almacen/MovimientoServlet");
                     request.setAttribute("itemName", "movimientos");
                     request.setAttribute("busqueda", busqueda);

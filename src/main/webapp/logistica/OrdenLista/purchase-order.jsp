@@ -11,6 +11,52 @@
     </jsp:include>
     <!-- Incluir modales personalizados -->
     <jsp:include page="/WEB-INF/includes/modal-alerts.jsp" />
+    <style>
+        /* Estilo para el encabezado de la tabla igual que en productor */
+        .table-card .card-header {
+            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
+            color: #fff;
+            border-radius: 12px 12px 0 0;
+            padding: 20px 30px;
+            margin: 0;
+        }
+        .table-card .card-header h5,
+        .table-card .card-header small {
+            color: white !important;
+        }
+        /* Estilo para el botón Limpiar igual que en productor - sobrescribir estilos globales */
+        .btn-outline-secondary {
+            color: #6c757d !important;
+            border: 1px solid #6c757d !important;
+            background-color: transparent !important;
+            background-image: none !important;
+        }
+        .btn-outline-secondary:hover {
+            color: #fff !important;
+            background-color: #6c757d !important;
+            border: 1px solid #6c757d !important;
+            background-image: none !important;
+        }
+        .btn-outline-secondary:focus {
+            color: #fff !important;
+            background-color: #6c757d !important;
+            border: 1px solid #6c757d !important;
+            box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.5) !important;
+        }
+        /* Estilos para stat-cards */
+        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
+        .stat-card {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+        .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: #6c757d; font-weight: 600; }
+        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #00a896; }
+        @media (max-width: 768px) {
+            .stats-container { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
 <div class="dashboard-main-wrapper">
@@ -31,93 +77,128 @@
             </c:if>
 
             <div class="page-header mb-1" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
-                <h2 class="pageheader-title mb-0" style="font-size: 1.4rem; line-height: 1.2;"><i class="fas fa-file-invoice-dollar me-2"></i>Orden de Compra</h2>
-                <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Administra las órdenes de compra del sistema.</p>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h2 class="pageheader-title mb-0" style="font-size: 1.4rem; line-height: 1.2;"><i class="fas fa-file-invoice-dollar me-2"></i>Orden de Compra</h2>
+                        <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Administra las órdenes de compra del sistema.</p>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <%
+                            String busquedaParam = request.getParameter("busqueda");
+                            String proveedorParam = request.getParameter("proveedor");
+                            String estadoParam = request.getParameter("estado");
+                            StringBuilder urlParams = new StringBuilder();
+                            if (busquedaParam != null && !busquedaParam.trim().isEmpty()) {
+                                urlParams.append("&busqueda=").append(java.net.URLEncoder.encode(busquedaParam, "UTF-8"));
+                            }
+                            if (proveedorParam != null && !proveedorParam.trim().isEmpty()) {
+                                urlParams.append("&proveedor=").append(java.net.URLEncoder.encode(proveedorParam, "UTF-8"));
+                            }
+                            if (estadoParam != null && !estadoParam.trim().isEmpty()) {
+                                urlParams.append("&estado=").append(java.net.URLEncoder.encode(estadoParam, "UTF-8"));
+                            }
+                            String urlBase = request.getContextPath() + "/logistica/OrdenCompraReporteServlet?action=exportar" + urlParams.toString();
+                            String urlEnviar = request.getContextPath() + "/logistica/OrdenCompraReporteServlet?action=formEnviar" + urlParams.toString();
+                        %>
+                        <a href="<%= urlBase %>" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <i class="fas fa-file-excel me-1"></i>Exportar a Excel
+                        </a>
+                        <a href="<%= urlEnviar %>" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <i class="fas fa-envelope me-1"></i>Enviar por Correo
+                        </a>
+                        <a href="${pageContext.request.contextPath}/orden-compra?action=crear" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
+                            <i class="fas fa-plus me-1"></i>Agregar Orden
+                        </a>
+                    </div>
+                </div>
             </div>
 
+            <%
+                // Obtener estadísticas del servlet
+                Integer totalOrdenesAttr = (Integer) request.getAttribute("totalOrdenes");
+                Integer ordenesPendientesAttr = (Integer) request.getAttribute("ordenesPendientes");
+                Integer ordenesAprobadasAttr = (Integer) request.getAttribute("ordenesAprobadas");
+                int totalOrdenes = (totalOrdenesAttr != null) ? totalOrdenesAttr : 0;
+                int ordenesPendientes = (ordenesPendientesAttr != null) ? ordenesPendientesAttr : 0;
+                int ordenesAprobadas = (ordenesAprobadasAttr != null) ? ordenesAprobadasAttr : 0;
+            %>
+
+            <!-- ===================== Tarjetas de estadísticas ===================== -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Total de Órdenes</h3>
+                    <p><%= totalOrdenes %></p>
+                </div>
+                <div class="stat-card">
+                    <h3>Pendientes</h3>
+                    <p><%= ordenesPendientes %></p>
+                </div>
+                <div class="stat-card">
+                    <h3>Aprobadas</h3>
+                    <p><%= ordenesAprobadas %></p>
+                </div>
+            </div>
+
+            <!-- ===================== Card: Búsqueda y filtros ===================== -->
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+                <form action="${pageContext.request.contextPath}/orden-compra" method="GET" id="filterForm">
+                    <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
+                    <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
+                        <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
+                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" id="searchInput" placeholder="N° Orden o producto..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <button class="btn btn-sm btn-primary shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-truck me-1"></i>Proveedor</label>
+                            <select class="form-select form-select-sm shadow-sm" name="proveedor" id="proveedorFilter" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <option value="">Todos</option>
+                                <% ArrayList<ProveedorBean> listaProveedores = (ArrayList<ProveedorBean>) request.getAttribute("listaProveedores");
+                                    if(listaProveedores != null){
+                                        for(ProveedorBean proveedor : listaProveedores){ %>
+                                <option value="<%= proveedor.getId() %>" ${param.proveedor == proveedor.getId() ? 'selected' : ''} >
+                                    <%= proveedor.getNombre() %>
+                                </option>
+                                <%  }
+                                } %>
+                            </select>
+                        </div>
+                        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-toggle-on me-1"></i>Estado</label>
+                            <select class="form-select form-select-sm shadow-sm" name="estado" id="estadoFilter" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <option value="" ${param.estado == '' ? 'selected' : ''}>Todos</option>
+                                <option value="Pendiente" ${param.estado == 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                                <option value="Aprobado" ${param.estado == 'Aprobado' ? 'selected' : ''}>Aprobado</option>
+                                <option value="Rechazado" ${param.estado == 'Rechazado' ? 'selected' : ''}>Rechazado</option>
+                                <option value="Recibido" ${param.estado == 'Recibido' ? 'selected' : ''}>Recibido</option>
+                            </select>
+                        </div>
+                        <div class="col-xl-2 col-lg-2 col-md-12 col-sm-12 d-flex align-items-end">
+                            <a href="${pageContext.request.contextPath}/orden-compra" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <i class="fas fa-sync-alt me-1"></i>Limpiar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ===================== Card: Tabla de órdenes ===================== -->
             <div class="row">
                 <div class="col-12">
                     <div class="table-card shadow-sm">
-                        <div class="card-header">
+                        <div class="card-header" style="padding: 0.5rem 0.75rem;">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <div>
                                     <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-file-invoice-dollar me-2"></i>Tabla de Ordenes</h5>
                                     <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todas las órdenes de compra</small>
                                 </div>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <%
-                                        String busquedaParam = request.getParameter("busqueda");
-                                        String proveedorParam = request.getParameter("proveedor");
-                                        String estadoParam = request.getParameter("estado");
-                                        StringBuilder urlParams = new StringBuilder();
-                                        if (busquedaParam != null && !busquedaParam.trim().isEmpty()) {
-                                            urlParams.append("&busqueda=").append(java.net.URLEncoder.encode(busquedaParam, "UTF-8"));
-                                        }
-                                        if (proveedorParam != null && !proveedorParam.trim().isEmpty()) {
-                                            urlParams.append("&proveedor=").append(java.net.URLEncoder.encode(proveedorParam, "UTF-8"));
-                                        }
-                                        if (estadoParam != null && !estadoParam.trim().isEmpty()) {
-                                            urlParams.append("&estado=").append(java.net.URLEncoder.encode(estadoParam, "UTF-8"));
-                                        }
-                                        String urlBase = request.getContextPath() + "/logistica/OrdenCompraReporteServlet?action=exportar" + urlParams.toString();
-                                        String urlEnviar = request.getContextPath() + "/logistica/OrdenCompraReporteServlet?action=formEnviar" + urlParams.toString();
-                                    %>
-                                    <a href="<%= urlBase %>" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                        <i class="fas fa-file-excel me-1"></i>Exportar a Excel
-                                    </a>
-                                    <a href="<%= urlEnviar %>" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                        <i class="fas fa-envelope me-1"></i>Enviar por Correo
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/orden-compra?action=crear" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
-                                        <i class="fas fa-plus me-1"></i>Agregar Orden
-                                    </a>
-                                </div>
                             </div>
                         </div>
                         <div class="card-body" style="padding: 0.75rem;">
-                            <form action="${pageContext.request.contextPath}/orden-compra" method="GET">
-                                <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
-                                <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
-                                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
-                                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
-                                        <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" placeholder="N° Orden o producto..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                    </div>
-                                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
-                                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-truck me-1"></i>Proveedor</label>
-                                        <select class="form-select form-select-sm shadow-sm" name="proveedor" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                            <option value="">Todos</option>
-                                            <% ArrayList<ProveedorBean> listaProveedores = (ArrayList<ProveedorBean>) request.getAttribute("listaProveedores");
-                                                if(listaProveedores != null){
-                                                    for(ProveedorBean proveedor : listaProveedores){ %>
-                                            <option value="<%= proveedor.getId() %>" ${param.proveedor == proveedor.getId() ? 'selected' : ''} >
-                                                <%= proveedor.getNombre() %>
-                                            </option>
-                                            <%  }
-                                            } %>
-                                        </select>
-                                    </div>
-                                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6">
-                                        <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-toggle-on me-1"></i>Estado</label>
-                                        <select class="form-select form-select-sm shadow-sm" name="estado" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                            <option value="" ${param.estado == '' ? 'selected' : ''}>Todos</option>
-                                            <option value="Pendiente" ${param.estado == 'Pendiente' ? 'selected' : ''}>Pendiente</option>
-                                            <option value="Aprobado" ${param.estado == 'Aprobado' ? 'selected' : ''}>Aprobado</option>
-                                            <option value="Rechazado" ${param.estado == 'Rechazado' ? 'selected' : ''}>Rechazado</option>
-                                            <option value="Recibido" ${param.estado == 'Recibido' ? 'selected' : ''}>Recibido</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-xl-1 col-lg-1 col-md-6 col-sm-6 d-flex align-items-end">
-                                        <button type="submit" class="btn btn-sm btn-primary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                            <i class="fas fa-search me-1"></i>Buscar
-                                        </button>
-                                    </div>
-                                    <div class="col-xl-2 col-lg-2 col-md-3 col-sm-6 d-flex align-items-end">
-                                        <a href="${pageContext.request.contextPath}/orden-compra" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                            <i class="fas fa-sync-alt me-1"></i>Limpiar
-                                        </a>
-                                    </div>
-                                </div>
-                            </form>
 
                             <div class="table-responsive">
                                 <table id="purchaseTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
@@ -350,6 +431,36 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Aplicar filtros automáticamente al cambiar valores
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterForm = document.getElementById('filterForm');
+        const searchInput = document.getElementById('searchInput');
+        const proveedorFilter = document.getElementById('proveedorFilter');
+        const estadoFilter = document.getElementById('estadoFilter');
+        
+        // Aplicar filtros cuando cambien los selects
+        if (proveedorFilter) {
+            proveedorFilter.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        }
+        
+        if (estadoFilter) {
+            estadoFilter.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        }
+        
+        // Aplicar filtros al presionar Enter en el campo de búsqueda
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    filterForm.submit();
+                }
+            });
+        }
+    });
     // Función para ordenar la tabla
     let sortDirection = {}; // Almacena la dirección de ordenamiento para cada columna
     

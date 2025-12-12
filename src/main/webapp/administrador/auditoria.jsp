@@ -8,8 +8,9 @@
     if (listaAuditoria == null) listaAuditoria = new ArrayList<>();
     
     int totalRegistros = request.getAttribute("totalRegistros") != null ? (Integer) request.getAttribute("totalRegistros") : 0;
-    int currentPage = request.getAttribute("page") != null ? (Integer) request.getAttribute("page") : 1;
-    int size = request.getAttribute("size") != null ? (Integer) request.getAttribute("size") : 20;
+    int currentPage = request.getAttribute("currentPage") != null ? (Integer) request.getAttribute("currentPage") : 
+                      (request.getAttribute("page") != null ? (Integer) request.getAttribute("page") : 1);
+    int size = request.getAttribute("size") != null ? (Integer) request.getAttribute("size") : 5;
     int totalPages = request.getAttribute("totalPages") != null ? (Integer) request.getAttribute("totalPages") : 1;
     
     String usuarioId = (String) request.getAttribute("usuarioId");
@@ -33,6 +34,32 @@
         .badge-fallido { background-color: #dc3545; color: white; }
         .badge-error { background-color: #ffc107; color: #212529; }
         .table-responsive { max-height: 600px; overflow-y: auto; }
+        /* Estilos para stat-cards */
+        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
+        .stat-card {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+        .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: #6c757d; font-weight: 600; }
+        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #00a896; }
+        @media (max-width: 768px) {
+            .stats-container { grid-template-columns: 1fr; }
+        }
+        /* Estilo para el botón Limpiar */
+        .btn-outline-secondary {
+            color: #6c757d !important;
+            border: 1px solid #6c757d !important;
+            background-color: transparent !important;
+            background-image: none !important;
+        }
+        .btn-outline-secondary:hover {
+            color: #fff !important;
+            background-color: #6c757d !important;
+            border: 1px solid #6c757d !important;
+            background-image: none !important;
+        }
     </style>
 </head>
 <body>
@@ -43,18 +70,45 @@
     <jsp:include page="/administrador/layouts/header_admin.jsp" />
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
-            <div class="page-header mb-4">
-                <h2 class="pageheader-title"><i class="fas fa-clipboard-list me-2"></i>Auditoría del Sistema</h2>
-                <p class="pageheader-text">Registro de acciones importantes realizadas en el sistema.</p>
+            <div class="page-header mb-1" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+                <h2 class="pageheader-title mb-0" style="font-size: 1.4rem; line-height: 1.2;"><i class="fas fa-clipboard-list me-2"></i>Auditoría del Sistema</h2>
+                <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Registro de acciones importantes realizadas en el sistema.</p>
             </div>
 
-            <!-- Filtros -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtros de Búsqueda</h5>
+            <%
+                // Obtener estadísticas del servlet
+                Integer totalRegistrosAuditoriaAttr = (Integer) request.getAttribute("totalRegistrosAuditoria");
+                Integer accionesHoyAttr = (Integer) request.getAttribute("accionesHoy");
+                Integer accionesFallidasAttr = (Integer) request.getAttribute("accionesFallidas");
+                int totalRegistrosAuditoria = (totalRegistrosAuditoriaAttr != null) ? totalRegistrosAuditoriaAttr : 0;
+                int accionesHoy = (accionesHoyAttr != null) ? accionesHoyAttr : 0;
+                int accionesFallidas = (accionesFallidasAttr != null) ? accionesFallidasAttr : 0;
+            %>
+
+            <!-- ===================== Tarjetas de estadísticas ===================== -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Total de Registros</h3>
+                    <p><%= totalRegistrosAuditoria %></p>
                 </div>
-                <div class="card-body">
-                    <form method="get" action="<%= request.getContextPath() %>/AuditoriaServlet">
+                <div class="stat-card">
+                    <h3>Acciones Hoy</h3>
+                    <p><%= accionesHoy %></p>
+                </div>
+                <div class="stat-card">
+                    <h3>Acciones Fallidas (Hoy)</h3>
+                    <p><%= accionesFallidas %></p>
+                </div>
+            </div>
+
+            <!-- ===================== Card: Búsqueda y filtros ===================== -->
+            <div class="card shadow-sm mb-4" id="filterCard">
+                <div class="card-header bg-primary text-white" style="padding: 0.5rem 0.75rem;">
+                    <h5 class="mb-0" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-filter me-2"></i>Filtros de Búsqueda</h5>
+                </div>
+                <div class="card-body" style="padding: 0.75rem;">
+                    <form method="get" action="<%= request.getContextPath() %>/AuditoriaServlet" id="filterForm">
+                        <input type="hidden" name="size" value="<%= size %>">
                         <div class="row g-3">
                             <div class="col-md-3">
                                 <label class="form-label">Usuario ID</label>
@@ -66,7 +120,7 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Módulo</label>
-                                <select class="form-select" name="modulo">
+                                <select class="form-select" name="modulo" id="moduloFilter">
                                     <option value="">Todos</option>
                                     <option value="USUARIOS" <%= "USUARIOS".equals(modulo) ? "selected" : "" %>>Usuarios</option>
                                     <option value="PRODUCTOS" <%= "PRODUCTOS".equals(modulo) ? "selected" : "" %>>Productos</option>
@@ -78,7 +132,7 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Estado</label>
-                                <select class="form-select" name="estado">
+                                <select class="form-select" name="estado" id="estadoFilter">
                                     <option value="">Todos</option>
                                     <option value="EXITOSO" <%= "EXITOSO".equals(estado) ? "selected" : "" %>>Exitoso</option>
                                     <option value="FALLIDO" <%= "FALLIDO".equals(estado) ? "selected" : "" %>>Fallido</option>
@@ -87,18 +141,15 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Fecha Desde</label>
-                                <input type="date" class="form-control" name="fecha_desde" value="<%= fechaDesde != null ? fechaDesde : "" %>">
+                                <input type="date" class="form-control" name="fecha_desde" id="fechaDesdeFilter" value="<%= fechaDesde != null ? fechaDesde : "" %>">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Fecha Hasta</label>
-                                <input type="date" class="form-control" name="fecha_hasta" value="<%= fechaHasta != null ? fechaHasta : "" %>">
+                                <input type="date" class="form-control" name="fecha_hasta" id="fechaHastaFilter" value="<%= fechaHasta != null ? fechaHasta : "" %>">
                             </div>
                             <div class="col-md-6 d-flex align-items-end gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search me-2"></i>Buscar
-                                </button>
-                                <a href="<%= request.getContextPath() %>/AuditoriaServlet" class="btn btn-secondary">
-                                    <i class="fas fa-redo me-2"></i>Limpiar
+                                <a href="<%= request.getContextPath() %>/AuditoriaServlet" class="btn btn-outline-secondary">
+                                    <i class="fas fa-sync-alt me-2"></i>Limpiar
                                 </a>
                             </div>
                         </div>
@@ -116,7 +167,6 @@
                                     <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-list me-2"></i>Registros de Auditoría</h5>
                                     <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todos los registros de auditoría del sistema</small>
                                 </div>
-                                <span class="badge bg-primary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">Total: <%= totalRegistros %></span>
                             </div>
                         </div>
                         <div class="card-body" style="padding: 0.75rem;">
@@ -178,41 +228,51 @@
                                 </table>
                             </div>
                         </div>
-                <% if (totalPages > 1) { %>
-                <div class="card-footer">
-                    <nav aria-label="Paginación">
-                        <ul class="pagination justify-content-center mb-0">
-                            <% if (currentPage > 1) { %>
-                            <li class="page-item">
-                                <a class="page-link" href="?page=<%= currentPage - 1 %>&size=<%= size %>">Anterior</a>
-                            </li>
-                            <% } %>
-                            <% for (int i = 1; i <= totalPages; i++) { %>
-                                <% if (i == currentPage) { %>
-                                <li class="page-item active">
-                                    <span class="page-link"><%= i %></span>
-                                </li>
-                                <% } else { %>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=<%= i %>&size=<%= size %>"><%= i %></a>
-                                </li>
-                                <% } %>
-                            <% } %>
-                            <% if (currentPage < totalPages) { %>
-                            <li class="page-item">
-                                <a class="page-link" href="?page=<%= currentPage + 1 %>&size=<%= size %>">Siguiente</a>
-                            </li>
-                            <% } %>
-                        </ul>
-                    </nav>
-                </div>
-                <% } %>
+                        <%-- Incluir componente de paginación --%>
+                        <jsp:include page="/WEB-INF/includes/pagination.jsp" />
+                    </div>
             </div>
         </div>
         <jsp:include page="/administrador/layouts/footer.jsp" />
     </div>
 </div>
 
+<script>
+    // Aplicar filtros automáticamente al cambiar valores
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterForm = document.getElementById('filterForm');
+        const moduloFilter = document.getElementById('moduloFilter');
+        const estadoFilter = document.getElementById('estadoFilter');
+        const fechaDesdeFilter = document.getElementById('fechaDesdeFilter');
+        const fechaHastaFilter = document.getElementById('fechaHastaFilter');
+        
+        // Aplicar filtros cuando cambien los selects
+        if (moduloFilter && filterForm) {
+            moduloFilter.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        }
+        
+        if (estadoFilter && filterForm) {
+            estadoFilter.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        }
+        
+        // Aplicar filtros cuando cambien las fechas
+        if (fechaDesdeFilter && filterForm) {
+            fechaDesdeFilter.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        }
+        
+        if (fechaHastaFilter && filterForm) {
+            fechaHastaFilter.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        }
+    });
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

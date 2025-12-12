@@ -137,7 +137,7 @@ public class IncidenciaServlet extends HttpServlet {
             String busqueda = request.getParameter("busqueda");
             
             int page = 1;
-            int size = 10;
+            int size = 5;
             try {
                 String pageParam = request.getParameter("page");
                 if (pageParam != null && !pageParam.isEmpty()) {
@@ -154,6 +154,11 @@ public class IncidenciaServlet extends HttpServlet {
             if (totalPages == 0) totalPages = 1;
             if (page > totalPages) page = totalPages;
             
+            // Calcular estadísticas (sin filtros para obtener totales reales)
+            int totalIncidencias = incidenciaDAO.contarTotalIncidencias();
+            int incidenciasPendientes = incidenciaDAO.contarIncidenciasPendientes();
+            int incidenciasResueltas = incidenciaDAO.contarIncidenciasResueltas();
+            
             request.setAttribute("incidencias", incidencias);
             request.setAttribute("totalRegistros", totalRegistros);
             request.setAttribute("currentPage", page);
@@ -161,6 +166,9 @@ public class IncidenciaServlet extends HttpServlet {
             request.setAttribute("size", size);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("totalRows", totalRegistros);
+            request.setAttribute("totalIncidencias", totalIncidencias);
+            request.setAttribute("incidenciasPendientes", incidenciasPendientes);
+            request.setAttribute("incidenciasResueltas", incidenciasResueltas);
             request.setAttribute("estado", estado);
             request.setAttribute("tipo", tipo);
             request.setAttribute("busqueda", busqueda);

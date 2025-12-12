@@ -200,5 +200,89 @@ public class VehiculoDAO extends DAOBase {
         String sql = "SELECT COUNT(*) FROM vehiculos WHERE placa = ? AND id_vehiculo != ?";
         return count(sql, placa, idExcluir) > 0;
     }
+
+    /**
+     * Cuenta el total de vehículos
+     */
+    public int contarTotalVehiculos() {
+        String sql = "SELECT COUNT(*) FROM vehiculos";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        int count = 0;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar total vehículos", e);
+            throw new RuntimeException("Error al contar total vehículos", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return count;
+    }
+
+    /**
+     * Cuenta vehículos con planes de transporte asignados
+     */
+    public int contarVehiculosConPlanes() {
+        String sql = "SELECT COUNT(DISTINCT v.id_vehiculo) FROM vehiculos v " +
+                     "INNER JOIN planes_transporte pt ON v.id_vehiculo = pt.vehiculo_id";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        int count = 0;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar vehículos con planes", e);
+            throw new RuntimeException("Error al contar vehículos con planes", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return count;
+    }
+
+    /**
+     * Cuenta vehículos sin planes de transporte asignados
+     */
+    public int contarVehiculosSinPlanes() {
+        String sql = "SELECT COUNT(*) FROM vehiculos v " +
+                     "LEFT JOIN planes_transporte pt ON v.id_vehiculo = pt.vehiculo_id " +
+                     "WHERE pt.vehiculo_id IS NULL";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        int count = 0;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar vehículos sin planes", e);
+            throw new RuntimeException("Error al contar vehículos sin planes", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return count;
+    }
 }
 

@@ -73,7 +73,16 @@
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 15px; text-align: center; border-bottom: 1px solid var(--border-color); }
     thead th { background-color: var(--seafoam-light); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; }
-    tbody tr:hover { background-color: var(--seafoam-light); }
+    tbody tr { transition: all 0.3s ease; cursor: pointer; }
+    tbody tr:hover { 
+        background-color: rgba(0, 168, 150, 0.1) !important; 
+        transform: scale(1.01);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    tbody tr:hover td {
+        color: var(--turquoise-dark);
+        font-weight: 500;
+    }
     .table-responsive { border-radius: 8px; overflow: hidden; }
 
     .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }

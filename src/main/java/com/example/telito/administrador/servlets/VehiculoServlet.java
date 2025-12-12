@@ -53,6 +53,11 @@ public class VehiculoServlet extends HttpServlet {
                 if (totalPages == 0) totalPages = 1;
                 if (page > totalPages) page = totalPages;
 
+                // Calcular estadísticas (sin filtros para obtener totales reales)
+                int totalVehiculos = vehiculoDAO.contarTotalVehiculos();
+                int vehiculosConPlanes = vehiculoDAO.contarVehiculosConPlanes();
+                int vehiculosSinPlanes = vehiculoDAO.contarVehiculosSinPlanes();
+
                 ArrayList<Vehiculo> listaVehiculos = vehiculoDAO.listarVehiculos(busqueda, page, size);
                 request.setAttribute("listaVehiculos", listaVehiculos);
                 request.setAttribute("currentPage", page);
@@ -60,6 +65,9 @@ public class VehiculoServlet extends HttpServlet {
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("totalRows", totalRows);
                 request.setAttribute("busqueda", busqueda);
+                request.setAttribute("totalVehiculos", totalVehiculos);
+                request.setAttribute("vehiculosConPlanes", vehiculosConPlanes);
+                request.setAttribute("vehiculosSinPlanes", vehiculosSinPlanes);
                 request.setAttribute("baseUrl", request.getContextPath() + "/administrador/VehiculoServlet");
                 request.setAttribute("param1Name", "action");
                 request.setAttribute("param1Value", "listar");

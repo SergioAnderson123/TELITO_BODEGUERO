@@ -62,6 +62,61 @@ public class MovimientoDao extends DAOBase {
         }
         return 0;
     }
+
+    /**
+     * Cuenta movimientos de tipo 'Entrada'
+     */
+    public int contarMovimientosEntrada(String busqueda) {
+        return contarTotalMovimientos(busqueda, "Entrada", null);
+    }
+
+    /**
+     * Cuenta movimientos de tipo 'Salida'
+     */
+    public int contarMovimientosSalida(String busqueda) {
+        return contarTotalMovimientos(busqueda, "Salida", null);
+    }
+
+    /**
+     * Cuenta movimientos de tipo 'Ajuste'
+     */
+    public int contarMovimientosAjuste(String busqueda) {
+        String sql = "SELECT COUNT(*) FROM movimientos_inventario m " +
+                "INNER JOIN lotes l ON (m.lote_id = l.id_lote) " +
+                "INNER JOIN productos p ON (l.producto_id = p.id_producto) " +
+                "WHERE m.motivo LIKE 'Ajuste de inventario%'";
+        
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (p.nombre LIKE ? OR l.codigo_lote LIKE ?)";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar movimientos de ajuste", e);
+            throw new RuntimeException("Error al contar movimientos de ajuste", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
+    }
     
     public int contarMovimientosPorUsuario(int usuarioId) {
         return contarMovimientosPorUsuario(usuarioId, null, null);

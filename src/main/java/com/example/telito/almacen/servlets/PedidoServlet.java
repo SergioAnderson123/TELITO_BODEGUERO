@@ -46,7 +46,7 @@ public class PedidoServlet extends HttpServlet {
         switch (action) {
             case "lista":
                 try {
-                    int registrosPorPagina = 10;
+                    int registrosPorPagina = 5;
                     String pageStr = request.getParameter("page");
                     int paginaActual = 1;
                     try {
@@ -67,6 +67,11 @@ public class PedidoServlet extends HttpServlet {
                     if (totalPaginas == 0) totalPaginas = 1;
                     if (paginaActual > totalPaginas) paginaActual = totalPaginas;
                     
+                    // Calcular estadísticas (sin filtros para obtener totales reales)
+                    int totalPedidos = pedidoDao.contarTotalPedidos();
+                    int pedidosPendientes = pedidoDao.contarPedidosPendientes();
+                    int pedidosDespachados = pedidoDao.contarPedidosDespachados();
+                    
                     int offset = (paginaActual - 1) * registrosPorPagina;
                     ArrayList<Pedido> listaPaginada = pedidoDao.listarPedidosPaginados(offset, registrosPorPagina, busqueda, estado);
 
@@ -80,6 +85,9 @@ public class PedidoServlet extends HttpServlet {
                     request.setAttribute("size", registrosPorPagina);
                     request.setAttribute("totalPages", totalPaginas);
                     request.setAttribute("totalRows", totalRegistros);
+                    request.setAttribute("totalPedidos", totalPedidos);
+                    request.setAttribute("pedidosPendientes", pedidosPendientes);
+                    request.setAttribute("pedidosDespachados", pedidosDespachados);
                     request.setAttribute("baseUrl", request.getContextPath() + "/almacen/PedidoServlet");
                     request.setAttribute("itemName", "pedidos");
                     request.setAttribute("busqueda", busqueda);

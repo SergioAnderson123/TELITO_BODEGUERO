@@ -65,6 +65,11 @@ public class PlanTransporteServlet extends HttpServlet {
                 if (totalPages == 0) totalPages = 1;
                 if (page > totalPages) page = totalPages;
 
+                // Calcular estadísticas (sin filtros para obtener totales reales)
+                int totalPlanes = planTransporteDao.contarPlanes(null, null, null, null, null);
+                int planesEnRuta = planTransporteDao.contarPlanes(null, null, "En Ruta", null, null);
+                int planesEntregados = planTransporteDao.contarPlanes(null, null, "Entregado", null, null);
+
                 ConductorDao conductorDao = new ConductorDao();
                 ArrayList<PlanTransporteBean> listaPlanes = planTransporteDao.listarPlanesDeTransporte(busqueda, conductorId, estado, fechaDesde, fechaHasta, page, size);
 
@@ -79,6 +84,9 @@ public class PlanTransporteServlet extends HttpServlet {
                 request.setAttribute("size", size);
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("totalRows", totalRows);
+                request.setAttribute("totalPlanes", totalPlanes);
+                request.setAttribute("planesEnRuta", planesEnRuta);
+                request.setAttribute("planesEntregados", planesEntregados);
                 request.setAttribute("baseUrl", request.getContextPath() + "/planes-transporte");
                 request.setAttribute("itemName", "planes de transporte");
 
