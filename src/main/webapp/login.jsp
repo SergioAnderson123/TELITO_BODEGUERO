@@ -31,33 +31,73 @@
         }
 
         body {
-            /* Fondo con el verde más claro */
-            background-color: #1aa87e;
+            margin: 0;
+            padding: 0;
             min-height: 100vh;
             font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Video de fondo */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -2;
+        }
+
+        .video-background video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+            transform: scale(1);
+        }
+
+        /* Overlay oscuro sobre el video para mejor legibilidad */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.35) 100%);
+            z-index: -1;
         }
 
         .login-container {
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding: 60px 80px 40px 80px;
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.15) 0%, 
+                rgba(255, 255, 255, 0.25) 100%);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border-radius: 24px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
             padding: 45px 50px;
             width: 100%;
             max-width: 520px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             position: relative;
             z-index: 2;
             transform: scale(0.9);
-            transform-origin: center center;
+            transform-origin: right center;
         }
 
         .login-header {
@@ -77,10 +117,11 @@
         }
 
         .login-header h1 {
-            color: var(--primary-color);
-            font-weight: 600;
-            font-size: 1.8rem;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.9rem;
             margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         .login-header p {
@@ -91,10 +132,11 @@
 
         /* Estilo para el Slogan */
         .login-header p.slogan {
-            color: #555;
-            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.05rem;
             font-weight: 500;
-            margin-top: 5px; /* <--- AJUSTA ESTE VALOR (puedes probar con 5px, 10px, etc.) */
+            margin-top: 5px;
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
         }
 
         .form-floating {
@@ -102,7 +144,7 @@
         }
 
         .form-floating .form-control {
-            border: 2px solid #e9ecef;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
             padding: 0.875rem 1rem 0.875rem 3rem;
             font-size: 1rem;
@@ -112,12 +154,15 @@
             min-height: 58px;
             line-height: 1.5;
             vertical-align: middle;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2b2d42;
         }
         
 
         .form-floating .form-control:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            border-color: rgba(32, 201, 151, 0.8);
+            box-shadow: 0 0 0 0.2rem rgba(32, 201, 151, 0.25);
+            background: rgba(255, 255, 255, 0.95);
         }
 
         .form-floating {
@@ -242,24 +287,27 @@
             margin-bottom: 20px;
             padding: 15px 20px;
             font-weight: 500;
+            backdrop-filter: blur(10px);
         }
 
         .alert-danger {
-            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            background: rgba(255, 235, 238, 0.95);
             color: #c62828;
+            border: 1px solid rgba(198, 40, 40, 0.2);
         }
 
         .login-footer {
             text-align: center;
             margin-top: 30px;
             padding-top: 20px;
-            border-top: 1px solid #e9ecef;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .login-footer p {
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.9);
             font-size: 0.9rem;
             margin: 0;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
         }
 
         .form-floating .form-control.is-invalid {
@@ -268,6 +316,25 @@
 
         .invalid-feedback {
             font-weight: 500;
+            color: #ff6b6b;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Estilos para texto muted y enlaces */
+        .text-muted {
+            color: rgba(255, 255, 255, 0.85) !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        a {
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: #20c997;
+            text-shadow: 0 2px 8px rgba(32, 201, 151, 0.4);
         }
 
         /* Animaciones */
@@ -299,10 +366,17 @@
 
         /* Responsive */
         @media (max-width: 576px) {
+            .login-container {
+                justify-content: center;
+                padding: 20px;
+            }
+
             .login-card {
                 padding: 35px 25px;
                 margin: 10px;
                 max-width: 100%;
+                transform: scale(1);
+                transform-origin: center center;
             }
 
             .login-header .logo {
@@ -347,13 +421,27 @@
             
             small.text-muted {
                 font-size: 0.8rem !important;
+                color: rgba(255, 255, 255, 0.85) !important;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             }
         }
         
         @media (min-width: 577px) and (max-width: 768px) {
+            .login-container {
+                justify-content: center;
+                padding: 40px;
+            }
+
             .login-card {
                 max-width: 480px;
                 padding: 40px 35px;
+                transform: scale(0.95);
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .login-container {
+                padding: 40px 60px;
             }
         }
     </style>
@@ -364,7 +452,13 @@
 </head>
 <body>
 
-<div id="tsparticles"></div>
+<!-- Video de fondo -->
+<div class="video-background">
+    <video autoplay muted loop playsinline>
+        <source src="<%= request.getContextPath() %>/videos/4293956-uhd_3840_2160_25fps.mp4" type="video/mp4">
+    </video>
+</div>
+<div class="video-overlay"></div>
 
 <div class="login-container">
     <div class="login-card">

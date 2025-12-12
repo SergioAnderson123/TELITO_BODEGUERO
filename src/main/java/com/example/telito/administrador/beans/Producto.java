@@ -14,6 +14,8 @@ public class Producto {
     private int categoriaId;      // <-- AÑADIDO
     private String categoriaNombre; // <-- AÑADIDO
     private boolean activo;       // <-- AÑADIDO
+    private int numeroLotes;      // <-- AÑADIDO para mostrar cantidad de lotes
+    private Categoria categoria;  // <-- AÑADIDO objeto Categoria completo
 
     // Getters y Setters
 
@@ -111,5 +113,21 @@ public class Producto {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public int getNumeroLotes() {
+        return numeroLotes;
+    }
+
+    public void setNumeroLotes(int numeroLotes) {
+        this.numeroLotes = numeroLotes;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 }

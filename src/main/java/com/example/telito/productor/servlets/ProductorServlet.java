@@ -131,16 +131,27 @@ public class ProductorServlet extends HttpServlet {
                 break;
 
             case "formActualizarPrecios":
-                // Buscar por SKU (si viene) y mostrar el formulario de actualización de precio
-                // SOLO si el producto pertenece al productor logueado
-                String skuBusqueda = request.getParameter("sku");
-                if (skuBusqueda != null && !skuBusqueda.trim().isEmpty()) {
-                    Producto prod = productoDao.obtenerProductoPorSku(skuBusqueda.trim(), idProductor);
-                    if (prod != null) {
-                        // También enviamos el SKU para mantenerlo en la URL si lo necesitas
-                        request.setAttribute("producto", prod);
+                // Búsqueda mejorada: por SKU o nombre de producto
+                String busqueda = request.getParameter("busqueda");
+                List<Producto> listaProductosBusqueda = new ArrayList<>();
+                
+                if (busqueda != null && !busqueda.trim().isEmpty()) {
+                    String terminoBusqueda = busqueda.trim();
+                    
+                    // Obtener todos los productos del productor que coincidan con SKU o nombre
+                    listaProductosBusqueda = productoDao.buscarProductosPorSKUoNombre(terminoBusqueda, idProductor);
+                    
+                    // Si no se encontró ninguno, podemos enviar un mensaje
+                    if (listaProductosBusqueda.isEmpty()) {
+                        request.setAttribute("alertType", "warning");
+                        request.setAttribute("alertMessage", "No se encontraron productos con ese SKU o nombre.");
                     }
                 }
+                
+                // Enviar la búsqueda para mantener el valor en el input
+                request.setAttribute("busqueda", busqueda != null ? busqueda : "");
+                request.setAttribute("listaProductos", listaProductosBusqueda);
+                
                 view = request.getRequestDispatcher("productor/actualizarPrecios.jsp");
                 view.forward(request, response);
                 break;
@@ -576,6 +587,9 @@ public class ProductorServlet extends HttpServlet {
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
                 
+                // Importante: limpiar cualquier salida previa
+                response.resetBuffer();
+                
                 try {
                     String idOrdenStr = request.getParameter("idOrden");
                     String nuevoEstado = request.getParameter("nuevoEstado");
@@ -614,9 +628,9 @@ public class ProductorServlet extends HttpServlet {
                         if ("En Proceso".equals(nuevoEstado)) {
                             System.out.println("✓ El estado es 'En Proceso', procediendo a enviar correo...");
                             try {
-                    // Obtener datos de la orden, SOLO si pertenece al productor logueado
-                    System.out.println("Obteniendo datos básicos de la orden ID: " + idOrden);
-                    Object[] datosOrden = ordenCompraDao.obtenerDatosBasicosOrden(idOrden, idProductor);
+                                // Obtener datos de la orden, SOLO si pertenece al productor logueado
+                                System.out.println("Obteniendo datos básicos de la orden ID: " + idOrden);
+                                Object[] datosOrden = ordenCompraDao.obtenerDatosBasicosOrden(idOrden, idProductor);
                                 
                                 if (datosOrden != null) {
                                     System.out.println("✓ Datos de orden obtenidos correctamente");
@@ -680,17 +694,22 @@ public class ProductorServlet extends HttpServlet {
                             System.out.println("⚠ El estado no es 'En Proceso', no se enviará correo. Estado recibido: '" + nuevoEstado + "'");
                         }
                         
+                        // IMPORTANTE: Siempre responder con éxito si se actualizó el estado
                         response.getWriter().write("{\"success\": true, \"message\": \"Estado actualizado correctamente\"}");
+                        response.getWriter().flush();
                     } else {
                         response.getWriter().write("{\"success\": false, \"message\": \"No se pudo actualizar el estado\"}");
+                        response.getWriter().flush();
                         System.err.println("❌ No se pudo actualizar el estado");
                     }
                 } catch (NumberFormatException e) {
                     response.getWriter().write("{\"success\": false, \"message\": \"ID de orden inválido\"}");
+                    response.getWriter().flush();
                     System.err.println("❌ ERROR: ID de orden inválido - " + e.getMessage());
                     e.printStackTrace();
                 } catch (Exception e) {
                     response.getWriter().write("{\"success\": false, \"message\": \"Error interno del servidor: " + e.getMessage().replace("\"", "\\\"") + "\"}");
+                    response.getWriter().flush();
                     System.err.println("❌ ERROR: Error al cambiar estado - " + e.getMessage());
                     e.printStackTrace();
                 }
@@ -921,7 +940,7 @@ public class ProductorServlet extends HttpServlet {
             INNER JOIN productos p ON l.producto_id = p.id_producto
             WHERE p.productor_id = ?
             AND l.id_lote >= (
-                SELECT COALESCE(MAX(id_lote) - 100, 1)
+                SELECT GREATEST(COALESCE(MAX(id_lote), 100) - 100, 0)
                 FROM lotes l2
                 INNER JOIN productos p2 ON l2.producto_id = p2.id_producto
                 WHERE p2.productor_id = ?

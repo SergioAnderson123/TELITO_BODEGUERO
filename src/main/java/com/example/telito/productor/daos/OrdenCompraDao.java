@@ -267,13 +267,19 @@ public class OrdenCompraDao extends DAOBase {
                      "SET oc.estado = ? " +
                      "WHERE oc.id_orden_compra = ? AND p.productor_id = ? AND p.activo = 1";
 
-        int filasAfectadas = executeUpdate(sql, nuevoEstado, idOrden, productorId);
-        if (filasAfectadas == 0) {
-            logger.warn("No se encontró la orden con ID {} o no pertenece al productor {} o ya tiene el estado {}", idOrden, productorId, nuevoEstado);
-        } else {
-            logger.info("Estado de orden {} actualizado a {} (productor: {})", idOrden, nuevoEstado, productorId);
+        try {
+            int filasAfectadas = executeUpdate(sql, nuevoEstado, idOrden, productorId);
+            if (filasAfectadas == 0) {
+                logger.warn("No se encontró la orden con ID {} o no pertenece al productor {} o ya tiene el estado {}", idOrden, productorId, nuevoEstado);
+            } else {
+                logger.info("Estado de orden {} actualizado a {} (productor: {})", idOrden, nuevoEstado, productorId);
+            }
+            return filasAfectadas > 0;
+        } catch (Exception e) {
+            logger.error("Error al actualizar estado de orden {} a {} para productor {}: {}", idOrden, nuevoEstado, productorId, e.getMessage());
+            e.printStackTrace();
+            throw e; // Re-lanzar para que el servlet pueda manejarlo
         }
-        return filasAfectadas > 0;
     }
 
     /**

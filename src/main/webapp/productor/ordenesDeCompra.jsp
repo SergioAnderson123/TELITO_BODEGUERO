@@ -750,37 +750,54 @@
 
 <!-- Modal: Asignar Lote a Orden -->
 <div class="modal fade" id="asignarLoteModal" tabindex="-1" aria-labelledby="asignarLoteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                <h5 class="modal-title" id="asignarLoteModalLabel">
-                    <i class="fas fa-boxes me-2"></i>Asignar Lote a Orden
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #00a896 0%, #028f80 100%); border-radius: 16px 16px 0 0; padding: 20px 25px; border-bottom: none;">
+                <h5 class="modal-title d-flex align-items-center" id="asignarLoteModalLabel" style="font-weight: 600; font-size: 1.2rem;">
+                    <span class="d-flex align-items-center justify-content-center me-3" style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 10px; width: 45px; height: 45px;">
+                        <i class="fas fa-boxes" style="font-size: 1.2rem;"></i>
+                    </span>
+                    Asignar Lote a Orden
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="opacity: 1; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; border: none; color: white;" onmouseover="this.style.background='rgba(255,255,255,0.25)';" onmouseout="this.style.background='rgba(255,255,255,0.15)';">
+                    <i class="fas fa-times" style="color: white; font-size: 18px;"></i>
+                </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="padding: 25px; background: #f8f9fa;">
                 <div id="loadingLotes" class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
+                    <div class="spinner-border" style="color: #00a896; width: 3rem; height: 3rem;" role="status">
                         <span class="visually-hidden">Cargando...</span>
                     </div>
-                    <p class="mt-3 text-muted">Cargando lotes disponibles...</p>
+                    <p class="mt-3 text-muted" style="font-size: 0.95rem;">Cargando lotes disponibles...</p>
                 </div>
                 <div id="tableLotesContainer" style="display: none;">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Orden:</strong> <span id="modalOrdenNumero"></span> | 
-                        <strong>Producto:</strong> <span id="modalProductoNombre"></span>
+                    <div class="alert" style="background: linear-gradient(135deg, rgba(0,168,150,0.1) 0%, rgba(2,143,128,0.1) 100%); border: 2px solid #00a896; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px;">
+                        <i class="fas fa-info-circle me-2" style="color: #00a896; font-size: 1.1rem;"></i>
+                        <strong style="color: #00a896;">Orden:</strong> <span id="modalOrdenNumero" style="color: #495057; font-weight: 600;"></span> | 
+                        <strong style="color: #00a896;">Producto:</strong> <span id="modalProductoNombre" style="color: #495057; font-weight: 600;"></span>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered">
-                            <thead class="table-light">
+                    <div class="table-responsive" style="background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+                            <thead style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
                                 <tr>
-                                    <th style="width: 50px;">Seleccionar</th>
-                                    <th>Código Lote</th>
-                                    <th>SKU</th>
-                                    <th>Producto</th>
-                                    <th>Paquetes</th>
-                                    <th>Fecha de Vencimiento</th>
+                                    <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; width: 80px; text-align: center;">
+                                        <i class="fas fa-check-circle me-1" style="color: #00a896;"></i>Seleccionar
+                                    </th>
+                                    <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
+                                        <i class="fas fa-barcode me-1" style="color: #00a896;"></i>Código Lote
+                                    </th>
+                                    <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
+                                        <i class="fas fa-tag me-1" style="color: #00a896;"></i>SKU
+                                    </th>
+                                    <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
+                                        <i class="fas fa-box me-1" style="color: #00a896;"></i>Producto
+                                    </th>
+                                    <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; text-align: center;">
+                                        <i class="fas fa-cubes me-1" style="color: #00a896;"></i>Paquetes
+                                    </th>
+                                    <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
+                                        <i class="fas fa-calendar-alt me-1" style="color: #00a896;"></i>Fecha de Vencimiento
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="tableLotesBody">
@@ -788,17 +805,17 @@
                             </tbody>
                         </table>
                     </div>
-                    <div id="noLotesMessage" class="alert alert-warning" style="display: none;">
+                    <div id="noLotesMessage" class="alert alert-warning" style="display: none; border-radius: 12px; margin-top: 15px;">
                         <i class="fas fa-exclamation-triangle me-2"></i>
                         No hay lotes disponibles para este producto.
                     </div>
                 </div>
             </div>
-            <div class="modal-footer" style="border-top: 2px solid #e9ecef;">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <div class="modal-footer" style="background: white; border-top: 2px solid #e9ecef; padding: 20px 25px; border-radius: 0 0 16px 16px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="padding: 10px 20px; border-radius: 8px; font-weight: 600;">
                     <i class="fas fa-arrow-left me-2"></i>Volver
                 </button>
-                <button type="button" class="btn btn-primary" id="btnEnviarLote" onclick="asignarLoteAOrden()">
+                <button type="button" class="btn btn-primary" id="btnEnviarLote" onclick="asignarLoteAOrden()" style="padding: 10px 20px; border-radius: 8px; font-weight: 600; background: linear-gradient(135deg, #00a896 0%, #028f80 100%); border: none;">
                     <i class="fas fa-paper-plane me-2"></i>Enviar
                 </button>
             </div>
@@ -1076,17 +1093,28 @@
                     body: 'idOrden=' + idOrden + '&nuevoEstado=' + encodeURIComponent(nuevoEstado)
                 })
                 .then(response => {
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+                    
                     // Verificar si la respuesta es OK
                     if (!response.ok) {
                         throw new Error('Error HTTP: ' + response.status);
                     }
-                    // Intentar parsear como JSON
-                    return response.json().catch(() => {
-                        // Si no es JSON válido, devolver un objeto de error
-                        throw new Error('La respuesta del servidor no es válida');
+                    
+                    // Leer el texto de la respuesta primero
+                    return response.text().then(text => {
+                        console.log('Response text:', text);
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            console.error('Error al parsear JSON:', e);
+                            console.error('Texto recibido:', text);
+                            throw new Error('La respuesta del servidor no es JSON válido');
+                        }
                     });
                 })
                 .then(data => {
+                    console.log('Data recibida:', data);
                     if (data.success) {
                         // Obtener la fila de la tabla
                         const row = elemento.closest('tr');

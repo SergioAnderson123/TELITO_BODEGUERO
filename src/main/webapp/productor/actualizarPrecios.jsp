@@ -1,15 +1,20 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.example.telito.productor.beans.Producto" %>
+<%@ page import="java.util.ArrayList" %>
 <%--
-    JSP: Actualizar Precios
-    Propósito: Buscar un producto por SKU y actualizar su precio sugerido.
+    JSP: Actualizar Precios (VERSIÓN MEJORADA)
+    Propósito: Buscar productos por SKU o nombre y actualizar su precio sugerido.
     Atributos esperados (request):
-      - producto (Producto) después de buscar por SKU; null si no se encontró o aún no se buscó
+      - listaProductos (ArrayList<Producto>) lista de productos del productor
+      - producto (Producto) producto seleccionado para actualizar; null si aún no se seleccionó
     Navegación: Sidebar con sección "Actualizar Precios" activa.
 --%>
 <%
-    // Objeto "producto" enviado por el servlet tras la búsqueda por SKU
+    // Objeto "producto" enviado por el servlet tras la búsqueda
     Producto producto = (Producto) request.getAttribute("producto");
+    ArrayList<Producto> listaProductos = (ArrayList<Producto>) request.getAttribute("listaProductos");
+    String busqueda = request.getParameter("busqueda");
+    if (busqueda == null) busqueda = "";
 %>
 
 <!DOCTYPE html>
@@ -58,7 +63,7 @@
             border-bottom: 1px solid var(--border-color);
         }
         .dashboard-wrapper { margin-left: 250px; width: calc(100% - 250px); min-height: 100vh; }
-        .dashboard-content { margin-top: 70px; padding: 30px; }
+        .dashboard-content { margin-top: 70px; padding: 20px; }
 
         /* =====================
            Sidebar (igual a logística y almacenero)
@@ -352,62 +357,206 @@
     <!-- ===================== Contenido principal ===================== -->
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
-            <div class="page-header mb-4">
+            <div class="page-header mb-3">
                 <h2 class="pageheader-title mb-1"><i class="fas fa-tags me-2"></i>Actualizar Precios</h2>
-                <p class="text-muted">Modifica el precio sugerido de un producto. Busca por SKU y define el nuevo precio.</p>
+                <p class="text-muted" style="font-size: 0.85rem;">Busca y actualiza el precio de tus productos de forma rápida y eficiente.</p>
             </div>
 
-            <!-- ===================== Card: Búsqueda por SKU ===================== -->
-            <div class="card mb-4">
-                <div class="card-header"><h5 class="mb-0"><strong>1. Buscar Producto</strong></h5></div>
+            <!-- Mensajes de éxito/error -->
+            <%
+                String alertType = (String) request.getAttribute("alertType");
+                String alertMessage = (String) request.getAttribute("alertMessage");
+                if (alertType != null && alertMessage != null) {
+            %>
+            <div class="alert alert-<%= alertType %> alert-dismissible fade show" role="alert" style="padding: 10px 15px; margin-bottom: 15px; font-size: 0.9rem;">
+                <i class="fas <%= "success".equals(alertType) ? "fa-check-circle" : "fa-exclamation-triangle" %> me-2"></i>
+                <%= alertMessage %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <% } %>
+
+            <!-- ===================== Card: Búsqueda Mejorada ===================== -->
+            <div class="card mb-3" style="padding: 20px;">
+                <div class="card-header" style="padding: 15px 20px; margin: -20px -20px 20px -20px;">
+                    <h5 class="mb-0"><i class="fas fa-search me-2"></i><strong>Buscar Producto</strong></h5>
+                </div>
                 <div class="card-body">
                     <form method="GET" action="<%= request.getContextPath() %>/ProductorServlet" class="row g-3 align-items-end">
                         <input type="hidden" name="action" value="formActualizarPrecios">
-                        <div class="col-md-9">
-                            <label for="sku" class="form-label">SKU del Producto</label>
-                            <input id="sku" type="text" class="form-control" name="sku" placeholder="Ingrese el SKU para buscar..." required value="<%= (request.getParameter("sku") != null ? request.getParameter("sku") : "") %>">
+                        <div class="col-md-10">
+                            <label for="busqueda" class="form-label" style="font-weight: 600; font-size: 0.9rem;">
+                                <i class="fas fa-barcode me-2" style="color: #00a896;"></i>Buscar por SKU o Nombre de Producto
+                            </label>
+                            <input id="busqueda" type="text" class="form-control" name="busqueda" 
+                                   placeholder="Ej: SKU019 o cerveza..." 
+                                   value="<%= busqueda %>" 
+                                   style="padding: 10px 12px; font-size: 0.95rem;">
+                            <small class="text-muted" style="font-size: 0.8rem;">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Puedes buscar por código SKU o por el nombre del producto
+                            </small>
                         </div>
-                        <div class="col-md-3">
-                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-2"></i>Buscar</button>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100" style="padding: 10px;">
+                                <i class="fas fa-search me-2"></i>Buscar
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <%-- El card de actualización solo se muestra si se encontró un producto --%>
-            <!-- ===================== Card: Actualización de Precio ===================== -->
-            <% if (producto != null && producto.getIdProducto() != 0) { %>
-            <div class="card">
-                <div class="card-header"><h5 class="mb-0"><strong>2. Actualizar Precio</strong></h5></div>
-                <div class="card-body">
-                    <form method="POST" action="<%= request.getContextPath() %>/ProductorServlet?action=actualizarPrecio" class="row g-3">
-                        <input type="hidden" name="idProducto" value="<%= producto.getIdProducto() %>">
-
-                        <div class="col-md-6">
-                            <label class="form-label">Nombre del Producto</label>
-                            <input type="text" class="form-control" value="<%= producto.getNombre() %>" readonly style="background-color: #f8f9fa;">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Precio Actual</label>
-                            <div class="input-group">
-                                <span class="input-group-text">S/</span>
-                                <input type="text" class="form-control" value="<%= String.format("%.2f", producto.getPrecioActual()) %>" readonly style="background-color: #f8f9fa;">
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <label for="nuevoPrecio" class="form-label"><strong>Precio Sugerido (Nuevo)</strong></label>
-                            <div class="input-group">
-                                <span class="input-group-text">S/</span>
-                                <input id="nuevoPrecio" type="number" class="form-control" name="nuevoPrecio" step="0.01" min="0" value="0.00" required>
-                            </div>
-                        </div>
-                        <div class="col-12 text-end mt-4">
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt me-2"></i>Actualizar Precio</button>
-                        </div>
-                    </form>
+            <!-- ===================== Tabla de Productos ===================== -->
+            <% if (listaProductos != null && !listaProductos.isEmpty()) { %>
+            <div class="card" style="padding: 0;">
+                <div class="card-header" style="padding: 15px 20px; margin: 0; border-radius: 12px 12px 0 0;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i><strong>Productos Encontrados</strong>
+                        <span class="badge bg-white text-dark ms-2" style="font-size: 0.85rem;"><%= listaProductos.size() %></span>
+                    </h5>
+                </div>
+                <div class="card-body" style="padding: 15px;">
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
+                            <thead style="background: #f8f9fa; position: sticky; top: 0; z-index: 10;">
+                                <tr>
+                                    <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
+                                        <i class="fas fa-barcode me-1" style="color: #00a896;"></i>SKU
+                                    </th>
+                                    <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
+                                        <i class="fas fa-box me-1" style="color: #00a896;"></i>Producto
+                                    </th>
+                                    <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
+                                        <i class="fas fa-folder me-1" style="color: #00a896;"></i>Categoría
+                                    </th>
+                                    <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; text-align: center;">
+                                        <i class="fas fa-dollar-sign me-1" style="color: #00a896;"></i>Precio Actual
+                                    </th>
+                                    <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; text-align: center;">
+                                        <i class="fas fa-boxes me-1" style="color: #00a896;"></i>Lotes
+                                    </th>
+                                    <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; text-align: center;">
+                                        <i class="fas fa-cog me-1" style="color: #00a896;"></i>Acción
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (Producto p : listaProductos) { %>
+                                <tr style="transition: all 0.3s ease; cursor: pointer;" 
+                                    onmouseover="this.style.backgroundColor='rgba(0,168,150,0.05)'; this.style.transform='scale(1.01)';"
+                                    onmouseout="this.style.backgroundColor=''; this.style.transform='scale(1)';">
+                                    <td style="padding: 10px;"><strong style="color: #495057;"><%= p.getCodigoSKU() %></strong></td>
+                                    <td style="padding: 10px;"><%= p.getNombre() %></td>
+                                    <td style="padding: 10px;"><%= p.getCategoria() != null ? p.getCategoria().getNombre() : "N/A" %></td>
+                                    <td style="padding: 10px; text-align: center;">
+                                        <span style="color: #00a896; font-weight: 600; font-size: 1rem;">
+                                            S/ <%= String.format("%.2f", p.getPrecioActual()) %>
+                                        </span>
+                                    </td>
+                                    <td style="padding: 10px; text-align: center;">
+                                        <span class="badge <%= p.getNumeroLotes() > 0 ? "bg-success" : "bg-secondary" %>" style="font-size: 0.85rem;">
+                                            <%= p.getNumeroLotes() %>
+                                        </span>
+                                    </td>
+                                    <td style="padding: 10px; text-align: center;">
+                                        <button type="button" class="btn btn-sm btn-primary" 
+                                                onclick="seleccionarProducto(<%= p.getIdProducto() %>, '<%= p.getCodigoSKU() %>', '<%= p.getNombre() %>', <%= p.getPrecioActual() %>)"
+                                                style="font-size: 0.8rem; padding: 6px 12px;">
+                                            <i class="fas fa-edit me-1"></i>Actualizar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <% } else if (busqueda != null && !busqueda.trim().isEmpty()) { %>
+            <div class="alert alert-warning" style="display: flex; align-items: center; gap: 10px; padding: 15px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem;"></i>
+                <div>
+                    <strong>No se encontraron productos</strong>
+                    <p class="mb-0" style="font-size: 0.9rem;">Intenta con otro SKU o nombre de producto.</p>
                 </div>
             </div>
             <% } %>
+
+            <!-- ===================== Modal: Actualizar Precio ===================== -->
+            <div class="modal fade" id="modalActualizarPrecio" tabindex="-1" aria-labelledby="modalActualizarPrecioLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                        <div class="modal-header text-white" style="background: linear-gradient(135deg, #00a896 0%, #028f80 100%); border-radius: 16px 16px 0 0; padding: 20px 25px; border-bottom: none;">
+                            <h5 class="modal-title d-flex align-items-center" id="modalActualizarPrecioLabel" style="font-weight: 600; font-size: 1.2rem;">
+                                <span class="d-flex align-items-center justify-content-center me-3" style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 10px; width: 45px; height: 45px;">
+                                    <i class="fas fa-tags" style="font-size: 1.2rem;"></i>
+                                </span>
+                                Actualizar Precio
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="opacity: 1; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; border: none; color: white;" onmouseover="this.style.background='rgba(255,255,255,0.25)';" onmouseout="this.style.background='rgba(255,255,255,0.15)';">
+                                <i class="fas fa-times" style="color: white; font-size: 18px;"></i>
+                            </button>
+                        </div>
+                        <form method="POST" action="<%= request.getContextPath() %>/ProductorServlet?action=actualizarPrecio" id="formActualizarPrecio">
+                            <div class="modal-body" style="padding: 25px; background: #f8f9fa;">
+                                <input type="hidden" name="idProducto" id="modalIdProducto">
+                                
+                                <!-- Info del Producto -->
+                                <div class="mb-4" style="background: white; padding: 15px 20px; border-radius: 12px; border-left: 4px solid #00a896;">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">SKU</small>
+                                            <strong id="modalSKU" style="color: #495057; font-size: 1rem;"></strong>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Producto</small>
+                                            <strong id="modalNombre" style="color: #00a896; font-size: 1rem;"></strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Precio Actual -->
+                                <div class="mb-3" style="background: white; padding: 15px; border-radius: 10px;">
+                                    <label class="form-label" style="font-weight: 600; font-size: 0.9rem; color: #495057;">
+                                        <i class="fas fa-info-circle me-2" style="color: #17a2b8;"></i>Precio Actual
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text" style="background: #e9ecef; border: 2px solid #dee2e6;">S/</span>
+                                        <input type="text" class="form-control" id="modalPrecioActual" readonly 
+                                               style="background-color: #f8f9fa; border: 2px solid #dee2e6; font-weight: 600; font-size: 1.1rem; color: #495057;">
+                                    </div>
+                                </div>
+
+                                <!-- Nuevo Precio -->
+                                <div class="mb-3" style="background: white; padding: 15px; border-radius: 10px;">
+                                    <label for="nuevoPrecio" class="form-label" style="font-weight: 600; font-size: 0.9rem; color: #495057;">
+                                        <i class="fas fa-tag me-2" style="color: #00a896;"></i>Nuevo Precio <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text" style="background: rgba(0,168,150,0.1); border: 2px solid #00a896; color: #00a896; font-weight: 600;">S/</span>
+                                        <input type="number" class="form-control" id="nuevoPrecio" name="nuevoPrecio" 
+                                               step="0.01" min="0.01" required
+                                               style="border: 2px solid #00a896; font-weight: 600; font-size: 1.1rem;"
+                                               placeholder="0.00">
+                                    </div>
+                                    <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">
+                                        <i class="fas fa-lightbulb me-1" style="color: #ffc107;"></i>
+                                        Ingresa el nuevo precio sugerido para este producto
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="modal-footer" style="background: white; border-top: 2px solid #e9ecef; padding: 20px 25px; border-radius: 0 0 16px 16px;">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="padding: 10px 20px; border-radius: 8px;">
+                                    <i class="fas fa-times me-2"></i>Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-primary" style="padding: 10px 20px; border-radius: 8px;">
+                                    <i class="fas fa-check me-2"></i>Actualizar Precio
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -486,6 +635,19 @@
                 closeSidebar();
             }
         });
+        
+        // ============ Función: Seleccionar Producto desde la Tabla ============
+        function seleccionarProducto(id, sku, nombre, precioActual) {
+            document.getElementById('modalIdProducto').value = id;
+            document.getElementById('modalSKU').textContent = sku;
+            document.getElementById('modalNombre').textContent = nombre;
+            document.getElementById('modalPrecioActual').value = precioActual.toFixed(2);
+            document.getElementById('nuevoPrecio').value = '';
+            
+            // Abrir el modal
+            var modal = new bootstrap.Modal(document.getElementById('modalActualizarPrecio'));
+            modal.show();
+        }
     </script>
 </body>
 </html>

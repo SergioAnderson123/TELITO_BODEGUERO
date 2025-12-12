@@ -9,7 +9,9 @@ public class Producto {
     private double precioActual;
     private int unidadesPorPaquete;
     private Usuario productor;
+    private int productorId;
     private Categoria categoria;
+    private int categoriaId;
     private int numeroLotes;
     private double stockTotal;
     // Y sus respectivos getter y setter
@@ -94,4 +96,19 @@ public class Producto {
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
-}
+
+    public int getProductorId() {
+        return productorId;
+    }
+
+    public void setProductorId(int productorId) {
+        this.productorId = productorId;
+    }
+
+    public int getCategoriaId() {
+        return categoriaId;
+    }
+
+    public void setCategoriaId(int categoriaId) {
+        this.categoriaId = categoriaId;
+    }}

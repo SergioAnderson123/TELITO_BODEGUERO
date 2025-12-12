@@ -58,21 +58,81 @@
             height: 70px; border-bottom: 1px solid var(--border-color);
         }
         .dashboard-wrapper { margin-left: 250px; width: calc(100% - 250px); min-height: 100vh; }
-        .dashboard-content { margin-top: 70px; padding: 30px; }
+        .dashboard-content { margin-top: 70px; padding: 20px; }
+        
+        /* ===================== Sidebar - Igual a misProductos.jsp ===================== */
         .nav-left-sidebar {
             width: 250px;
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, #055e68 100%);
-            min-height: 100vh; position: fixed; left: 0; top: 0; z-index: 1000;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 3px 0 15px rgba(0,0,0,.12);
         }
-        .nav-link { color: rgba(255,255,255,0.9) !important; padding: 12px 20px; border-radius: 8px; margin: 5px 15px; transition: all 0.3s ease; display: flex; align-items: center; }
-        .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.18); color: #fff !important; transform: translateX(5px); }
-        .nav-link i { margin-right: 10px; width: 20px; }
-        .nav-divider { color: rgba(255,255,255,0.8); font-weight: 600; padding: 15px 20px 5px; margin-top: 20px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-link {
+            color: rgba(255,255,255,.95) !important;
+            padding: 13px 20px;
+            border-radius: 10px;
+            margin: 6px 15px;
+            transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #fff;
+            transform: scaleY(0);
+            transition: transform .3s ease;
+            border-radius: 0 4px 4px 0;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255,255,255,.25);
+            color: #fff !important;
+            transform: translateX(8px);
+            box-shadow: 0 4px 12px rgba(0,0,0,.15);
+        }
+        .nav-link:hover::before, .nav-link.active::before {
+            transform: scaleY(1);
+        }
+        .nav-link i { margin-right: 12px; width: 22px; font-size: 1.1rem; }
+        .nav-divider {
+            color: rgba(255,255,255,.95);
+            font-weight: 700;
+            padding: 18px 20px 8px;
+            margin-top: 25px;
+            font-size: .8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-top: 1px solid rgba(255,255,255,.15);
+        }
+        
         .navbar-brand { font-weight: 700; color: var(--turquoise-dark); }
-        .page-header { margin-bottom: 30px; }
-        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 10px; }
-        .page-header p { color: var(--text-muted); font-size: 1.05rem; }
+        .page-header { 
+            margin-bottom: 15px; 
+            padding-top: 0.5rem; 
+            padding-bottom: 0.5rem; 
+        }
+        .page-header h2 { 
+            color: var(--turquoise-dark); 
+            font-weight: 700; 
+            margin-bottom: 5px; 
+            font-size: 1.4rem; 
+        }
+        .page-header p { 
+            color: var(--text-muted); 
+            font-size: 0.85rem; 
+            margin-bottom: 0;
+        }
         .pageheader-title {
             display: flex;
             align-items: center;
@@ -111,41 +171,126 @@
         .sidebar-overlay.active {
             opacity: 1;
         }
+        
+        /* ===================== Card mejorada ===================== */
         .card {
             background-color: var(--white);
-            padding: 30px;
+            padding: 0;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            margin-bottom: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
             border: none;
         }
         .card-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 25px; 
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
             color: white;
             border-radius: 12px 12px 0 0;
-            padding: 20px 30px;
-            margin: -30px -30px 25px -30px;
+            padding: 15px 20px;
+            margin: 0;
+            border-bottom: none;
         }
-        .card-header h2, .card-header h5 { margin: 0; color: white; }
-        .card-body { padding: 30px; }
+        .card-header h5 { 
+            margin: 0; 
+            color: white; 
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-body { 
+            padding: 20px; 
+        }
+        
+        /* ===================== Alert mejorada ===================== */
+        .alert-info {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: none;
+            border-left: 4px solid #2196f3;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        .alert-info ul {
+            margin-bottom: 8px;
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+        .alert-info li {
+            font-size: 0.85rem;
+            margin-bottom: 3px;
+        }
+        .alert-info strong {
+            color: #1976d2;
+        }
+        
+        /* ===================== Formulario mejorado ===================== */
+        form label { 
+            display: block; 
+            margin-bottom: 6px; 
+            font-weight: 600; 
+            color: var(--text-dark); 
+            font-size: 0.9rem;
+        }
+        form label i {
+            color: #00a896;
+            margin-right: 6px;
+        }
+        form input, form select, form textarea {
+            width: 100%; 
+            padding: 10px 12px; 
+            border: 2px solid var(--border-color); 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        form input:focus, form select:focus, form textarea:focus {
+            border-color: #00a896;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        .form-control {
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #00a896;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        
+        /* ===================== Botones mejorados ===================== */
         .btn-primary {
-            background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%);
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
             border: none;
             color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,168,150,0.4);
+            background: linear-gradient(135deg, #00b8a3 0%, #02a190 100%);
         }
         .btn-secondary {
-            background: #8d99ae;
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
             border: none;
             color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
-        form label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark); }
-        form input, form select, form textarea {
-            width: 100%; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-size: 1rem;
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(108,117,125,0.3);
         }
+        
+        /* ===================== Responsive ===================== */
         @media (max-width: 992px) {
             .sidebar-toggle {
                 display: inline-block;
@@ -162,9 +307,33 @@
             .sidebar-overlay {
                 display: block;
             }
-            .dashboard-header { left: 0; }
+            .dashboard-header { 
+                left: 0; 
+                padding: 0 10px;
+            }
+            .navbar-brand span {
+                font-size: 0.9rem;
+            }
+            .navbar-nav .nav-link span {
+                display: none;
+            }
             .dashboard-wrapper { margin-left: 0; width: 100%; }
-            .dashboard-content { padding: 20px; }
+            .dashboard-content { padding: 15px; }
+        }
+        
+        @media (max-width: 576px) {
+            .navbar-brand span {
+                display: none;
+            }
+            .page-header h2 {
+                font-size: 1.2rem;
+            }
+            .card-body {
+                padding: 15px;
+            }
+            .alert-info {
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -230,6 +399,12 @@
             <nav class="navbar navbar-expand">
                 <ul class="navbar-nav flex-column w-100">
                     <li class="nav-divider"><i class="fas fa-bars me-2"></i>Menú</li>
+                    <!-- Inicio -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="<%= request.getContextPath() %>/ProductorServlet?action=inicio">
+                            <i class="fas fa-home"></i>Inicio
+                        </a>
+                    </li>
                     <!-- Mis productos -->
                     <li class="nav-item">
                         <a class="nav-link" href="<%= request.getContextPath() %>/ProductorServlet?action=listarProductos">
@@ -263,39 +438,53 @@
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
             <% if (errorMsg != null) { %>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <%= errorMsg %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="padding: 10px 15px; margin-bottom: 15px; font-size: 0.9rem;">
+                <i class="fas fa-exclamation-triangle me-2"></i><%= errorMsg %>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
             <% } %>
 
-            <div class="page-header mb-4">
-                <h2><i class="fas fa-envelope me-2"></i>Enviar Reporte de Productos por Correo</h2>
+            <div class="page-header mb-3">
+                <h2 class="pageheader-title"><i class="fas fa-envelope me-2"></i>Enviar Reporte de Productos por Correo</h2>
                 <p class="text-muted">Genera y envía un reporte Excel de tus productos por correo electrónico.</p>
             </div>
 
             <div class="row">
-                <div class="col-xl-8 col-lg-10 col-md-12 mx-auto">
+                <div class="col-xl-10 col-lg-11 col-md-12 mx-auto">
                     <div class="card">
                         <div class="card-header">
                             <h5 class="mb-0"><i class="fas fa-file-excel me-2"></i>Formulario de Envío</h5>
                         </div>
                         <div class="card-body">
-                            <div class="alert alert-info mb-4">
-                                <i class="fas fa-info-circle me-2"></i>
-                                <strong>Información del reporte:</strong> Se generará un reporte Excel que incluye:
-                                <ul class="mb-0 mt-2">
-                                    <li>SKU</li>
-                                    <li>Nombre del Producto</li>
-                                    <li>Descripción</li>
-                                    <li>Categoría</li>
-                                    <li>Precio por Paquete</li>
-                                    <li>Unidades por Paquete</li>
-                                    <li>Stock Total</li>
-                                    <li>N° de Lotes</li>
-                                    <li><strong>Valor Total del Inventario</strong></li>
-                                </ul>
-                                <p class="mb-0 mt-2"><strong>Filtros aplicados:</strong> <%= filtrosInfo.toString() %></p>
+                            <!-- Info Box Compacto -->
+                            <div class="alert alert-info">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-info-circle me-2" style="font-size: 1.2rem; margin-top: 2px;"></i>
+                                    <div style="flex: 1;">
+                                        <strong>Información del reporte:</strong> Se generará un reporte Excel que incluye:
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-top: 10px;">
+                                            <div style="display: flex; align-items: center; font-size: 0.85rem;">
+                                                <i class="fas fa-check-circle me-2" style="color: #00a896; font-size: 0.75rem;"></i>SKU y Nombre del Producto
+                                            </div>
+                                            <div style="display: flex; align-items: center; font-size: 0.85rem;">
+                                                <i class="fas fa-check-circle me-2" style="color: #00a896; font-size: 0.75rem;"></i>Descripción y Categoría
+                                            </div>
+                                            <div style="display: flex; align-items: center; font-size: 0.85rem;">
+                                                <i class="fas fa-check-circle me-2" style="color: #00a896; font-size: 0.75rem;"></i>Precio y Unidades
+                                            </div>
+                                            <div style="display: flex; align-items: center; font-size: 0.85rem;">
+                                                <i class="fas fa-check-circle me-2" style="color: #00a896; font-size: 0.75rem;"></i>Stock Total y N° de Lotes
+                                            </div>
+                                            <div style="display: flex; align-items: center; font-size: 0.85rem;">
+                                                <i class="fas fa-check-circle me-2" style="color: #00a896; font-size: 0.75rem;"></i><strong>Valor Total del Inventario</strong>
+                                            </div>
+                                        </div>
+                                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(33,150,243,0.2);">
+                                            <strong style="font-size: 0.85rem;">Filtros aplicados:</strong> 
+                                            <span style="font-size: 0.85rem;"><%= filtrosInfo.toString() %></span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <form action="<%= request.getContextPath() %>/productor/ProductoReporteServlet" method="POST">
@@ -307,29 +496,31 @@
                                 <input type="hidden" name="categoria" value="<%= categoria %>">
                                 <% } %>
 
-                                <div class="mb-3">
-                                    <label for="email_destino" class="form-label">
-                                        <i class="fas fa-envelope me-2"></i>Email de Destino <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="email" class="form-control" id="email_destino" name="email_destino" required>
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="email_destino" class="form-label">
+                                            <i class="fas fa-envelope"></i>Email de Destino <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="email" class="form-control" id="email_destino" name="email_destino" placeholder="ejemplo@correo.com" required>
+                                    </div>
+
+                                    <div class="col-md-12 mb-3">
+                                        <label for="asunto" class="form-label">
+                                            <i class="fas fa-tag"></i>Asunto del Correo
+                                        </label>
+                                        <input type="text" class="form-control" id="asunto" name="asunto" 
+                                               value="Reporte de Productos - Productor - TELITO BODEGUERO">
+                                    </div>
+
+                                    <div class="col-md-12 mb-3">
+                                        <label for="mensaje" class="form-label">
+                                            <i class="fas fa-comment"></i>Mensaje Adicional (Opcional)
+                                        </label>
+                                        <textarea class="form-control" id="mensaje" name="mensaje" rows="3" placeholder="Escribe un mensaje adicional para el destinatario..."></textarea>
+                                    </div>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label for="asunto" class="form-label">
-                                        <i class="fas fa-tag me-2"></i>Asunto del Correo
-                                    </label>
-                                    <input type="text" class="form-control" id="asunto" name="asunto" 
-                                           value="Reporte de Productos - Productor - TELITO BODEGUERO">
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="mensaje" class="form-label">
-                                        <i class="fas fa-comment me-2"></i>Mensaje Adicional (Opcional)
-                                    </label>
-                                    <textarea class="form-control" id="mensaje" name="mensaje" rows="4"></textarea>
-                                </div>
-
-                                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                                <div class="d-flex justify-content-between mt-3 pt-3 border-top" style="gap: 10px;">
                                     <a href="<%= request.getContextPath() %>/ProductorServlet?action=listarProductos" class="btn btn-secondary">
                                         <i class="fas fa-arrow-left me-2"></i>Cancelar
                                     </a>

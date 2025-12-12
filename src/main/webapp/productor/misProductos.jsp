@@ -337,20 +337,239 @@
         }
 
         /* =====================
-           Modal personalizado (solo para addProductModal)
+           Modal personalizado mejorado (para addProductModal)
         ====================== */
-        #addProductModal.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-        #addProductModal .modal-content { background-color: var(--white); margin: 5% auto; padding: 20px; border: none; width: 60%; max-width: 700px; max-height: 90vh; overflow-y: auto; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: slide-down 0.3s ease-out; }
-        @keyframes slide-down { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        #addProductModal .modal-header { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(160deg, var(--turquoise-dark) 0%, var(--seafoam) 100%); padding: 15px 20px; margin: -20px -20px 15px -20px; border-radius: 12px 12px 0 0; }
-        #addProductModal .modal-header h2 { margin: 0; color: white; }
-        #addProductModal .modal-close { color: white; font-size: 28px; font-weight: bold; cursor: pointer; opacity: 0.9; }
-        #addProductModal .modal-close:hover { opacity: 1; }
-        #addProductModal .modal-footer { display: flex; justify-content: flex-end; gap: 15px; padding-top: 15px; margin-top: 15px; border-top: 1px solid var(--border-color); }
+        #addProductModal.modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1050; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #addProductModal.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #addProductModal .modal-content { 
+            background-color: var(--white); 
+            width: 100%;
+            max-width: 750px; 
+            max-height: 85vh; 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        @keyframes modalSlideIn { 
+            from { 
+                transform: scale(0.9) translateY(-20px); 
+                opacity: 0; 
+            } 
+            to { 
+                transform: scale(1) translateY(0); 
+                opacity: 1; 
+            } 
+        }
+        #addProductModal .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            padding: 20px 25px; 
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+        }
+        #addProductModal .modal-header h2 { 
+            margin: 0; 
+            color: white; 
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #addProductModal .modal-header h2 i {
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        #addProductModal .modal-close { 
+            color: white; 
+            font-size: 24px; 
+            font-weight: normal; 
+            cursor: pointer; 
+            opacity: 0.9; 
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        #addProductModal .modal-close:hover { 
+            opacity: 1; 
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        #addProductModal .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(85vh - 160px);
+        }
+        #addProductModal .form-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #00a896;
+        }
+        #addProductModal .form-section-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--turquoise-dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #addProductModal .form-section-title i {
+            color: #00a896;
+        }
+        #addProductModal .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        #addProductModal .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        #addProductModal .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        #addProductModal .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #addProductModal .form-group label i {
+            color: var(--seafoam);
+            font-size: 0.85rem;
+        }
+        #addProductModal .form-group input,
+        #addProductModal .form-group select,
+        #addProductModal .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        #addProductModal .form-group input:focus,
+        #addProductModal .form-group select:focus,
+        #addProductModal .form-group textarea:focus {
+            border-color: #00a896;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        #addProductModal .form-group input:disabled,
+        #addProductModal .form-group input[readonly] {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+            color: #28a745;
+            font-weight: 600;
+        }
+        #addProductModal .form-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 6px;
+            padding: 8px 12px;
+            background: rgba(0,168,150,0.05);
+            border-radius: 6px;
+        }
+        #addProductModal .form-hint i {
+            color: #00a896;
+            flex-shrink: 0;
+        }
+        #addProductModal .modal-footer { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 12px; 
+            padding: 20px 25px; 
+            border-top: 2px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 0 0 16px 16px;
+        }
+        #addProductModal .modal-footer button {
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #addProductModal .modal-footer .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        #addProductModal .modal-footer .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+        }
+        #addProductModal .modal-footer button[type="submit"] {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+        }
+        #addProductModal .modal-footer button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40,167,69,0.4);
+        }
         
         /* Asegurar que los modales Bootstrap tengan z-index correcto */
         #resumenLotesProductoModal {
             z-index: 1055;
+        }
+        
+        /* Estilos adicionales para el modal de resumen de lotes */
+        #resumenLotesProductoModal .modal-dialog {
+            max-width: 900px;
+        }
+        #resumenLotesProductoModal .table tbody tr {
+            transition: all 0.3s ease;
+        }
+        #resumenLotesProductoModal .table tbody tr:hover {
+            background-color: rgba(0,168,150,0.05);
+            transform: scale(1.01);
         }
 
         /* =====================
@@ -435,7 +654,68 @@
             .dashboard-wrapper { margin-left: 0; width: 100%; }
             .dashboard-content { padding: 20px; }
             .stats-container { grid-template-columns: 1fr; }
-            .modal-content { width: 92%; margin: 15% auto; }
+            
+            /* Modal responsive */
+            #addProductModal .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: 90vh;
+                margin: 10px;
+            }
+            #addProductModal.show {
+                padding: 10px;
+            }
+            #addProductModal .form-row {
+                grid-template-columns: 1fr;
+            }
+            #addProductModal .modal-header h2 {
+                font-size: 1.1rem;
+            }
+            #addProductModal .modal-body {
+                padding: 15px;
+            }
+            #addProductModal .form-section {
+                padding: 15px;
+            }
+            #addProductModal .modal-footer {
+                flex-direction: column-reverse;
+                gap: 8px;
+            }
+            #addProductModal .modal-footer button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            /* Modal Resumen de Lotes responsive */
+            #resumenLotesProductoModal .modal-dialog {
+                max-width: 95%;
+                margin: 10px;
+            }
+            #resumenLotesProductoModal .modal-header h5 {
+                font-size: 1rem;
+            }
+            #resumenLotesProductoModal .modal-header .d-flex span {
+                width: 38px;
+                height: 38px;
+                padding: 8px;
+            }
+            #resumenLotesProductoModal .modal-header .d-flex i {
+                font-size: 1.1rem;
+            }
+            #resumenLotesProductoModal .modal-body {
+                padding: 15px;
+            }
+            #resumenLotesProductoModal .table {
+                font-size: 0.8rem;
+            }
+            #resumenLotesProductoModal .table th,
+            #resumenLotesProductoModal .table td {
+                padding: 8px 6px;
+                font-size: 0.75rem;
+            }
+            #resumenLotesProductoModal .table th i {
+                display: none; /* Ocultar iconos en móvil para ahorrar espacio */
+            }
             
             /* Asegurar que los botones sean clickeables en móvil */
             .btn,
@@ -453,6 +733,40 @@
             }
             .navbar-brand i {
                 margin-right: 0;
+            }
+            #addProductModal .modal-header {
+                padding: 15px;
+            }
+            #addProductModal .modal-header h2 {
+                font-size: 1rem;
+            }
+            #addProductModal .modal-header h2 i {
+                padding: 6px;
+            }
+            #addProductModal .modal-close {
+                width: 32px;
+                height: 32px;
+                font-size: 20px;
+            }
+            
+            /* Modal Resumen de Lotes en móviles pequeños */
+            #resumenLotesProductoModal .modal-header {
+                padding: 15px;
+            }
+            #resumenLotesProductoModal .modal-header h5 {
+                font-size: 0.9rem;
+            }
+            #resumenLotesProductoModal .modal-header .d-flex span {
+                width: 35px;
+                height: 35px;
+                margin-right: 10px !important;
+            }
+            #resumenLotesProductoModal .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            #resumenLotesProductoModal .table {
+                min-width: 600px; /* Permitir scroll horizontal si es necesario */
             }
         }
     </style>
@@ -739,51 +1053,129 @@
     <!-- Cierre del contenedor principal -->
     </div>
 
-<!-- ===================== Modal: Agregar Producto ===================== -->
+<!-- ===================== Modal: Agregar Producto (Versión Mejorada) ===================== -->
 <div id="addProductModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Agregar Nuevo Producto</h2>
+            <h2><i class="fas fa-box-open"></i> Agregar Nuevo Producto</h2>
             <span class="modal-close">&times;</span>
         </div>
+        
         <form method="POST" action="<%= request.getContextPath() %>/ProductorServlet?action=crearProducto" id="formAgregarProducto">
-            <div style="display: flex; gap: 15px;">
-                <div style="flex: 1;"><label for="productName">Nombre del producto</label><input type="text" name="productName" id="productName" required></div>
-                <div style="flex: 1;"><label for="productCategory">Categoría</label>
-                    <select name="productCategory" id="productCategory" required>
-                        <option value="">Seleccionar...</option>
-                        <% if (todasLasCategorias != null) { %>
-                            <% for (Categoria categoria : todasLasCategorias) { %>
-                                <option value="<%= categoria.getIdCategoria() %>"><%= categoria.getNombre() %></option>
-                            <% } %>
-                        <% } %>
-                    </select>
+            <div class="modal-body">
+                <!-- Sección: Información Básica -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Información Básica
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productName">
+                                <i class="fas fa-tag"></i>
+                                Nombre del Producto
+                            </label>
+                            <input type="text" 
+                                   name="productName" 
+                                   id="productName" 
+                                   placeholder="Ej: Cerveza Pilsen" 
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productCategory">
+                                <i class="fas fa-folder"></i>
+                                Categoría
+                            </label>
+                            <select name="productCategory" id="productCategory" required>
+                                <option value="">Seleccionar categoría...</option>
+                                <% if (todasLasCategorias != null) { %>
+                                    <% for (Categoria categoria : todasLasCategorias) { %>
+                                        <option value="<%= categoria.getIdCategoria() %>"><%= categoria.getNombre() %></option>
+                                    <% } %>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="productDescription">
+                                <i class="fas fa-align-left"></i>
+                                Descripción
+                            </label>
+                            <textarea name="productDescription" 
+                                      id="productDescription" 
+                                      rows="3" 
+                                      placeholder="Describe tu producto..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección: Información de Stock y Precio -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <i class="fas fa-dollar-sign"></i>
+                        Precios y Embalaje
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productSKUDisplay">
+                                <i class="fas fa-barcode"></i>
+                                SKU (Código)
+                            </label>
+                            <input type="text" 
+                                   id="productSKUDisplay" 
+                                   readonly 
+                                   placeholder="Generando...">
+                            <div class="form-hint">
+                                <i class="fas fa-magic"></i>
+                                <span>El SKU se genera automáticamente al abrir el formulario</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="productPrice">
+                                <i class="fas fa-money-bill-wave"></i>
+                                Precio por Paquete (S/)
+                            </label>
+                            <input type="number" 
+                                   name="productPrice" 
+                                   id="productPrice" 
+                                   step="0.01" 
+                                   min="0.01"
+                                   placeholder="0.00" 
+                                   required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productUnits">
+                                <i class="fas fa-boxes"></i>
+                                Unidades por Paquete
+                            </label>
+                            <input type="number" 
+                                   name="productUnits" 
+                                   id="productUnits" 
+                                   min="1" 
+                                   value="1" 
+                                   required>
+                            <div class="form-hint">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>Ej: Si vendes cerveza en cajas de 12, ingresa <strong>12</strong></span>
+                            </div>
+                        </div>
+                        <div class="form-group"></div>
+                    </div>
                 </div>
             </div>
-            <div style="display: flex; gap: 15px; margin-top: 10px;">
-                <div style="flex: 1;">
-                    <label for="productSKUDisplay">SKU (generado automáticamente)</label>
-                    <input type="text" id="productSKUDisplay" readonly style="background-color: #f0f0f0; cursor: not-allowed;" placeholder="Cargando...">
-                    <small style="color: var(--text-muted); display: block; margin-top: 3px; font-size: 0.85rem;">
-                        <i class="fas fa-info-circle"></i> El SKU se genera automáticamente
-                    </small>
-                </div>
-                <div style="flex: 1;"><label for="productPrice">Precio por Paquete (S/)</label><input type="number" name="productPrice" id="productPrice" step="0.01" required></div>
-            </div>
-            <div style="display: flex; gap: 15px; margin-top: 10px;">
-                <div style="flex: 1;">
-                    <label for="productUnits">Unidades por Paquete</label>
-                    <input type="number" name="productUnits" id="productUnits" min="1" value="1" required>
-                    <small style="color: var(--text-muted); display: block; margin-top: 3px; font-size: 0.85rem;">
-                        <i class="fas fa-box"></i> Ej: Si vende cerveza en cajas de 12, ingrese 12
-                    </small>
-                </div>
-                <div style="flex: 1;"></div>
-            </div>
-            <div style="margin-top: 10px;"><label for="productDescription">Descripción</label><textarea name="productDescription" id="productDescription" rows="2"></textarea></div>
+
             <div class="modal-footer">
-                <button type="button" class="btn-secondary modal-cancel">Cancelar</button>
-                <button type="submit" id="btnGuardarProducto">Guardar Producto</button>
+                <button type="button" class="btn-secondary modal-cancel">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit" id="btnGuardarProducto">
+                    <i class="fas fa-check"></i>
+                    Guardar Producto
+                </button>
             </div>
         </form>
     </div>
@@ -801,7 +1193,7 @@
 
     // Función para cargar el siguiente SKU disponible
     function cargarNuevoSKU() {
-        skuDisplay.value = 'Cargando...';
+        skuDisplay.value = 'Generando...';
         skuDisplay.style.color = '#999';
         
         const contextPath = '<%= request.getContextPath() %>';
@@ -824,21 +1216,57 @@
             });
     }
 
-    // Al abrir el modal, cargar el nuevo SKU
-    openBtn.onclick = function() { 
-        modal.style.display = "block";
-        cargarNuevoSKU(); // Cargar el SKU automáticamente
-        // Limpiar solo los campos editables (no borrar las opciones del select)
+    // Función para abrir el modal
+    function abrirModal() {
+        modal.classList.add('show');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+        cargarNuevoSKU();
+        limpiarFormulario();
+    }
+
+    // Función para cerrar el modal (sin animación)
+    function cerrarModal() {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        document.body.style.overflow = ''; // Restaurar scroll del body
+    }
+
+    // Función para limpiar el formulario
+    function limpiarFormulario() {
         document.getElementById('productName').value = '';
-        document.getElementById('productCategory').selectedIndex = 0; // Volver a "Seleccionar..."
+        document.getElementById('productCategory').selectedIndex = 0;
         document.getElementById('productDescription').value = '';
         document.getElementById('productPrice').value = '';
         document.getElementById('productUnits').value = '1';
     }
+
+    // Event listeners para abrir/cerrar modal
+    if (openBtn) {
+        openBtn.addEventListener('click', abrirModal);
+    }
     
-    closeBtn.onclick = function() { modal.style.display = "none"; }
-    cancelBtn.onclick = function() { modal.style.display = "none"; }
-    window.onclick = function(event) { if (event.target == modal) { modal.style.display = "none"; } }
+    if (closeBtn) {
+        closeBtn.addEventListener('click', cerrarModal);
+    }
+    
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', cerrarModal);
+    }
+
+    // Cerrar modal al hacer clic fuera del contenido
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            cerrarModal();
+        }
+    });
+
+    // Cerrar modal con la tecla ESC
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modal.classList.contains('show')) {
+            cerrarModal();
+        }
+    });
 
     // Búsqueda, filtro por categoría y orden de precio (en cliente)
     const searchInput = document.getElementById('searchInput');
@@ -1063,6 +1491,9 @@
                     
                     data.lotes.forEach(lote => {
                         const row = document.createElement('tr');
+                        row.style.transition = 'all 0.3s ease';
+                        row.style.borderBottom = '1px solid #e9ecef';
+                        
                         const fechaVencimiento = lote.fechaVencimiento || 'Sin fecha';
                         
                         // Convertir a números explícitamente
@@ -1079,23 +1510,39 @@
                         }
                         
                         // Determinar el color del badge según el porcentaje
-                        let badgeClass = 'badge bg-secondary';
+                        let badgeStyle = '';
+                        let badgeIcon = '';
                         if (parseFloat(porcentajeUsado) === 0) {
-                            badgeClass = 'badge bg-success';
+                            badgeStyle = 'background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; box-shadow: 0 2px 6px rgba(40,167,69,0.3);';
+                            badgeIcon = '<i class="fas fa-check-circle me-1"></i>';
                         } else if (parseFloat(porcentajeUsado) < 50) {
-                            badgeClass = 'badge bg-info';
+                            badgeStyle = 'background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%); color: white; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; box-shadow: 0 2px 6px rgba(23,162,184,0.3);';
+                            badgeIcon = '<i class="fas fa-info-circle me-1"></i>';
                         } else if (parseFloat(porcentajeUsado) < 90) {
-                            badgeClass = 'badge bg-warning text-dark';
+                            badgeStyle = 'background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); color: #000; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; box-shadow: 0 2px 6px rgba(255,193,7,0.3);';
+                            badgeIcon = '<i class="fas fa-exclamation-triangle me-1"></i>';
                         } else {
-                            badgeClass = 'badge bg-danger';
+                            badgeStyle = 'background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; box-shadow: 0 2px 6px rgba(220,53,69,0.3);';
+                            badgeIcon = '<i class="fas fa-fire me-1"></i>';
                         }
                         
                         row.innerHTML = 
-                            '<td><strong>' + lote.codigoLote + '</strong></td>' +
-                            '<td>' + paquetesInicial + ' paquetes<br><small class="text-muted">(' + stockInicial.toLocaleString() + ' unidades)</small></td>' +
-                            '<td>' + paquetesRestante + ' paquetes<br><small class="text-muted">(' + stockRestante.toLocaleString() + ' unidades)</small></td>' +
-                            '<td><span class="' + badgeClass + '">' + porcentajeUsado + '% usado</span></td>' +
-                            '<td>' + fechaVencimiento + '</td>';
+                            '<td style="padding: 12px 16px; vertical-align: middle;"><strong style="color: #495057; font-size: 0.95rem;">' + lote.codigoLote + '</strong></td>' +
+                            '<td style="padding: 12px 16px; vertical-align: middle; text-align: center;"><span style="color: #495057; font-weight: 500;">' + paquetesInicial + '</span> <span style="color: #6c757d; font-size: 0.85rem;">paquetes</span><br><small style="color: #adb5bd; font-size: 0.8rem;">(' + stockInicial.toLocaleString() + ' unidades)</small></td>' +
+                            '<td style="padding: 12px 16px; vertical-align: middle; text-align: center;"><span style="color: #00a896; font-weight: 600; font-size: 1.05rem;">' + paquetesRestante + '</span> <span style="color: #6c757d; font-size: 0.85rem;">paquetes</span><br><small style="color: #adb5bd; font-size: 0.8rem;">(' + stockRestante.toLocaleString() + ' unidades)</small></td>' +
+                            '<td style="padding: 12px 16px; vertical-align: middle; text-align: center;"><span style="' + badgeStyle + '">' + badgeIcon + porcentajeUsado + '%</span></td>' +
+                            '<td style="padding: 12px 16px; vertical-align: middle; text-align: center;"><span style="color: #495057; font-weight: 500;"><i class="far fa-calendar-alt me-1" style="color: #00a896;"></i>' + fechaVencimiento + '</span></td>';
+                        
+                        // Agregar efecto hover
+                        row.addEventListener('mouseenter', function() {
+                            this.style.background = 'rgba(0,168,150,0.05)';
+                            this.style.transform = 'scale(1.01)';
+                        });
+                        row.addEventListener('mouseleave', function() {
+                            this.style.background = '';
+                            this.style.transform = 'scale(1)';
+                        });
+                        
                         tbody.appendChild(row);
                     });
                 } else {
@@ -1168,46 +1615,82 @@
     });
 </script>
 
-<!-- Modal para mostrar resumen de lotes de un producto -->
+<!-- Modal para mostrar resumen de lotes de un producto - VERSIÓN MEJORADA -->
 <div class="modal fade" id="resumenLotesProductoModal" tabindex="-1" aria-labelledby="resumenLotesProductoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="resumenLotesProductoModalLabel">
-                    <i class="fas fa-boxes me-2"></i>Resumen de Lotes del Producto
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #00a896 0%, #028f80 100%); border-radius: 16px 16px 0 0; padding: 20px 25px; border-bottom: none;">
+                <h5 class="modal-title d-flex align-items-center" id="resumenLotesProductoModalLabel" style="font-weight: 600; font-size: 1.3rem;">
+                    <span class="d-flex align-items-center justify-content-center me-3" style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 10px; width: 45px; height: 45px;">
+                        <i class="fas fa-boxes" style="font-size: 1.3rem;"></i>
+                    </span>
+                    Resumen de Lotes del Producto
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="opacity: 1; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); transition: all 0.3s ease; position: relative; display: flex; align-items: center; justify-content: center; border: none; font-size: 20px; color: white; font-weight: 300;" onmouseover="this.style.background='rgba(255,255,255,0.25)'; this.style.transform='rotate(90deg)';" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='rotate(0deg)';">
+                    <i class="fas fa-times" style="color: white; font-size: 18px;"></i>
+                </button>
             </div>
-            <div class="modal-body">
-                <h6 class="mb-3" id="modalProductoNombreResumen"></h6>
-                <div id="loadingResumenProducto" class="text-center py-3">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Cargando...</span>
+            <div class="modal-body" style="padding: 25px; background: #f8f9fa;">
+                <!-- Nombre del producto con estilo destacado -->
+                <div class="mb-4" style="background: white; padding: 15px 20px; border-radius: 12px; border-left: 4px solid #00a896;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-box text-muted me-3" style="font-size: 1.3rem; color: #00a896 !important;"></i>
+                        <div>
+                            <small class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Producto</small>
+                            <h6 class="mb-0" id="modalProductoNombreResumen" style="font-size: 1.15rem; font-weight: 600; color: var(--turquoise-dark);"></h6>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Loading spinner mejorado -->
+                <div id="loadingResumenProducto" class="text-center py-5">
+                    <div class="spinner-border" role="status" style="color: #00a896; width: 3rem; height: 3rem; border-width: 0.3rem;">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-3 text-muted" style="font-size: 0.9rem;">Cargando información de lotes...</p>
+                </div>
+
+                <!-- Contenido de lotes -->
                 <div id="contenidoResumenProducto" style="display: none;">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-sm">
-                            <thead class="table-light">
+                    <div class="table-responsive" style="border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <table class="table table-hover mb-0" style="background: white;">
+                            <thead style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
                                 <tr>
-                                    <th>Código Lote</th>
-                                    <th>Cantidad Inicial</th>
-                                    <th>Cantidad Restante</th>
-                                    <th>% Usado</th>
-                                    <th>Fecha Vencimiento</th>
+                                    <th style="padding: 14px 16px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: #495057; border: none;">
+                                        <i class="fas fa-barcode me-2" style="color: #00a896;"></i>Código Lote
+                                    </th>
+                                    <th style="padding: 14px 16px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: #495057; border: none; text-align: center;">
+                                        <i class="fas fa-boxes me-2" style="color: #00a896;"></i>Inicial
+                                    </th>
+                                    <th style="padding: 14px 16px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: #495057; border: none; text-align: center;">
+                                        <i class="fas fa-box-open me-2" style="color: #00a896;"></i>Restante
+                                    </th>
+                                    <th style="padding: 14px 16px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: #495057; border: none; text-align: center;">
+                                        <i class="fas fa-chart-pie me-2" style="color: #00a896;"></i>% Usado
+                                    </th>
+                                    <th style="padding: 14px 16px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: #495057; border: none; text-align: center;">
+                                        <i class="fas fa-calendar-alt me-2" style="color: #00a896;"></i>Vencimiento
+                                    </th>
                                 </tr>
                             </thead>
-                            <tbody id="tablaResumenLotesProducto">
+                            <tbody id="tablaResumenLotesProducto" style="font-size: 0.9rem;">
+                                <!-- Contenido dinámico -->
                             </tbody>
                         </table>
                     </div>
-                    <div id="sinLotesProducto" class="alert alert-info" style="display: none;">
-                        No hay lotes registrados para este producto.
+                    <div id="sinLotesProducto" class="alert d-flex align-items-center" style="display: none; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border: none; border-left: 4px solid #2196f3; border-radius: 8px; margin-top: 20px; padding: 15px 20px;">
+                        <i class="fas fa-info-circle me-3" style="font-size: 1.5rem; color: #2196f3;"></i>
+                        <div>
+                            <strong style="color: #1976d2;">Sin lotes registrados</strong>
+                            <p class="mb-0 mt-1" style="font-size: 0.9rem; color: #555;">No hay lotes registrados para este producto.</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <div class="modal-footer" style="background: white; border-top: 2px solid #e9ecef; padding: 20px 25px; border-radius: 0 0 16px 16px;">
+                <button type="button" class="btn d-flex align-items-center" data-bs-dismiss="modal" style="background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white; padding: 10px 25px; border-radius: 8px; font-weight: 600; border: none; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(108,117,125,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
             </div>
         </div>
     </div>

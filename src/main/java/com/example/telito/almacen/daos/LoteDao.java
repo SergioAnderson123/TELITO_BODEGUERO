@@ -272,6 +272,17 @@ public class LoteDao extends DAOBase {
         executeUpdate(sql, nuevoStock, idLote);
     }
 
+    /**
+     * Actualiza la ubicación, distrito y estado de un lote existente.
+     * Se usa cuando el almacén recibe un lote del productor.
+     */
+    public void actualizarUbicacionYEstado(int idLote, int ubicacionId, int distritoId, String estado) {
+        String sql = "UPDATE lotes SET ubicacion_id = ?, distrito_id = ?, estado = ? WHERE id_lote = ?";
+        executeUpdate(sql, ubicacionId, distritoId, estado, idLote);
+        logger.info("Lote {} actualizado - Nueva ubicación: {}, distrito: {}, estado: {}", 
+                   idLote, ubicacionId, distritoId, estado);
+    }
+
     public Lote buscarLotePorId(int idLote) {
         Lote lote = null;
         String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, l.estado, " +

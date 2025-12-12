@@ -361,5 +361,68 @@ public class ProductoDao extends DAOBase {
         
         return 0;
     }
-}
 
+    /**
+     * Busca productos por SKU o nombre (búsqueda parcial).
+     * Solo retorna productos del productor especificado.
+     * @param termino Término de búsqueda (SKU o nombre)
+     * @param productorId ID del productor
+     * @return Lista de productos que coinciden
+     */
+    public ArrayList<Producto> buscarProductosPorSKUoNombre(String termino, int productorId) {
+        ArrayList<Producto> lista = new ArrayList<>();
+        
+        String sql = "SELECT p.*, c.id_categoria, c.nombre as categoria_nombre, " +
+                "(SELECT COUNT(*) FROM lotes WHERE producto_id = p.id_producto AND estado = 'Disponible') as numero_lotes " +
+                "FROM productos p " +
+                "LEFT JOIN categorias c ON p.categoria_id = c.id_categoria " +
+                "WHERE (p.codigo_sku LIKE ? OR p.nombre LIKE ?) " +
+                "AND p.productor_id = ? " +
+                "AND p.activo = 1 " +
+                "ORDER BY p.nombre";
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            String pattern = "%" + termino + "%";
+            pstmt.setString(1, pattern);
+            pstmt.setString(2, pattern);
+            pstmt.setInt(3, productorId);
+            rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                Producto producto = new Producto();
+                producto.setIdProducto(rs.getInt("id_producto"));
+                producto.setCodigoSKU(rs.getString("codigo_sku"));
+                producto.setNombre(rs.getString("nombre"));
+                producto.setDescripcion(rs.getString("descripcion"));
+                producto.setPrecioActual(rs.getDouble("precio_actual"));
+                producto.setUnidadesPorPaquete(rs.getInt("unidades_por_paquete"));
+                producto.setProductorId(rs.getInt("productor_id"));
+                producto.setCategoriaId(rs.getInt("categoria_id"));
+                producto.setNumeroLotes(rs.getInt("numero_lotes"));
+                
+                // Crear objeto Categoria si existe
+                String catNombre = rs.getString("categoria_nombre");
+                if (catNombre != null && !catNombre.isEmpty()) {
+                    Categoria categoria = new Categoria();
+                    categoria.setIdCategoria(rs.getInt("id_categoria"));
+                    categoria.setNombre(catNombre);
+                    producto.setCategoria(categoria);
+                }
+                
+                lista.add(producto);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al buscar productos por SKU o nombre: " + termino, e);
+            throw new RuntimeException("Error al buscar productos", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return lista;
+    }}

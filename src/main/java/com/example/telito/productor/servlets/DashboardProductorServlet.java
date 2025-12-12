@@ -98,7 +98,7 @@ public class DashboardProductorServlet extends HttpServlet {
             INNER JOIN productos p ON l.producto_id = p.id_producto
             WHERE p.productor_id = ?
             AND l.id_lote >= (
-                SELECT COALESCE(MAX(id_lote) - 100, 1)
+                SELECT GREATEST(COALESCE(MAX(id_lote), 100) - 100, 0)
                 FROM lotes l2
                 INNER JOIN productos p2 ON l2.producto_id = p2.id_producto
                 WHERE p2.productor_id = ?

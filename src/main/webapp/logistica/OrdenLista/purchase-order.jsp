@@ -323,104 +323,155 @@
 
 <!-- Modal: Ver Detalles de Orden Recibida -->
 <div class="modal fade" id="detalleOrdenModal" tabindex="-1" aria-labelledby="detalleOrdenModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                <h5 class="modal-title" id="detalleOrdenModalLabel">
-                    <i class="fas fa-box-open me-2"></i>Detalles de Orden Recibida
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #00a896 0%, #028f80 100%); border-radius: 16px 16px 0 0; padding: 20px 25px; border-bottom: none;">
+                <h5 class="modal-title d-flex align-items-center" id="detalleOrdenModalLabel" style="font-weight: 600; font-size: 1.2rem;">
+                    <span class="d-flex align-items-center justify-content-center me-3" style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 10px; width: 45px; height: 45px;">
+                        <i class="fas fa-box-open" style="font-size: 1.2rem;"></i>
+                    </span>
+                    Detalles de Orden Recibida
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="opacity: 1; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; border: none; color: white;" onmouseover="this.style.background='rgba(255,255,255,0.25)';" onmouseout="this.style.background='rgba(255,255,255,0.15)';">
+                    <i class="fas fa-times" style="color: white; font-size: 18px;"></i>
+                </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="padding: 25px; background: #f8f9fa;">
                 <div id="loadingDetalle" class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
+                    <div class="spinner-border" style="color: #00a896; width: 3rem; height: 3rem;" role="status">
                         <span class="visually-hidden">Cargando...</span>
                     </div>
-                    <p class="mt-3 text-muted">Cargando detalles de la orden...</p>
+                    <p class="mt-3 text-muted" style="font-size: 0.95rem;">Cargando detalles de la orden...</p>
                 </div>
                 <div id="detalleOrdenContainer" style="display: none;">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Orden:</strong> <span id="detalleNumeroOrden"></span>
+                    <div class="alert" style="background: linear-gradient(135deg, rgba(0,168,150,0.1) 0%, rgba(2,143,128,0.1) 100%); border: 2px solid #00a896; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px;">
+                        <i class="fas fa-info-circle me-2" style="color: #00a896; font-size: 1.1rem;"></i>
+                        <strong style="color: #00a896;">Orden:</strong> <span id="detalleNumeroOrden" style="color: #495057; font-weight: 600;"></span>
                     </div>
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Productor:</label>
-                            <p id="detalleProductor" class="form-control-plaintext">-</p>
+                            <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
+                                    <i class="fas fa-user me-2" style="color: #00a896;"></i>Productor
+                                </label>
+                                <p id="detalleProductor" class="mb-0" style="font-size: 1rem; font-weight: 500; color: #495057;">-</p>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Personal Responsable:</label>
-                            <p id="detallePersonalResponsable" class="form-control-plaintext">-</p>
+                            <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
+                                    <i class="fas fa-user-tie me-2" style="color: #00a896;"></i>Personal Responsable
+                                </label>
+                                <p id="detallePersonalResponsable" class="mb-0" style="font-size: 1rem; font-weight: 500; color: #495057;">-</p>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Producto:</label>
-                            <p id="detalleProducto" class="form-control-plaintext">-</p>
+                            <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
+                                    <i class="fas fa-box me-2" style="color: #00a896;"></i>Producto
+                                </label>
+                                <p id="detalleProducto" class="mb-0" style="font-size: 1rem; font-weight: 500; color: #495057;">-</p>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">SKU:</label>
-                            <p id="detalleSKU" class="form-control-plaintext"><span class="badge bg-secondary">-</span></p>
+                            <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
+                                    <i class="fas fa-barcode me-2" style="color: #00a896;"></i>SKU
+                                </label>
+                                <p id="detalleSKU" class="mb-0"><span class="badge" style="background: linear-gradient(135deg, #00a896 0%, #028f80 100%); font-size: 0.9rem; padding: 6px 12px;">-</span></p>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Cantidad Solicitada:</label>
-                            <p id="detalleCantidad" class="form-control-plaintext">-</p>
+                            <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
+                                    <i class="fas fa-cubes me-2" style="color: #00a896;"></i>Cantidad
+                                </label>
+                                <p id="detalleCantidad" class="mb-0" style="font-size: 1.3rem; font-weight: 600; color: #00a896;">-</p>
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Monto Total:</label>
-                            <p id="detalleMontoTotal" class="form-control-plaintext">-</p>
+                            <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
+                                    <i class="fas fa-dollar-sign me-2" style="color: #00a896;"></i>Monto Total
+                                </label>
+                                <p id="detalleMontoTotal" class="mb-0" style="font-size: 1.3rem; font-weight: 600; color: #00a896;">-</p>
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Estado:</label>
-                            <p id="detalleEstado" class="form-control-plaintext"><span class="badge">-</span></p>
+                            <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
+                                    <i class="fas fa-clipboard-check me-2" style="color: #00a896;"></i>Estado
+                                </label>
+                                <p id="detalleEstado" class="mb-0"><span class="badge" style="font-size: 0.9rem; padding: 6px 12px;">-</span></p>
+                            </div>
                         </div>
                     </div>
                     
-                    <hr>
+                    <hr style="border-top: 2px solid #e9ecef; margin: 25px 0;">
                     
-                    <h6 class="mb-3"><i class="fas fa-boxes me-2"></i>Lote Asignado por el Productor</h6>
+                    <h6 class="mb-3" style="color: #00a896; font-weight: 600; font-size: 1rem;">
+                        <i class="fas fa-boxes me-2"></i>Lote Asignado por el Productor
+                    </h6>
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Código de Lote:</label>
-                            <p id="detalleCodigoLote" class="form-control-plaintext"><strong>-</strong></p>
+                            <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
+                                    <i class="fas fa-tag me-2" style="color: #00a896;"></i>Código de Lote
+                                </label>
+                                <p id="detalleCodigoLote" class="mb-0" style="font-size: 1.1rem; font-weight: 600; color: #495057;">-</p>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Fecha de Vencimiento:</label>
-                            <p id="detalleFechaVencimiento" class="form-control-plaintext">-</p>
+                            <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
+                                    <i class="fas fa-calendar-alt me-2" style="color: #00a896;"></i>Fecha de Vencimiento
+                                </label>
+                                <p id="detalleFechaVencimiento" class="mb-0" style="font-size: 1rem; font-weight: 500; color: #495057;">-</p>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Stock Disponible:</label>
-                            <p id="detalleStockDisponible" class="form-control-plaintext">-</p>
+                            <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
+                                    <i class="fas fa-boxes me-2" style="color: #00a896;"></i>Stock Disponible
+                                </label>
+                                <p id="detalleStockDisponible" class="mb-0" style="font-size: 1.1rem; font-weight: 600; color: #00a896;">-</p>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Ubicación:</label>
-                            <p id="detalleUbicacion" class="form-control-plaintext">-</p>
+                            <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
+                                    <i class="fas fa-map-marker-alt me-2" style="color: #00a896;"></i>Ubicación
+                                </label>
+                                <p id="detalleUbicacion" class="mb-0" style="font-size: 1rem; font-weight: 500; color: #495057;">-</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div id="errorDetalle" class="alert alert-warning" style="display: none;">
+                <div id="errorDetalle" class="alert alert-warning" style="display: none; border-radius: 12px;">
                     <i class="fas fa-exclamation-triangle me-2"></i>
                     No se pudieron cargar los detalles de la orden.
                 </div>
             </div>
-            <div class="modal-footer d-flex justify-content-between">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <div class="modal-footer d-flex justify-content-between" style="background: white; border-top: 2px solid #e9ecef; padding: 20px 25px; border-radius: 0 0 16px 16px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="padding: 10px 20px; border-radius: 8px; font-weight: 600;">
                     <i class="fas fa-arrow-left me-2"></i>Volver
                 </button>
                 <div>
-                    <button type="button" class="btn btn-danger me-2" id="btnRechazar" onclick="cambiarEstadoOrden('Rechazado')">
+                    <button type="button" class="btn btn-danger me-2" id="btnRechazar" onclick="cambiarEstadoOrden('Rechazado')" style="padding: 10px 20px; border-radius: 8px; font-weight: 600;">
                         <i class="fas fa-times-circle me-2"></i>Rechazar
                     </button>
-                    <button type="button" class="btn btn-success" id="btnAprobar" onclick="cambiarEstadoOrden('Aprobado')">
+                    <button type="button" class="btn btn-success" id="btnAprobar" onclick="cambiarEstadoOrden('Aprobado')" style="padding: 10px 20px; border-radius: 8px; font-weight: 600; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none;">
                         <i class="fas fa-check-circle me-2"></i>Aprobar
                     </button>
                 </div>
