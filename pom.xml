@@ -122,6 +122,18 @@
             <version>2.15.1</version>
         </dependency>
 
+        <!-- Apache POI (para procesamiento de archivos Excel) -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.5</version>
+        </dependency>
+
         <!-- Logback (ya incluido en Spring Boot Starter, pero explícito para claridad) -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
