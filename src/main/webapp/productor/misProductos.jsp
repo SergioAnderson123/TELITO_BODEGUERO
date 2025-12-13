@@ -668,6 +668,183 @@
             #addProductModal .form-row {
                 grid-template-columns: 1fr;
             }
+        }
+        
+        /* ===================== Estilos para Modal de Enviar Productos por Correo ===================== */
+        #sendProductosModal.modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1050; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #sendProductosModal.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #sendProductosModal .modal-content { 
+            background-color: #ffffff; 
+            width: 100%;
+            max-width: 700px; 
+            max-height: 90vh; 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        #sendProductosModal .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            padding: 20px 25px; 
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+        }
+        #sendProductosModal .modal-header h2 { 
+            margin: 0; 
+            color: white; 
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #sendProductosModal .modal-header h2 i {
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        #sendProductosModal .modal-close { 
+            color: white; 
+            font-size: 24px; 
+            font-weight: normal; 
+            cursor: pointer; 
+            opacity: 0.9; 
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        #sendProductosModal .modal-close:hover { 
+            opacity: 1; 
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        #sendProductosModal .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(90vh - 200px);
+        }
+        #sendProductosModal .form-group {
+            margin-bottom: 1.25rem;
+        }
+        #sendProductosModal .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2b2d42;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #sendProductosModal .form-group label i {
+            color: #00a896;
+            font-size: 0.85rem;
+        }
+        #sendProductosModal .form-group input,
+        #sendProductosModal .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        #sendProductosModal .form-group input:focus,
+        #sendProductosModal .form-group textarea:focus {
+            border-color: #00a896;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        #sendProductosModal .form-hint {
+            margin-top: 6px;
+            font-size: 0.8rem;
+            color: #6c757d;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        #sendProductosModal .form-hint i {
+            color: #00a896;
+            margin-top: 2px;
+        }
+        #sendProductosModal .modal-footer { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 12px; 
+            padding: 20px 25px; 
+            border-top: 2px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 0 0 16px 16px;
+        }
+        #sendProductosModal .modal-footer button {
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #sendProductosModal .modal-footer .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        #sendProductosModal .modal-footer .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+        }
+        #sendProductosModal .modal-footer button[type="submit"] {
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+        }
+        #sendProductosModal .modal-footer button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+        }
+        @media (max-width: 768px) {
+            #sendProductosModal .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: 95vh;
+                margin: 10px;
+            }
+            #sendProductosModal.show {
+                padding: 10px;
+            }
             #addProductModal .modal-header h2 {
                 font-size: 1.1rem;
             }
@@ -892,9 +1069,9 @@
                         <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=exportar" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                             <i class="fas fa-file-excel me-1"></i>Exportar Productos
                         </a>
-                        <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=formEnviar" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <button type="button" id="openSendProductosModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                             <i class="fas fa-envelope me-1"></i>Enviar Productos
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1274,6 +1451,7 @@
             cerrarModal();
         }
     });
+    
 
     // Búsqueda, filtro por categoría y orden de precio (en cliente)
     const searchInput = document.getElementById('searchInput');
@@ -1760,6 +1938,163 @@
         </div>
     </div>
 </div>
+
+<!-- ===================== Modal: Enviar Productos por Correo ===================== -->
+<div id="sendProductosModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-envelope"></i> Enviar Reporte de Productos por Correo</h2>
+            <span class="modal-close">&times;</span>
+        </div>
+        
+        <form method="POST" action="<%= request.getContextPath() %>/productor/ProductoReporteServlet" id="formEnviarProductos">
+            <input type="hidden" name="action" value="enviar">
+            <input type="hidden" name="busqueda" id="hiddenBusqueda" value="">
+            <input type="hidden" name="categoria" id="hiddenCategoria" value="">
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="modalEmailDestino">
+                        <i class="fas fa-envelope"></i>
+                        Email de Destino <span class="text-danger">*</span>
+                    </label>
+                    <input type="email" 
+                           name="email_destino" 
+                           id="modalEmailDestino" 
+                           placeholder="correo@ejemplo.com" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el correo electrónico donde deseas recibir el reporte.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalAsunto">
+                        <i class="fas fa-tag"></i>
+                        Asunto del Correo
+                    </label>
+                    <input type="text" 
+                           name="asunto" 
+                           id="modalAsunto" 
+                           value="Reporte de Productos - Productor - TELITO BODEGUERO" 
+                           placeholder="Asunto del correo">
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Si no especificas un asunto, se usará uno por defecto.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalMensaje">
+                        <i class="fas fa-comment"></i>
+                        Mensaje Adicional (Opcional)
+                    </label>
+                    <textarea name="mensaje" 
+                              id="modalMensaje" 
+                              rows="4" 
+                              placeholder="Escribe un mensaje personalizado que aparecerá en el correo..."></textarea>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Puedes agregar un mensaje personalizado que aparecerá en el cuerpo del correo.</span>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning" style="background: rgba(255,193,7,0.1); border-left: 4px solid #ffc107; border-radius: 8px; padding: 12px 15px; margin-top: 15px; font-size: 0.9rem;">
+                    <i class="fas fa-exclamation-triangle me-2" style="color: #ffc107;"></i>
+                    <strong>Nota:</strong> El archivo Excel se generará con los mismos filtros que tienes aplicados en la tabla de productos. 
+                    Incluirá todas las columnas (SKU, Nombre, Categoría, Precio, Lotes) y tendrá filtros automáticos habilitados.
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary modal-cancel">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit">
+                    <i class="fas fa-paper-plane"></i>
+                    Enviar Reporte
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Script para el modal de Enviar Productos (debe estar después del modal HTML) -->
+<script>
+    // Esperar a que el DOM esté completamente cargado
+    document.addEventListener('DOMContentLoaded', function() {
+        const sendProductosModal = document.getElementById('sendProductosModal');
+        const openSendProductosBtn = document.getElementById('openSendProductosModalBtn');
+        
+        console.log('Elementos del modal:', { sendProductosModal, openSendProductosBtn });
+        
+        if (!sendProductosModal || !openSendProductosBtn) {
+            console.error('No se encontraron los elementos del modal de Enviar Productos');
+            return;
+        }
+        
+        const closeSendProductosBtn = sendProductosModal.querySelector('.modal-close');
+        const cancelSendProductosBtn = sendProductosModal.querySelector('.modal-cancel');
+        
+        // Función para abrir el modal
+        function abrirModalEnviarProductos() {
+            console.log('Abriendo modal de Enviar Productos');
+            // Obtener filtros actuales de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const busqueda = urlParams.get('busqueda') || '';
+            const categoria = urlParams.get('categoria') || '';
+            
+            // Poblar campos ocultos con los filtros
+            const hiddenBusqueda = document.getElementById('hiddenBusqueda');
+            const hiddenCategoria = document.getElementById('hiddenCategoria');
+            if (hiddenBusqueda) hiddenBusqueda.value = busqueda;
+            if (hiddenCategoria) hiddenCategoria.value = categoria;
+            
+            sendProductosModal.classList.add('show');
+            sendProductosModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Función para cerrar el modal
+        function cerrarModalEnviarProductos() {
+            sendProductosModal.classList.remove('show');
+            sendProductosModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        
+        // Event listener para el botón
+        openSendProductosBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Click en botón Enviar Productos');
+            abrirModalEnviarProductos();
+        });
+        
+        if (closeSendProductosBtn) {
+            closeSendProductosBtn.addEventListener('click', cerrarModalEnviarProductos);
+        }
+        
+        if (cancelSendProductosBtn) {
+            cancelSendProductosBtn.addEventListener('click', cerrarModalEnviarProductos);
+        }
+        
+        // Cerrar al hacer clic fuera del modal
+        sendProductosModal.addEventListener('click', function(e) {
+            if (e.target === sendProductosModal) {
+                cerrarModalEnviarProductos();
+            }
+        });
+        
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && sendProductosModal && sendProductosModal.classList.contains('show')) {
+                cerrarModalEnviarProductos();
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

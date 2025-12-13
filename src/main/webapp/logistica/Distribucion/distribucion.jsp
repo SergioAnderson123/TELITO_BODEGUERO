@@ -41,6 +41,193 @@
             border: 1px solid #6c757d !important;
             box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.5) !important;
         }
+        
+        /* ===================== Estilos para Modal de Enviar por Correo ===================== */
+        #sendDistribucionModal.modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1050; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #sendDistribucionModal.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #sendDistribucionModal .modal-content { 
+            background-color: #ffffff; 
+            width: 100%;
+            max-width: 700px; 
+            max-height: 90vh; 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        #sendDistribucionModal .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            padding: 20px 25px; 
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+        }
+        #sendDistribucionModal .modal-header h2 { 
+            margin: 0; 
+            color: white; 
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #sendDistribucionModal .modal-header h2 i {
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        #sendDistribucionModal .modal-close { 
+            color: white; 
+            font-size: 24px; 
+            font-weight: normal; 
+            cursor: pointer; 
+            opacity: 0.9; 
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        #sendDistribucionModal .modal-close:hover { 
+            opacity: 1; 
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        #sendDistribucionModal .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(90vh - 200px);
+        }
+        #sendDistribucionModal .form-group {
+            margin-bottom: 1.25rem;
+        }
+        #sendDistribucionModal .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2b2d42;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #sendDistribucionModal .form-group label i {
+            color: #00a896;
+            font-size: 0.85rem;
+        }
+        #sendDistribucionModal .form-group input,
+        #sendDistribucionModal .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        #sendDistribucionModal .form-group input:focus,
+        #sendDistribucionModal .form-group textarea:focus {
+            border-color: #00a896;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        #sendDistribucionModal .form-hint {
+            margin-top: 6px;
+            font-size: 0.8rem;
+            color: #6c757d;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        #sendDistribucionModal .form-hint i {
+            color: #00a896;
+            margin-top: 2px;
+        }
+        #sendDistribucionModal .modal-footer { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 12px; 
+            padding: 20px 25px; 
+            border-top: 2px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 0 0 16px 16px;
+        }
+        #sendDistribucionModal .modal-footer button {
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #sendDistribucionModal .modal-footer .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        #sendDistribucionModal .modal-footer .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+        }
+        #sendDistribucionModal .modal-footer button[type="submit"] {
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+        }
+        #sendDistribucionModal .modal-footer button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+        }
+        @media (max-width: 768px) {
+            #sendDistribucionModal .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: 95vh;
+                margin: 10px;
+            }
+            #sendDistribucionModal.show {
+                padding: 10px;
+            }
+        }
         /* Estilos para stat-cards */
         .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
         .stat-card {
@@ -109,9 +296,9 @@
                         <a href="<%= urlBase %>" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                             <i class="fas fa-file-excel me-1"></i>Exportar a Excel
                         </a>
-                        <a href="<%= urlEnviar %>" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <button type="button" id="openSendDistribucionModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                             <i class="fas fa-envelope me-1"></i>Enviar por Correo
-                        </a>
+                        </button>
                         <a href="${pageContext.request.contextPath}/planes-transporte?action=crear" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
                             <i class="fas fa-plus me-1"></i>Agregar Plan
                         </a>
@@ -432,6 +619,83 @@
             }
         });
     }
+    
+    // ===================== Modal: Enviar Distribución y Transporte por Correo =====================
+    document.addEventListener('DOMContentLoaded', function() {
+        const sendDistribucionModal = document.getElementById('sendDistribucionModal');
+        const openSendDistribucionBtn = document.getElementById('openSendDistribucionModalBtn');
+        
+        if (!sendDistribucionModal || !openSendDistribucionBtn) {
+            console.error('No se encontraron los elementos del modal de Enviar Distribución');
+            return;
+        }
+        
+        const closeSendDistribucionBtn = sendDistribucionModal.querySelector('.modal-close');
+        const cancelSendDistribucionBtn = sendDistribucionModal.querySelector('.modal-cancel');
+        
+        // Función para abrir el modal
+        function abrirModalEnviarDistribucion() {
+            // Obtener filtros actuales de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const busqueda = urlParams.get('busqueda') || '';
+            const conductor = urlParams.get('conductor') || '';
+            const estado = urlParams.get('estado') || '';
+            const fechaDesde = urlParams.get('fecha_desde') || '';
+            const fechaHasta = urlParams.get('fecha_hasta') || '';
+            
+            // Poblar campos ocultos con los filtros
+            const hiddenBusqueda = document.getElementById('hiddenBusqueda');
+            const hiddenConductor = document.getElementById('hiddenConductor');
+            const hiddenEstado = document.getElementById('hiddenEstado');
+            const hiddenFechaDesde = document.getElementById('hiddenFechaDesde');
+            const hiddenFechaHasta = document.getElementById('hiddenFechaHasta');
+            if (hiddenBusqueda) hiddenBusqueda.value = busqueda;
+            if (hiddenConductor) hiddenConductor.value = conductor;
+            if (hiddenEstado) hiddenEstado.value = estado;
+            if (hiddenFechaDesde) hiddenFechaDesde.value = fechaDesde;
+            if (hiddenFechaHasta) hiddenFechaHasta.value = fechaHasta;
+            
+            sendDistribucionModal.classList.add('show');
+            sendDistribucionModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Función para cerrar el modal
+        function cerrarModalEnviarDistribucion() {
+            sendDistribucionModal.classList.remove('show');
+            sendDistribucionModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        
+        // Event listener para el botón
+        openSendDistribucionBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            abrirModalEnviarDistribucion();
+        });
+        
+        if (closeSendDistribucionBtn) {
+            closeSendDistribucionBtn.addEventListener('click', cerrarModalEnviarDistribucion);
+        }
+        
+        if (cancelSendDistribucionBtn) {
+            cancelSendDistribucionBtn.addEventListener('click', cerrarModalEnviarDistribucion);
+        }
+        
+        // Cerrar al hacer clic fuera del modal
+        sendDistribucionModal.addEventListener('click', function(e) {
+            if (e.target === sendDistribucionModal) {
+                cerrarModalEnviarDistribucion();
+            }
+        });
+        
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && sendDistribucionModal && sendDistribucionModal.classList.contains('show')) {
+                cerrarModalEnviarDistribucion();
+            }
+        });
+    });
 </script>
 
 <style>
@@ -453,6 +717,91 @@
         color: var(--turquoise-dark);
     }
 </style>
+
+<!-- ===================== Modal: Enviar Distribución y Transporte por Correo ===================== -->
+<div id="sendDistribucionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-envelope"></i> Enviar Reporte de Distribución y Transporte por Correo</h2>
+            <span class="modal-close">&times;</span>
+        </div>
+        
+        <form method="POST" action="<%= request.getContextPath() %>/logistica/DistribucionTransporteReporteServlet" id="formEnviarDistribucion">
+            <input type="hidden" name="action" value="enviar">
+            <input type="hidden" name="busqueda" id="hiddenBusqueda" value="">
+            <input type="hidden" name="conductor" id="hiddenConductor" value="">
+            <input type="hidden" name="estado" id="hiddenEstado" value="">
+            <input type="hidden" name="fecha_desde" id="hiddenFechaDesde" value="">
+            <input type="hidden" name="fecha_hasta" id="hiddenFechaHasta" value="">
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="modalEmailDestino">
+                        <i class="fas fa-envelope"></i>
+                        Email de Destino <span class="text-danger">*</span>
+                    </label>
+                    <input type="email" 
+                           name="email_destino" 
+                           id="modalEmailDestino" 
+                           placeholder="correo@ejemplo.com" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el correo electrónico donde deseas recibir el reporte.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalAsunto">
+                        <i class="fas fa-tag"></i>
+                        Asunto del Correo
+                    </label>
+                    <input type="text" 
+                           name="asunto" 
+                           id="modalAsunto" 
+                           value="Reporte de Distribución y Transporte - Logística - TELITO BODEGUERO" 
+                           placeholder="Asunto del correo">
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Si no especificas un asunto, se usará uno por defecto.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalMensaje">
+                        <i class="fas fa-comment"></i>
+                        Mensaje Adicional (Opcional)
+                    </label>
+                    <textarea name="mensaje" 
+                              id="modalMensaje" 
+                              rows="4" 
+                              placeholder="Escribe un mensaje personalizado que aparecerá en el correo..."></textarea>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Puedes agregar un mensaje personalizado que aparecerá en el cuerpo del correo.</span>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning" style="background: rgba(255,193,7,0.1); border-left: 4px solid #ffc107; border-radius: 8px; padding: 12px 15px; margin-top: 15px; font-size: 0.9rem;">
+                    <i class="fas fa-exclamation-triangle me-2" style="color: #ffc107;"></i>
+                    <strong>Nota:</strong> El archivo Excel se generará con los mismos filtros que tienes aplicados en la tabla de distribución y transporte. 
+                    Incluirá todas las columnas (Número Plan, Conductor, Vehículo, Destino, Estado, Fecha, etc.) y tendrá filtros automáticos habilitados.
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary modal-cancel">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit">
+                    <i class="fas fa-paper-plane"></i>
+                    Enviar Reporte
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 </body>
 </html>

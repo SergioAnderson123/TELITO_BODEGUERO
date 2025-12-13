@@ -40,6 +40,193 @@
             border: 1px solid #6c757d !important;
             box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.5) !important;
         }
+        
+        /* ===================== Estilos para Modal de Enviar por Correo ===================== */
+        #sendMovimientosModal.modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1050; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #sendMovimientosModal.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #sendMovimientosModal .modal-content { 
+            background-color: #ffffff; 
+            width: 100%;
+            max-width: 700px; 
+            max-height: 90vh; 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        #sendMovimientosModal .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            padding: 20px 25px; 
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+        }
+        #sendMovimientosModal .modal-header h2 { 
+            margin: 0; 
+            color: white; 
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #sendMovimientosModal .modal-header h2 i {
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        #sendMovimientosModal .modal-close { 
+            color: white; 
+            font-size: 24px; 
+            font-weight: normal; 
+            cursor: pointer; 
+            opacity: 0.9; 
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        #sendMovimientosModal .modal-close:hover { 
+            opacity: 1; 
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        #sendMovimientosModal .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(90vh - 200px);
+        }
+        #sendMovimientosModal .form-group {
+            margin-bottom: 1.25rem;
+        }
+        #sendMovimientosModal .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2b2d42;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #sendMovimientosModal .form-group label i {
+            color: #00a896;
+            font-size: 0.85rem;
+        }
+        #sendMovimientosModal .form-group input,
+        #sendMovimientosModal .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        #sendMovimientosModal .form-group input:focus,
+        #sendMovimientosModal .form-group textarea:focus {
+            border-color: #00a896;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        #sendMovimientosModal .form-hint {
+            margin-top: 6px;
+            font-size: 0.8rem;
+            color: #6c757d;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        #sendMovimientosModal .form-hint i {
+            color: #00a896;
+            margin-top: 2px;
+        }
+        #sendMovimientosModal .modal-footer { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 12px; 
+            padding: 20px 25px; 
+            border-top: 2px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 0 0 16px 16px;
+        }
+        #sendMovimientosModal .modal-footer button {
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #sendMovimientosModal .modal-footer .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        #sendMovimientosModal .modal-footer .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+        }
+        #sendMovimientosModal .modal-footer button[type="submit"] {
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+        }
+        #sendMovimientosModal .modal-footer button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+        }
+        @media (max-width: 768px) {
+            #sendMovimientosModal .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: 95vh;
+                margin: 10px;
+            }
+            #sendMovimientosModal.show {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -87,9 +274,9 @@
                         <a href="<%= urlBase %>" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                             <i class="fas fa-file-excel me-1"></i>Exportar a Excel
                         </a>
-                        <a href="<%= urlEnviar %>" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <button type="button" id="openSendMovimientosModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                             <i class="fas fa-envelope me-1"></i>Enviar por Correo
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -391,6 +578,77 @@
             }
         });
     }
+    
+    // ===================== Modal: Enviar Movimientos por Correo =====================
+    document.addEventListener('DOMContentLoaded', function() {
+        const sendMovimientosModal = document.getElementById('sendMovimientosModal');
+        const openSendMovimientosBtn = document.getElementById('openSendMovimientosModalBtn');
+        
+        if (!sendMovimientosModal || !openSendMovimientosBtn) {
+            console.error('No se encontraron los elementos del modal de Enviar Movimientos');
+            return;
+        }
+        
+        const closeSendMovimientosBtn = sendMovimientosModal.querySelector('.modal-close');
+        const cancelSendMovimientosBtn = sendMovimientosModal.querySelector('.modal-cancel');
+        
+        // Función para abrir el modal
+        function abrirModalEnviarMovimientos() {
+            // Obtener filtros actuales de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const busqueda = urlParams.get('busqueda') || '';
+            const tipo = urlParams.get('tipo') || '';
+            const periodo = urlParams.get('periodo') || '';
+            
+            // Poblar campos ocultos con los filtros
+            const hiddenBusqueda = document.getElementById('hiddenBusqueda');
+            const hiddenTipo = document.getElementById('hiddenTipo');
+            const hiddenPeriodo = document.getElementById('hiddenPeriodo');
+            if (hiddenBusqueda) hiddenBusqueda.value = busqueda;
+            if (hiddenTipo) hiddenTipo.value = tipo;
+            if (hiddenPeriodo) hiddenPeriodo.value = periodo;
+            
+            sendMovimientosModal.classList.add('show');
+            sendMovimientosModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Función para cerrar el modal
+        function cerrarModalEnviarMovimientos() {
+            sendMovimientosModal.classList.remove('show');
+            sendMovimientosModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        
+        // Event listener para el botón
+        openSendMovimientosBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            abrirModalEnviarMovimientos();
+        });
+        
+        if (closeSendMovimientosBtn) {
+            closeSendMovimientosBtn.addEventListener('click', cerrarModalEnviarMovimientos);
+        }
+        
+        if (cancelSendMovimientosBtn) {
+            cancelSendMovimientosBtn.addEventListener('click', cerrarModalEnviarMovimientos);
+        }
+        
+        // Cerrar al hacer clic fuera del modal
+        sendMovimientosModal.addEventListener('click', function(e) {
+            if (e.target === sendMovimientosModal) {
+                cerrarModalEnviarMovimientos();
+            }
+        });
+        
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && sendMovimientosModal && sendMovimientosModal.classList.contains('show')) {
+                cerrarModalEnviarMovimientos();
+            }
+        });
+    });
 </script>
 
 <style>
@@ -412,6 +670,89 @@
         color: var(--turquoise-dark);
     }
 </style>
+
+<!-- ===================== Modal: Enviar Movimientos por Correo ===================== -->
+<div id="sendMovimientosModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-envelope"></i> Enviar Reporte de Movimientos por Correo</h2>
+            <span class="modal-close">&times;</span>
+        </div>
+        
+        <form method="POST" action="<%= request.getContextPath() %>/logistica/MovimientoInventarioReporteServlet" id="formEnviarMovimientos">
+            <input type="hidden" name="action" value="enviar">
+            <input type="hidden" name="busqueda" id="hiddenBusqueda" value="">
+            <input type="hidden" name="tipo" id="hiddenTipo" value="">
+            <input type="hidden" name="periodo" id="hiddenPeriodo" value="">
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="modalEmailDestino">
+                        <i class="fas fa-envelope"></i>
+                        Email de Destino <span class="text-danger">*</span>
+                    </label>
+                    <input type="email" 
+                           name="email_destino" 
+                           id="modalEmailDestino" 
+                           placeholder="correo@ejemplo.com" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el correo electrónico donde deseas recibir el reporte.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalAsunto">
+                        <i class="fas fa-tag"></i>
+                        Asunto del Correo
+                    </label>
+                    <input type="text" 
+                           name="asunto" 
+                           id="modalAsunto" 
+                           value="Reporte de Movimientos de Inventario - Logística - TELITO BODEGUERO" 
+                           placeholder="Asunto del correo">
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Si no especificas un asunto, se usará uno por defecto.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalMensaje">
+                        <i class="fas fa-comment"></i>
+                        Mensaje Adicional (Opcional)
+                    </label>
+                    <textarea name="mensaje" 
+                              id="modalMensaje" 
+                              rows="4" 
+                              placeholder="Escribe un mensaje personalizado que aparecerá en el correo..."></textarea>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Puedes agregar un mensaje personalizado que aparecerá en el cuerpo del correo.</span>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning" style="background: rgba(255,193,7,0.1); border-left: 4px solid #ffc107; border-radius: 8px; padding: 12px 15px; margin-top: 15px; font-size: 0.9rem;">
+                    <i class="fas fa-exclamation-triangle me-2" style="color: #ffc107;"></i>
+                    <strong>Nota:</strong> El archivo Excel se generará con los mismos filtros que tienes aplicados en la tabla de movimientos. 
+                    Incluirá todas las columnas (Fecha, Tipo, Producto, Cantidad, Usuario, etc.) y tendrá filtros automáticos habilitados.
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary modal-cancel">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit">
+                    <i class="fas fa-paper-plane"></i>
+                    Enviar Reporte
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 </body>
 </html>

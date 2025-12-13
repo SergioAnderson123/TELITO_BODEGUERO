@@ -246,6 +246,193 @@
             .dashboard-header { left: 0; }
             .dashboard-wrapper { margin-left: 0; width: 100%; }
         }
+        
+        /* ===================== Estilos para Modal de Enviar Lotes por Correo ===================== */
+        #sendLotesModal.modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1050; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #sendLotesModal.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #sendLotesModal .modal-content { 
+            background-color: #ffffff; 
+            width: 100%;
+            max-width: 700px; 
+            max-height: 90vh; 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        #sendLotesModal .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            padding: 20px 25px; 
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+        }
+        #sendLotesModal .modal-header h2 { 
+            margin: 0; 
+            color: white; 
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #sendLotesModal .modal-header h2 i {
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        #sendLotesModal .modal-close { 
+            color: white; 
+            font-size: 24px; 
+            font-weight: normal; 
+            cursor: pointer; 
+            opacity: 0.9; 
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        #sendLotesModal .modal-close:hover { 
+            opacity: 1; 
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        #sendLotesModal .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(90vh - 200px);
+        }
+        #sendLotesModal .form-group {
+            margin-bottom: 1.25rem;
+        }
+        #sendLotesModal .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2b2d42;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #sendLotesModal .form-group label i {
+            color: #00a896;
+            font-size: 0.85rem;
+        }
+        #sendLotesModal .form-group input,
+        #sendLotesModal .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        #sendLotesModal .form-group input:focus,
+        #sendLotesModal .form-group textarea:focus {
+            border-color: #00a896;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        #sendLotesModal .form-hint {
+            margin-top: 6px;
+            font-size: 0.8rem;
+            color: #6c757d;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        #sendLotesModal .form-hint i {
+            color: #00a896;
+            margin-top: 2px;
+        }
+        #sendLotesModal .modal-footer { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 12px; 
+            padding: 20px 25px; 
+            border-top: 2px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 0 0 16px 16px;
+        }
+        #sendLotesModal .modal-footer button {
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #sendLotesModal .modal-footer .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        #sendLotesModal .modal-footer .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+        }
+        #sendLotesModal .modal-footer button[type="submit"] {
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+        }
+        #sendLotesModal .modal-footer button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+        }
+        @media (max-width: 768px) {
+            #sendLotesModal .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: 95vh;
+                margin: 10px;
+            }
+            #sendLotesModal.show {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -355,13 +542,13 @@
                         <p class="text-muted mb-0">Registra los nuevos lotes de productos distribuidos en diferentes ubicaciones.</p>
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
-                        <div class="btn-group">
-                            <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=exportar" class="btn btn-sm" style="background: linear-gradient(160deg, #28a745 0%, #20c997 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
-                                <i class="fas fa-boxes me-2"></i>Exportar Lotes
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=exportar" class="btn btn-sm btn-success text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                <i class="fas fa-file-excel me-1"></i>Exportar Lotes
                             </a>
-                            <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=formEnviar" class="btn btn-sm" style="background: linear-gradient(160deg, #17a2b8 0%, #138496 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px;">
-                                <i class="fas fa-envelope me-2"></i>Enviar Lotes
-                            </a>
+                            <button type="button" id="openSendLotesModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                <i class="fas fa-envelope me-1"></i>Enviar Lotes
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -733,6 +920,157 @@
                 closeSidebar();
             }
         });
+        
+        // ===================== Modal: Enviar Lotes por Correo =====================
+        document.addEventListener('DOMContentLoaded', function() {
+            const sendLotesModal = document.getElementById('sendLotesModal');
+            const openSendLotesBtn = document.getElementById('openSendLotesModalBtn');
+            
+            if (!sendLotesModal || !openSendLotesBtn) {
+                console.error('No se encontraron los elementos del modal de Enviar Lotes');
+                return;
+            }
+            
+            const closeSendLotesBtn = sendLotesModal.querySelector('.modal-close');
+            const cancelSendLotesBtn = sendLotesModal.querySelector('.modal-cancel');
+            
+            // Función para abrir el modal
+            function abrirModalEnviarLotes() {
+                // Obtener filtros actuales de la URL (si existen)
+                const urlParams = new URLSearchParams(window.location.search);
+                const producto = urlParams.get('producto') || '';
+                const distrito = urlParams.get('distrito') || '';
+                
+                // Poblar campos ocultos con los filtros
+                const hiddenProducto = document.getElementById('hiddenProducto');
+                const hiddenDistrito = document.getElementById('hiddenDistrito');
+                if (hiddenProducto) hiddenProducto.value = producto;
+                if (hiddenDistrito) hiddenDistrito.value = distrito;
+                
+                sendLotesModal.classList.add('show');
+                sendLotesModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+            
+            // Función para cerrar el modal
+            function cerrarModalEnviarLotes() {
+                sendLotesModal.classList.remove('show');
+                sendLotesModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+            
+            // Event listener para el botón
+            openSendLotesBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                abrirModalEnviarLotes();
+            });
+            
+            if (closeSendLotesBtn) {
+                closeSendLotesBtn.addEventListener('click', cerrarModalEnviarLotes);
+            }
+            
+            if (cancelSendLotesBtn) {
+                cancelSendLotesBtn.addEventListener('click', cerrarModalEnviarLotes);
+            }
+            
+            // Cerrar al hacer clic fuera del modal
+            sendLotesModal.addEventListener('click', function(e) {
+                if (e.target === sendLotesModal) {
+                    cerrarModalEnviarLotes();
+                }
+            });
+            
+            // Cerrar con tecla ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sendLotesModal && sendLotesModal.classList.contains('show')) {
+                    cerrarModalEnviarLotes();
+                }
+            });
+        });
     </script>
+
+<!-- ===================== Modal: Enviar Lotes por Correo ===================== -->
+<div id="sendLotesModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-envelope"></i> Enviar Reporte de Lotes por Correo</h2>
+            <span class="modal-close">&times;</span>
+        </div>
+        
+        <form method="POST" action="<%= request.getContextPath() %>/productor/LoteReporteServlet" id="formEnviarLotes">
+            <input type="hidden" name="action" value="enviar">
+            <input type="hidden" name="producto" id="hiddenProducto" value="">
+            <input type="hidden" name="distrito" id="hiddenDistrito" value="">
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="modalEmailDestino">
+                        <i class="fas fa-envelope"></i>
+                        Email de Destino <span class="text-danger">*</span>
+                    </label>
+                    <input type="email" 
+                           name="email_destino" 
+                           id="modalEmailDestino" 
+                           placeholder="correo@ejemplo.com" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el correo electrónico donde deseas recibir el reporte.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalAsunto">
+                        <i class="fas fa-tag"></i>
+                        Asunto del Correo
+                    </label>
+                    <input type="text" 
+                           name="asunto" 
+                           id="modalAsunto" 
+                           value="Reporte de Lotes - Productor - TELITO BODEGUERO" 
+                           placeholder="Asunto del correo">
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Si no especificas un asunto, se usará uno por defecto.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalMensaje">
+                        <i class="fas fa-comment"></i>
+                        Mensaje Adicional (Opcional)
+                    </label>
+                    <textarea name="mensaje" 
+                              id="modalMensaje" 
+                              rows="4" 
+                              placeholder="Escribe un mensaje personalizado que aparecerá en el correo..."></textarea>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Puedes agregar un mensaje personalizado que aparecerá en el cuerpo del correo.</span>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning" style="background: rgba(255,193,7,0.1); border-left: 4px solid #ffc107; border-radius: 8px; padding: 12px 15px; margin-top: 15px; font-size: 0.9rem;">
+                    <i class="fas fa-exclamation-triangle me-2" style="color: #ffc107;"></i>
+                    <strong>Nota:</strong> El archivo Excel se generará con los mismos filtros que tienes aplicados en la tabla de lotes. 
+                    Incluirá todas las columnas (Código, Producto, Cantidad, Fecha de Vencimiento, etc.) y tendrá filtros automáticos habilitados.
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary modal-cancel">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit">
+                    <i class="fas fa-paper-plane"></i>
+                    Enviar Reporte
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 </body>
 </html>
