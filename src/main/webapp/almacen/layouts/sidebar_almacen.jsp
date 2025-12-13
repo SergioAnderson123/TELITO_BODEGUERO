@@ -9,28 +9,21 @@
                 <li class="nav-item">
                     <a class="nav-link <c:if test='${param.activeMenu == "Gestion de inventario"}'>active</c:if>"
                        href="${pageContext.request.contextPath}/almacen/LoteServlet?action=lista">
-                        <i class="fas fa-box"></i>Gestion de Inventario
+                        <i class="fas fa-boxes"></i>Gestion de Inventario
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link <c:if test='${param.activeMenu == "Registrar entradas"}'>active</c:if>"
                        href="${pageContext.request.contextPath}/almacen/EntradaServlet?action=lista">
-                        <i class="fas fa-arrow-down"></i>Registrar Entradas
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link <c:if test='${param.activeMenu == "Cargar Excel"}'>active</c:if>"
-                       href="${pageContext.request.contextPath}/almacen/ExcelValidacionServlet?action=form">
-                        <i class="fas fa-file-excel"></i>Cargar Excel
+                        <i class="fas fa-dolly"></i>Registrar Entradas
                     </a>
                 </li>
                 
                 <li class="nav-item">
                     <a class="nav-link <c:if test='${param.activeMenu == "Registrar salidas"}'>active</c:if>"
                        href="${pageContext.request.contextPath}/almacen/PedidoServlet?action=lista">
-                        <i class="fas fa-arrow-up"></i>Registrar Salidas
+                        <i class="fas fa-truck-loading"></i>Registrar Salidas
                     </a>
                 </li>
 
@@ -45,6 +38,13 @@
                     <a class="nav-link <c:if test='${param.activeMenu == "Incidencias"}'>active</c:if>"
                        href="${pageContext.request.contextPath}/almacen/IncidenciaServlet">
                         <i class="fas fa-exclamation-triangle"></i>Incidencias
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link <c:if test='${param.activeMenu == "Cargar Excel"}'>active</c:if>"
+                       href="${pageContext.request.contextPath}/almacen/ExcelValidacionServlet?action=form">
+                        <i class="fas fa-file-upload"></i>Cargar Excel
                     </a>
                 </li>
 

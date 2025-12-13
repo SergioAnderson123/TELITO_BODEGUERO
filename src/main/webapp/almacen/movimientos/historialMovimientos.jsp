@@ -38,6 +38,203 @@
             border: 1px solid #6c757d !important;
             background-image: none !important;
         }
+        
+        /* ===================== Estilos para Modal de Enviar por Correo ===================== */
+        #sendEmailModal.modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1050; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #sendEmailModal.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #sendEmailModal .modal-content { 
+            background-color: #ffffff; 
+            width: 100%;
+            max-width: 700px; 
+            max-height: 90vh; 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        @keyframes modalSlideIn { 
+            from { 
+                transform: scale(0.9) translateY(-20px); 
+                opacity: 0; 
+            } 
+            to { 
+                transform: scale(1) translateY(0); 
+                opacity: 1; 
+            } 
+        }
+        #sendEmailModal .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            padding: 20px 25px; 
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+        }
+        #sendEmailModal .modal-header h2 { 
+            margin: 0; 
+            color: white; 
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #sendEmailModal .modal-header h2 i {
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        #sendEmailModal .modal-close { 
+            color: white; 
+            font-size: 24px; 
+            font-weight: normal; 
+            cursor: pointer; 
+            opacity: 0.9; 
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        #sendEmailModal .modal-close:hover { 
+            opacity: 1; 
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        #sendEmailModal .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(90vh - 200px);
+        }
+        #sendEmailModal .form-group {
+            margin-bottom: 1.25rem;
+        }
+        #sendEmailModal .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2b2d42;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #sendEmailModal .form-group label i {
+            color: #00a896;
+            font-size: 0.85rem;
+        }
+        #sendEmailModal .form-group input,
+        #sendEmailModal .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        #sendEmailModal .form-group input:focus,
+        #sendEmailModal .form-group textarea:focus {
+            border-color: #00a896;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        #sendEmailModal .form-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-top: 6px;
+            padding: 8px 12px;
+            background: rgba(0,168,150,0.05);
+            border-radius: 6px;
+        }
+        #sendEmailModal .form-hint i {
+            color: #00a896;
+            flex-shrink: 0;
+        }
+        #sendEmailModal .alert-info {
+            background: rgba(0,168,150,0.1);
+            border-left: 4px solid #00a896;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+        }
+        #sendEmailModal .modal-footer { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 12px; 
+            padding: 20px 25px; 
+            border-top: 2px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 0 0 16px 16px;
+        }
+        #sendEmailModal .modal-footer button {
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #sendEmailModal .modal-footer .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        #sendEmailModal .modal-footer .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+        }
+        #sendEmailModal .modal-footer button[type="submit"] {
+            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+        }
+        #sendEmailModal .modal-footer button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+        }
+        @media (max-width: 768px) {
+            #sendEmailModal .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: 95vh;
+                margin: 10px;
+            }
+            #sendEmailModal.show {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -71,9 +268,9 @@
                             <a href="<%= request.getContextPath() %>/almacen/MovimientoReporteServlet?action=exportar" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                 <i class="fas fa-file-excel me-1"></i>Exportar a Excel
                             </a>
-                            <a href="<%= request.getContextPath() %>/almacen/MovimientoReporteServlet?action=formEnviar" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <button type="button" id="openSendEmailModal" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                 <i class="fas fa-envelope me-1"></i>Enviar por Correo
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -410,6 +607,152 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Modal de Enviar por Correo -->
+<div id="sendEmailModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-envelope"></i> Enviar Reporte por Correo</h2>
+            <span class="modal-close">&times;</span>
+        </div>
+        
+        <form method="POST" action="<%= request.getContextPath() %>/almacen/MovimientoReporteServlet" id="formEnviarCorreo">
+            <input type="hidden" name="action" value="enviar">
+            
+            <div class="modal-body">
+                <div class="alert alert-info" style="margin-bottom: 20px; padding: 15px; border-radius: 8px; background-color: #d1ecf1; border: 1px solid #bee5eb;">
+                    <div style="display: flex; align-items: start; gap: 12px;">
+                        <i class="fas fa-info-circle" style="color: #0c5460; font-size: 1.3rem; margin-top: 3px;"></i>
+                        <div>
+                            <strong style="color: #0c5460; display: block; margin-bottom: 8px;">Información del reporte:</strong>
+                            <div style="font-size: 0.9rem; color: #0c5460;">
+                                <p style="margin: 5px 0; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-check-circle" style="color: #17a2b8;"></i>
+                                    <span>Fecha y Hora de Movimiento</span>
+                                </p>
+                                <p style="margin: 5px 0; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-check-circle" style="color: #17a2b8;"></i>
+                                    <span>Producto y Lote</span>
+                                </p>
+                                <p style="margin: 5px 0; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-check-circle" style="color: #17a2b8;"></i>
+                                    <span>Tipo de Movimiento (Entrada/Salida/Ajuste)</span>
+                                </p>
+                                <p style="margin: 5px 0; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-check-circle" style="color: #17a2b8;"></i>
+                                    <span>Cantidad y Responsable</span>
+                                </p>
+                                <p style="margin: 5px 0; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-check-circle" style="color: #17a2b8;"></i>
+                                    <span>Motivo y Referencia</span>
+                                </p>
+                            </div>
+                            <p style="margin: 10px 0 0 0; font-size: 0.85rem; color: #0c5460;">
+                                <strong>Filtros aplicados:</strong> Todos los movimientos
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email_destino">
+                        <i class="fas fa-envelope"></i>
+                        Correo Electrónico de Destino *
+                    </label>
+                    <input type="email" 
+                           id="email_destino" 
+                           name="email_destino" 
+                           class="form-control" 
+                           placeholder="ejemplo@correo.com"
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingrese el email donde desea recibir el reporte</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="asunto">
+                        <i class="fas fa-tag"></i>
+                        Asunto del Correo *
+                    </label>
+                    <input type="text" 
+                           id="asunto" 
+                           name="asunto" 
+                           class="form-control" 
+                           value="Reporte de Historial de Movimientos - Almacén"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="mensaje">
+                        <i class="fas fa-comment-alt"></i>
+                        Mensaje Adicional (Opcional)
+                    </label>
+                    <textarea id="mensaje" 
+                              name="mensaje" 
+                              class="form-control" 
+                              rows="4"
+                              placeholder="Puede agregar información adicional sobre el reporte..."></textarea>
+                    <div class="form-hint">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Este mensaje se incluirá en el cuerpo del correo electrónico</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary modal-cancel">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit">
+                    <i class="fas fa-paper-plane"></i>
+                    Enviar Reporte
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Modal de Enviar por Correo
+const sendEmailModal = document.getElementById('sendEmailModal');
+const openSendEmailBtn = document.getElementById('openSendEmailModal');
+
+if (sendEmailModal && openSendEmailBtn) {
+    const closeSendEmailBtn = sendEmailModal.querySelector('.modal-close');
+    const cancelSendEmailBtn = sendEmailModal.querySelector('.modal-cancel');
+    
+    openSendEmailBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        sendEmailModal.classList.add('show');
+        sendEmailModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    });
+    
+    function cerrarModalEnviar() {
+        sendEmailModal.classList.remove('show');
+        sendEmailModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    
+    if (closeSendEmailBtn) {
+        closeSendEmailBtn.addEventListener('click', cerrarModalEnviar);
+    }
+    
+    if (cancelSendEmailBtn) {
+        cancelSendEmailBtn.addEventListener('click', cerrarModalEnviar);
+    }
+    
+    sendEmailModal.addEventListener('click', function(event) {
+        if (event.target === sendEmailModal) {
+            cerrarModalEnviar();
+        }
+    });
+}
+</script>
 
 </body>
 </html>

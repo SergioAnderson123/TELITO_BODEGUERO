@@ -101,6 +101,24 @@
                 </div>
             </div>
 
+            <!-- ===================== Alerta de Limpieza Automática ===================== -->
+            <% if (totalRegistrosAuditoria > 100) { %>
+            <div class="alert alert-warning alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+                <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
+                <div class="flex-grow-1">
+                    <strong>⚠️ Alto volumen de registros de auditoría</strong><br>
+                    <small>
+                        Tienes <%= totalRegistrosAuditoria %> registros acumulados. Para reducir costos de nube, ejecuta la limpieza automática.<br>
+                        <strong>📋 Configuración actual:</strong> Elimina registros mayores a 3 días | Envía reporte a: a20223291@pucp.edu.pe
+                    </small>
+                </div>
+                <button type="button" class="btn btn-sm btn-warning ms-3" onclick="ejecutarLimpiezaAuditoria()">
+                    <i class="fas fa-broom me-1"></i>Limpiar Ahora
+                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <% } %>
+
             <!-- ===================== Card: Búsqueda y filtros ===================== -->
             <div class="card shadow-sm mb-4" id="filterCard">
                 <div class="card-header bg-primary text-white" style="padding: 0.5rem 0.75rem;">
@@ -237,6 +255,9 @@
     </div>
 </div>
 
+<%-- Incluir modales del sistema --%>
+<jsp:include page="/WEB-INF/includes/modal-alerts.jsp" />
+
 <script>
     // Aplicar filtros automáticamente al cambiar valores
     document.addEventListener('DOMContentLoaded', function() {
@@ -272,6 +293,145 @@
             });
         }
     });
+    
+    /**
+     * Muestra una notificación tipo toast en la parte superior
+     */
+    function mostrarNotificacion(mensaje, tipo = 'info', duracion = 5000) {
+        const tiposColor = {
+            'success': 'alert-success',
+            'danger': 'alert-danger',
+            'warning': 'alert-warning',
+            'info': 'alert-info'
+        };
+        
+        const iconos = {
+            'success': 'fa-check-circle',
+            'danger': 'fa-exclamation-circle',
+            'warning': 'fa-exclamation-triangle',
+            'info': 'fa-info-circle'
+        };
+        
+        const alertHtml = `
+            <div class="alert ${tiposColor[tipo]} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" 
+                 role="alert" style="z-index: 9999; min-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                <i class="fas ${iconos[tipo]} me-2"></i>
+                <strong>${mensaje}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', alertHtml);
+        
+        // Auto-cerrar después de la duración especificada
+        if (duracion > 0) {
+            setTimeout(() => {
+                const alerts = document.querySelectorAll('.alert');
+                const lastAlert = alerts[alerts.length - 1];
+                if (lastAlert) {
+                    const bsAlert = new bootstrap.Alert(lastAlert);
+                    bsAlert.close();
+                }
+            }, duracion);
+        }
+    }
+    
+    /**
+     * Función principal para ejecutar la limpieza de auditoría
+     * Usa el modal de confirmación del sistema
+     */
+    function ejecutarLimpiezaAuditoria() {
+        showDeleteConfirm(
+            '¿Estás seguro de ejecutar la limpieza automática de auditoría?<br><br>' +
+            '<ul class="text-start mt-3" style="font-size: 0.95rem;">' +
+            '<li>Se eliminarán registros mayores a <strong>3 días</strong></li>' +
+            '<li>Se enviarán por correo antes de eliminar (respaldo)</li>' +
+            '<li>Los registros de los últimos 3 días se mantendrán</li>' +
+            '<li>Recibirás un archivo Excel con los datos eliminados</li>' +
+            '</ul>',
+            function() {
+                confirmarLimpieza();
+            },
+            'Confirmar Limpieza de Auditoría'
+        );
+    }
+
+    /**
+     * Confirma y ejecuta la limpieza
+     */
+    function confirmarLimpieza() {
+        // Mostrar notificación de procesamiento
+        mostrarNotificacion('Procesando limpieza... Por favor espera', 'warning', 0);
+        
+        // Ejecutar limpieza vía AJAX
+        fetch('<%= request.getContextPath() %>/AuditoriaCleanupServlet', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=ejecutar_limpieza'
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Cerrar todas las notificaciones anteriores
+            document.querySelectorAll('.alert').forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+            
+            if (data.success) {
+                // Verificar si hubo eliminaciones
+                if (data.registrosEliminados > 0) {
+                    // Mostrar notificación de éxito con eliminaciones
+                    const mensajeExito = `
+                        <div class="mb-0">
+                            <strong>✅ Limpieza Completada Exitosamente</strong><br>
+                            <small>
+                                📊 Registros totales antes: ${data.registrosTotalesAntes}<br>
+                                🗑️ Registros eliminados: ${data.registrosEliminados}<br>
+                                📋 Registros restantes: ${data.registrosTotalesDespues}<br>
+                                💾 Espacio liberado: ~${data.espacioLiberadoKB} KB<br>
+                                ${data.reporteEnviado ? '✅ Reporte enviado a: a20223291@pucp.edu.pe' : '❌ Error al enviar reporte'}
+                            </small>
+                        </div>
+                    `;
+                    mostrarNotificacion(mensajeExito, 'success', 10000);
+                    
+                    // Recargar página después de 3 segundos
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                } else {
+                    // No hubo eliminaciones - mostrar mensaje informativo
+                    const mensajeInfo = `
+                        <div class="mb-0">
+                            <strong>ℹ️ Sin Cambios</strong><br>
+                            <small>
+                                ${data.message}<br>
+                                📊 Total de registros: ${data.registrosTotalesAntes}<br>
+                                ⏰ Solo se eliminan registros mayores a 7 días<br>
+                                💡 Todos tus registros son recientes (última semana)
+                            </small>
+                        </div>
+                    `;
+                    mostrarNotificacion(mensajeInfo, 'info', 10000);
+                }
+            } else {
+                // Mostrar notificación de error
+                mostrarNotificacion('❌ Error: ' + (data.message || 'No se pudo completar la limpieza'), 'danger', 8000);
+            }
+        })
+        .catch(error => {
+            // Cerrar notificaciones anteriores
+            document.querySelectorAll('.alert').forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+            
+            // Mostrar error de conexión
+            mostrarNotificacion('❌ Error de conexión: ' + error.message, 'danger', 8000);
+        });
+    }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

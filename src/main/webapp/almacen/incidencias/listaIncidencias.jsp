@@ -325,7 +325,23 @@
                                     </c:choose>
                                 </tbody>
                             </table>
-                            <jsp:include page="/WEB-INF/includes/pagination.jsp" />
+                            <!-- Paginación -->
+                            <jsp:include page="/WEB-INF/includes/pagination.jsp">
+                                <jsp:param name="currentPage" value="${currentPage}" />
+                                <jsp:param name="totalPages" value="${totalPages}" />
+                                <jsp:param name="totalRows" value="${totalRows}" />
+                                <jsp:param name="size" value="${size}" />
+                                <jsp:param name="baseUrl" value="${baseUrl}" />
+                                <jsp:param name="itemName" value="${itemName}" />
+                                <jsp:param name="param1Name" value="action" />
+                                <jsp:param name="param1Value" value="listar" />
+                                <jsp:param name="param2Name" value="estado" />
+                                <jsp:param name="param2Value" value="${estado}" />
+                                <jsp:param name="param3Name" value="tipo" />
+                                <jsp:param name="param3Value" value="${tipo}" />
+                                <jsp:param name="param4Name" value="busqueda" />
+                                <jsp:param name="param4Value" value="${busqueda}" />
+                            </jsp:include>
                         </div>
                     </div>
                 </div>

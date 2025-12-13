@@ -35,22 +35,8 @@ public class DashboardProductorServlet extends HttpServlet {
             return;
         }
         
-        // Obtener ID del productor desde la sesión
-        com.example.telito.administrador.beans.Usuario usuario = 
-            (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
-        int idProductor = usuario != null ? usuario.getIdUsuario() : 0;
-        
-        if (idProductor == 0) {
-            response.sendRedirect(request.getContextPath() + "/acceso/login");
-            return;
-        }
-        
-        // Obtener métricas del dashboard
-        MetricasProductor metricas = obtenerMetricas(idProductor);
-        
-        request.setAttribute("metricas", metricas);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/productor/dashboard-productor.jsp");
-        dispatcher.forward(request, response);
+        // Redirigir al dashboard correcto (inicio-productor.jsp a través de ProductorServlet)
+        response.sendRedirect(request.getContextPath() + "/ProductorServlet?action=inicio");
     }
     
     /**

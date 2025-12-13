@@ -321,7 +321,7 @@
             const messageElement = document.getElementById('customDeleteMessage');
             const deleteBtn = document.getElementById('customDeleteBtn');
             
-            messageElement.textContent = message || '¿Estás seguro de que deseas eliminar este elemento?';
+            messageElement.innerHTML = message || '¿Estás seguro de que deseas eliminar este elemento?';
             
             // Limpiar listeners anteriores
             const newDeleteBtn = deleteBtn.cloneNode(true);

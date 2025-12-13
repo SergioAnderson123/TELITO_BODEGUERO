@@ -21,7 +21,7 @@ public class LoteDao extends DAOBase {
      */
     public ArrayList<Lote> listarLotesRegistrados(int pagina, String busqueda, String estadoStock) {
         ArrayList<Lote> lista = new ArrayList<>();
-        int registrosPorPagina = 10;
+        int registrosPorPagina = 5;
         int offset = (pagina - 1) * registrosPorPagina;
 
         String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, l.estado, " +

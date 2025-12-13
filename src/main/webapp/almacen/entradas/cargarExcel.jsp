@@ -18,9 +18,11 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
-                        <div class="page-header">
-                            <h2><i class="fas fa-file-excel me-2"></i>Cargar Entradas desde Excel</h2>
-                            <p class="text-muted">Valida y carga múltiples entradas de inventario desde un archivo Excel.</p>
+                        <div class="page-header mb-3" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+                            <h2 style="font-size: 1.4rem; line-height: 1.2; margin-bottom: 0.2rem;">
+                                <i class="fas fa-file-excel me-2"></i>Cargar Entradas desde Excel
+                            </h2>
+                            <p class="text-muted mb-0" style="font-size: 0.85rem;">Valida y carga múltiples entradas de inventario desde un archivo Excel.</p>
                         </div>
                     </div>
                 </div>
@@ -30,16 +32,16 @@
                     java.util.ArrayList<String> errores = (java.util.ArrayList<String>) request.getAttribute("errores");
                     if (errores != null && !errores.isEmpty()) {
                 %>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <h5 class="alert-heading">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="padding: 0.65rem 0.85rem; margin-bottom: 0.75rem; font-size: 0.85rem;">
+                    <h6 class="alert-heading mb-2" style="font-size: 0.9rem;">
                         <i class="fas fa-exclamation-triangle me-2"></i>Errores encontrados:
-                    </h5>
-                    <ul class="mb-0">
+                    </h6>
+                    <ul class="mb-0" style="padding-left: 1.25rem; font-size: 0.8rem;">
                         <% for (String error : errores) { %>
                             <li><%= error %></li>
                         <% } %>
                     </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.7rem;"></button>
                 </div>
                 <% } %>
                 
@@ -49,50 +51,67 @@
                     if (successMsg != null) {
                         session.removeAttribute("successMsg");
                 %>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <div class="alert alert-success alert-dismissible fade show" role="alert" style="padding: 0.65rem 0.85rem; margin-bottom: 0.75rem; font-size: 0.85rem;">
                     <i class="fas fa-check-circle me-2"></i><%= successMsg %>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.7rem;"></button>
                 </div>
                 <% } %>
                 
-                <div class="row mt-4">
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h3 class="mb-4" style="border-bottom: 1px solid #dee2e6; padding-bottom: 0.75rem;">Instrucciones</h3>
+                <div class="row mt-3">
+                    <div class="col-lg-10 offset-lg-1">
+                        <div class="card shadow-sm" style="border-radius: 10px;">
+                            <div class="card-body" style="padding: 1.25rem;">
+                                <h3 class="mb-3" style="border-bottom: 2px solid #00a896; padding-bottom: 0.5rem; font-size: 1.15rem; color: #00a896;">
+                                    <i class="fas fa-list-ol me-2"></i>Instrucciones
+                                </h3>
                                 
-                                <ol style="list-style-type: none; padding-left: 0;">
-                                    <li class="mb-3">
-                                        <strong>1) Descarga la plantilla oficial</strong> para asegurar el formato correcto
-                                        <div class="mt-2">
-                                            <a href="${pageContext.request.contextPath}/almacen/ExcelValidacionServlet?action=descargarPlantilla" 
-                                               class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-download me-2"></i>Descargar plantilla Excel
-                                            </a>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-4">
+                                        <div class="d-flex align-items-start gap-2" style="padding: 0.5rem; background-color: #f8f9fa; border-radius: 6px;">
+                                            <div style="background-color: #00a896; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; flex-shrink: 0;">1</div>
+                                            <div>
+                                                <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Descarga la plantilla oficial</strong>
+                                                <a href="${pageContext.request.contextPath}/almacen/ExcelValidacionServlet?action=descargarPlantilla" 
+                                                   class="btn btn-sm btn-outline-primary" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+                                                    <i class="fas fa-download me-1"></i>Descargar
+                                                </a>
+                                            </div>
                                         </div>
-                                    </li>
-                                    <li class="mb-2"><strong>2) Rellena los datos</strong> en la plantilla descargada</li>
-                                    <li class="mb-4"><strong>3) Sube el archivo</strong> para su validación</li>
-                                </ol>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="d-flex align-items-start gap-2" style="padding: 0.5rem; background-color: #f8f9fa; border-radius: 6px; height: 100%;">
+                                            <div style="background-color: #00a896; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; flex-shrink: 0;">2</div>
+                                            <div>
+                                                <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Rellena los datos</strong>
+                                                <small style="font-size: 0.75rem; color: #6c757d;">Completa la información en la plantilla descargada</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="d-flex align-items-start gap-2" style="padding: 0.5rem; background-color: #f8f9fa; border-radius: 6px; height: 100%;">
+                                            <div style="background-color: #00a896; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; flex-shrink: 0;">3</div>
+                                            <div>
+                                                <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Sube el archivo</strong>
+                                                <small style="font-size: 0.75rem; color: #6c757d;">Carga el archivo para validación</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    <strong>Formato requerido:</strong> El archivo debe tener las siguientes columnas en orden:
-                                    <ul class="mb-0 mt-2">
-                                        <li>Código Lote</li>
-                                        <li>Código SKU Producto</li>
-                                        <li>Cantidad</li>
-                                        <li>Fecha Vencimiento (formato: dd/MM/yyyy)</li>
-                                        <li>Ubicación</li>
-                                        <li>Orden Compra (opcional)</li>
-                                    </ul>
+                                <div class="alert alert-info mb-3" style="padding: 0.65rem 0.85rem; font-size: 0.85rem;">
+                                    <div style="display: flex; align-items: start; gap: 8px;">
+                                        <i class="fas fa-info-circle" style="color: #0c5460; margin-top: 2px; flex-shrink: 0;"></i>
+                                        <div>
+                                            <strong style="font-size: 0.85rem;">Formato requerido:</strong> Código Lote, Código SKU, Cantidad, Fecha Vencimiento (dd/MM/yyyy), Ubicación, Orden Compra (opcional)
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <form method="POST" action="${pageContext.request.contextPath}/almacen/ExcelValidacionServlet?action=validar" 
                                       enctype="multipart/form-data" id="formCargaExcel">
                                     
-                                    <div class="mb-4">
-                                        <label for="archivoExcel" class="form-label">
+                                    <div class="mb-3">
+                                        <label for="archivoExcel" class="form-label" style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.4rem;">
                                             <i class="fas fa-file-excel me-2"></i>Seleccionar archivo Excel
                                         </label>
                                         <input type="file" 
@@ -100,17 +119,18 @@
                                                id="archivoExcel" 
                                                name="archivoExcel" 
                                                accept=".xlsx,.xls"
-                                               required>
-                                        <small class="text-muted">Formatos aceptados: .xlsx, .xls (máximo 10 MB)</small>
+                                               required
+                                               style="font-size: 0.85rem; padding: 0.5rem;">
+                                        <small class="text-muted" style="font-size: 0.75rem;">Formatos aceptados: .xlsx, .xls (máximo 10 MB)</small>
                                     </div>
                                     
-                                    <div class="d-flex justify-content-end gap-2 mt-4">
+                                    <div class="d-flex justify-content-end gap-2 mt-3">
                                         <a href="${pageContext.request.contextPath}/almacen/EntradaServlet" 
-                                           class="btn btn-secondary">
-                                            <i class="fas fa-times me-2"></i>Cancelar
+                                           class="btn btn-secondary btn-sm" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+                                            <i class="fas fa-times me-1"></i>Cancelar
                                         </a>
-                                        <button type="submit" class="btn btn-primary" id="btnValidar">
-                                            <i class="fas fa-check-circle me-2"></i>Validar Archivo
+                                        <button type="submit" class="btn btn-primary btn-sm" id="btnValidar" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+                                            <i class="fas fa-check-circle me-1"></i>Validar Archivo
                                         </button>
                                     </div>
                                 </form>

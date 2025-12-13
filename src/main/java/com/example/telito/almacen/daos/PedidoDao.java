@@ -288,4 +288,49 @@ public class PedidoDao extends DAOBase {
         return count(sql);
     }
 
+    /**
+     * Método para obtener todos los pedidos sin paginación (para reportes)
+     */
+    public ArrayList<Pedido> listarTodosLosPedidos() {
+        ArrayList<Pedido> listaPedidos = new ArrayList<>();
+        String sql = "SELECT p.id_pedido, p.numero_pedido, p.fecha_creacion, p.destino, p.estado_preparacion, " +
+                "c.nombre AS nombre_cliente, c.id_cliente " +
+                "FROM pedidos p " +
+                "LEFT JOIN clientes c ON p.cliente_id = c.id_cliente " +
+                "ORDER BY p.id_pedido DESC";
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Pedido pedido = new Pedido();
+                pedido.setIdPedido(rs.getInt("id_pedido"));
+                pedido.setNumeroPedido(rs.getString("numero_pedido"));
+                pedido.setFechaCreacion(rs.getTimestamp("fecha_creacion"));
+                pedido.setDestino(rs.getString("destino"));
+                pedido.setEstadoPreparacion(rs.getString("estado_preparacion"));
+                
+                // Cliente
+                Cliente cliente = new Cliente();
+                cliente.setIdCliente(rs.getInt("id_cliente"));
+                cliente.setNombre(rs.getString("nombre_cliente"));
+                pedido.setCliente(cliente);
+                
+                listaPedidos.add(pedido);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al listar todos los pedidos", e);
+            throw new RuntimeException("Error al listar todos los pedidos", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return listaPedidos;
+    }
+
 }

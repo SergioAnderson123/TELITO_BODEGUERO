@@ -1,6 +1,7 @@
 package com.example.telito.util;
 
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -1066,7 +1067,7 @@ public class ExcelUtil {
     }
 
     /**
-     * Genera un archivo Excel con las órdenes de compra.
+     * Genera un archivo Excel con las órdenes de compra del módulo de almacén.
      * Incluye filtros automáticos en las columnas y formato profesional.
      * 
      * @param listaOrdenes Lista de órdenes de compra a exportar
@@ -1094,14 +1095,14 @@ public class ExcelUtil {
             Cell titleCell = titleRow.createCell(0);
             titleCell.setCellValue("REPORTE DE ÓRDENES DE COMPRA - TELITO BODEGUERO");
             titleCell.setCellStyle(titleStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 7));
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 8));
 
             // Fecha de generación
             Row dateRow = sheet.createRow(rowNum++);
             Cell dateCell = dateRow.createCell(0);
             dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
             dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
 
             // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
@@ -1109,7 +1110,7 @@ public class ExcelUtil {
                 Cell filterCell = filterRow.createCell(0);
                 filterCell.setCellValue("Filtros aplicados: " + filtrosInformacion);
                 filterCell.setCellStyle(dataStyle);
-                sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
+                sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
             }
 
             // Fila en blanco
@@ -1118,8 +1119,8 @@ public class ExcelUtil {
             // Encabezados - guardar el índice de esta fila para el autoFilter
             int headerRowIndex = rowNum;
             Row headerRow = sheet.createRow(rowNum++);
-            String[] headers = {"N° de Orden", "Proveedor", "Producto", "Cantidad (Paquetes)", 
-                               "Monto Total", "Estado", "Personal Responsable"};
+            String[] headers = {"N° de Orden", "SKU", "Producto", "Proveedor", "Cantidad", 
+                               "Costo Total", "Fecha Pedido", "Fecha Entrega", "Estado"};
             int colNum = 0;
             for (String header : headers) {
                 Cell cell = headerRow.createCell(colNum++);
@@ -1127,59 +1128,69 @@ public class ExcelUtil {
                 cell.setCellStyle(headerStyle);
             }
 
-            // Datos de órdenes
+            // Datos de órdenes usando el bean de almacén OrdenCompra
             double montoTotalGeneral = 0.0;
             for (Object obj : listaOrdenes) {
                 Row row = sheet.createRow(rowNum++);
                 try {
+                    com.example.telito.almacen.beans.OrdenCompra orden = (com.example.telito.almacen.beans.OrdenCompra) obj;
+                    
                     // N° de Orden
                     Cell cell = row.createCell(0);
-                    cell.setCellValue((String) obj.getClass().getMethod("getNumeroOrden").invoke(obj));
+                    cell.setCellValue(orden.getNumeroOrden() != null ? orden.getNumeroOrden() : "");
                     cell.setCellStyle(dataStyle);
 
-                    // Proveedor
+                    // SKU del Producto
                     cell = row.createCell(1);
-                    cell.setCellValue((String) obj.getClass().getMethod("getNombreProveedor").invoke(obj));
+                    cell.setCellValue(orden.getProductoSku() != null ? orden.getProductoSku() : "");
                     cell.setCellStyle(dataStyle);
 
                     // Producto
                     cell = row.createCell(2);
-                    cell.setCellValue((String) obj.getClass().getMethod("getNombreProducto").invoke(obj));
+                    cell.setCellValue(orden.getNombreProducto() != null ? orden.getNombreProducto() : "");
                     cell.setCellStyle(dataStyle);
 
-                    // Cantidad (Paquetes)
-                    int cantidad = (Integer) obj.getClass().getMethod("getCantidadPaquetes").invoke(obj);
+                    // Proveedor
                     cell = row.createCell(3);
-                    cell.setCellValue(cantidad);
+                    cell.setCellValue(orden.getNombreProveedor() != null ? orden.getNombreProveedor() : "");
                     cell.setCellStyle(dataStyle);
 
-                    // Monto Total
-                    String montoTotalStr = (String) obj.getClass().getMethod("getMontoTotal").invoke(obj);
-                    // Extraer el número del string "S/. XX.XX"
-                    double monto = 0.0;
-                    if (montoTotalStr != null && !montoTotalStr.trim().isEmpty()) {
-                        try {
-                            String montoLimpio = montoTotalStr.replace("S/.", "").replace(" ", "").trim();
-                            monto = Double.parseDouble(montoLimpio);
-                        } catch (NumberFormatException e) {
-                            // Si falla, intentar sin formato
-                            monto = 0.0;
-                        }
-                    }
-                    montoTotalGeneral += monto;
+                    // Cantidad
                     cell = row.createCell(4);
+                    cell.setCellValue(orden.getCantidad());
+                    cell.setCellStyle(dataStyle);
+
+                    // Costo Total
+                    double monto = 0.0;
+                    if (orden.getCostoTotal() != null) {
+                        monto = orden.getCostoTotal().doubleValue();
+                        montoTotalGeneral += monto;
+                    }
+                    cell = row.createCell(5);
                     cell.setCellValue(monto);
                     cell.setCellStyle(currencyStyle);
 
-                    // Estado
-                    String estado = (String) obj.getClass().getMethod("getEstado").invoke(obj);
-                    cell = row.createCell(5);
-                    cell.setCellValue(estado != null ? estado : "");
+                    // Fecha de Pedido
+                    cell = row.createCell(6);
+                    if (orden.getFechaPedido() != null) {
+                        cell.setCellValue(new java.text.SimpleDateFormat("dd/MM/yyyy").format(orden.getFechaPedido()));
+                    } else {
+                        cell.setCellValue("");
+                    }
                     cell.setCellStyle(dataStyle);
 
-                    // Personal Responsable
-                    cell = row.createCell(6);
-                    cell.setCellValue((String) obj.getClass().getMethod("getPersonalResponsable").invoke(obj));
+                    // Fecha de Entrega Esperada
+                    cell = row.createCell(7);
+                    if (orden.getFechaEntregaEsperada() != null) {
+                        cell.setCellValue(new java.text.SimpleDateFormat("dd/MM/yyyy").format(orden.getFechaEntregaEsperada()));
+                    } else {
+                        cell.setCellValue("");
+                    }
+                    cell.setCellStyle(dataStyle);
+
+                    // Estado
+                    cell = row.createCell(8);
+                    cell.setCellValue(orden.getEstado() != null ? orden.getEstado() : "");
                     cell.setCellStyle(dataStyle);
 
                 } catch (Exception e) {
@@ -1195,7 +1206,7 @@ public class ExcelUtil {
             totalLabelCell.setCellValue("TOTAL GENERAL:");
             totalLabelCell.setCellStyle(headerStyle);
             
-            Cell totalValueCell = totalRow.createCell(4);
+            Cell totalValueCell = totalRow.createCell(5);
             totalValueCell.setCellValue(montoTotalGeneral);
             totalValueCell.setCellStyle(currencyStyle);
 
@@ -2361,5 +2372,161 @@ public class ExcelUtil {
             workbook.write(outputStream);
         }
     }
+
+    /**
+     * Genera un archivo Excel con la lista de pedidos del almacén
+     */
+    public static void generarExcelPedidos(ArrayList<?> listaPedidos, OutputStream outputStream, String filtrosInformacion) throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Pedidos de Salida");
+
+            // ===== ESTILOS =====
+            CellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(IndexedColors.DARK_TEAL.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            headerStyle.setAlignment(HorizontalAlignment.CENTER);
+            headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+            headerStyle.setBorderBottom(BorderStyle.THIN);
+            headerStyle.setBorderTop(BorderStyle.THIN);
+            headerStyle.setBorderLeft(BorderStyle.THIN);
+            headerStyle.setBorderRight(BorderStyle.THIN);
+
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerFont.setColor(IndexedColors.WHITE.getIndex());
+            headerFont.setFontHeightInPoints((short) 12);
+            headerStyle.setFont(headerFont);
+
+            CellStyle titleStyle = workbook.createCellStyle();
+            Font titleFont = workbook.createFont();
+            titleFont.setBold(true);
+            titleFont.setFontHeightInPoints((short) 16);
+            titleFont.setColor(IndexedColors.DARK_TEAL.getIndex());
+            titleStyle.setFont(titleFont);
+            titleStyle.setAlignment(HorizontalAlignment.CENTER);
+
+            CellStyle infoStyle = workbook.createCellStyle();
+            Font infoFont = workbook.createFont();
+            infoFont.setItalic(true);
+            infoFont.setFontHeightInPoints((short) 10);
+            infoFont.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
+            infoStyle.setFont(infoFont);
+
+            CellStyle dataStyle = workbook.createCellStyle();
+            dataStyle.setAlignment(HorizontalAlignment.LEFT);
+            dataStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+            dataStyle.setBorderBottom(BorderStyle.THIN);
+            dataStyle.setBorderTop(BorderStyle.THIN);
+            dataStyle.setBorderLeft(BorderStyle.THIN);
+            dataStyle.setBorderRight(BorderStyle.THIN);
+
+            CellStyle numberStyle = workbook.createCellStyle();
+            numberStyle.cloneStyleFrom(dataStyle);
+            numberStyle.setAlignment(HorizontalAlignment.RIGHT);
+
+            CellStyle dateStyle = workbook.createCellStyle();
+            dateStyle.cloneStyleFrom(dataStyle);
+            dateStyle.setAlignment(HorizontalAlignment.CENTER);
+            CreationHelper createHelper = workbook.getCreationHelper();
+            dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/mm/yyyy hh:mm"));
+
+            // ===== TÍTULO =====
+            int rowIndex = 0;
+            Row titleRow = sheet.createRow(rowIndex++);
+            titleRow.setHeightInPoints(25);
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("📦 REPORTE DE PEDIDOS DE SALIDA - ALMACÉN");
+            titleCell.setCellStyle(titleStyle);
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 5));
+
+            // ===== INFORMACIÓN DE FILTROS =====
+            Row infoRow1 = sheet.createRow(rowIndex++);
+            Cell infoCell1 = infoRow1.createCell(0);
+            infoCell1.setCellValue("Filtros aplicados: " + filtrosInformacion);
+            infoCell1.setCellStyle(infoStyle);
+            sheet.addMergedRegion(new CellRangeAddress(rowIndex - 1, rowIndex - 1, 0, 5));
+
+            Row infoRow2 = sheet.createRow(rowIndex++);
+            Cell infoCell2 = infoRow2.createCell(0);
+            infoCell2.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date()));
+            infoCell2.setCellStyle(infoStyle);
+            sheet.addMergedRegion(new CellRangeAddress(rowIndex - 1, rowIndex - 1, 0, 5));
+
+            rowIndex++; // Fila vacía
+
+            // ===== ENCABEZADOS =====
+            int headerRowIndex = rowIndex;
+            Row headerRow = sheet.createRow(rowIndex++);
+            headerRow.setHeightInPoints(20);
+
+            String[] headers = {
+                "N° Pedido", 
+                "Cliente", 
+                "Destino", 
+                "Fecha Creación", 
+                "Estado", 
+                "Productos"
+            };
+
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // ===== DATOS =====
+            for (Object obj : listaPedidos) {
+                com.example.telito.almacen.beans.Pedido pedido = (com.example.telito.almacen.beans.Pedido) obj;
+                Row dataRow = sheet.createRow(rowIndex++);
+
+                Cell c0 = dataRow.createCell(0);
+                c0.setCellValue(pedido.getNumeroPedido());
+                c0.setCellStyle(dataStyle);
+
+                Cell c1 = dataRow.createCell(1);
+                c1.setCellValue(pedido.getCliente() != null ? pedido.getCliente().getNombre() : "");
+                c1.setCellStyle(dataStyle);
+
+                Cell c2 = dataRow.createCell(2);
+                c2.setCellValue(pedido.getDestino() != null ? pedido.getDestino() : "");
+                c2.setCellStyle(dataStyle);
+
+                Cell c3 = dataRow.createCell(3);
+                if (pedido.getFechaCreacion() != null) {
+                    c3.setCellValue(pedido.getFechaCreacion());
+                    c3.setCellStyle(dateStyle);
+                } else {
+                    c3.setCellValue("");
+                    c3.setCellStyle(dataStyle);
+                }
+
+                Cell c4 = dataRow.createCell(4);
+                c4.setCellValue(pedido.getEstadoPreparacion() != null ? pedido.getEstadoPreparacion() : "");
+                c4.setCellStyle(dataStyle);
+
+                Cell c5 = dataRow.createCell(5);
+                int cantidadProductos = pedido.getItems() != null ? pedido.getItems().size() : 0;
+                c5.setCellValue(cantidadProductos + " producto(s)");
+                c5.setCellStyle(numberStyle);
+            }
+
+            // ===== AJUSTAR ANCHO DE COLUMNAS =====
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+                int currentWidth = sheet.getColumnWidth(i);
+                sheet.setColumnWidth(i, currentWidth + 1000);
+            }
+
+            // Aplicar filtro automático
+            sheet.setAutoFilter(new CellRangeAddress(headerRowIndex, headerRowIndex, 0, headers.length - 1));
+            
+            // Congelar paneles
+            sheet.createFreezePane(0, headerRowIndex + 1);
+
+            // Escribir al stream
+            workbook.write(outputStream);
+        }
+    }
 }
+
 

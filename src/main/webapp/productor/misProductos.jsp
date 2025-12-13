@@ -769,6 +769,13 @@
                 min-width: 600px; /* Permitir scroll horizontal si es necesario */
             }
         }
+        
+        /* Fix para botones clickeables en cualquier tamaño de ventana */
+        .page-header .btn, .page-header button, .page-header a.btn {
+            position: relative !important;
+            z-index: 100 !important;
+            pointer-events: auto !important;
+        }
     </style>
 </head>
 <body>

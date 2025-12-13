@@ -360,5 +360,18 @@ public class EmailService {
                "</body>" +
                "</html>";
     }
+    
+    /**
+     * Método de instancia para enviar emails personalizados.
+     * Delega al método estático enviarCorreo.
+     * 
+     * @param destinatario Email del destinatario
+     * @param asunto Asunto del correo
+     * @param contenidoHTML Contenido HTML del correo
+     * @return true si se envió correctamente
+     */
+    public boolean enviarEmailPersonalizado(String destinatario, String asunto, String contenidoHTML) {
+        return enviarCorreo(destinatario, asunto, contenidoHTML);
+    }
 }
 

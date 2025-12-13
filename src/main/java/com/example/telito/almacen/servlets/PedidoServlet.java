@@ -47,6 +47,8 @@ public class PedidoServlet extends HttpServlet {
             case "lista":
                 try {
                     int registrosPorPagina = 5;
+                    
+                    // Paginación para PEDIDOS
                     String pageStr = request.getParameter("page");
                     int paginaActual = 1;
                     try {
@@ -75,21 +77,51 @@ public class PedidoServlet extends HttpServlet {
                     int offset = (paginaActual - 1) * registrosPorPagina;
                     ArrayList<Pedido> listaPaginada = pedidoDao.listarPedidosPaginados(offset, registrosPorPagina, busqueda, estado);
 
-                    // También traemos los planes de transporte pendientes
+                    // Paginación para PLANES DE TRANSPORTE
                     PlanTransporteDao planTransporteDao = new PlanTransporteDao();
-                    ArrayList<PlanTransporte> listaPlanes = planTransporteDao.listarPlanesPendientes();
+                    String pagePlanesStr = request.getParameter("pagePlanes");
+                    int paginaPlanes = 1;
+                    try {
+                        if (pagePlanesStr != null && !pagePlanesStr.isEmpty()) {
+                            paginaPlanes = Integer.parseInt(pagePlanesStr);
+                        }
+                    } catch (NumberFormatException e) {
+                        paginaPlanes = 1;
+                    }
+                    if (paginaPlanes < 1) paginaPlanes = 1;
 
+                    int totalPlanes = planTransporteDao.contarTotalPlanes();
+                    int totalPaginasPlanes = (int) Math.ceil((double) totalPlanes / registrosPorPagina);
+                    if (totalPaginasPlanes == 0) totalPaginasPlanes = 1;
+                    if (paginaPlanes > totalPaginasPlanes) paginaPlanes = totalPaginasPlanes;
+                    
+                    int offsetPlanes = (paginaPlanes - 1) * registrosPorPagina;
+                    ArrayList<PlanTransporte> listaPlanes = planTransporteDao.listarPlanesPaginados(offsetPlanes, registrosPorPagina);
+
+                    // Atributos para tabla de PEDIDOS
                     request.setAttribute("listaPedidos", listaPaginada);
-                    request.setAttribute("listaPlanes", listaPlanes);
                     request.setAttribute("currentPage", paginaActual);
                     request.setAttribute("size", registrosPorPagina);
                     request.setAttribute("totalPages", totalPaginas);
                     request.setAttribute("totalRows", totalRegistros);
+                    request.setAttribute("baseUrl", request.getContextPath() + "/almacen/PedidoServlet");
+                    request.setAttribute("itemName", "pedidos");
+                    
+                    // Atributos para tabla de PLANES
+                    request.setAttribute("listaPlanes", listaPlanes);
+                    request.setAttribute("currentPagePlanes", paginaPlanes);
+                    request.setAttribute("sizePlanes", registrosPorPagina);
+                    request.setAttribute("totalPagesPlanes", totalPaginasPlanes);
+                    request.setAttribute("totalRowsPlanes", totalPlanes);
+                    request.setAttribute("baseUrlPlanes", request.getContextPath() + "/almacen/PedidoServlet");
+                    request.setAttribute("itemNamePlanes", "planes");
+                    
+                    // Estadísticas
                     request.setAttribute("totalPedidos", totalPedidos);
                     request.setAttribute("pedidosPendientes", pedidosPendientes);
                     request.setAttribute("pedidosDespachados", pedidosDespachados);
-                    request.setAttribute("baseUrl", request.getContextPath() + "/almacen/PedidoServlet");
-                    request.setAttribute("itemName", "pedidos");
+                    
+                    // Filtros
                     request.setAttribute("busqueda", busqueda);
                     request.setAttribute("estadoFiltro", estado);
 

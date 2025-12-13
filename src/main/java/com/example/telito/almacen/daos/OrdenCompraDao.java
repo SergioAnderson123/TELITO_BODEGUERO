@@ -328,4 +328,76 @@ public class OrdenCompraDao extends DAOBase {
         }
         return 0;
     }
+
+    /**
+     * Método para obtener todas las órdenes sin paginación (para reportes)
+     */
+    public ArrayList<OrdenCompra> listarTodasLasOrdenes() {
+        ArrayList<OrdenCompra> lista = new ArrayList<>();
+        String sql = "SELECT oc.id_orden_compra, " +
+                "IFNULL(oc.numero_Orden, CONCAT('OC', LPAD(oc.id_orden_compra, 3, '0'))) AS numero_orden, " +
+                "prod.nombre AS producto_nombre, " +
+                "prod.sku AS producto_sku, " +
+                "CONCAT(productor.nombres, ' ', productor.apellidos) AS nombre_productor, " +
+                "oc.cantidad, " +
+                "oc.fecha_pedido, " +
+                "oc.fecha_entrega_esperada, " +
+                "oc.costo_total, " +
+                "CASE " +
+                "    WHEN EXISTS (SELECT 1 FROM movimientos_inventario mi WHERE mi.orden_compra_id = oc.id_orden_compra AND mi.tipo = 'Entrada') " +
+                "    THEN 'Registrado' " +
+                "    ELSE oc.estado " +
+                "END AS estado " +
+                "FROM ordenes_compra oc " +
+                "INNER JOIN productos prod ON (oc.producto_id = prod.id_producto) " +
+                "INNER JOIN usuarios productor ON (oc.productor_id = productor.id_usuario) " +
+                "WHERE oc.estado = 'Aprobado' " +
+                "ORDER BY oc.id_orden_compra DESC";
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                OrdenCompra oc = new OrdenCompra();
+                oc.setIdOrdenCompra(rs.getInt("id_orden_compra"));
+                oc.setNumeroOrden(rs.getString("numero_orden"));
+                oc.setNombreProducto(rs.getString("producto_nombre"));
+                oc.setProductoSku(rs.getString("producto_sku"));
+                oc.setNombreProveedor(rs.getString("nombre_productor"));
+                oc.setCantidad(rs.getInt("cantidad"));
+                
+                // Manejo de fechas que pueden ser NULL
+                Date fechaPedido = rs.getDate("fecha_pedido");
+                if (fechaPedido != null) {
+                    oc.setFechaPedido(fechaPedido);
+                }
+                
+                Date fechaEntrega = rs.getDate("fecha_entrega_esperada");
+                if (fechaEntrega != null) {
+                    oc.setFechaEntregaEsperada(fechaEntrega);
+                }
+                
+                // Manejo de BigDecimal que puede ser NULL
+                java.math.BigDecimal costo = rs.getBigDecimal("costo_total");
+                if (costo != null) {
+                    oc.setCostoTotal(costo);
+                }
+                
+                oc.setEstado(rs.getString("estado"));
+                lista.add(oc);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al listar todas las órdenes", e);
+            throw new RuntimeException("Error al listar todas las órdenes", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return lista;
+    }
 }
