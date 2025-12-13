@@ -42,6 +42,10 @@ public class PlanTransporteServlet extends HttpServlet {
         String action = request.getParameter("action") == null ? "listar" : request.getParameter("action");
 
         PlanTransporteDao planTransporteDao = new PlanTransporteDao();
+        LoteDao loteDao = new LoteDao();
+        ConductorDao conductorDao = new ConductorDao();
+        VehiculoDao vehiculoDao = new VehiculoDao();
+        DistritoDao distritoDao = new DistritoDao();
         RequestDispatcher rd;
 
         switch (action) {
@@ -70,11 +74,14 @@ public class PlanTransporteServlet extends HttpServlet {
                 int planesEnRuta = planTransporteDao.contarPlanes(null, null, "En Ruta", null, null);
                 int planesEntregados = planTransporteDao.contarPlanes(null, null, "Entregado", null, null);
 
-                ConductorDao conductorDao = new ConductorDao();
                 ArrayList<PlanTransporteBean> listaPlanes = planTransporteDao.listarPlanesDeTransporte(busqueda, conductorId, estado, fechaDesde, fechaHasta, page, size);
 
+                // Cargar datos para el modal de Agregar Plan y filtros
                 request.setAttribute("listaConductores", conductorDao.listarConductores());
                 request.setAttribute("listaPlanes", listaPlanes);
+                request.setAttribute("listaLotes", loteDao.listarLotesDisponibles());
+                request.setAttribute("listaVehiculos", vehiculoDao.listarVehiculos());
+                request.setAttribute("listaDistritos", distritoDao.listarDistritos());
                 request.setAttribute("busqueda", busqueda);
                 request.setAttribute("conductorFiltro", conductorId);
                 request.setAttribute("estadoFiltro", estado);
@@ -95,13 +102,8 @@ public class PlanTransporteServlet extends HttpServlet {
                 break;
 
             case "crear":
-                LoteDao loteDao = new LoteDao();
-                ConductorDao conductorDaoForm = new ConductorDao();
-                VehiculoDao vehiculoDao = new VehiculoDao();
-                DistritoDao distritoDao = new DistritoDao();
-
                 request.setAttribute("listaLotes", loteDao.listarLotesDisponibles());
-                request.setAttribute("listaConductores", conductorDaoForm.listarConductores());
+                request.setAttribute("listaConductores", conductorDao.listarConductores());
                 request.setAttribute("listaVehiculos", vehiculoDao.listarVehiculos());
                 request.setAttribute("listaDistritos", distritoDao.listarDistritos());
 

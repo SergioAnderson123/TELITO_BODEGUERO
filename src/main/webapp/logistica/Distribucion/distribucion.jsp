@@ -2,6 +2,9 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.example.telito.logistica.beans.PlanTransporteBean" %>
 <%@ page import="com.example.telito.logistica.beans.ConductorBean" %>
+<%@ page import="com.example.telito.logistica.beans.LoteBean" %>
+<%@ page import="com.example.telito.logistica.beans.VehiculoBean" %>
+<%@ page import="com.example.telito.logistica.beans.DistritoBean" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!doctype html>
 <html lang="es">
@@ -228,6 +231,185 @@
                 padding: 10px;
             }
         }
+        
+        /* ===================== Estilos para Modal de Agregar Plan ===================== */
+        #agregarPlanModal.modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1050; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #agregarPlanModal.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #agregarPlanModal .modal-content { 
+            background-color: #ffffff; 
+            width: 100%;
+            max-width: 800px; 
+            max-height: 90vh; 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        #agregarPlanModal .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%); 
+            padding: 20px 25px; 
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 4px 12px rgba(40,167,69,0.2);
+        }
+        #agregarPlanModal .modal-header h2 { 
+            margin: 0; 
+            color: white; 
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #agregarPlanModal .modal-header h2 i {
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        #agregarPlanModal .modal-close-plan { 
+            color: white; 
+            font-size: 24px; 
+            font-weight: normal; 
+            cursor: pointer; 
+            opacity: 0.9; 
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        #agregarPlanModal .modal-close-plan:hover { 
+            opacity: 1; 
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        #agregarPlanModal .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(90vh - 200px);
+        }
+        #agregarPlanModal .form-group {
+            margin-bottom: 1.25rem;
+        }
+        #agregarPlanModal .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2b2d42;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #agregarPlanModal .form-group label i {
+            color: #28a745;
+            font-size: 0.85rem;
+        }
+        #agregarPlanModal .form-group input,
+        #agregarPlanModal .form-group select,
+        #agregarPlanModal .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        #agregarPlanModal .form-group input:focus,
+        #agregarPlanModal .form-group select:focus,
+        #agregarPlanModal .form-group textarea:focus {
+            border-color: #28a745;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(40,167,69,0.1);
+        }
+        #agregarPlanModal .form-hint {
+            margin-top: 6px;
+            font-size: 0.8rem;
+            color: #6c757d;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        #agregarPlanModal .form-hint i {
+            color: #28a745;
+            margin-top: 2px;
+        }
+        #agregarPlanModal .modal-footer { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 12px; 
+            padding: 20px 25px; 
+            border-top: 2px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 0 0 16px 16px;
+        }
+        #agregarPlanModal .modal-footer button {
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #agregarPlanModal .modal-footer .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        #agregarPlanModal .modal-footer .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+        }
+        #agregarPlanModal .modal-footer button[type="submit"] {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+        }
+        #agregarPlanModal .modal-footer button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40,167,69,0.4);
+        }
+        @media (max-width: 768px) {
+            #agregarPlanModal .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: 95vh;
+                margin: 10px;
+            }
+            #agregarPlanModal.show {
+                padding: 10px;
+            }
+        }
         /* Estilos para stat-cards */
         .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
         .stat-card {
@@ -299,9 +481,9 @@
                         <button type="button" id="openSendDistribucionModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                             <i class="fas fa-envelope me-1"></i>Enviar por Correo
                         </button>
-                        <a href="${pageContext.request.contextPath}/planes-transporte?action=crear" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
+                        <button type="button" id="openAgregarPlanModalBtn" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
                             <i class="fas fa-plus me-1"></i>Agregar Plan
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -696,6 +878,63 @@
             }
         });
     });
+    
+    // ===================== Modal: Agregar Plan de Transporte =====================
+    document.addEventListener('DOMContentLoaded', function() {
+        const agregarPlanModal = document.getElementById('agregarPlanModal');
+        const openAgregarPlanBtn = document.getElementById('openAgregarPlanModalBtn');
+        
+        if (!agregarPlanModal || !openAgregarPlanBtn) {
+            console.error('No se encontraron los elementos del modal de Agregar Plan');
+            return;
+        }
+        
+        const closeAgregarPlanBtn = agregarPlanModal.querySelector('.modal-close-plan');
+        const cancelAgregarPlanBtn = agregarPlanModal.querySelector('.modal-cancel-plan');
+        
+        // Función para abrir el modal
+        function abrirModalAgregarPlan() {
+            agregarPlanModal.classList.add('show');
+            agregarPlanModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Función para cerrar el modal
+        function cerrarModalAgregarPlan() {
+            agregarPlanModal.classList.remove('show');
+            agregarPlanModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        
+        // Event listener para el botón
+        openAgregarPlanBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            abrirModalAgregarPlan();
+        });
+        
+        if (closeAgregarPlanBtn) {
+            closeAgregarPlanBtn.addEventListener('click', cerrarModalAgregarPlan);
+        }
+        
+        if (cancelAgregarPlanBtn) {
+            cancelAgregarPlanBtn.addEventListener('click', cerrarModalAgregarPlan);
+        }
+        
+        // Cerrar al hacer clic fuera del modal
+        agregarPlanModal.addEventListener('click', function(e) {
+            if (e.target === agregarPlanModal) {
+                cerrarModalAgregarPlan();
+            }
+        });
+        
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && agregarPlanModal && agregarPlanModal.classList.contains('show')) {
+                cerrarModalAgregarPlan();
+            }
+        });
+    });
 </script>
 
 <style>
@@ -717,6 +956,134 @@
         color: var(--turquoise-dark);
     }
 </style>
+
+<!-- ===================== Modal: Agregar Plan de Transporte ===================== -->
+<div id="agregarPlanModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-plus"></i> Generar Nuevo Plan de Transporte</h2>
+            <span class="modal-close-plan">&times;</span>
+        </div>
+        
+        <form method="POST" action="${pageContext.request.contextPath}/planes-transporte" id="formAgregarPlan">
+            <input type="hidden" name="action" value="guardar">
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="modalLote">
+                        <i class="fas fa-box"></i>
+                        Producto y Lote a Transportar <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-control" id="modalLote" name="lote_id" required>
+                        <option value="" selected disabled>Seleccione un lote...</option>
+                        <%
+                            ArrayList<LoteBean> lotesModal = (ArrayList<LoteBean>) request.getAttribute("listaLotes");
+                            if (lotesModal != null) {
+                                for (LoteBean lote : lotesModal) { %>
+                        <option value="<%= lote.getId() %>"><%= lote.getNombreProducto() %> (<%= lote.getCodigoLote() %>)</option>
+                        <%     }
+                        } %>
+                    </select>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Selecciona el producto y lote que será transportado</span>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="modalConductor">
+                                <i class="fas fa-user"></i>
+                                Conductor Asignado <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-control" id="modalConductor" name="conductor_id" required>
+                                <option value="" selected disabled>Seleccione un conductor...</option>
+                                <%
+                                    ArrayList<ConductorBean> conductoresModal = (ArrayList<ConductorBean>) request.getAttribute("listaConductores");
+                                    if (conductoresModal != null) {
+                                        for (ConductorBean conductor : conductoresModal) { %>
+                                <option value="<%= conductor.getId() %>"><%= conductor.getNombreCompleto() %></option>
+                                <%     }
+                                } %>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="modalVehiculo">
+                                <i class="fas fa-truck"></i>
+                                Vehículo Asignado <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-control" id="modalVehiculo" name="vehiculo_id" required>
+                                <option value="" selected disabled>Seleccione un vehículo...</option>
+                                <%
+                                    ArrayList<VehiculoBean> vehiculosModal = (ArrayList<VehiculoBean>) request.getAttribute("listaVehiculos");
+                                    if (vehiculosModal != null) {
+                                        for (VehiculoBean vehiculo : vehiculosModal) { %>
+                                <option value="<%= vehiculo.getId() %>"><%= vehiculo.getPlaca() %></option>
+                                <%     }
+                                } %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="modalFechaEntrega">
+                                <i class="fas fa-calendar-alt"></i>
+                                Fecha de Entrega Programada <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" class="form-control" id="modalFechaEntrega" name="fecha_entrega" required>
+                            <div class="form-hint">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Fecha estimada de entrega del producto</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="modalDestino">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Destino (Distrito) <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-control" id="modalDestino" name="distrito_id" required>
+                                <option value="" selected disabled>Seleccione un destino...</option>
+                                <%
+                                    ArrayList<DistritoBean> distritosModal = (ArrayList<DistritoBean>) request.getAttribute("listaDistritos");
+                                    if (distritosModal != null) {
+                                        for (DistritoBean distrito : distritosModal) { %>
+                                <option value="<%= distrito.getId() %>"><%= distrito.getNombre() %></option>
+                                <%     }
+                                } %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info" style="background: rgba(13,202,240,0.1); border-left: 4px solid #0dcaf0; border-radius: 8px; padding: 12px 15px; margin-top: 15px; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle me-2" style="color: #0dcaf0;"></i>
+                    <strong>Importante:</strong> Asegúrate de verificar la disponibilidad del conductor y vehículo para la fecha seleccionada.
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary modal-cancel-plan">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit">
+                    <i class="fas fa-save"></i>
+                    Guardar Plan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <!-- ===================== Modal: Enviar Distribución y Transporte por Correo ===================== -->
 <div id="sendDistribucionModal" class="modal">
