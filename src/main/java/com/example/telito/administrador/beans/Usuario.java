@@ -9,6 +9,7 @@ public class Usuario {
     private String apellidos;
     private String email;
     private String codigoProductor; // Código único para productores (ej: PROD-0001)
+    private Integer distritoId; // ID del distrito asignado (para Gerente de Tienda)
     private String password;
     private boolean activo;
     private boolean cuentaActivada; // Indica si la cuenta ha sido activada por email
@@ -87,6 +88,14 @@ public class Usuario {
 
     public void setCodigoProductor(String codigoProductor) {
         this.codigoProductor = codigoProductor;
+    }
+    
+    public Integer getDistritoId() {
+        return distritoId;
+    }
+    
+    public void setDistritoId(Integer distritoId) {
+        this.distritoId = distritoId;
     }
     
     public boolean isCuentaActivada() {

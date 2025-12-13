@@ -19,6 +19,7 @@ public class AuthorizationHelper {
     public static final int ROL_LOGISTICA = 2;
     public static final int ROL_PRODUCTOR = 3;
     public static final int ROL_ALMACEN = 4;
+    public static final int ROL_GERENTE_TIENDA = 7;
 
     /**
      * Obtiene el usuario actual de la sesión.
@@ -178,6 +179,16 @@ public class AuthorizationHelper {
     public static boolean esProductor(HttpSession session) {
         return tieneRol(session, ROL_PRODUCTOR);
     }
+    
+    /**
+     * Verifica si el usuario actual tiene permisos de gerente de tienda.
+     * 
+     * @param session Sesión HTTP
+     * @return true si el usuario es gerente de tienda, false en caso contrario
+     */
+    public static boolean esGerenteTienda(HttpSession session) {
+        return tieneRol(session, ROL_GERENTE_TIENDA);
+    }
 
     /**
      * Verifica si el usuario puede acceder al módulo de almacén.
@@ -222,6 +233,17 @@ public class AuthorizationHelper {
     public static boolean puedeAccederAdministrador(HttpSession session) {
         return esAdministrador(session);
     }
+    
+    /**
+     * Verifica si el usuario puede acceder al módulo de gerente de tienda.
+     * Solo los usuarios con rol de gerente de tienda pueden acceder.
+     * 
+     * @param session Sesión HTTP
+     * @return true si el usuario puede acceder al módulo de gerente de tienda, false en caso contrario
+     */
+    public static boolean puedeAccederGerenteTienda(HttpSession session) {
+        return esGerenteTienda(session);
+    }
 
     /**
      * Obtiene la URL de redirección según el rol del usuario.
@@ -253,6 +275,8 @@ public class AuthorizationHelper {
             case "almacenero":
             case "almacén":
                 return contextPath + "/almacen/index.jsp";
+            case "gerente de tienda":
+                return contextPath + "/gerente-tienda/index.jsp";
             default:
                 return contextPath + "/acceso/login";
         }

@@ -13,7 +13,7 @@ public class UsuarioDAO extends DAOBase {
 
         ArrayList<Usuario> listaUsuarios = new ArrayList<>();
         // La consulta base une usuarios con roles para mostrar el nombre del rol.
-        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.codigo_productor, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
+        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.codigo_productor, u.activo, u.rol_id, u.foto_perfil, u.distrito_id, r.nombre AS nombre_rol FROM usuarios u " +
                 "INNER JOIN roles r ON u.rol_id = r.id_rol WHERE 1=1";
 
         // Voy añadiendo a la consulta los filtros que el usuario haya usado.
@@ -23,10 +23,10 @@ public class UsuarioDAO extends DAOBase {
         if (rolId != null && !rolId.trim().isEmpty()) {
             sql += " AND u.rol_id = ?";
         }
+        // Solo filtrar por estado si se especifica un valor (1=activo, 0=inactivo)
+        // Si es null o vacío, significa "Todos" y no se aplica filtro
         if (estado != null && !estado.trim().isEmpty()) {
             sql += " AND u.activo = ?";
-        } else if (estado == null) {
-            sql += " AND u.activo = 1"; // Por defecto, solo muestro los activos.
         }
 
         // Lógica para ordenar la tabla según la columna que se elija.
@@ -99,6 +99,14 @@ public class UsuarioDAO extends DAOBase {
                     // Columna foto_perfil no existe, usar valor por defecto
                     usuario.setFotoPerfil(null);
                 }
+                
+                // Intentar obtener distrito_id si existe la columna
+                try {
+                    int distritoId = rs.getInt("distrito_id");
+                    usuario.setDistritoId(rs.wasNull() ? null : distritoId);
+                } catch (SQLException e) {
+                    usuario.setDistritoId(null);
+                }
 
                 Rol rol = new Rol();
                 rol.setIdRol(rs.getInt("rol_id"));
@@ -126,10 +134,10 @@ public class UsuarioDAO extends DAOBase {
         if (rolId != null && !rolId.trim().isEmpty()) {
             sql += " AND u.rol_id = ?";
         }
+        // Solo filtrar por estado si se especifica un valor (1=activo, 0=inactivo)
+        // Si es null o vacío, significa "Todos" y no se aplica filtro
         if (estado != null && !estado.trim().isEmpty()) {
             sql += " AND u.activo = ?";
-        } else if (estado == null) {
-            sql += " AND u.activo = 1";
         }
 
         Connection conn = null;
@@ -171,9 +179,12 @@ public class UsuarioDAO extends DAOBase {
     public boolean crearUsuario(Usuario usuario) {
         // Encripto el password con SHA2 para no guardarlo en texto plano.
         // Si es productor y tiene código, incluirlo; si no, el trigger lo generará automáticamente
+        // Si es Gerente de Tienda, incluir distrito_id
         // cuenta_activada se establece en FALSE por defecto (requiere activación por email)
         String sql;
-        if (usuario.getRol().getIdRol() == 3 && usuario.getCodigoProductor() != null && !usuario.getCodigoProductor().trim().isEmpty()) {
+        int rolId = usuario.getRol().getIdRol();
+        
+        if (rolId == 3 && usuario.getCodigoProductor() != null && !usuario.getCodigoProductor().trim().isEmpty()) {
             // Productor con código específico
             sql = "INSERT INTO usuarios (nombres, apellidos, email, codigo_productor, password, activo, rol_id, cuenta_activada) VALUES (?, ?, ?, ?, SHA2(?, 256), 1, ?, 0)";
             int filasAfectadas = executeUpdate(sql,
@@ -182,7 +193,18 @@ public class UsuarioDAO extends DAOBase {
                 usuario.getEmail(),
                 usuario.getCodigoProductor(),
                 usuario.getPassword(),
-                usuario.getRol().getIdRol());
+                rolId);
+            return filasAfectadas > 0;
+        } else if (rolId == 7 && usuario.getDistritoId() != null) {
+            // Gerente de Tienda con distrito asignado
+            sql = "INSERT INTO usuarios (nombres, apellidos, email, password, activo, rol_id, distrito_id, cuenta_activada) VALUES (?, ?, ?, SHA2(?, 256), 1, ?, ?, 0)";
+            int filasAfectadas = executeUpdate(sql,
+                usuario.getNombres(),
+                usuario.getApellidos(),
+                usuario.getEmail(),
+                usuario.getPassword(),
+                rolId,
+                usuario.getDistritoId());
             return filasAfectadas > 0;
         } else {
             // Usuario normal o productor sin código (el trigger generará el código)
@@ -192,7 +214,7 @@ public class UsuarioDAO extends DAOBase {
                 usuario.getApellidos(),
                 usuario.getEmail(),
                 usuario.getPassword(),
-                usuario.getRol().getIdRol());
+                rolId);
             return filasAfectadas > 0;
         }
     }
@@ -200,7 +222,7 @@ public class UsuarioDAO extends DAOBase {
     // Para cargar los datos de un usuario en el formulario de edición.
     public Usuario obtenerUsuarioPorId(int id) {
         Usuario usuario = null;
-        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.codigo_productor, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
+        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.codigo_productor, u.activo, u.rol_id, u.foto_perfil, u.distrito_id, r.nombre AS nombre_rol FROM usuarios u " +
                 "INNER JOIN roles r ON u.rol_id = r.id_rol WHERE u.id_usuario = ?";
 
         Connection conn = null;
@@ -264,25 +286,38 @@ public class UsuarioDAO extends DAOBase {
 
     // Actualiza los datos del usuario desde el formulario de edición.
     public void actualizarUsuario(Usuario usuario) {
+        int rolId = usuario.getRol().getIdRol();
+        
         // Si es productor, actualizar también el código de productor
-        if (usuario.getRol().getIdRol() == 3 && usuario.getCodigoProductor() != null) {
-            String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, codigo_productor = ?, rol_id = ?, activo = ? WHERE id_usuario = ?";
+        if (rolId == 3 && usuario.getCodigoProductor() != null) {
+            String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, codigo_productor = ?, rol_id = ?, activo = ?, distrito_id = NULL WHERE id_usuario = ?";
             executeUpdate(sql,
                 usuario.getNombres(),
                 usuario.getApellidos(),
                 usuario.getEmail(),
                 usuario.getCodigoProductor(),
-                usuario.getRol().getIdRol(),
+                rolId,
                 usuario.isActivo(),
                 usuario.getIdUsuario());
-        } else {
-            // Si cambia de productor a otro rol, limpiar el código de productor
-            String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, codigo_productor = NULL, rol_id = ?, activo = ? WHERE id_usuario = ?";
+        } else if (rolId == 7 && usuario.getDistritoId() != null) {
+            // Si es Gerente de Tienda, actualizar distrito_id y limpiar codigo_productor
+            String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, codigo_productor = NULL, rol_id = ?, activo = ?, distrito_id = ? WHERE id_usuario = ?";
             executeUpdate(sql,
                 usuario.getNombres(),
                 usuario.getApellidos(),
                 usuario.getEmail(),
-                usuario.getRol().getIdRol(),
+                rolId,
+                usuario.isActivo(),
+                usuario.getDistritoId(),
+                usuario.getIdUsuario());
+        } else {
+            // Si cambia de productor o gerente a otro rol, limpiar campos específicos
+            String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, codigo_productor = NULL, rol_id = ?, activo = ?, distrito_id = NULL WHERE id_usuario = ?";
+            executeUpdate(sql,
+                usuario.getNombres(),
+                usuario.getApellidos(),
+                usuario.getEmail(),
+                rolId,
                 usuario.isActivo(),
                 usuario.getIdUsuario());
         }
@@ -414,6 +449,14 @@ public class UsuarioDAO extends DAOBase {
                     usuario.setCuentaActivada(true);
                     usuario.setFechaActivacion(null);
                 }
+                
+                // Intentar obtener distrito_id si existe la columna
+                try {
+                    int distritoId = rs.getInt("distrito_id");
+                    usuario.setDistritoId(rs.wasNull() ? null : distritoId);
+                } catch (SQLException e) {
+                    usuario.setDistritoId(null);
+                }
 
                 Rol rol = new Rol();
                 rol.setIdRol(rs.getInt("rol_id"));
@@ -488,6 +531,14 @@ public class UsuarioDAO extends DAOBase {
                     usuario.setFotoPerfil(rs.getString("foto_perfil"));
                 } catch (SQLException e) {
                     usuario.setFotoPerfil(null);
+                }
+                
+                // Intentar obtener distrito_id si existe la columna
+                try {
+                    int distritoId = rs.getInt("distrito_id");
+                    usuario.setDistritoId(rs.wasNull() ? null : distritoId);
+                } catch (SQLException e) {
+                    usuario.setDistritoId(null);
                 }
                 
                 Rol rol = new Rol();
@@ -707,7 +758,7 @@ public class UsuarioDAO extends DAOBase {
      */
     public ArrayList<Usuario> listarTodosUsuarios(String busqueda, String rolId, String estado, String sortBy, String sortOrder) {
         ArrayList<Usuario> listaUsuarios = new ArrayList<>();
-        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.codigo_productor, u.activo, u.rol_id, u.foto_perfil, r.nombre AS nombre_rol FROM usuarios u " +
+        String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.codigo_productor, u.activo, u.rol_id, u.foto_perfil, u.distrito_id, r.nombre AS nombre_rol FROM usuarios u " +
                 "INNER JOIN roles r ON u.rol_id = r.id_rol WHERE 1=1";
 
         // Aplicar filtros
@@ -717,10 +768,10 @@ public class UsuarioDAO extends DAOBase {
         if (rolId != null && !rolId.trim().isEmpty()) {
             sql += " AND u.rol_id = ?";
         }
+        // Solo filtrar por estado si se especifica un valor (1=activo, 0=inactivo)
+        // Si es null o vacío, significa "Todos" y no se aplica filtro
         if (estado != null && !estado.trim().isEmpty()) {
             sql += " AND u.activo = ?";
-        } else if (estado == null) {
-            sql += " AND u.activo = 1"; // Por defecto, solo activos
         }
 
         // Ordenamiento - por defecto DESC para que los más recientes aparezcan primero
@@ -781,6 +832,14 @@ public class UsuarioDAO extends DAOBase {
                     usuario.setFotoPerfil(rs.getString("foto_perfil"));
                 } catch (SQLException e) {
                     usuario.setFotoPerfil(null);
+                }
+                
+                // Intentar obtener distrito_id si existe la columna
+                try {
+                    int distritoId = rs.getInt("distrito_id");
+                    usuario.setDistritoId(rs.wasNull() ? null : distritoId);
+                } catch (SQLException e) {
+                    usuario.setDistritoId(null);
                 }
 
                 Rol rol = new Rol();

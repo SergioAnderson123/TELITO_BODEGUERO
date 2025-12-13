@@ -307,6 +307,9 @@ public class LoginServlet extends HttpServlet {
             case "productor":
                 response.sendRedirect(contextPath + "/productor/DashboardProductorServlet");
                 break;
+            case "gerente de tienda":
+                response.sendRedirect(contextPath + "/gerente-tienda/index.jsp");
+                break;
             default:
                 response.sendRedirect(contextPath + "/acceso/login");
                 break;

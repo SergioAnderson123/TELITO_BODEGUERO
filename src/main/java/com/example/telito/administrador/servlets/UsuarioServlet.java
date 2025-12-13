@@ -6,6 +6,7 @@ import com.example.telito.administrador.daos.UsuarioDAO;
 import com.example.telito.administrador.services.AuditoriaService;
 import com.example.telito.administrador.services.UsuarioService;
 import com.example.telito.administrador.validators.UsuarioValidator;
+import com.example.telito.almacen.daos.DistritoDao;
 import com.example.telito.util.AuthorizationHelper;
 import com.google.gson.Gson;
 import jakarta.servlet.RequestDispatcher;
@@ -136,6 +137,10 @@ public class UsuarioServlet extends HttpServlet {
                 String busqueda = request.getParameter("busqueda");
                 String rolId = request.getParameter("rol");
                 String estado = request.getParameter("estado");
+                // Normalizar: si estado es cadena vacía, tratarlo como null (Todos)
+                if (estado != null && estado.trim().isEmpty()) {
+                    estado = null;
+                }
                 String sortBy = request.getParameter("sortBy");
                 String sortOrder = request.getParameter("sortOrder");
             
@@ -185,6 +190,10 @@ public class UsuarioServlet extends HttpServlet {
             ArrayList<Usuario> listaUsuarios = usuarioDAO.listarUsuarios(
                 busqueda, rolId, estado, sortBy, sortOrder, page, size);
 
+            // Cargar distritos para el select de Gerente de Tienda
+            DistritoDao distritoDao = new DistritoDao();
+            request.setAttribute("distritos", distritoDao.listar());
+            
             // Establecer atributos en el request
                 request.setAttribute("lista", listaUsuarios);
                 request.setAttribute("busqueda", busqueda);
@@ -378,7 +387,9 @@ public class UsuarioServlet extends HttpServlet {
             }
             
                         session.setAttribute("successMsg", "Usuario creado con éxito.");
-                        response.sendRedirect(request.getContextPath() + "/UsuarioServlet");
+                        // Redirigir con ordenamiento por ID descendente para que el nuevo usuario aparezca primero
+                        // Si no se especifica sortBy, el DAO usa por defecto u.id_usuario DESC
+                        response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=listar&page=1");
                     } else {
             logger.error("Error al crear usuario: {}", resultado.getError());
             errores.add(resultado.getError());
@@ -494,6 +505,16 @@ public class UsuarioServlet extends HttpServlet {
         String codigoProductor = request.getParameter("codigo_productor");
         if (codigoProductor != null && !codigoProductor.trim().isEmpty()) {
             usuario.setCodigoProductor(codigoProductor.trim());
+        }
+        
+        // Distrito (solo para usuarios con rol Gerente de Tienda)
+        String distritoIdStr = request.getParameter("distrito_id");
+        if (distritoIdStr != null && !distritoIdStr.trim().isEmpty()) {
+            try {
+                usuario.setDistritoId(Integer.parseInt(distritoIdStr));
+            } catch (NumberFormatException e) {
+                usuario.setDistritoId(null);
+            }
         }
 
         String password = request.getParameter("password");

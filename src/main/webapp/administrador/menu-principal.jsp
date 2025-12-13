@@ -22,11 +22,6 @@
                     <h2 class="pageheader-title mb-0" style="font-size: 1.4rem;"><i class="fas fa-chart-pie me-2"></i>¡Bienvenido, Administrador!</h2>
                     <p class="pageheader-text mb-0" style="font-size: 0.85rem;">Resumen general del sistema y accesos rápidos.</p>
                 </div>
-                <div class="mt-1 mt-md-0">
-                    <button class="btn btn-primary shadow-sm btn-sm" onclick="location.href='<%= request.getContextPath() %>/UsuarioServlet?action=formCrear'" style="font-weight: 600; padding: 6px 14px; font-size: 0.9rem;">
-                        <i class="fas fa-user-plus me-1"></i> Crear usuario
-                    </button>
-                </div>
             </div>
         </div>
     </div>
