@@ -34,7 +34,8 @@ public class MovimientoProductoServlet extends HttpServlet {
         // Obtener parámetros de búsqueda y filtros
         String busqueda = request.getParameter("busqueda");
         String tipo = request.getParameter("tipo");
-        String periodo = request.getParameter("periodo");
+        String fechaDesde = request.getParameter("fecha_desde");
+        String fechaHasta = request.getParameter("fecha_hasta");
 
         // Parámetros de paginación
         int page = 1;
@@ -50,22 +51,31 @@ public class MovimientoProductoServlet extends HttpServlet {
 
         // Obtener datos filtrados desde el DAO
         MovimientoInventarioDao movimientoDao = new MovimientoInventarioDao();
-        int totalRows = movimientoDao.contarMovimientos(busqueda, tipo, periodo);
+        int totalRows = movimientoDao.contarMovimientos(busqueda, tipo, fechaDesde, fechaHasta);
         int totalPages = (int) Math.ceil(totalRows / (double) size);
         if (totalPages == 0) totalPages = 1;
         if (page > totalPages) page = totalPages;
 
-        ArrayList<MovimientoInventarioBean> listaMovimientos = movimientoDao.obtenerMovimientos(busqueda, tipo, periodo, page, size);
+        ArrayList<MovimientoInventarioBean> listaMovimientos = movimientoDao.obtenerMovimientos(busqueda, tipo, fechaDesde, fechaHasta, page, size);
+
+        // Contar totales de Entradas y Salidas con los mismos filtros (excepto tipo)
+        int totalEntradas = movimientoDao.contarMovimientos(busqueda, "Entrada", fechaDesde, fechaHasta);
+        int totalSalidas = movimientoDao.contarMovimientos(busqueda, "Salida", fechaDesde, fechaHasta);
+        int totalAjustes = movimientoDao.contarMovimientos(busqueda, "Ajuste", fechaDesde, fechaHasta);
 
         // Enviar datos a la JSP
         request.setAttribute("listaMovimientos", listaMovimientos);
         request.setAttribute("busqueda", busqueda);
         request.setAttribute("tipoFiltro", tipo);
-        request.setAttribute("periodoFiltro", periodo);
+        request.setAttribute("fechaDesdeFiltro", fechaDesde);
+        request.setAttribute("fechaHastaFiltro", fechaHasta);
         request.setAttribute("currentPage", page);
         request.setAttribute("size", size);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalRows", totalRows);
+        request.setAttribute("totalEntradas", totalEntradas);
+        request.setAttribute("totalSalidas", totalSalidas);
+        request.setAttribute("totalAjustes", totalAjustes);
         request.setAttribute("baseUrl", request.getContextPath() + "/MovimientoProductoServlet");
         request.setAttribute("itemName", "movimientos");
 

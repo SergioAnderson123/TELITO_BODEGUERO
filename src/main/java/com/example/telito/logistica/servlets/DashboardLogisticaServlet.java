@@ -177,7 +177,7 @@ public class DashboardLogisticaServlet extends HttpServlet {
     private java.util.List<MovimientoInventarioBean> obtenerUltimosMovimientos(int limite) {
         try {
             MovimientoInventarioDao movimientoDao = new MovimientoInventarioDao();
-            return new java.util.ArrayList<>(movimientoDao.obtenerMovimientos(null, null, null, 1, limite));
+            return new java.util.ArrayList<>(movimientoDao.obtenerMovimientos(null, null, null, null, 1, limite));
         } catch (Exception e) {
             System.err.println("Error al obtener últimos movimientos: " + e.getMessage());
             e.printStackTrace();

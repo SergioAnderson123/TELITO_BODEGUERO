@@ -82,10 +82,11 @@ public class MovimientoInventarioReporteServlet extends HttpServlet {
         // Obtener parámetros de filtros de la URL
         String busqueda = request.getParameter("busqueda");
         String tipo = request.getParameter("tipo");
-        String periodo = request.getParameter("periodo");
+        String fechaDesde = request.getParameter("fecha_desde");
+        String fechaHasta = request.getParameter("fecha_hasta");
 
         // Obtener todos los registros sin paginación
-        ArrayList<MovimientoInventarioBean> listaMovimientos = movimientoDao.listarTodosMovimientos(busqueda, tipo, periodo);
+        ArrayList<MovimientoInventarioBean> listaMovimientos = movimientoDao.listarTodosMovimientos(busqueda, tipo, fechaDesde, fechaHasta);
 
         // Construir información de filtros
         StringBuilder filtrosInfo = new StringBuilder();
@@ -96,16 +97,13 @@ public class MovimientoInventarioReporteServlet extends HttpServlet {
             if (filtrosInfo.length() > 0) filtrosInfo.append(", ");
             filtrosInfo.append("Tipo: ").append(tipo);
         }
-        if (periodo != null && !periodo.trim().isEmpty()) {
+        if (fechaDesde != null && !fechaDesde.trim().isEmpty()) {
             if (filtrosInfo.length() > 0) filtrosInfo.append(", ");
-            String periodoTexto = "";
-            switch (periodo) {
-                case "7": periodoTexto = "Últimos 7 días"; break;
-                case "30": periodoTexto = "Últimos 30 días"; break;
-                case "90": periodoTexto = "Últimos 90 días"; break;
-                default: periodoTexto = "Últimos " + periodo + " días";
-            }
-            filtrosInfo.append("Período: ").append(periodoTexto);
+            filtrosInfo.append("Fecha Desde: ").append(fechaDesde);
+        }
+        if (fechaHasta != null && !fechaHasta.trim().isEmpty()) {
+            if (filtrosInfo.length() > 0) filtrosInfo.append(", ");
+            filtrosInfo.append("Fecha Hasta: ").append(fechaHasta);
         }
         if (filtrosInfo.length() == 0) {
             filtrosInfo.append("Todos los movimientos");
@@ -135,7 +133,8 @@ public class MovimientoInventarioReporteServlet extends HttpServlet {
         // Preservar parámetros de filtros en el formulario
         String busqueda = request.getParameter("busqueda");
         String tipo = request.getParameter("tipo");
-        String periodo = request.getParameter("periodo");
+        String fechaDesde = request.getParameter("fecha_desde");
+        String fechaHasta = request.getParameter("fecha_hasta");
         
         if (busqueda != null) {
             request.setAttribute("busqueda", busqueda);
@@ -143,8 +142,11 @@ public class MovimientoInventarioReporteServlet extends HttpServlet {
         if (tipo != null) {
             request.setAttribute("tipo", tipo);
         }
-        if (periodo != null) {
-            request.setAttribute("periodo", periodo);
+        if (fechaDesde != null) {
+            request.setAttribute("fecha_desde", fechaDesde);
+        }
+        if (fechaHasta != null) {
+            request.setAttribute("fecha_hasta", fechaHasta);
         }
 
         request.getRequestDispatcher("/logistica/enviar-reporte-movimientos.jsp")
@@ -163,14 +165,16 @@ public class MovimientoInventarioReporteServlet extends HttpServlet {
         // Obtener parámetros de filtros (si vienen del formulario)
         String busqueda = request.getParameter("busqueda");
         String tipo = request.getParameter("tipo");
-        String periodo = request.getParameter("periodo");
+        String fechaDesde = request.getParameter("fecha_desde");
+        String fechaHasta = request.getParameter("fecha_hasta");
 
         if (emailDestino == null || emailDestino.trim().isEmpty()) {
             session.setAttribute("errorMsg", "El email de destino es obligatorio.");
             String redirectUrl = request.getContextPath() + "/logistica/MovimientoInventarioReporteServlet?action=formEnviar";
             if (busqueda != null) redirectUrl += "&busqueda=" + busqueda;
             if (tipo != null) redirectUrl += "&tipo=" + tipo;
-            if (periodo != null) redirectUrl += "&periodo=" + periodo;
+            if (fechaDesde != null) redirectUrl += "&fecha_desde=" + fechaDesde;
+            if (fechaHasta != null) redirectUrl += "&fecha_hasta=" + fechaHasta;
             response.sendRedirect(redirectUrl);
             return;
         }
@@ -181,7 +185,8 @@ public class MovimientoInventarioReporteServlet extends HttpServlet {
             String redirectUrl = request.getContextPath() + "/logistica/MovimientoInventarioReporteServlet?action=formEnviar";
             if (busqueda != null) redirectUrl += "&busqueda=" + busqueda;
             if (tipo != null) redirectUrl += "&tipo=" + tipo;
-            if (periodo != null) redirectUrl += "&periodo=" + periodo;
+            if (fechaDesde != null) redirectUrl += "&fecha_desde=" + fechaDesde;
+            if (fechaHasta != null) redirectUrl += "&fecha_hasta=" + fechaHasta;
             response.sendRedirect(redirectUrl);
             return;
         }
@@ -189,7 +194,7 @@ public class MovimientoInventarioReporteServlet extends HttpServlet {
         MovimientoInventarioDao movimientoDao = new MovimientoInventarioDao();
 
         // Obtener todos los registros sin paginación con los mismos filtros
-        ArrayList<MovimientoInventarioBean> listaMovimientos = movimientoDao.listarTodosMovimientos(busqueda, tipo, periodo);
+        ArrayList<MovimientoInventarioBean> listaMovimientos = movimientoDao.listarTodosMovimientos(busqueda, tipo, fechaDesde, fechaHasta);
 
         // Construir información de filtros
         StringBuilder filtrosInfo = new StringBuilder();
@@ -200,16 +205,13 @@ public class MovimientoInventarioReporteServlet extends HttpServlet {
             if (filtrosInfo.length() > 0) filtrosInfo.append(", ");
             filtrosInfo.append("Tipo: ").append(tipo);
         }
-        if (periodo != null && !periodo.trim().isEmpty()) {
+        if (fechaDesde != null && !fechaDesde.trim().isEmpty()) {
             if (filtrosInfo.length() > 0) filtrosInfo.append(", ");
-            String periodoTexto = "";
-            switch (periodo) {
-                case "7": periodoTexto = "Últimos 7 días"; break;
-                case "30": periodoTexto = "Últimos 30 días"; break;
-                case "90": periodoTexto = "Últimos 90 días"; break;
-                default: periodoTexto = "Últimos " + periodo + " días";
-            }
-            filtrosInfo.append("Período: ").append(periodoTexto);
+            filtrosInfo.append("Fecha Desde: ").append(fechaDesde);
+        }
+        if (fechaHasta != null && !fechaHasta.trim().isEmpty()) {
+            if (filtrosInfo.length() > 0) filtrosInfo.append(", ");
+            filtrosInfo.append("Fecha Hasta: ").append(fechaHasta);
         }
         if (filtrosInfo.length() == 0) {
             filtrosInfo.append("Todos los movimientos");
@@ -380,7 +382,8 @@ public class MovimientoInventarioReporteServlet extends HttpServlet {
         StringBuilder params = new StringBuilder();
         if (busqueda != null) params.append("?busqueda=").append(busqueda);
         if (tipo != null) params.append(params.length() == 0 ? "?" : "&").append("tipo=").append(tipo);
-        if (periodo != null) params.append(params.length() == 0 ? "?" : "&").append("periodo=").append(periodo);
+        if (fechaDesde != null) params.append(params.length() == 0 ? "?" : "&").append("fecha_desde=").append(fechaDesde);
+        if (fechaHasta != null) params.append(params.length() == 0 ? "?" : "&").append("fecha_hasta=").append(fechaHasta);
         response.sendRedirect(redirectUrl + params.toString());
     }
 }

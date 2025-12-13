@@ -257,7 +257,8 @@
                         <%
                             String busquedaParam = request.getParameter("busqueda");
                             String tipoParam = request.getParameter("tipo");
-                            String periodoParam = request.getParameter("periodo");
+                            String fechaDesdeParam = request.getParameter("fecha_desde");
+                            String fechaHastaParam = request.getParameter("fecha_hasta");
                             StringBuilder urlParams = new StringBuilder();
                             if (busquedaParam != null && !busquedaParam.trim().isEmpty()) {
                                 urlParams.append("&busqueda=").append(java.net.URLEncoder.encode(busquedaParam, "UTF-8"));
@@ -265,8 +266,11 @@
                             if (tipoParam != null && !tipoParam.trim().isEmpty()) {
                                 urlParams.append("&tipo=").append(java.net.URLEncoder.encode(tipoParam, "UTF-8"));
                             }
-                            if (periodoParam != null && !periodoParam.trim().isEmpty()) {
-                                urlParams.append("&periodo=").append(java.net.URLEncoder.encode(periodoParam, "UTF-8"));
+                            if (fechaDesdeParam != null && !fechaDesdeParam.trim().isEmpty()) {
+                                urlParams.append("&fecha_desde=").append(java.net.URLEncoder.encode(fechaDesdeParam, "UTF-8"));
+                            }
+                            if (fechaHastaParam != null && !fechaHastaParam.trim().isEmpty()) {
+                                urlParams.append("&fecha_hasta=").append(java.net.URLEncoder.encode(fechaHastaParam, "UTF-8"));
                             }
                             String urlBase = request.getContextPath() + "/logistica/MovimientoInventarioReporteServlet?action=exportar" + urlParams.toString();
                             String urlEnviar = request.getContextPath() + "/logistica/MovimientoInventarioReporteServlet?action=formEnviar" + urlParams.toString();
@@ -282,33 +286,15 @@
             </div>
 
             <%
-                // Calcular estadísticas desde la lista de movimientos
-                ArrayList<MovimientoInventarioBean> listaMovimientosStats = 
-                    (ArrayList<MovimientoInventarioBean>) request.getAttribute("listaMovimientos");
-                int totalMovimientos = 0;
-                int movimientosEntrada = 0;
-                int movimientosSalida = 0;
-                int movimientosAjuste = 0;
+                // Obtener totales desde el servlet (ya calculados con todos los registros, no solo la página actual)
+                Integer totalMovimientos = (Integer) request.getAttribute("totalRows");
+                Integer totalEntradas = (Integer) request.getAttribute("totalEntradas");
+                Integer totalSalidas = (Integer) request.getAttribute("totalSalidas");
                 
-                if (listaMovimientosStats != null) {
-                    totalMovimientos = listaMovimientosStats.size();
-                    for (MovimientoInventarioBean mov : listaMovimientosStats) {
-                        String tipoMov = mov.getTipo();
-                        if ("Entrada".equalsIgnoreCase(tipoMov)) {
-                            movimientosEntrada++;
-                        } else if ("Salida".equalsIgnoreCase(tipoMov)) {
-                            movimientosSalida++;
-                        } else if ("Ajuste".equalsIgnoreCase(tipoMov)) {
-                            movimientosAjuste++;
-                        }
-                    }
-                }
-                
-                // Si hay totalRows disponible, usarlo para el total real
-                Integer totalRowsAttr = (Integer) request.getAttribute("totalRows");
-                if (totalRowsAttr != null) {
-                    totalMovimientos = totalRowsAttr;
-                }
+                // Valores por defecto si no están disponibles
+                if (totalMovimientos == null) totalMovimientos = 0;
+                if (totalEntradas == null) totalEntradas = 0;
+                if (totalSalidas == null) totalSalidas = 0;
             %>
 
             <!-- ===================== Tarjetas de estadísticas ===================== -->
@@ -322,13 +308,13 @@
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                     <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Entradas</h3>
-                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= movimientosEntrada %></p>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalEntradas %></p>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                     <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Salidas</h3>
-                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= movimientosSalida %></p>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalSalidas %></p>
                     </div>
                 </div>
             </div>
@@ -338,7 +324,7 @@
                 <form action="<%= request.getContextPath() %>/MovimientoProductoServlet" method="GET">
                     <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                     <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
-                        <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
+                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12">
                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                             <div class="input-group">
                                 <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" id="searchInput" placeholder="Producto o lote..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
@@ -347,7 +333,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-filter me-1"></i>Tipo</label>
                             <select class="form-select form-select-sm shadow-sm" name="tipo" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                 <option value="" ${param.tipo == '' ? 'selected' : ''}>Todos</option>
@@ -356,16 +342,15 @@
                                 <option value="Ajuste" ${param.tipo == 'Ajuste' ? 'selected' : ''}>Ajuste</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-calendar me-1"></i>Periodo</label>
-                            <select class="form-select form-select-sm shadow-sm" name="periodo" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                <option value="" ${param.periodo == '' ? 'selected' : ''}>Todos</option>
-                                <option value="7" ${param.periodo == '7' ? 'selected' : ''}>Últimos 7 días</option>
-                                <option value="30" ${param.periodo == '30' ? 'selected' : ''}>Últimos 30 días</option>
-                                <option value="90" ${param.periodo == '90' ? 'selected' : ''}>Últimos 90 días</option>
-                            </select>
+                        <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-calendar me-1"></i>Fecha Desde</label>
+                            <input type="date" class="form-control form-control-sm shadow-sm" name="fecha_desde" id="fechaDesdeFilter" value="${param.fecha_desde}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                         </div>
-                        <div class="col-md-2 d-flex align-items-end">
+                        <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-calendar me-1"></i>Fecha Hasta</label>
+                            <input type="date" class="form-control form-control-sm shadow-sm" name="fecha_hasta" id="fechaHastaFilter" value="${param.fecha_hasta}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                        </div>
+                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 d-flex align-items-end">
                             <a href="<%= request.getContextPath() %>/MovimientoProductoServlet" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                 <i class="fas fa-sync-alt me-1"></i>Limpiar
                             </a>
@@ -474,8 +459,10 @@
                                     request.setAttribute("param1Value", request.getAttribute("busqueda"));
                                     request.setAttribute("param2Name", "tipo");
                                     request.setAttribute("param2Value", request.getAttribute("tipoFiltro"));
-                                    request.setAttribute("param3Name", "periodo");
-                                    request.setAttribute("param3Value", request.getAttribute("periodoFiltro"));
+                                    request.setAttribute("param3Name", "fecha_desde");
+                                    request.setAttribute("param3Value", request.getAttribute("fechaDesdeFiltro"));
+                                    request.setAttribute("param4Name", "fecha_hasta");
+                                    request.setAttribute("param4Value", request.getAttribute("fechaHastaFiltro"));
                                 %>
                                 <jsp:include page="/WEB-INF/includes/pagination.jsp" />
                             </div>
@@ -496,7 +483,8 @@
         const form = document.querySelector('form[action*="MovimientoProductoServlet"]');
         const busquedaInput = form.querySelector('input[name="busqueda"]');
         const tipoSelect = form.querySelector('select[name="tipo"]');
-        const periodoSelect = form.querySelector('select[name="periodo"]');
+        const fechaDesdeFilter = document.getElementById('fechaDesdeFilter');
+        const fechaHastaFilter = document.getElementById('fechaHastaFilter');
         
         // Aplicar filtros cuando cambien los selects
         if (tipoSelect) {
@@ -505,8 +493,15 @@
             });
         }
         
-        if (periodoSelect) {
-            periodoSelect.addEventListener('change', function() {
+        // Aplicar filtros cuando cambien las fechas
+        if (fechaDesdeFilter) {
+            fechaDesdeFilter.addEventListener('change', function() {
+                form.submit();
+            });
+        }
+        
+        if (fechaHastaFilter) {
+            fechaHastaFilter.addEventListener('change', function() {
                 form.submit();
             });
         }
@@ -598,15 +593,18 @@
             const urlParams = new URLSearchParams(window.location.search);
             const busqueda = urlParams.get('busqueda') || '';
             const tipo = urlParams.get('tipo') || '';
-            const periodo = urlParams.get('periodo') || '';
+            const fechaDesde = urlParams.get('fecha_desde') || '';
+            const fechaHasta = urlParams.get('fecha_hasta') || '';
             
             // Poblar campos ocultos con los filtros
             const hiddenBusqueda = document.getElementById('hiddenBusqueda');
             const hiddenTipo = document.getElementById('hiddenTipo');
-            const hiddenPeriodo = document.getElementById('hiddenPeriodo');
+            const hiddenFechaDesde = document.getElementById('hiddenFechaDesde');
+            const hiddenFechaHasta = document.getElementById('hiddenFechaHasta');
             if (hiddenBusqueda) hiddenBusqueda.value = busqueda;
             if (hiddenTipo) hiddenTipo.value = tipo;
-            if (hiddenPeriodo) hiddenPeriodo.value = periodo;
+            if (hiddenFechaDesde) hiddenFechaDesde.value = fechaDesde;
+            if (hiddenFechaHasta) hiddenFechaHasta.value = fechaHasta;
             
             sendMovimientosModal.classList.add('show');
             sendMovimientosModal.style.display = 'flex';
@@ -683,7 +681,8 @@
             <input type="hidden" name="action" value="enviar">
             <input type="hidden" name="busqueda" id="hiddenBusqueda" value="">
             <input type="hidden" name="tipo" id="hiddenTipo" value="">
-            <input type="hidden" name="periodo" id="hiddenPeriodo" value="">
+            <input type="hidden" name="fecha_desde" id="hiddenFechaDesde" value="">
+            <input type="hidden" name="fecha_hasta" id="hiddenFechaHasta" value="">
             
             <div class="modal-body">
                 <div class="form-group">

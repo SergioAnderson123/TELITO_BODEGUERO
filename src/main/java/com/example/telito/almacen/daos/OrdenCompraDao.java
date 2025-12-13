@@ -8,11 +8,22 @@ import java.util.ArrayList;
 public class OrdenCompraDao extends DAOBase {
 
     public int contarOrdenesPendientes() {
-        return contarOrdenesPendientes(null, null);
+        return contarOrdenesPendientes(null, null, null);
     }
     
     public int contarOrdenesPendientes(String busqueda, String proveedorId) {
-        String sql = "SELECT COUNT(*) FROM ordenes_compra oc " +
+        return contarOrdenesPendientes(busqueda, proveedorId, null);
+    }
+    
+    public int contarOrdenesPendientes(String busqueda, String proveedorId, String estado) {
+        String sql = "SELECT COUNT(*) FROM (" +
+                "SELECT oc.id_orden_compra, " +
+                "CASE " +
+                "    WHEN EXISTS (SELECT 1 FROM movimientos_inventario mi WHERE mi.orden_compra_id = oc.id_orden_compra AND mi.tipo = 'Entrada') " +
+                "    THEN 'Registrado' " +
+                "    ELSE oc.estado " +
+                "END AS estado_calculado " +
+                "FROM ordenes_compra oc " +
                 "INNER JOIN productos prod ON (oc.producto_id = prod.id_producto) " +
                 "INNER JOIN usuarios productor ON (oc.productor_id = productor.id_usuario) " +
                 "WHERE oc.estado = 'Aprobado'";
@@ -41,6 +52,14 @@ public class OrdenCompraDao extends DAOBase {
         if (proveedorId != null && !proveedorId.trim().isEmpty()) {
             sql += " AND productor.id_usuario = ?";
             params.add(Integer.parseInt(proveedorId));
+        }
+        
+        sql += ") AS ordenes_filtradas";
+        
+        // Filtro por estado - aplicar sobre el estado calculado
+        if (estado != null && !estado.trim().isEmpty()) {
+            sql += " WHERE estado_calculado = ?";
+            params.add(estado);
         }
         
         Connection conn = null;
@@ -117,12 +136,17 @@ public class OrdenCompraDao extends DAOBase {
     }
 
     public ArrayList<OrdenCompra> listarOrdenesPaginadas(int offset, int limit) {
-        return listarOrdenesPaginadas(offset, limit, null, null);
+        return listarOrdenesPaginadas(offset, limit, null, null, null);
     }
     
     public ArrayList<OrdenCompra> listarOrdenesPaginadas(int offset, int limit, String busqueda, String proveedorId) {
+        return listarOrdenesPaginadas(offset, limit, busqueda, proveedorId, null);
+    }
+    
+    public ArrayList<OrdenCompra> listarOrdenesPaginadas(int offset, int limit, String busqueda, String proveedorId, String estado) {
         ArrayList<OrdenCompra> lista = new ArrayList<>();
-        String sql = "SELECT oc.id_orden_compra, " +
+        String sql = "SELECT * FROM (" +
+                "SELECT oc.id_orden_compra, " +
                 "IFNULL(oc.numero_Orden, CONCAT('OC', LPAD(oc.id_orden_compra, 3, '0'))) AS numero_orden, " +
                 "prod.nombre AS producto_nombre, " +
                 "CONCAT(productor.nombres, ' ', productor.apellidos) AS nombre_productor, " +
@@ -163,7 +187,15 @@ public class OrdenCompraDao extends DAOBase {
             params.add(Integer.parseInt(proveedorId));
         }
         
-        sql += " ORDER BY oc.id_orden_compra DESC LIMIT ? OFFSET ?";
+        sql += ") AS ordenes_filtradas";
+        
+        // Filtro por estado - aplicar sobre el estado calculado
+        if (estado != null && !estado.trim().isEmpty()) {
+            sql += " WHERE estado = ?";
+            params.add(estado);
+        }
+        
+        sql += " ORDER BY id_orden_compra DESC LIMIT ? OFFSET ?";
 
         Connection conn = null;
         PreparedStatement pstmt = null;

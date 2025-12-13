@@ -307,7 +307,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
                                 <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-truck me-1"></i>Proveedor</label>
                                 <select class="form-select form-select-sm shadow-sm" name="proveedor" id="proveedorFilter" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                     <option value="">Todos</option>
@@ -340,7 +340,23 @@
                                     %>
                                 </select>
                             </div>
-                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 d-flex align-items-end">
+                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+                                <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-toggle-on me-1"></i>Estado</label>
+                                <select class="form-select form-select-sm shadow-sm" name="estado" id="estadoFilter" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                    <option value="">Todos</option>
+                                    <%
+                                        String estadoParam = request.getParameter("estado");
+                                        String[] estados = {"Pendiente", "Aprobado", "En Proceso", "Rechazado", "Recibido", "Registrado"};
+                                        for (String estado : estados) {
+                                            String selected = (estadoParam != null && estadoParam.equals(estado)) ? "selected" : "";
+                                    %>
+                                    <option value="<%= estado %>" <%= selected %>><%= estado %></option>
+                                    <%
+                                        }
+                                    %>
+                                </select>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 d-flex align-items-end">
                                 <a href="<%= request.getContextPath() %>/almacen/EntradaServlet?action=lista" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                     <i class="fas fa-sync-alt me-1"></i>Limpiar
                                 </a>
@@ -458,10 +474,17 @@
         const filterForm = document.getElementById('filterForm');
         const searchInput = document.getElementById('searchInput');
         const proveedorFilter = document.getElementById('proveedorFilter');
+        const estadoFilter = document.getElementById('estadoFilter');
         
         // Aplicar filtros cuando cambien los selects
         if (proveedorFilter && filterForm) {
             proveedorFilter.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        }
+        
+        if (estadoFilter && filterForm) {
+            estadoFilter.addEventListener('change', function() {
                 filterForm.submit();
             });
         }

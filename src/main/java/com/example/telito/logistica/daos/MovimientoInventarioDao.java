@@ -10,11 +10,11 @@ public class MovimientoInventarioDao extends DAOBase {
 
     // === MÉTODO MODIFICADO PARA ACEPTAR FILTROS (sin paginación, para compatibilidad) ===
     public ArrayList<MovimientoInventarioBean> obtenerMovimientos(String busqueda, String tipo, String periodo) {
-        return obtenerMovimientos(busqueda, tipo, periodo, 1, Integer.MAX_VALUE);
+        return obtenerMovimientos(busqueda, tipo, null, null, 1, Integer.MAX_VALUE);
     }
 
     // === MÉTODO CON PAGINACIÓN PARA OBTENER MOVIMIENTOS ===
-    public ArrayList<MovimientoInventarioBean> obtenerMovimientos(String busqueda, String tipo, String periodo, int page, int size) {
+    public ArrayList<MovimientoInventarioBean> obtenerMovimientos(String busqueda, String tipo, String fechaDesde, String fechaHasta, int page, int size) {
         ArrayList<MovimientoInventarioBean> listaMovimientos = new ArrayList<>();
 
         String sql = """
@@ -52,15 +52,16 @@ public class MovimientoInventarioDao extends DAOBase {
             params.add(tipo.trim());
         }
 
-        // Filtro por periodo (últimos X días)
-        if (periodo != null && !periodo.trim().isEmpty()) {
-            try {
-                int dias = Integer.parseInt(periodo);
-                sql += " AND mi.fecha >= DATE_SUB(CURDATE(), INTERVAL ? DAY)";
-                params.add(dias);
-            } catch (NumberFormatException e) {
-                // Si no es un número válido, ignorar el filtro
-            }
+        // Filtro por fecha desde
+        if (fechaDesde != null && !fechaDesde.trim().isEmpty()) {
+            sql += " AND mi.fecha >= ?";
+            params.add(fechaDesde.trim());
+        }
+        
+        // Filtro por fecha hasta
+        if (fechaHasta != null && !fechaHasta.trim().isEmpty()) {
+            sql += " AND mi.fecha <= ?";
+            params.add(fechaHasta.trim() + " 23:59:59");
         }
 
         sql += " ORDER BY mi.fecha DESC LIMIT ? OFFSET ?";
@@ -110,7 +111,7 @@ public class MovimientoInventarioDao extends DAOBase {
     }
 
     // === MÉTODO PARA CONTAR TOTAL DE MOVIMIENTOS CON FILTROS ===
-    public int contarMovimientos(String busqueda, String tipo, String periodo) {
+    public int contarMovimientos(String busqueda, String tipo, String fechaDesde, String fechaHasta) {
         String sql = """
             SELECT COUNT(*) as total
             FROM movimientos_inventario mi
@@ -138,15 +139,16 @@ public class MovimientoInventarioDao extends DAOBase {
             params.add(tipo.trim());
         }
 
-        // Filtro por periodo
-        if (periodo != null && !periodo.trim().isEmpty()) {
-            try {
-                int dias = Integer.parseInt(periodo);
-                sql += " AND mi.fecha >= DATE_SUB(CURDATE(), INTERVAL ? DAY)";
-                params.add(dias);
-            } catch (NumberFormatException e) {
-                // Ignorar si no es válido
-            }
+        // Filtro por fecha desde
+        if (fechaDesde != null && !fechaDesde.trim().isEmpty()) {
+            sql += " AND mi.fecha >= ?";
+            params.add(fechaDesde.trim());
+        }
+        
+        // Filtro por fecha hasta
+        if (fechaHasta != null && !fechaHasta.trim().isEmpty()) {
+            sql += " AND mi.fecha <= ?";
+            params.add(fechaHasta.trim() + " 23:59:59");
         }
 
         Connection conn = null;
@@ -176,11 +178,11 @@ public class MovimientoInventarioDao extends DAOBase {
 
     // === MÉTODO PARA OBTENER TODO SIN FILTROS (para mantener compatibilidad) ===
     public ArrayList<MovimientoInventarioBean> obtenerMovimientos() {
-        return obtenerMovimientos(null, null, null);
+        return obtenerMovimientos(null, null, null, null, 1, Integer.MAX_VALUE);
     }
 
     // === MÉTODO PARA OBTENER TODOS LOS MOVIMIENTOS SIN PAGINACIÓN (para reportes) ===
-    public ArrayList<MovimientoInventarioBean> listarTodosMovimientos(String busqueda, String tipo, String periodo) {
-        return obtenerMovimientos(busqueda, tipo, periodo, 1, Integer.MAX_VALUE);
+    public ArrayList<MovimientoInventarioBean> listarTodosMovimientos(String busqueda, String tipo, String fechaDesde, String fechaHasta) {
+        return obtenerMovimientos(busqueda, tipo, fechaDesde, fechaHasta, 1, Integer.MAX_VALUE);
     }
 }

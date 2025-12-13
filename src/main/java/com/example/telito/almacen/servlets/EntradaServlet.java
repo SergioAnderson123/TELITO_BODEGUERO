@@ -61,20 +61,21 @@ public class EntradaServlet extends HttpServlet {
                     // Parámetros de filtros
                     String busqueda = request.getParameter("busqueda");
                     String proveedorId = request.getParameter("proveedor");
+                    String estado = request.getParameter("estado");
 
                     // Contar total con filtros
-                    int totalRegistros = ordenCompraDao.contarOrdenesPendientes(busqueda, proveedorId);
+                    int totalRegistros = ordenCompraDao.contarOrdenesPendientes(busqueda, proveedorId, estado);
                     int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
                     if (totalPaginas == 0) totalPaginas = 1;
                     if (paginaActual > totalPaginas) paginaActual = totalPaginas;
                     
                     // Calcular estadísticas (sin filtros para obtener totales reales)
                     int totalOrdenes = ordenCompraDao.contarTotalOrdenes();
-                    int ordenesPendientes = ordenCompraDao.contarOrdenesPendientes(null, null);
+                    int ordenesPendientes = ordenCompraDao.contarOrdenesPendientes(null, null, null);
                     int ordenesRegistradas = ordenCompraDao.contarOrdenesRegistradas();
                     
                     int offset = (paginaActual - 1) * registrosPorPagina;
-                    ArrayList<OrdenCompra> listaPaginada = ordenCompraDao.listarOrdenesPaginadas(offset, registrosPorPagina, busqueda, proveedorId);
+                    ArrayList<OrdenCompra> listaPaginada = ordenCompraDao.listarOrdenesPaginadas(offset, registrosPorPagina, busqueda, proveedorId, estado);
 
                     // Obtener lista de productores para el filtro
                     request.setAttribute("listaProductores", ordenCompraDao.listarProductores());
