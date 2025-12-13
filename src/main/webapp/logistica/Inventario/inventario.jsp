@@ -561,10 +561,31 @@
             filterForm.submit();
         }
 
-        if (searchInput) {
+        // Variable para el timeout del debounce
+        let searchTimeout = null;
+        
+        // Aplicar filtros automáticamente mientras se escribe en el campo de búsqueda (con debounce)
+        if (searchInput && filterForm) {
+            searchInput.addEventListener('input', function(e) {
+                // Limpiar el timeout anterior
+                if (searchTimeout) {
+                    clearTimeout(searchTimeout);
+                }
+                
+                // Esperar 500ms después de que el usuario deje de escribir antes de enviar
+                searchTimeout = setTimeout(function() {
+                    applyFilters();
+                }, 500);
+            });
+            
+            // Aplicar filtros al presionar Enter en el campo de búsqueda (inmediato)
             searchInput.addEventListener('keypress', function(event) {
                 if (event.key === 'Enter') {
                     event.preventDefault();
+                    // Cancelar el timeout si existe
+                    if (searchTimeout) {
+                        clearTimeout(searchTimeout);
+                    }
                     applyFilters();
                 }
             });
