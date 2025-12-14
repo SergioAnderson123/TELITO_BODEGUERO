@@ -619,101 +619,94 @@ public class ProductorServlet extends HttpServlet {
                     if (actualizado) {
                         System.out.println("✓ Estado actualizado correctamente");
                         
-                        // ========== ENVÍO DE CORREO AL USUARIO DE LOGÍSTICA ==========
-                        // Solo enviar correo si el nuevo estado es "En Proceso"
-                        System.out.println("=== DEBUG: Verificando envío de correo ===");
-                        System.out.println("Nuevo estado recibido: '" + nuevoEstado + "'");
-                        System.out.println("¿Es 'En Proceso'? " + "En Proceso".equals(nuevoEstado));
+                        // IMPORTANTE: Responder PRIMERO antes de enviar correo para no bloquear la respuesta
+                        response.getWriter().write("{\"success\": true, \"message\": \"Estado actualizado correctamente\"}");
+                        response.getWriter().flush();
+                        System.out.println("✓ Respuesta JSON enviada al cliente");
                         
+                        // ========== ENVÍO DE CORREO AL USUARIO DE LOGÍSTICA (ASÍNCRONO) ==========
+                        // Enviar correo en un hilo separado para no bloquear la respuesta
                         if ("En Proceso".equals(nuevoEstado)) {
-                            System.out.println("✓ El estado es 'En Proceso', procediendo a enviar correo...");
-                            try {
-                                // Obtener datos de la orden, SOLO si pertenece al productor logueado
-                                System.out.println("Obteniendo datos básicos de la orden ID: " + idOrden);
-                                Object[] datosOrden = ordenCompraDao.obtenerDatosBasicosOrden(idOrden, idProductor);
-                                
-                                if (datosOrden != null) {
-                                    System.out.println("✓ Datos de orden obtenidos correctamente");
-                                    String numeroOrden = (String) datosOrden[0];
-                                    String nombreProducto = (String) datosOrden[1];
-                                    int cantidad = (Integer) datosOrden[2];
-                                    double montoTotal = (Double) datosOrden[3];
-                                    int usuarioIdLogistica = (Integer) datosOrden[4];
+                            final int ordenIdFinal = idOrden;
+                            final int productorIdFinal = idProductor;
+                            
+                            new Thread(() -> {
+                                try {
+                                    System.out.println("=== INICIANDO ENVÍO DE CORREO EN HILO SEPARADO ===");
+                                    OrdenCompraDao ordenDaoEmail = new OrdenCompraDao();
+                                    Object[] datosOrden = ordenDaoEmail.obtenerDatosBasicosOrden(ordenIdFinal, productorIdFinal);
                                     
-                                    System.out.println("Número de orden: " + numeroOrden);
-                                    System.out.println("Producto: " + nombreProducto);
-                                    System.out.println("Cantidad: " + cantidad);
-                                    System.out.println("Monto total: " + montoTotal);
-                                    System.out.println("Usuario ID de logística: " + usuarioIdLogistica);
-                                    
-                                    // Obtener email del usuario de logística
-                                    UsuarioDAO usuarioDAO = new UsuarioDAO();
-                                    System.out.println("Obteniendo email del usuario de logística ID: " + usuarioIdLogistica);
-                                    String emailLogistica = usuarioDAO.obtenerEmailPorId(usuarioIdLogistica);
-                                    
-                                    if (emailLogistica != null && !emailLogistica.trim().isEmpty()) {
-                                        System.out.println("✓ Email obtenido: " + emailLogistica);
+                                    if (datosOrden != null) {
+                                        String numeroOrden = (String) datosOrden[0];
+                                        String nombreProducto = (String) datosOrden[1];
+                                        int cantidad = (Integer) datosOrden[2];
+                                        double montoTotal = (Double) datosOrden[3];
+                                        int usuarioIdLogistica = (Integer) datosOrden[4];
                                         
-                                        String asunto = "TELITO BODEGUERO - Orden de Compra Aceptada por Productor";
+                                        UsuarioDAO usuarioDAO = new UsuarioDAO();
+                                        String emailLogistica = usuarioDAO.obtenerEmailPorId(usuarioIdLogistica);
                                         
-                                        // Usar plantilla HTML profesional
-                                        String mensaje = com.example.telito.util.EmailTemplates.generarCorreoOrdenAceptadaLogistica(
-                                            numeroOrden,
-                                            nombreProducto,
-                                            cantidad,
-                                            montoTotal,
-                                            new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
-                                        );
-                                        
-                                        // Enviar correo HTML
-                                        System.out.println("Enviando correo a: " + emailLogistica);
-                                        boolean correoEnviado = EmailUtil.sendSystemAlertHTML(
-                                            emailLogistica,
-                                            asunto,
-                                            mensaje
-                                        );
-                                        
-                                        if (correoEnviado) {
-                                            System.out.println("✓✓✓ Correo enviado exitosamente al usuario de logística: " + emailLogistica);
-                                        } else {
-                                            System.err.println("⚠⚠⚠ No se pudo enviar el correo al usuario de logística: " + emailLogistica);
+                                        if (emailLogistica != null && !emailLogistica.trim().isEmpty()) {
+                                            String asunto = "TELITO BODEGUERO - Orden de Compra Aceptada por Productor";
+                                            String mensaje = com.example.telito.util.EmailTemplates.generarCorreoOrdenAceptadaLogistica(
+                                                numeroOrden,
+                                                nombreProducto,
+                                                cantidad,
+                                                montoTotal,
+                                                new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
+                                            );
+                                            
+                                            boolean correoEnviado = EmailUtil.sendSystemAlertHTML(
+                                                emailLogistica,
+                                                asunto,
+                                                mensaje
+                                            );
+                                            
+                                            if (correoEnviado) {
+                                                System.out.println("✓✓✓ Correo enviado exitosamente al usuario de logística: " + emailLogistica);
+                                            } else {
+                                                System.err.println("⚠⚠⚠ No se pudo enviar el correo al usuario de logística: " + emailLogistica);
+                                            }
                                         }
-                                    } else {
-                                        System.err.println("⚠⚠⚠ Usuario de logística no tiene email configurado. ID: " + usuarioIdLogistica);
-                                        System.err.println("Email obtenido: " + (emailLogistica == null ? "null" : "vacío"));
                                     }
-                                } else {
-                                    System.err.println("❌❌❌ No se pudieron obtener los datos de la orden ID: " + idOrden);
+                                } catch (Exception e) {
+                                    System.err.println("❌❌❌ Error al enviar correo de notificación (hilo separado): " + e.getMessage());
+                                    e.printStackTrace();
                                 }
-                            } catch (Exception e) {
-                                // No bloquear la operación si falla el correo
-                                System.err.println("❌❌❌ Error al enviar correo de notificación: " + e.getMessage());
-                                e.printStackTrace();
-                            }
-                        } else {
+                            }).start();
+                        }
+                        
+                        // El código de envío de correo anterior se eliminó porque ahora es asíncrono
+                        // Si el estado no es "En Proceso", no se envía correo
+                        if (!"En Proceso".equals(nuevoEstado)) {
                             System.out.println("⚠ El estado no es 'En Proceso', no se enviará correo. Estado recibido: '" + nuevoEstado + "'");
                         }
                         
-                        // IMPORTANTE: Siempre responder con éxito si se actualizó el estado
-                        response.getWriter().write("{\"success\": true, \"message\": \"Estado actualizado correctamente\"}");
-                        response.getWriter().flush();
+                        // La respuesta ya se envió arriba, no necesitamos enviarla de nuevo
+                        return;
                     } else {
+                        // Si no se actualizó, enviar respuesta de error
                         response.getWriter().write("{\"success\": false, \"message\": \"No se pudo actualizar el estado\"}");
                         response.getWriter().flush();
                         System.err.println("❌ No se pudo actualizar el estado");
+                        return;
                     }
                 } catch (NumberFormatException e) {
                     response.getWriter().write("{\"success\": false, \"message\": \"ID de orden inválido\"}");
                     response.getWriter().flush();
                     System.err.println("❌ ERROR: ID de orden inválido - " + e.getMessage());
                     e.printStackTrace();
+                    return;
                 } catch (Exception e) {
-                    response.getWriter().write("{\"success\": false, \"message\": \"Error interno del servidor: " + e.getMessage().replace("\"", "\\\"") + "\"}");
-                    response.getWriter().flush();
+                    String errorMsg = e.getMessage() != null ? e.getMessage().replace("\"", "\\\"") : "Error desconocido";
+                    String jsonError = "{\"success\": false, \"message\": \"Error interno del servidor: " + errorMsg + "\"}";
                     System.err.println("❌ ERROR: Error al cambiar estado - " + e.getMessage());
+                    System.err.println("Enviando: " + jsonError);
+                    response.getWriter().write(jsonError);
+                    response.getWriter().flush();
                     e.printStackTrace();
+                    return;
                 }
-                return;
 
             case "asignarLoteAOrden":
                 // Asignar un lote específico a una orden de compra

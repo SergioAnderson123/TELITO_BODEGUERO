@@ -1267,10 +1267,29 @@
         showConfirm(
             '¿Deseas cambiar el estado de esta orden a "' + nuevoEstado + '"?',
             function() {
-                // Mostrar indicador de carga
-                elemento.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Procesando...';
+                // Guardar el estado original para poder restaurarlo en caso de error
+                const row = elemento.closest('tr');
+                if (!row) {
+                    console.error('❌ No se encontró la fila (tr)');
+                    showError('Error: No se pudo encontrar la fila de la orden');
+                    return;
+                }
+                
+                console.log('Fila encontrada. Número de celdas:', row.cells.length);
+                console.log('Contenido de las celdas:', Array.from(row.cells).map((cell, idx) => `[${idx}]: ${cell.textContent.trim().substring(0, 30)}`));
+                
+                // Las columnas son: 0=Código, 1=Producto, 2=Cantidad, 3=Monto, 4=Solicitante, 5=Estado, 6=Acciones
+                const estadoCellOriginal = row.cells[5] ? row.cells[5].innerHTML : '';
+                const accionesCellOriginal = row.cells[6] ? row.cells[6].innerHTML : '';
+                
+                // Mostrar indicador de carga en la celda de estado
+                if (row.cells[5]) {
+                    row.cells[5].innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Procesando...';
+                }
                 elemento.style.pointerEvents = 'none';
-
+                
+                console.log('Iniciando cambio de estado. ID Orden:', idOrden, 'Nuevo Estado:', nuevoEstado);
+                
                 // Hacer petición AJAX
                 fetch('<%= request.getContextPath() %>/ProductorServlet?action=cambiarEstadoOrden', {
                     method: 'POST',
@@ -1280,54 +1299,96 @@
                     body: 'idOrden=' + idOrden + '&nuevoEstado=' + encodeURIComponent(nuevoEstado)
                 })
                 .then(response => {
-                    console.log('Response status:', response.status);
-                    console.log('Response headers:', response.headers);
+                    console.log('Response recibida. Status:', response.status, 'OK:', response.ok);
                     
                     // Verificar si la respuesta es OK
                     if (!response.ok) {
+                        console.error('Response no OK:', response.status, response.statusText);
                         throw new Error('Error HTTP: ' + response.status);
                     }
                     
-                    // Leer el texto de la respuesta primero
-                    return response.text().then(text => {
-                        console.log('Response text:', text);
-                        try {
-                            return JSON.parse(text);
-                        } catch (e) {
-                            console.error('Error al parsear JSON:', e);
-                            console.error('Texto recibido:', text);
-                            throw new Error('La respuesta del servidor no es JSON válido');
-                        }
-                    });
+                    // Leer el texto de la respuesta
+                    return response.text();
                 })
-                .then(data => {
-                    console.log('Data recibida:', data);
+                .then(text => {
+                    console.log('Response text recibido:', text);
+                    console.log('Longitud del texto:', text ? text.length : 0);
+                    
+                    // Verificar si la respuesta está vacía
+                    if (!text || text.trim() === '') {
+                        console.error('Respuesta vacía del servidor');
+                        throw new Error('La respuesta del servidor está vacía');
+                    }
+                    
+                    // Parsear JSON
+                    let data;
+                    try {
+                        data = JSON.parse(text);
+                        console.log('JSON parseado correctamente:', data);
+                    } catch (e) {
+                        console.error('Error al parsear JSON:', e);
+                        console.error('Texto recibido:', text);
+                        throw new Error('La respuesta del servidor no es JSON válido: ' + text.substring(0, 100));
+                    }
+                    
+                    // Verificar que data existe y tiene la propiedad success
+                    if (!data || typeof data.success === 'undefined') {
+                        console.error('Data inválida:', data);
+                        throw new Error('Respuesta del servidor inválida');
+                    }
+                    
+                    console.log('Procesando respuesta. Success:', data.success);
+                    
                     if (data.success) {
-                        // Obtener la fila de la tabla
-                        const row = elemento.closest('tr');
+                        console.log('Actualizando UI con estado En Proceso');
                         
-                        // Actualizar el badge con el nuevo estado
-                        const estadoCell = row.cells[6]; // Columna de estado
-                        estadoCell.innerHTML = '<span class="badge" style="background: linear-gradient(160deg, #ffc107 0%, #ff9800 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;"><i class="fas fa-spinner me-1"></i>En Proceso</span>';
+                        // Las columnas son: 0=Código, 1=Producto, 2=Cantidad, 3=Monto, 4=Solicitante, 5=Estado, 6=Acciones
+                        // Actualizar el badge con el nuevo estado (columna 5)
+                        const estadoCell = row.cells[5];
+                        if (estadoCell) {
+                            estadoCell.innerHTML = '<span class="badge" style="background: linear-gradient(160deg, #ffc107 0%, #ff9800 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;"><i class="fas fa-spinner me-1"></i>En Proceso</span>';
+                            console.log('✓ Badge de estado actualizado en columna 5');
+                        } else {
+                            console.error('❌ No se encontró la celda de estado (columna 5). Total de celdas:', row.cells.length);
+                        }
                         
-                        // IMPORTANTE: Mostrar el botón de editar en la columna de acciones
-                        const accionesCell = row.cells[7]; // Columna de acciones
-                        accionesCell.innerHTML = '<a href="#" class="btn-view" onclick="editarOrden(\'' + idOrden + '\'); return false;"><i class="fas fa-edit"></i> Editar</a>';
+                        // IMPORTANTE: Mostrar el botón de editar en la columna de acciones (columna 6)
+                        const accionesCell = row.cells[6];
+                        if (accionesCell) {
+                            accionesCell.innerHTML = '<button type="button" class="btn btn-sm shadow-sm btn-ver-lotes" onclick="editarOrden(\'' + idOrden + '\')" title="Editar orden"><i class="fas fa-edit"></i> Editar</button>';
+                            console.log('✓ Botón de editar agregado en columna 6');
+                        } else {
+                            console.error('❌ No se encontró la celda de acciones (columna 6). Total de celdas:', row.cells.length);
+                        }
+                        
+                        // Actualizar el atributo data-estado de la fila para los filtros
+                        if (row) {
+                            row.dataset.estado = 'En Proceso';
+                            console.log('✓ Atributo data-estado actualizado');
+                        }
+                        
+                        console.log('UI actualizada correctamente');
                         
                         // Mostrar mensaje de éxito
                         showSuccess('Estado cambiado a "' + nuevoEstado + '" correctamente');
                     } else {
+                        console.error('Error del servidor:', data.message);
                         showError('Error al cambiar el estado: ' + (data.message || 'Error desconocido'));
-                        // Restaurar el badge original
-                        elemento.innerHTML = '<i class="fas fa-check me-1"></i>Recibido';
+                        // Restaurar todo al estado original
+                        if (row.cells[5]) row.cells[5].innerHTML = estadoCellOriginal;
+                        if (row.cells[6]) row.cells[6].innerHTML = accionesCellOriginal;
                         elemento.style.pointerEvents = 'auto';
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    console.error('Error completo en catch:', error);
+                    console.error('Error message:', error.message);
+                    console.error('Stack trace:', error.stack);
                     showError('Error de conexión al cambiar el estado. Por favor, intenta de nuevo.');
-                    // Restaurar el badge original
-                    elemento.innerHTML = '<i class="fas fa-check me-1"></i>Recibido';
+                    
+                    // Restaurar todo al estado original
+                    if (row.cells[5]) row.cells[5].innerHTML = estadoCellOriginal;
+                    if (row.cells[6]) row.cells[6].innerHTML = accionesCellOriginal;
                     elemento.style.pointerEvents = 'auto';
                 });
             },

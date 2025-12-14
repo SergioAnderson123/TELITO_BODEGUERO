@@ -151,6 +151,23 @@
 </div>
 
 <style>
+    /* Asegurar que los modales de alerta aparezcan por encima de otros modales */
+    #customErrorModal {
+        z-index: 1060 !important;
+    }
+    
+    #customSuccessModal,
+    #customAlertModal,
+    #customConfirmModal,
+    #customDeleteModal {
+        z-index: 1055 !important;
+    }
+    
+    /* Asegurar que el backdrop del modal de error esté por encima */
+    .modal-backdrop.error-backdrop {
+        z-index: 1055 !important;
+    }
+    
     .modal-content {
         border-radius: 15px;
         overflow: hidden;
@@ -356,8 +373,31 @@
     // Función para mostrar error
     function showError(message) {
         const modal = getErrorModal();
+        const modalElement = document.getElementById('customErrorModal');
         document.getElementById('customErrorMessage').textContent = message;
+        
+        // Asegurar que el modal de error aparezca por encima de otros modales
+        modalElement.style.zIndex = '1060';
+        
         modal.show();
+        
+        // Después de mostrar, asegurar z-index alto y manejar backdrops
+        setTimeout(() => {
+            modalElement.style.zIndex = '1060';
+            
+            // Encontrar todos los backdrops y ajustar sus z-index
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach((backdrop, index) => {
+                if (index === backdrops.length - 1) {
+                    // El último backdrop (el del modal de error) debe tener z-index más alto
+                    backdrop.style.zIndex = '1055';
+                    backdrop.classList.add('error-backdrop');
+                } else {
+                    // Los backdrops anteriores deben tener z-index menor
+                    backdrop.style.zIndex = '1040';
+                }
+            });
+        }, 50);
     }
     
     // Reemplazar alert y confirm nativos (opcional)

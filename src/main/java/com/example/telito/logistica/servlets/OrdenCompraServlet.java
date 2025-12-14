@@ -89,8 +89,8 @@ public class OrdenCompraServlet extends HttpServlet {
                 int ordenesPendientes = ordenCompraDao.contarOrdenes(null, null, "Pendiente");
                 int ordenesAprobadas = ordenCompraDao.contarOrdenes(null, null, "Aprobado");
 
-                // 6. Obtenemos la lista de proveedores para el menú del filtro
-                request.setAttribute("listaProveedores", proveedorDao.listarProveedores());
+                // 6. Obtenemos la lista de proveedores (productores) para el menú del filtro
+                request.setAttribute("listaProveedores", proveedorDao.listarProductores());
 
                 // 7. Enviamos datos a la vista
                 request.setAttribute("listaOrdenes", listaOrdenes);

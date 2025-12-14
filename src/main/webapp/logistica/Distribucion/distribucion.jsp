@@ -531,11 +531,15 @@
                         <div class="col-md-2">
                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-user me-1"></i>Conductor</label>
                             <select class="form-select form-select-sm shadow-sm" name="conductor" id="conductorFilter" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                <option value="">Todos</option>
+                                <option value="" ${empty param.conductor ? 'selected' : ''}>Todos</option>
                                 <% ArrayList<ConductorBean> listaConductores = (ArrayList<ConductorBean>) request.getAttribute("listaConductores");
                                     if(listaConductores != null){
-                                        for(ConductorBean conductor : listaConductores){ %>
-                                <option value="<%= conductor.getId() %>" ${param.conductor == conductor.getId() ? 'selected' : ''} >
+                                        for(ConductorBean conductor : listaConductores){ 
+                                            String conductorIdStr = String.valueOf(conductor.getId());
+                                            String paramConductor = request.getParameter("conductor") != null ? request.getParameter("conductor") : "";
+                                            boolean isSelected = conductorIdStr.equals(paramConductor);
+                                %>
+                                <option value="<%= conductor.getId() %>" <%= isSelected ? "selected" : "" %>>
                                     <%= conductor.getNombreCompleto() %>
                                 </option>
                                 <%  }

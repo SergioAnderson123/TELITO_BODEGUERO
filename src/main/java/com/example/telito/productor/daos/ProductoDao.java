@@ -31,10 +31,7 @@ public class ProductoDao extends DAOBase {
         String sql = "SELECT p.*, c.id_categoria, c.nombre as categoria_nombre, " +
                 "u.id_usuario, u.nombres, u.apellidos, " +
                 "IFNULL(l_sum.stock_total, 0) as stock_total, " +
-                "COUNT(DISTINCT CASE " +
-                "    WHEN lotes.id_lote IS NOT NULL AND lotes.stock_actual > 0 " +
-                "    THEN lotes.id_lote " +
-                "END) as numero_lotes " +
+                "COUNT(DISTINCT lotes.id_lote) as numero_lotes " +
                 "FROM productos p " +
                 "INNER JOIN categorias c ON (p.categoria_id = c.id_categoria) " +
                 "INNER JOIN usuarios u ON (p.productor_id = u.id_usuario) " +
@@ -103,10 +100,7 @@ public class ProductoDao extends DAOBase {
         String sql = "SELECT p.*, c.id_categoria, c.nombre as categoria_nombre, " +
                 "u.id_usuario, u.nombres, u.apellidos, " +
                 "IFNULL(l_sum.stock_total, 0) as stock_total, " +
-                "COUNT(DISTINCT CASE " +
-                "    WHEN lotes.id_lote IS NOT NULL AND lotes.stock_actual > 0 " +
-                "    THEN lotes.id_lote " +
-                "END) as numero_lotes " +
+                "COUNT(DISTINCT lotes.id_lote) as numero_lotes " +
                 "FROM productos p " +
                 "INNER JOIN categorias c ON (p.categoria_id = c.id_categoria) " +
                 "INNER JOIN usuarios u ON (p.productor_id = u.id_usuario) " +
@@ -373,7 +367,7 @@ public class ProductoDao extends DAOBase {
         ArrayList<Producto> lista = new ArrayList<>();
         
         String sql = "SELECT p.*, c.id_categoria, c.nombre as categoria_nombre, " +
-                "(SELECT COUNT(*) FROM lotes WHERE producto_id = p.id_producto AND estado = 'Disponible') as numero_lotes " +
+                "(SELECT COUNT(*) FROM lotes WHERE producto_id = p.id_producto) as numero_lotes " +
                 "FROM productos p " +
                 "LEFT JOIN categorias c ON p.categoria_id = c.id_categoria " +
                 "WHERE (p.codigo_sku LIKE ? OR p.nombre LIKE ?) " +

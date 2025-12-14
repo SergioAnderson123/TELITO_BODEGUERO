@@ -343,11 +343,15 @@
                         <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-truck me-1"></i>Proveedor</label>
                             <select class="form-select form-select-sm shadow-sm" name="proveedor" id="proveedorFilter" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                <option value="">Todos</option>
+                                <option value="" ${empty param.proveedor ? 'selected' : ''}>Todos</option>
                                 <% ArrayList<ProveedorBean> listaProveedores = (ArrayList<ProveedorBean>) request.getAttribute("listaProveedores");
                                     if(listaProveedores != null){
-                                        for(ProveedorBean proveedor : listaProveedores){ %>
-                                <option value="<%= proveedor.getId() %>" ${param.proveedor == proveedor.getId() ? 'selected' : ''} >
+                                        for(ProveedorBean proveedor : listaProveedores){ 
+                                            String proveedorIdStr = String.valueOf(proveedor.getId());
+                                            String paramProveedor = request.getParameter("proveedor") != null ? request.getParameter("proveedor") : "";
+                                            boolean isSelected = proveedorIdStr.equals(paramProveedor);
+                                %>
+                                <option value="<%= proveedor.getId() %>" <%= isSelected ? "selected" : "" %>>
                                     <%= proveedor.getNombre() %>
                                 </option>
                                 <%  }

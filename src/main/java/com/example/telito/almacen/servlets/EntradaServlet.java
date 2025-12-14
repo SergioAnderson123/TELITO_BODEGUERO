@@ -480,8 +480,8 @@ public class EntradaServlet extends HttpServlet {
             }
             // ========== FIN ENVÍO DE CORREO A LOGÍSTICA ==========
 
-            // 10. Redirigimos a la lista de inventario para ver el lote
-            response.sendRedirect(request.getContextPath() + "/almacen/LoteServlet");
+            // 10. Redirigimos de vuelta al módulo de Registrar Entradas
+            response.sendRedirect(request.getContextPath() + "/almacen/EntradaServlet?action=lista");
 
         } catch (Exception e) {
             e.printStackTrace();
