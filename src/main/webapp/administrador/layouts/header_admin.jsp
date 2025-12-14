@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.example.telito.administrador.beans.Usuario" %>
 <%
     Usuario usuarioHeader = (Usuario) session.getAttribute("usuario");
@@ -38,7 +39,7 @@
                         <span class="badge-notificacion" id="badgeNotificaciones" style="display: none;">0</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end notificaciones-dropdown" aria-labelledby="notificacionesDropdown" style="width: 380px;">
-                        <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, var(--turquoise-dark), var(--seafoam)); color: white; padding: 12px 20px;">
+                        <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; padding: 12px 20px;">
                             <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notificaciones</h6>
                             <button class="btn btn-sm btn-light" onclick="marcarTodasLeidas()" style="font-size: 0.75rem; padding: 2px 8px;">
                                 <i class="fas fa-check-double me-1"></i>Marcar todas
@@ -51,7 +52,7 @@
                             </div>
                         </div>
                         <div class="dropdown-divider m-0"></div>
-                        <a class="dropdown-item text-center text-primary fw-bold py-2" href="${pageContext.request.contextPath}/administrador/notificaciones.jsp">
+                        <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #00a896 !important;">
                             <i class="fas fa-list me-2"></i>Ver todas las notificaciones
                         </a>
                     </div>
@@ -498,5 +499,199 @@ window.addEventListener('resize', function() {
         closeSidebar();
     }
 });
+
+// Cargar y mostrar todas las notificaciones en el modal grande
+function mostrarModalTodasNotificaciones() {
+    fetch('${pageContext.request.contextPath}/NotificacionServlet?action=todas', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            const notifs = data.datos.notificaciones || [];
+            mostrarTodasNotificaciones(notifs);
+            
+            const modal = new bootstrap.Modal(document.getElementById('modalTodasNotificaciones'));
+            modal.show();
+        } else {
+            mostrarToast('danger', 'Error al cargar notificaciones', 'fas fa-exclamation-triangle');
+        }
+    })
+    .catch(error => {
+        console.error('Error al cargar todas las notificaciones:', error);
+        mostrarToast('danger', 'Error de conexión con el servidor', 'fas fa-exclamation-triangle');
+    });
+}
+
+// Mostrar todas las notificaciones en el modal grande
+function mostrarTodasNotificaciones(notificaciones) {
+    const lista = document.getElementById('listaNotificacionesGrande');
+    
+    if (notificaciones.length === 0) {
+        lista.innerHTML = '<div class="text-center py-4 text-muted">' +
+            '<i class="fas fa-bell-slash fa-2x mb-2"></i>' +
+            '<p class="mb-0">No tienes notificaciones</p>' +
+        '</div>';
+        return;
+    }
+    
+    const htmlArray = notificaciones.map(notif => {
+        const iconoTipo = obtenerIconoTipo(notif.tipo || notif.tipoNotificacion);
+        const tiempoRelativo = obtenerTiempoRelativo(notif.fechaCreacion);
+        const idNotif = notif.id || notif.idNotificacion;
+        const nivelPrioridad = notif.nivel || notif.nivelPrioridad;
+        const tipoNotif = notif.tipo || notif.tipoNotificacion || '';
+        const esLeida = notif.leida || false;
+        const claseLeida = esLeida ? '' : 'no-leida';
+        
+        return '<div class="notificacion-item-grande ' + claseLeida + '">' +
+                '<div class="d-flex gap-3 align-items-start">' +
+                    '<div class="notificacion-icon-grande ' + nivelPrioridad + '">' +
+                        '<i class="' + iconoTipo + '"></i>' +
+                    '</div>' +
+                    '<div class="notificacion-contenido-grande flex-grow-1">' +
+                        '<div class="d-flex justify-content-between align-items-start mb-2">' +
+                            '<div class="notificacion-titulo-grande">' + notif.titulo + '</div>' +
+                            (!esLeida ? '<span class="badge bg-primary rounded-pill" style="font-size: 0.7rem;">Nueva</span>' : '') +
+                        '</div>' +
+                        '<div class="notificacion-mensaje-grande">' + notif.mensaje + '</div>' +
+                        '<div class="notificacion-tiempo-grande">' +
+                            '<i class="far fa-clock me-1"></i>' + tiempoRelativo +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+    });
+    
+    lista.innerHTML = htmlArray.join('');
+    
+    // Actualizar contador en el modal
+    const contador = notificaciones.filter(n => !(n.leida || false)).length;
+    const contadorEl = document.getElementById('contadorModalNotificaciones');
+    if (contadorEl) {
+        contadorEl.textContent = contador > 0 ? contador + ' no leída' + (contador > 1 ? 's' : '') : 'Todas leídas';
+    }
+}
+
+// Marcar todas como leídas desde el modal
+function marcarTodasLeidasDesdeModal() {
+    fetch('${pageContext.request.contextPath}/NotificacionServlet?action=marcarTodasLeidas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            cargarContadorNotificaciones();
+            mostrarModalTodasNotificaciones(); // Recargar notificaciones
+            mostrarToast('success', 'Todas las notificaciones marcadas como leídas', 'fas fa-check-circle');
+        } else {
+            mostrarToast('danger', 'Error al marcar notificaciones', 'fas fa-exclamation-triangle');
+        }
+    })
+    .catch(error => {
+        console.error('Error al marcar todas como leídas:', error);
+        mostrarToast('danger', 'Error de conexión con el servidor', 'fas fa-exclamation-triangle');
+    });
+}
 </script>
+
+<!-- Modal Grande para Todas las Notificaciones -->
+<div class="modal fade" id="modalTodasNotificaciones" tabindex="-1" aria-labelledby="modalTodasNotificacionesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+                <h5 class="modal-title" id="modalTodasNotificacionesLabel" style="font-weight: 600;">
+                    <i class="fas fa-bell me-2"></i>Todas las Notificaciones
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <div style="padding: 15px 20px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center;">
+                    <span id="contadorModalNotificaciones" style="color: #6c757d; font-size: 0.9rem;">Cargando...</span>
+                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
+                        <i class="fas fa-check-double me-1"></i>Marcar todas como leídas
+                    </button>
+                </div>
+                <div id="listaNotificacionesGrande" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                        <p class="mb-0">Cargando notificaciones...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e9ecef; padding: 15px 20px; border-radius: 0 0 15px 15px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 8px 20px;">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .notificacion-item-grande {
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        cursor: default;
+        background: white;
+        border-left: 4px solid transparent;
+    }
+    
+    .notificacion-item-grande:hover {
+        background: #f8f9fa;
+    }
+    
+    .notificacion-item-grande.no-leida {
+        background: #e8f4f8;
+        border-left-color: #00a896;
+    }
+    
+    .notificacion-icon-grande {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+    
+    .notificacion-icon-grande.CRITICAL {
+        background: #fee;
+        color: #dc3545;
+    }
+    
+    .notificacion-icon-grande.WARNING {
+        background: #fff3cd;
+        color: #ffc107;
+    }
+    
+    .notificacion-icon-grande.INFO {
+        background: #d1ecf1;
+        color: #0dcaf0;
+    }
+    
+    .notificacion-titulo-grande {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #212529;
+        margin-bottom: 8px;
+    }
+    
+    .notificacion-mensaje-grande {
+        font-size: 0.9rem;
+        color: #495057;
+        line-height: 1.5;
+        margin-bottom: 8px;
+    }
+    
+    .notificacion-tiempo-grande {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
 

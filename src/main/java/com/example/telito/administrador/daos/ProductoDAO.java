@@ -134,6 +134,55 @@ public class ProductoDAO extends DAOBase {
     }
 
     /**
+     * Lista todos los productos de un productor específico con stock total calculado desde lotes.
+     * @param productorId ID del productor
+     * @return Lista de productos del productor
+     */
+    public ArrayList<Producto> listarProductosPorProductor(int productorId) {
+        ArrayList<Producto> listaProductos = new ArrayList<>();
+        String sql = "SELECT p.*, c.nombre as categoria_nombre, " +
+                "COALESCE(SUM(l.stock_actual), 0) as stock_total " +
+                "FROM productos p " +
+                "LEFT JOIN categorias c ON p.categoria_id = c.id_categoria " +
+                "LEFT JOIN lotes l ON p.id_producto = l.producto_id " +
+                "WHERE p.activo = 1 AND p.productor_id = ? " +
+                "GROUP BY p.id_producto " +
+                "ORDER BY p.nombre";
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, productorId);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Producto producto = new Producto();
+                producto.setIdProducto(rs.getInt("id_producto"));
+                producto.setCodigoSku(rs.getString("codigo_sku"));
+                producto.setNombre(rs.getString("nombre"));
+                producto.setDescripcion(rs.getString("descripcion"));
+                producto.setPrecioActual(rs.getDouble("precio_actual"));
+                producto.setStock(rs.getInt("stock_total")); // Stock sumado desde lotes
+                producto.setUnidadesPorPaquete(rs.getInt("unidades_por_paquete"));
+                producto.setProductorId(rs.getInt("productor_id"));
+                producto.setCategoriaId(rs.getInt("categoria_id"));
+                producto.setCategoriaNombre(rs.getString("categoria_nombre"));
+                listaProductos.add(producto);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al listar productos por productor: " + productorId, e);
+            throw new RuntimeException("Error al listar productos por productor", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return listaProductos;
+    }
+
+    /**
      * Busca productos por SKU o nombre (búsqueda parcial).
      * Solo retorna productos del productor especificado.
      * @param termino Término de búsqueda (SKU o nombre)

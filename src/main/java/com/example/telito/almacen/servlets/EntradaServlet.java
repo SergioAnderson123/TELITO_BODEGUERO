@@ -5,6 +5,7 @@ import com.example.telito.almacen.daos.*;
 import com.example.telito.administrador.daos.UsuarioDAO;
 import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.EmailUtil;
+import com.example.telito.util.NotificacionService;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -455,6 +456,20 @@ public class EntradaServlet extends HttpServlet {
 
             // 8. Actualizamos el estado de la orden a "Aprobado" (ciclo completo)
             ordenCompraDao.actualizarEstado(idOrden, "Aprobado");
+
+            // 9. ========== NOTIFICACIÓN A LOGÍSTICA ==========
+            // Notificar a logística que la entrada fue registrada
+            try {
+                NotificacionService.notificarEntradaRegistrada(
+                    oc.getNumeroOrden(),
+                    idOrden,
+                    oc.getNombreProducto(),
+                    cantidadRecibida
+                );
+            } catch (Exception e) {
+                System.err.println("⚠ Error al crear notificación de entrada: " + e.getMessage());
+            }
+            // ========== FIN NOTIFICACIÓN A LOGÍSTICA ==========
 
             // 10. ========== ENVÍO DE CORREO A LOGÍSTICA ==========
             // Notificar a logística que la entrada fue registrada exitosamente

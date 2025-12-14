@@ -17,6 +17,7 @@ import com.example.telito.logistica.daos.ProveedorDao;
 import com.example.telito.logistica.daos.VehiculoDao;
 import com.example.telito.administrador.daos.AlertaDAO;
 import com.example.telito.util.EmailUtil;
+import com.example.telito.util.NotificacionService;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -183,6 +184,55 @@ public class PlanTransporteServlet extends HttpServlet {
 
             // 3. Llamamos al DAO para guardar en la BD
             planTransporteDao.crearPlan(numeroPlan, loteId, conductorId, vehiculoId, fechaEntrega, distritoId);
+
+            // 3.5. ========== NOTIFICACIÓN WEB A ALMACÉN ==========
+            try {
+                // Obtener información del lote y destino para la notificación
+                LoteDao loteDao = new LoteDao();
+                DistritoDao distritoDao = new DistritoDao();
+                
+                String sqlLote = "SELECT l.codigo_lote, p.nombre AS nombre_producto, " +
+                                "FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes " +
+                                "FROM lotes l " +
+                                "INNER JOIN productos p ON l.producto_id = p.id_producto " +
+                                "WHERE l.id_lote = ?";
+                
+                String nombreProducto = "";
+                String nombreDestino = "";
+                int paquetes = 0;
+                
+                try (java.sql.Connection conn = com.example.telito.util.DatabaseConnection.getConnection();
+                     java.sql.PreparedStatement pstmt = conn.prepareStatement(sqlLote)) {
+                    pstmt.setInt(1, loteId);
+                    try (java.sql.ResultSet rs = pstmt.executeQuery()) {
+                        if (rs.next()) {
+                            nombreProducto = rs.getString("nombre_producto");
+                            paquetes = rs.getInt("paquetes");
+                        }
+                    }
+                }
+                
+                // Obtener nombre del distrito
+                try {
+                    com.example.telito.logistica.beans.DistritoBean distrito = distritoDao.obtenerDistritoPorId(distritoId);
+                    if (distrito != null) {
+                        nombreDestino = distrito.getNombre();
+                    }
+                } catch (Exception e) {
+                    nombreDestino = "Destino " + distritoId;
+                }
+                
+                // Crear notificación web
+                NotificacionService.notificarPlanTransporteCreado(
+                    numeroPlan,
+                    nombreProducto,
+                    nombreDestino,
+                    paquetes
+                );
+            } catch (Exception e) {
+                System.err.println("⚠ Error al crear notificación web de plan de transporte: " + e.getMessage());
+            }
+            // ========== FIN NOTIFICACIÓN WEB ==========
 
             // 4. ENVIAR NOTIFICACIÓN A ALMACÉN SOBRE EL NUEVO PLAN DE TRANSPORTE
             try {

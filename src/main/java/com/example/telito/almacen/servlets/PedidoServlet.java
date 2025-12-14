@@ -9,6 +9,7 @@ import com.example.telito.administrador.daos.AlertaDAO;
 import com.example.telito.administrador.daos.UsuarioDAO;
 import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.EmailUtil;
+import com.example.telito.util.NotificacionService;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -232,7 +233,21 @@ public class PedidoServlet extends HttpServlet {
 
                 if (lote == null || lote.getStockActual() < item.getCantidadRequerida()) {
                     stockSuficiente = false;
-                    request.setAttribute("error", "Stock insuficiente en el lote seleccionado para: " + item.getNombreProducto());
+                    String errorMsg = "Stock insuficiente en el lote seleccionado para: " + item.getNombreProducto();
+                    request.setAttribute("error", errorMsg);
+                    
+                    // Notificar a logística sobre el rechazo
+                    try {
+                        if (pedido != null) {
+                            NotificacionService.notificarPedidoRechazado(
+                                pedido.getNumeroPedido(),
+                                idPedido,
+                                errorMsg
+                            );
+                        }
+                    } catch (Exception e) {
+                        System.err.println("⚠ Error al crear notificación de pedido rechazado: " + e.getMessage());
+                    }
                     break;
                 }
             }
@@ -262,6 +277,29 @@ public class PedidoServlet extends HttpServlet {
 
                 // 3. Actualizamos el estado del pedido a "Despachado"
                 pedidoDao.actualizarEstado(idPedido, "Despachado");
+
+                // 3.5. ========== NOTIFICACIÓN WEB A LOGÍSTICA ==========
+                // Notificar a logística que el pedido fue completado
+                try {
+                    if (pedido != null) {
+                        System.out.println("🔔 Creando notificación web: Pedido completado - " + pedido.getNumeroPedido());
+                        int resultado = NotificacionService.notificarPedidoCompletado(
+                            pedido.getNumeroPedido(),
+                            idPedido
+                        );
+                        if (resultado > 0) {
+                            System.out.println("✓ Notificación web creada exitosamente para pedido: " + pedido.getNumeroPedido());
+                        } else {
+                            System.err.println("⚠ No se pudo crear notificación web para pedido: " + pedido.getNumeroPedido());
+                        }
+                    } else {
+                        System.err.println("⚠ Error: Pedido es null, no se puede crear notificación");
+                    }
+                } catch (Exception e) {
+                    System.err.println("⚠ Error al crear notificación de pedido completado: " + e.getMessage());
+                    e.printStackTrace();
+                }
+                // ========== FIN NOTIFICACIÓN WEB ==========
 
                 // 4. ENVIAR NOTIFICACIONES POR CORREO
                 try {
@@ -391,6 +429,24 @@ public class PedidoServlet extends HttpServlet {
 
                 // 3. Cambiar el estado del plan de transporte a "Salida"
                 planDao.actualizarEstado(idPlan, "Salida");
+
+                // 3.5. ========== NOTIFICACIÓN WEB A LOGÍSTICA ==========
+                // Notificar a logística que el plan de transporte fue despachado
+                try {
+                    Lote loteDespachado = loteDao.buscarLotePorId(plan.getIdLote());
+                    String codigoLote = (loteDespachado != null) ? loteDespachado.getCodigoLote() : "N/A";
+                    
+                    com.example.telito.util.NotificacionService.notificarPlanTransporteDespachado(
+                        plan.getNumeroPlan(),
+                        codigoLote,
+                        cantidadADespachar
+                    );
+                    System.out.println("✓ Notificación web creada para plan de transporte: " + plan.getNumeroPlan());
+                } catch (Exception e) {
+                    System.err.println("⚠ Error al crear notificación web de plan de transporte despachado: " + e.getMessage());
+                    e.printStackTrace();
+                }
+                // ========== FIN NOTIFICACIÓN WEB ==========
 
                 // 4. ENVIAR NOTIFICACIÓN A LOGÍSTICA SOBRE EL DESPACHO DEL PLAN
                 try {

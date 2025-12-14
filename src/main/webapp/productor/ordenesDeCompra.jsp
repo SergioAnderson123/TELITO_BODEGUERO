@@ -672,6 +672,33 @@
 
                 <!-- Right actions -->
                 <ul class="navbar-nav ms-auto">
+                    <!-- Notificaciones -->
+                    <li class="nav-item dropdown me-3">
+                        <a class="nav-link position-relative" href="javascript:void(0);" role="button" id="notificacionesDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 8px 12px;" onclick="event.preventDefault();">
+                            <i class="fas fa-bell" style="font-size: 1.3rem; color: var(--turquoise-dark);"></i>
+                            <span class="badge-notificacion" id="badgeNotificaciones" style="display: none;">0</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notificaciones-dropdown" aria-labelledby="notificacionesDropdown" style="width: 380px;">
+                            <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; padding: 12px 20px;">
+                                <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notificaciones</h6>
+                                <button class="btn btn-sm btn-light" onclick="marcarTodasLeidas()" style="font-size: 0.75rem; padding: 2px 8px;">
+                                    <i class="fas fa-check-double me-1"></i>Marcar todas
+                                </button>
+                            </div>
+                            <div id="listaNotificaciones" style="max-height: 400px; overflow-y: auto; overflow-x: hidden;">
+                                <div class="text-center py-4 text-muted">
+                                    <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                                    <p class="mb-0">Cargando notificaciones...</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-divider m-0"></div>
+                            <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #00a896 !important;">
+                                <i class="fas fa-list me-2"></i>Ver todas las notificaciones
+                            </a>
+                        </div>
+                    </li>
+                    
+                    <!-- Usuario -->
                     <li class="nav-item dropdown">
                         <%
                             com.example.telito.administrador.beans.Usuario usuarioHeaderOrdenes = 
@@ -886,7 +913,7 @@
                                             <i class="fas fa-thumbs-up me-1"></i>Aprobado
                                         </span>
                                     <% } else if ("Recibido".equals(estadoOrden)) { %>
-                                        <span class="badge-completada" style="cursor: pointer;" onclick="cambiarEstado(<%= ordenData[0] %>, 'En Proceso', this)" title="Click para cambiar a 'En Proceso'">
+                                        <span class="badge-completada" style="cursor: pointer;" onclick="if(typeof cambiarEstado === 'function') { cambiarEstado(<%= ordenData[0] != null ? ordenData[0] : 0 %>, 'En Proceso', this); } else { console.error('cambiarEstado no está definida'); alert('Error: La función cambiarEstado no está disponible'); }" title="Click para cambiar a 'En Proceso'">
                                             <i class="fas fa-check me-1"></i>Recibido
                                         </span>
                                     <% } else if ("En Proceso".equals(estadoOrden)) { %>
@@ -1255,137 +1282,199 @@
 
     // Función para cambiar estado de una orden
     function cambiarEstado(idOrden, nuevoEstado, elemento) {
-        // Usar modal personalizado en lugar de confirm
-        showConfirm(
-            '¿Deseas cambiar el estado de esta orden a "' + nuevoEstado + '"?',
-            function() {
-                // Guardar el estado original para poder restaurarlo en caso de error
-                const row = elemento.closest('tr');
-                if (!row) {
-                    console.error('❌ No se encontró la fila (tr)');
-                    showError('Error: No se pudo encontrar la fila de la orden');
+        console.log('🔔 cambiarEstado llamado:', {idOrden, nuevoEstado, elemento});
+        
+        // Validar parámetros
+        if (!idOrden || !nuevoEstado || !elemento) {
+            console.error('Parámetros inválidos en cambiarEstado:', {idOrden, nuevoEstado, elemento});
+            showError('Error: Parámetros inválidos');
+            return;
+        }
+        
+        // Si el estado es "Rechazado", pedir el motivo primero
+        if (nuevoEstado === 'Rechazado') {
+            console.log('📝 Estado es Rechazado, mostrando modal de motivo');
+            // Mostrar modal para pedir el motivo
+            const motivoModal = document.getElementById('motivoRechazoModal');
+            const motivoInput = document.getElementById('motivoRechazoInput');
+            const btnConfirmarRechazo = document.getElementById('btnConfirmarRechazo');
+            
+            if (!motivoModal || !motivoInput || !btnConfirmarRechazo) {
+                showError('Error: No se pudo cargar el modal de rechazo. Por favor, recarga la página.');
+                return;
+            }
+            
+            // Limpiar el input
+            motivoInput.value = '';
+            
+            // Mostrar el modal
+            const bsModal = new bootstrap.Modal(motivoModal);
+            bsModal.show();
+            
+            // Remover listeners anteriores y agregar uno nuevo
+            const newBtn = btnConfirmarRechazo.cloneNode(true);
+            btnConfirmarRechazo.parentNode.replaceChild(newBtn, btnConfirmarRechazo);
+            
+            // Configurar el botón de confirmar
+            document.getElementById('btnConfirmarRechazo').onclick = function() {
+                const motivo = motivoInput.value.trim();
+                if (!motivo) {
+                    showError('Por favor, ingresa un motivo para rechazar la orden.');
                     return;
                 }
                 
-                console.log('Fila encontrada. Número de celdas:', row.cells.length);
-                console.log('Contenido de las celdas:', Array.from(row.cells).map((cell, idx) => `[${idx}]: ${cell.textContent.trim().substring(0, 30)}`));
+                // Cerrar el modal
+                bsModal.hide();
                 
-                // Las columnas son: 0=Código, 1=Producto, 2=Cantidad, 3=Monto, 4=Solicitante, 5=Estado, 6=Acciones
-                const estadoCellOriginal = row.cells[5] ? row.cells[5].innerHTML : '';
-                const accionesCellOriginal = row.cells[6] ? row.cells[6].innerHTML : '';
-                
-                // Mostrar indicador de carga en la celda de estado
-                if (row.cells[5]) {
-                    row.cells[5].innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Procesando...';
+                // Proceder con el cambio de estado
+                procederCambioEstado(idOrden, nuevoEstado, elemento, motivo);
+            };
+        } else {
+            console.log('✅ Estado no es Rechazado, mostrando modal de confirmación para:', nuevoEstado);
+            
+            // Para otros estados, usar confirmación normal
+            // Verificar que showConfirm existe
+            if (typeof showConfirm !== 'function') {
+                console.error('❌ showConfirm no está definida, usando confirm nativo');
+                // Fallback a confirm nativo
+                if (confirm('¿Deseas cambiar el estado de esta orden a "' + nuevoEstado + '"?')) {
+                    procederCambioEstado(idOrden, nuevoEstado, elemento, '');
                 }
-                elemento.style.pointerEvents = 'none';
-                
-                console.log('Iniciando cambio de estado. ID Orden:', idOrden, 'Nuevo Estado:', nuevoEstado);
-                
-                // Hacer petición AJAX
-                fetch('<%= request.getContextPath() %>/ProductorServlet?action=cambiarEstadoOrden', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
+                return;
+            }
+            
+            console.log('✅ showConfirm está disponible, llamando...');
+            
+            // Llamar a showConfirm
+            try {
+                const result = showConfirm(
+                    '¿Deseas cambiar el estado de esta orden a "' + nuevoEstado + '"?',
+                    function() {
+                        console.log('✅ Usuario confirmó en showConfirm');
+                        procederCambioEstado(idOrden, nuevoEstado, elemento, '');
                     },
-                    body: 'idOrden=' + idOrden + '&nuevoEstado=' + encodeURIComponent(nuevoEstado)
-                })
-                .then(response => {
-                    console.log('Response recibida. Status:', response.status, 'OK:', response.ok);
-                    
-                    // Verificar si la respuesta es OK
-                    if (!response.ok) {
-                        console.error('Response no OK:', response.status, response.statusText);
-                        throw new Error('Error HTTP: ' + response.status);
-                    }
-                    
-                    // Leer el texto de la respuesta
-                    return response.text();
-                })
-                .then(text => {
-                    console.log('Response text recibido:', text);
-                    console.log('Longitud del texto:', text ? text.length : 0);
-                    
-                    // Verificar si la respuesta está vacía
-                    if (!text || text.trim() === '') {
-                        console.error('Respuesta vacía del servidor');
-                        throw new Error('La respuesta del servidor está vacía');
-                    }
-                    
-                    // Parsear JSON
-                    let data;
-                    try {
-                        data = JSON.parse(text);
-                        console.log('JSON parseado correctamente:', data);
-                    } catch (e) {
-                        console.error('Error al parsear JSON:', e);
-                        console.error('Texto recibido:', text);
-                        throw new Error('La respuesta del servidor no es JSON válido: ' + text.substring(0, 100));
-                    }
-                    
-                    // Verificar que data existe y tiene la propiedad success
-                    if (!data || typeof data.success === 'undefined') {
-                        console.error('Data inválida:', data);
-                        throw new Error('Respuesta del servidor inválida');
-                    }
-                    
-                    console.log('Procesando respuesta. Success:', data.success);
-                    
-                    if (data.success) {
-                        console.log('Actualizando UI con estado En Proceso');
-                        
-                        // Las columnas son: 0=Código, 1=Producto, 2=Cantidad, 3=Monto, 4=Solicitante, 5=Estado, 6=Acciones
-                        // Actualizar el badge con el nuevo estado (columna 5)
-                        const estadoCell = row.cells[5];
-                        if (estadoCell) {
-                            estadoCell.innerHTML = '<span class="badge" style="background: linear-gradient(160deg, #ffc107 0%, #ff9800 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;"><i class="fas fa-spinner me-1"></i>En Proceso</span>';
-                            console.log('✓ Badge de estado actualizado en columna 5');
-                        } else {
-                            console.error('❌ No se encontró la celda de estado (columna 5). Total de celdas:', row.cells.length);
-                        }
-                        
-                        // IMPORTANTE: Mostrar el botón de editar en la columna de acciones (columna 6)
-                        const accionesCell = row.cells[6];
-                        if (accionesCell) {
-                            accionesCell.innerHTML = '<button type="button" class="btn btn-sm shadow-sm btn-ver-lotes" onclick="editarOrden(\'' + idOrden + '\')" title="Editar orden"><i class="fas fa-edit"></i> Editar</button>';
-                            console.log('✓ Botón de editar agregado en columna 6');
-                        } else {
-                            console.error('❌ No se encontró la celda de acciones (columna 6). Total de celdas:', row.cells.length);
-                        }
-                        
-                        // Actualizar el atributo data-estado de la fila para los filtros
-                        if (row) {
-                            row.dataset.estado = 'En Proceso';
-                            console.log('✓ Atributo data-estado actualizado');
-                        }
-                        
-                        console.log('UI actualizada correctamente');
-                        
-                        // Mostrar mensaje de éxito
-                        showSuccess('Estado cambiado a "' + nuevoEstado + '" correctamente');
-                    } else {
-                        console.error('Error del servidor:', data.message);
-                        showError('Error al cambiar el estado: ' + (data.message || 'Error desconocido'));
-                        // Restaurar todo al estado original
-                        if (row.cells[5]) row.cells[5].innerHTML = estadoCellOriginal;
-                        if (row.cells[6]) row.cells[6].innerHTML = accionesCellOriginal;
-                        elemento.style.pointerEvents = 'auto';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error completo en catch:', error);
-                    console.error('Error message:', error.message);
-                    console.error('Stack trace:', error.stack);
-                    showError('Error de conexión al cambiar el estado. Por favor, intenta de nuevo.');
-                    
-                    // Restaurar todo al estado original
-                    if (row.cells[5]) row.cells[5].innerHTML = estadoCellOriginal;
-                    if (row.cells[6]) row.cells[6].innerHTML = accionesCellOriginal;
-                    elemento.style.pointerEvents = 'auto';
-                });
+                    'Cambiar estado de orden'
+                );
+                console.log('✅ showConfirm retornó:', result);
+            } catch (error) {
+                console.error('❌ Error al llamar showConfirm:', error);
+                // Fallback a confirm nativo
+                if (confirm('¿Deseas cambiar el estado de esta orden a "' + nuevoEstado + '"?')) {
+                    procederCambioEstado(idOrden, nuevoEstado, elemento, '');
+                }
+            }
+        }
+    }
+    
+    // Función auxiliar para proceder con el cambio de estado
+    function procederCambioEstado(idOrden, nuevoEstado, elemento, motivo) {
+        // Guardar el estado original para poder restaurarlo en caso de error
+        const row = elemento.closest('tr');
+        if (!row) {
+            showError('Error: No se pudo encontrar la fila de la orden');
+            return;
+        }
+        
+        // Las columnas son: 0=Código, 1=Producto, 2=Cantidad, 3=Monto, 4=Solicitante, 5=Estado, 6=Acciones
+        const estadoCellOriginal = row.cells[5] ? row.cells[5].innerHTML : '';
+        const accionesCellOriginal = row.cells[6] ? row.cells[6].innerHTML : '';
+        
+        // Mostrar indicador de carga en la celda de estado
+        if (row.cells[5]) {
+            row.cells[5].innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Procesando...';
+        }
+        elemento.style.pointerEvents = 'none';
+        
+        // Construir el body de la petición
+        let body = 'idOrden=' + idOrden + '&nuevoEstado=' + encodeURIComponent(nuevoEstado);
+        if (motivo) {
+            body += '&motivo=' + encodeURIComponent(motivo);
+        }
+        
+        // Hacer petición AJAX
+        fetch('<%= request.getContextPath() %>/ProductorServlet?action=cambiarEstadoOrden', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            'Cambiar estado de orden'
-        );
+            body: body
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error HTTP: ' + response.status);
+            }
+            return response.text();
+        })
+        .then(text => {
+            if (!text || text.trim() === '') {
+                throw new Error('La respuesta del servidor está vacía');
+            }
+            
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error('La respuesta del servidor no es JSON válido');
+            }
+            
+            if (!data || typeof data.success === 'undefined') {
+                throw new Error('Respuesta del servidor inválida');
+            }
+            
+            if (data.success) {
+                // Actualizar el badge con el nuevo estado (columna 5)
+                const estadoCell = row.cells[5];
+                if (estadoCell) {
+                    if (nuevoEstado === 'En Proceso') {
+                        estadoCell.innerHTML = '<span class="badge" style="background: linear-gradient(160deg, #ffc107 0%, #ff9800 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;"><i class="fas fa-spinner me-1"></i>En Proceso</span>';
+                    } else if (nuevoEstado === 'Rechazado') {
+                        estadoCell.innerHTML = '<span class="badge" style="background: linear-gradient(160deg, #dc3545 0%, #c82333 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;"><i class="fas fa-times me-1"></i>Rechazado</span>';
+                    } else if (nuevoEstado === 'Recibido') {
+                        estadoCell.innerHTML = '<span class="badge-completada"><i class="fas fa-check me-1"></i>Recibido</span>';
+                    } else if (nuevoEstado === 'Aprobado') {
+                        estadoCell.innerHTML = '<span class="badge" style="background: linear-gradient(160deg, #0d6efd 0%, #0a58ca 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;"><i class="fas fa-thumbs-up me-1"></i>Aprobado</span>';
+                    } else {
+                        estadoCell.innerHTML = '<span class="badge">' + nuevoEstado + '</span>';
+                    }
+                }
+                
+                // Mostrar el botón de editar solo si el estado es "En Proceso"
+                const accionesCell = row.cells[6];
+                if (accionesCell) {
+                    if (nuevoEstado === 'En Proceso') {
+                        accionesCell.innerHTML = '<button type="button" class="btn btn-sm shadow-sm btn-ver-lotes" onclick="editarOrden(\'' + idOrden + '\')" title="Editar orden"><i class="fas fa-edit"></i> Editar</button>';
+                    } else {
+                        accionesCell.innerHTML = '';
+                    }
+                }
+                
+                // Actualizar el atributo data-estado de la fila para los filtros
+                if (row) {
+                    row.dataset.estado = nuevoEstado;
+                }
+                
+                // Mostrar mensaje de éxito
+                showSuccess('Estado cambiado a "' + nuevoEstado + '" correctamente');
+                
+                // Si es rechazado, recargar la página después de 2 segundos
+                if (nuevoEstado === 'Rechazado') {
+                    setTimeout(() => location.reload(), 2000);
+                }
+            } else {
+                showError('Error al cambiar el estado: ' + (data.message || 'Error desconocido'));
+                // Restaurar todo al estado original
+                if (row.cells[5]) row.cells[5].innerHTML = estadoCellOriginal;
+                if (row.cells[6]) row.cells[6].innerHTML = accionesCellOriginal;
+                elemento.style.pointerEvents = 'auto';
+            }
+        })
+        .catch(error => {
+            showError('Error de conexión al cambiar el estado. Por favor, intenta de nuevo.');
+            // Restaurar todo al estado original
+            if (row.cells[5]) row.cells[5].innerHTML = estadoCellOriginal;
+            if (row.cells[6]) row.cells[6].innerHTML = accionesCellOriginal;
+            elemento.style.pointerEvents = 'auto';
+        });
     }
 
     // Inicializar filtros
@@ -1602,6 +1691,932 @@
         </form>
     </div>
 </div>
+
+<!-- Estilos y JavaScript para Notificaciones -->
+<style>
+    .badge-notificacion {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        background: #dc3545;
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 5px;
+        border-radius: 10px;
+        min-width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        line-height: 1;
+        animation: pulse-badge 2s infinite;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        border: 2px solid white;
+    }
+    
+    @keyframes pulse-badge {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .notificaciones-dropdown {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: none;
+        border-radius: 12px;
+        overflow: visible;
+    }
+    
+    #listaNotificaciones {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 168, 150, 0.3) transparent;
+    }
+    
+    #listaNotificaciones::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    #listaNotificaciones::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    #listaNotificaciones::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 168, 150, 0.3);
+        border-radius: 10px;
+    }
+    
+    #listaNotificaciones::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0, 168, 150, 0.5);
+    }
+    
+    .notificacion-item {
+        padding: 12px 20px;
+        border-bottom: 1px solid #eee;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: white;
+    }
+    
+    .notificacion-item:hover {
+        background: #f8f9fa;
+    }
+    
+    .notificacion-item.no-leida {
+        background: #e8f4f8;
+        border-left: 4px solid var(--turquoise-dark);
+    }
+    
+    .notificacion-item.no-leida:hover {
+        background: #d4ecf5;
+    }
+    
+    .notificacion-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    
+    .notificacion-icon.CRITICAL { background: #fee; color: #dc3545; }
+    .notificacion-icon.WARNING { background: #fff3cd; color: #ffc107; }
+    .notificacion-icon.INFO { background: #d1ecf1; color: #0dcaf0; }
+    
+    .notificacion-contenido {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .notificacion-titulo {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #212529 !important;
+        margin-bottom: 4px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.3;
+    }
+    
+    .notificacion-mensaje {
+        font-size: 0.8rem;
+        color: #495057 !important;
+        margin-bottom: 4px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.4;
+    }
+    
+    .notificacion-tiempo {
+        font-size: 0.7rem;
+        color: #6c757d !important;
+    }
+</style>
+
+<script>
+// ===================== Sistema de Notificaciones =====================
+document.addEventListener('DOMContentLoaded', function() {
+    cargarContadorNotificaciones();
+    cargarNotificacionesRecientes();
+    setInterval(function() {
+        cargarContadorNotificaciones();
+        cargarNotificacionesRecientes();
+    }, 120000);
+});
+
+function cargarContadorNotificaciones() {
+    fetch('<%= request.getContextPath() %>/NotificacionServlet?action=contador', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            const contador = data.datos.contador || 0;
+            const badge = document.getElementById('badgeNotificaciones');
+            if (badge) {
+                if (contador > 0) {
+                    badge.textContent = contador > 99 ? '99+' : contador;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+    })
+    .catch(error => console.error('Error al cargar contador:', error));
+}
+
+function cargarNotificacionesRecientes() {
+    fetch('<%= request.getContextPath() %>/NotificacionServlet?action=recientes', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            const notifs = data.datos.notificaciones || [];
+            mostrarNotificaciones(notifs);
+        }
+    })
+    .catch(error => {
+        console.error('Error al cargar notificaciones:', error);
+        const lista = document.getElementById('listaNotificaciones');
+        if (lista) {
+            lista.innerHTML = '<div class="text-center py-4 text-danger"><i class="fas fa-exclamation-triangle fa-2x mb-2"></i><p class="mb-0">Error al cargar notificaciones</p></div>';
+        }
+    });
+}
+
+function mostrarNotificaciones(notificaciones) {
+    const lista = document.getElementById('listaNotificaciones');
+    if (!lista) return;
+    
+    if (notificaciones.length === 0) {
+        lista.innerHTML = '<div class="text-center py-4 text-muted"><i class="fas fa-bell-slash fa-2x mb-2"></i><p class="mb-0">No tienes notificaciones nuevas</p></div>';
+        return;
+    }
+    
+    const htmlArray = notificaciones.map(notif => {
+        const iconoTipo = obtenerIconoTipo(notif.tipo || notif.tipoNotificacion);
+        const tiempoRelativo = obtenerTiempoRelativo(notif.fechaCreacion);
+        const idNotif = notif.id || notif.idNotificacion;
+        const nivelPrioridad = notif.nivel || notif.nivelPrioridad;
+        
+        return '<div class="notificacion-item no-leida" onclick="verNotificacion(' + idNotif + ', \'' + (notif.urlAccion || '') + '\')">' +
+                '<div class="d-flex gap-3">' +
+                    '<div class="notificacion-icon ' + nivelPrioridad + '">' +
+                        '<i class="' + iconoTipo + '"></i>' +
+                    '</div>' +
+                    '<div class="notificacion-contenido">' +
+                        '<div class="notificacion-titulo">' + notif.titulo + '</div>' +
+                        '<div class="notificacion-mensaje">' + notif.mensaje + '</div>' +
+                        '<div class="notificacion-tiempo"><i class="far fa-clock me-1"></i>' + tiempoRelativo + '</div>' +
+                    '</div>' +
+                    '<div class="text-primary"><i class="fas fa-circle" style="font-size: 8px;"></i></div>' +
+                '</div>' +
+            '</div>';
+    });
+    
+    lista.innerHTML = htmlArray.join('');
+}
+
+function obtenerIconoTipo(tipo) {
+    const iconos = {
+        'STOCK_CRITICO': 'fas fa-exclamation-triangle',
+        'STOCK_MINIMO': 'fas fa-box-open',
+        'VENCIMIENTO_7_DIAS': 'fas fa-calendar-times',
+        'VENCIMIENTO_3_DIAS': 'fas fa-bell',
+        'LOTE_VENCIDO': 'fas fa-times-circle',
+        'INCIDENCIA_REPORTADA': 'fas fa-exclamation-circle',
+        'AJUSTE_INVENTARIO': 'fas fa-exchange-alt',
+        'ENTRADA_REGISTRADA': 'fas fa-arrow-down',
+        'ORDEN_COMPRA_CREADA': 'fas fa-shopping-cart',
+        'ORDEN_LISTA': 'fas fa-check-circle',
+        'PLAN_TRANSPORTE_CREADO': 'fas fa-truck',
+        'PEDIDO_RECHAZADO': 'fas fa-times',
+        'PEDIDO_COMPLETADO': 'fas fa-check',
+        'ORDEN_CONFIRMADA': 'fas fa-check-circle',
+        'ORDEN_RECHAZADA': 'fas fa-times-circle',
+        'ORDEN_LISTA_PRODUCTOR': 'fas fa-check',
+        'PRODUCTO_NUEVO': 'fas fa-plus-circle',
+        'USUARIO_CREADO': 'fas fa-user-plus',
+        'ALERTA_CONFIGURADA': 'fas fa-cog',
+        'SISTEMA_ACTUALIZADO': 'fas fa-info-circle'
+    };
+    return iconos[tipo] || 'fas fa-bell';
+}
+
+function obtenerTiempoRelativo(fechaStr) {
+    let fecha;
+    if (typeof fechaStr === 'number') {
+        fecha = new Date(fechaStr);
+    } else if (typeof fechaStr === 'string') {
+        fecha = new Date(fechaStr);
+    } else {
+        return 'Reciente';
+    }
+    
+    if (isNaN(fecha.getTime())) {
+        return 'Reciente';
+    }
+    
+    const ahora = new Date();
+    const diffMs = ahora - fecha;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Ahora mismo';
+    if (diffMins < 60) return 'Hace ' + diffMins + ' min';
+    if (diffHours < 24) return 'Hace ' + diffHours + ' h';
+    if (diffDays < 7) return 'Hace ' + diffDays + ' días';
+    return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+}
+
+function verNotificacion(id, url) {
+    fetch('<%= request.getContextPath() %>/NotificacionServlet?action=marcarLeida&id=' + id, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            cargarContadorNotificaciones();
+            if (url && url.trim() !== '') {
+                window.location.href = url;
+            } else {
+                cargarNotificacionesRecientes();
+            }
+        }
+    })
+    .catch(error => console.error('Error al marcar como leída:', error));
+}
+
+function marcarTodasLeidas() {
+    const dropdown = document.getElementById('notificacionesDropdown');
+    if (dropdown) {
+        const bsDropdown = bootstrap.Dropdown.getInstance(dropdown);
+        if (bsDropdown) bsDropdown.hide();
+    }
+    
+    fetch('<%= request.getContextPath() %>/NotificacionServlet?action=marcarTodasLeidas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            cargarContadorNotificaciones();
+            cargarNotificacionesRecientes();
+            mostrarToast('success', 'Todas las notificaciones marcadas como leídas', 'fas fa-check-circle');
+        } else {
+            mostrarToast('danger', 'Error al marcar notificaciones', 'fas fa-exclamation-triangle');
+        }
+    })
+    .catch(error => {
+        console.error('Error al marcar todas como leídas:', error);
+        mostrarToast('danger', 'Error de conexión con el servidor', 'fas fa-exclamation-triangle');
+    });
+}
+
+function mostrarToast(tipo, mensaje, icono) {
+    const toastDiv = document.createElement('div');
+    toastDiv.className = 'position-fixed top-0 end-0 p-3';
+    toastDiv.style.zIndex = '9999';
+    toastDiv.style.marginTop = '70px';
+    
+    const colorMap = {
+        'success': '#28a745',
+        'danger': '#dc3545',
+        'warning': '#ffc107',
+        'info': '#17a2b8'
+    };
+    
+    toastDiv.innerHTML = 
+        '<div class="toast show" role="alert" style="min-width: 300px; border-left: 4px solid ' + (colorMap[tipo] || '#333') + ';">' +
+            '<div class="toast-header" style="background: ' + (colorMap[tipo] || '#333') + '; color: white;">' +
+                '<i class="' + (icono || 'fas fa-info-circle') + ' me-2"></i>' +
+                '<strong class="me-auto">Notificación</strong>' +
+                '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>' +
+            '</div>' +
+            '<div class="toast-body" style="font-size: 0.95rem;">' +
+                mensaje +
+            '</div>' +
+        '</div>';
+    
+    document.body.appendChild(toastDiv);
+    
+    setTimeout(function() {
+        toastDiv.querySelector('.toast').classList.remove('show');
+        setTimeout(function() { toastDiv.remove(); }, 300);
+    }, 3000);
+}
+
+// ===================== Sistema de Notificaciones =====================
+let ultimaActualizacion = Date.now();
+let modalNotificacionesMostrado = false;
+
+// Cargar notificaciones al inicio
+document.addEventListener('DOMContentLoaded', function() {
+    cargarContadorNotificaciones();
+    cargarNotificacionesRecientes();
+    
+    // Auto-refresh cada 5 segundos (5000ms)
+    setInterval(function() {
+        cargarContadorNotificaciones();
+        cargarNotificacionesRecientes();
+    }, 5000);
+});
+
+// Cargar contador de notificaciones no leídas
+function cargarContadorNotificaciones() {
+    fetch('<%= request.getContextPath() %>/NotificacionServlet?action=contador', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            const contador = data.datos.contador || 0;
+            const badge = document.getElementById('badgeNotificaciones');
+            if (badge) {
+                if (contador > 0) {
+                    badge.textContent = contador > 99 ? '99+' : contador;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+    })
+    .catch(error => console.error('Error al cargar contador:', error));
+}
+
+// Cargar notificaciones recientes
+function cargarNotificacionesRecientes() {
+    fetch('<%= request.getContextPath() %>/NotificacionServlet?action=recientes', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            const notifs = data.datos.notificaciones || [];
+            mostrarNotificaciones(notifs);
+            
+            // Mostrar modal automáticamente si hay notificaciones nuevas
+            if (notifs.length > 0) {
+                mostrarModalNotificaciones(notifs);
+            }
+        } else {
+            document.getElementById('listaNotificaciones').innerHTML = 
+                '<div class="text-center py-4 text-warning">' +
+                    '<i class="fas fa-exclamation-triangle fa-2x mb-2"></i>' +
+                    '<p class="mb-0">' + (data.mensaje || 'Error al cargar notificaciones') + '</p>' +
+                '</div>';
+        }
+    })
+    .catch(error => {
+        console.error('Error al cargar notificaciones:', error);
+        document.getElementById('listaNotificaciones').innerHTML = 
+            '<div class="text-center py-4 text-danger">' +
+                '<i class="fas fa-exclamation-triangle fa-2x mb-2"></i>' +
+                '<p class="mb-0">Error al cargar notificaciones</p>' +
+            '</div>';
+    });
+}
+
+// Mostrar notificaciones en el dropdown
+function mostrarNotificaciones(notificaciones) {
+    const lista = document.getElementById('listaNotificaciones');
+    
+    if (notificaciones.length === 0) {
+        lista.innerHTML = '<div class="text-center py-4 text-muted">' +
+            '<i class="fas fa-bell-slash fa-2x mb-2"></i>' +
+            '<p class="mb-0">No tienes notificaciones nuevas</p>' +
+        '</div>';
+        return;
+    }
+    
+    const htmlArray = notificaciones.map(notif => {
+        const iconoTipo = obtenerIconoTipo(notif.tipo || notif.tipoNotificacion);
+        const tiempoRelativo = obtenerTiempoRelativo(notif.fechaCreacion);
+        const idNotif = notif.id || notif.idNotificacion;
+        const nivelPrioridad = notif.nivel || notif.nivelPrioridad;
+        const ordenCompraId = notif.ordenCompraId || '';
+        const tipoNotif = notif.tipo || notif.tipoNotificacion || '';
+        
+        return '<div class="notificacion-item no-leida" onclick="verNotificacion(' + idNotif + ', \'' + (notif.urlAccion || '') + '\', ' + (ordenCompraId || 'null') + ', \'' + tipoNotif + '\')">' +
+                '<div class="d-flex gap-3">' +
+                    '<div class="notificacion-icon ' + nivelPrioridad + '">' +
+                        '<i class="' + iconoTipo + '"></i>' +
+                    '</div>' +
+                    '<div class="notificacion-contenido">' +
+                        '<div class="notificacion-titulo">' + notif.titulo + '</div>' +
+                        '<div class="notificacion-mensaje">' + notif.mensaje + '</div>' +
+                        '<div class="notificacion-tiempo">' +
+                            '<i class="far fa-clock me-1"></i>' + tiempoRelativo +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="text-primary"><i class="fas fa-circle" style="font-size: 8px;"></i></div>' +
+                '</div>' +
+            '</div>';
+    });
+    
+    lista.innerHTML = htmlArray.join('');
+}
+
+// Obtener icono según tipo de notificación
+function obtenerIconoTipo(tipo) {
+    const iconos = {
+        'STOCK_CRITICO': 'fas fa-exclamation-triangle',
+        'STOCK_MINIMO': 'fas fa-box-open',
+        'VENCIMIENTO_7_DIAS': 'fas fa-calendar-times',
+        'VENCIMIENTO_3_DIAS': 'fas fa-bell',
+        'LOTE_VENCIDO': 'fas fa-times-circle',
+        'INCIDENCIA_REPORTADA': 'fas fa-exclamation-circle',
+        'AJUSTE_INVENTARIO': 'fas fa-exchange-alt',
+        'ENTRADA_REGISTRADA': 'fas fa-arrow-down',
+        'ORDEN_COMPRA_CREADA': 'fas fa-shopping-cart',
+        'ORDEN_LISTA': 'fas fa-check-circle',
+        'PLAN_TRANSPORTE_CREADO': 'fas fa-truck',
+        'PEDIDO_RECHAZADO': 'fas fa-times',
+        'PEDIDO_COMPLETADO': 'fas fa-check',
+        'ORDEN_CONFIRMADA': 'fas fa-check-circle',
+        'ORDEN_RECHAZADA': 'fas fa-times-circle',
+        'ORDEN_LISTA_PRODUCTOR': 'fas fa-check',
+        'PRODUCTO_NUEVO': 'fas fa-plus-circle',
+        'USUARIO_CREADO': 'fas fa-user-plus',
+        'ALERTA_CONFIGURADA': 'fas fa-cog',
+        'SISTEMA_ACTUALIZADO': 'fas fa-info-circle'
+    };
+    return iconos[tipo] || 'fas fa-bell';
+}
+
+// Obtener tiempo relativo
+function obtenerTiempoRelativo(fechaStr) {
+    let fecha;
+    if (typeof fechaStr === 'number') {
+        fecha = new Date(fechaStr);
+    } else if (typeof fechaStr === 'string') {
+        fecha = new Date(fechaStr);
+    } else {
+        return 'Reciente';
+    }
+    
+    if (isNaN(fecha.getTime())) {
+        return 'Reciente';
+    }
+    
+    const ahora = new Date();
+    const diffMs = ahora - fecha;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Ahora mismo';
+    if (diffMins < 60) return 'Hace ' + diffMins + ' min';
+    if (diffHours < 24) return 'Hace ' + diffHours + ' h';
+    if (diffDays < 7) return 'Hace ' + diffDays + ' días';
+    return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+}
+
+// Ver notificación (marcar como leída y redirigir)
+function verNotificacion(id, url, ordenCompraId, tipoNotificacion) {
+    fetch('<%= request.getContextPath() %>/NotificacionServlet?action=marcarLeida&id=' + id, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            cargarContadorNotificaciones();
+            // Si es una notificación de orden de compra, redirigir a la página de órdenes
+            // Si es una notificación relacionada con órdenes de compra, redirigir a la página de órdenes
+            if (tipoNotificacion && (tipoNotificacion.includes('ORDEN_COMPRA') || tipoNotificacion.includes('ORDEN_RECHAZADA') || tipoNotificacion.includes('ORDEN_CONFIRMADA') || tipoNotificacion.includes('ORDEN_LISTA'))) {
+                window.location.href = '<%= request.getContextPath() %>/ProductorServlet?action=ordenesCompra';
+            } else if (url && url.trim() !== '') {
+                const contextPath = '<%= request.getContextPath() %>';
+                const finalUrl = url.startsWith('/') ? contextPath + url : url;
+                window.location.href = finalUrl;
+            } else {
+                cargarNotificacionesRecientes();
+            }
+        }
+    })
+    .catch(error => console.error('Error al marcar como leída:', error));
+}
+
+// Marcar todas como leídas
+function marcarTodasLeidas() {
+    const dropdown = document.getElementById('notificacionesDropdown');
+    if (dropdown) {
+        const bsDropdown = bootstrap.Dropdown.getInstance(dropdown);
+        if (bsDropdown) bsDropdown.hide();
+    }
+    
+    fetch('<%= request.getContextPath() %>/NotificacionServlet?action=marcarTodasLeidas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            cargarContadorNotificaciones();
+            cargarNotificacionesRecientes();
+            mostrarToast('success', 'Todas las notificaciones marcadas como leídas', 'fas fa-check-circle');
+        } else {
+            mostrarToast('danger', 'Error al marcar notificaciones', 'fas fa-exclamation-triangle');
+        }
+    })
+    .catch(error => {
+        console.error('Error al marcar todas como leídas:', error);
+        mostrarToast('danger', 'Error de conexión con el servidor', 'fas fa-exclamation-triangle');
+    });
+}
+
+// Mostrar modal de notificaciones automáticamente
+function mostrarModalNotificaciones(notificaciones) {
+    if (notificaciones.length === 0 || modalNotificacionesMostrado) {
+        return;
+    }
+    
+    const primeraNotificacion = notificaciones[0];
+    const iconoTipo = obtenerIconoTipo(primeraNotificacion.tipo || primeraNotificacion.tipoNotificacion);
+    const tiempoRelativo = obtenerTiempoRelativo(primeraNotificacion.fechaCreacion);
+    const nivelPrioridad = primeraNotificacion.nivel || primeraNotificacion.nivelPrioridad;
+    
+    document.getElementById('modalNotificacionIcono').className = 'notificacion-icon-modal ' + nivelPrioridad;
+    document.getElementById('modalNotificacionIcono').innerHTML = '<i class="' + iconoTipo + '"></i>';
+    document.getElementById('modalNotificacionTitulo').textContent = primeraNotificacion.titulo;
+    document.getElementById('modalNotificacionMensaje').textContent = primeraNotificacion.mensaje;
+    document.getElementById('modalNotificacionTiempo').innerHTML = '<i class="far fa-clock me-1"></i>' + tiempoRelativo;
+    
+    document.getElementById('modalNotificacion').setAttribute('data-notificacion-id', primeraNotificacion.id || primeraNotificacion.idNotificacion);
+    document.getElementById('modalNotificacion').setAttribute('data-notificacion-url', primeraNotificacion.urlAccion || '');
+    document.getElementById('modalNotificacion').setAttribute('data-orden-compra-id', primeraNotificacion.ordenCompraId || '');
+    document.getElementById('modalNotificacion').setAttribute('data-tipo-notificacion', primeraNotificacion.tipo || primeraNotificacion.tipoNotificacion || '');
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalNotificacion'));
+    modal.show();
+    
+    modalNotificacionesMostrado = true;
+    
+    const notifId = primeraNotificacion.id || primeraNotificacion.idNotificacion;
+    if (notifId) {
+        fetch('<%= request.getContextPath() %>/NotificacionServlet?action=marcarLeida&id=' + notifId, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.exito) {
+                cargarContadorNotificaciones();
+            }
+        })
+        .catch(error => console.error('Error al marcar como leída:', error));
+    }
+}
+
+// Función para ir a la acción de la notificación
+function irANotificacion() {
+    const modal = document.getElementById('modalNotificacion');
+    const url = modal.getAttribute('data-notificacion-url');
+    const tipoNotificacion = modal.getAttribute('data-tipo-notificacion');
+    const modalInstance = bootstrap.Modal.getInstance(modal);
+    modalInstance.hide();
+    
+    // Si es una notificación relacionada con órdenes de compra, redirigir a la página de órdenes
+    if (tipoNotificacion && (tipoNotificacion.includes('ORDEN_COMPRA') || tipoNotificacion.includes('ORDEN_RECHAZADA') || tipoNotificacion.includes('ORDEN_CONFIRMADA') || tipoNotificacion.includes('ORDEN_LISTA'))) {
+        window.location.href = '<%= request.getContextPath() %>/ProductorServlet?action=ordenesCompra';
+    } else if (url && url.trim() !== '') {
+        const contextPath = '<%= request.getContextPath() %>';
+        const finalUrl = url.startsWith('/') ? contextPath + url : url;
+        window.location.href = finalUrl;
+    }
+}
+
+// Cargar y mostrar todas las notificaciones en el modal grande
+function mostrarModalTodasNotificaciones() {
+    const dropdown = document.getElementById('notificacionesDropdown');
+    if (dropdown) {
+        const bsDropdown = bootstrap.Dropdown.getInstance(dropdown);
+        if (bsDropdown) bsDropdown.hide();
+    }
+    
+    document.getElementById('listaTodasNotificaciones').innerHTML = 
+        '<div class="text-center py-5">' +
+            '<i class="fas fa-spinner fa-spin fa-2x mb-3 text-muted"></i>' +
+            '<p class="text-muted">Cargando notificaciones...</p>' +
+        '</div>';
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalTodasNotificaciones'));
+    modal.show();
+    
+    fetch('<%= request.getContextPath() %>/NotificacionServlet?action=todas', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            const notifs = data.datos.notificaciones || [];
+            mostrarTodasNotificaciones(notifs);
+        } else {
+            document.getElementById('listaTodasNotificaciones').innerHTML = 
+                '<div class="text-center py-5 text-danger">' +
+                    '<i class="fas fa-exclamation-triangle fa-2x mb-3"></i>' +
+                    '<p>' + (data.mensaje || 'Error al cargar notificaciones') + '</p>' +
+                '</div>';
+        }
+    })
+    .catch(error => {
+        console.error('Error al cargar todas las notificaciones:', error);
+        document.getElementById('listaTodasNotificaciones').innerHTML = 
+            '<div class="text-center py-5 text-danger">' +
+                '<i class="fas fa-exclamation-triangle fa-2x mb-3"></i>' +
+                '<p>Error al cargar notificaciones</p>' +
+            '</div>';
+    });
+}
+
+// Mostrar todas las notificaciones en el modal grande
+function mostrarTodasNotificaciones(notificaciones) {
+    const lista = document.getElementById('listaTodasNotificaciones');
+    
+    if (notificaciones.length === 0) {
+        lista.innerHTML = '<div class="text-center py-5 text-muted">' +
+            '<i class="fas fa-bell-slash fa-3x mb-3"></i>' +
+            '<h5 class="mb-2">No tienes notificaciones</h5>' +
+            '<p class="mb-0">No hay notificaciones para mostrar</p>' +
+        '</div>';
+        return;
+    }
+    
+    const htmlArray = notificaciones.map(notif => {
+        const iconoTipo = obtenerIconoTipo(notif.tipo || notif.tipoNotificacion);
+        const tiempoRelativo = obtenerTiempoRelativo(notif.fechaCreacion);
+        const idNotif = notif.id || notif.idNotificacion;
+        const nivelPrioridad = notif.nivel || notif.nivelPrioridad;
+        const esLeida = notif.leida || false;
+        const claseLeida = esLeida ? '' : 'no-leida';
+        const ordenCompraId = notif.ordenCompraId || '';
+        const tipoNotif = notif.tipo || notif.tipoNotificacion || '';
+        
+        return '<div class="notificacion-item-grande ' + claseLeida + '" onclick="verNotificacion(' + idNotif + ', \'' + (notif.urlAccion || '') + '\', ' + (ordenCompraId || 'null') + ', \'' + tipoNotif + '\')">' +
+                '<div class="d-flex gap-3 align-items-start">' +
+                    '<div class="notificacion-icon-grande ' + nivelPrioridad + '">' +
+                        '<i class="' + iconoTipo + '"></i>' +
+                    '</div>' +
+                    '<div class="notificacion-contenido-grande flex-grow-1">' +
+                        '<div class="d-flex justify-content-between align-items-start mb-2">' +
+                            '<div class="notificacion-titulo-grande">' + notif.titulo + '</div>' +
+                            (!esLeida ? '<span class="badge bg-primary rounded-pill" style="font-size: 0.7rem;">Nueva</span>' : '') +
+                        '</div>' +
+                        '<div class="notificacion-mensaje-grande">' + notif.mensaje + '</div>' +
+                        '<div class="notificacion-tiempo-grande mt-2">' +
+                            '<i class="far fa-clock me-1"></i>' + tiempoRelativo +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+    });
+    
+    lista.innerHTML = htmlArray.join('');
+    
+    const contador = notificaciones.filter(n => !(n.leida || false)).length;
+    const contadorEl = document.getElementById('contadorModalNotificaciones');
+    if (contadorEl) {
+        contadorEl.textContent = contador > 0 ? contador + ' no leída' + (contador > 1 ? 's' : '') : 'Todas leídas';
+    }
+}
+
+// Marcar todas como leídas desde el modal
+function marcarTodasLeidasDesdeModal() {
+    fetch('<%= request.getContextPath() %>/NotificacionServlet?action=marcarTodasLeidas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            cargarContadorNotificaciones();
+            mostrarModalTodasNotificaciones();
+            mostrarToast('success', 'Todas las notificaciones marcadas como leídas', 'fas fa-check-circle');
+        } else {
+            mostrarToast('danger', 'Error al marcar notificaciones', 'fas fa-exclamation-triangle');
+        }
+    })
+    .catch(error => {
+        console.error('Error al marcar todas como leídas:', error);
+        mostrarToast('danger', 'Error de conexión con el servidor', 'fas fa-exclamation-triangle');
+    });
+}
+</script>
+
+<!-- Modal de Notificaciones -->
+<div class="modal fade" id="modalNotificacion" tabindex="-1" aria-labelledby="modalNotificacionLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+                <h5 class="modal-title" id="modalNotificacionLabel" style="font-weight: 600;">
+                    <i class="fas fa-bell me-2"></i>Nueva Notificación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 30px;">
+                <div class="d-flex align-items-start gap-4">
+                    <div id="modalNotificacionIcono" class="notificacion-icon-modal" style="flex-shrink: 0;">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <h6 id="modalNotificacionTitulo" style="font-weight: 600; color: #212529; margin-bottom: 10px; font-size: 1.1rem;"></h6>
+                        <p id="modalNotificacionMensaje" style="color: #495057; margin-bottom: 15px; line-height: 1.6; font-size: 0.95rem;"></p>
+                        <div id="modalNotificacionTiempo" style="color: #6c757d; font-size: 0.85rem;">
+                            <i class="far fa-clock me-1"></i>Reciente
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e9ecef; padding: 20px; border-radius: 0 0 15px 15px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 8px 20px;">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="irANotificacion()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); border: none; border-radius: 8px; padding: 8px 20px;">
+                    <i class="fas fa-arrow-right me-2"></i>Ver Detalles
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Grande para Todas las Notificaciones -->
+<div class="modal fade" id="modalTodasNotificaciones" tabindex="-1" aria-labelledby="modalTodasNotificacionesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+                <h5 class="modal-title" id="modalTodasNotificacionesLabel" style="font-weight: 600;">
+                    <i class="fas fa-bell me-2"></i>Todas las Notificaciones
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom" style="background: #f8f9fa;">
+                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
+                        <i class="fas fa-check-double me-1"></i>Marcar todas como leídas
+                    </button>
+                    <span class="text-muted" id="contadorModalNotificaciones"></span>
+                </div>
+                <div id="listaTodasNotificaciones" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+                    <div class="text-center py-5">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-3 text-muted"></i>
+                        <p class="text-muted">Cargando notificaciones...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e9ecef; padding: 15px 20px; border-radius: 0 0 15px 15px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 8px 20px;">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .notificacion-icon-modal {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .notificacion-icon-modal.CRITICAL {
+        background: #fee;
+        color: #dc3545;
+    }
+    
+    .notificacion-icon-modal.WARNING {
+        background: #fff3cd;
+        color: #ffc107;
+    }
+    
+    .notificacion-icon-modal.INFO {
+        background: #d1ecf1;
+        color: #0dcaf0;
+    }
+    
+    #modalNotificacion .modal-content {
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    .notificacion-item-grande {
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: white;
+        border-left: 4px solid transparent;
+    }
+    
+    .notificacion-item-grande:hover {
+        background: #f8f9fa;
+        border-left-color: #00a896;
+    }
+    
+    .notificacion-item-grande.no-leida {
+        background: #e8f4f8;
+        border-left-color: #00a896;
+    }
+    
+    .notificacion-icon-grande {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+    
+    .notificacion-icon-grande.CRITICAL {
+        background: #fee;
+        color: #dc3545;
+    }
+    
+    .notificacion-icon-grande.WARNING {
+        background: #fff3cd;
+        color: #ffc107;
+    }
+    
+    .notificacion-icon-grande.INFO {
+        background: #d1ecf1;
+        color: #0dcaf0;
+    }
+    
+    .notificacion-titulo-grande {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #212529;
+        margin-bottom: 8px;
+    }
+    
+    .notificacion-mensaje-grande {
+        font-size: 0.9rem;
+        color: #495057;
+        line-height: 1.5;
+        margin-bottom: 8px;
+    }
+    
+    .notificacion-tiempo-grande {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
 
 </body>
 </html>

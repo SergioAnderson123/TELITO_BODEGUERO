@@ -21,6 +21,7 @@ import com.example.telito.logistica.daos.ZonaDao;
 import com.example.telito.administrador.daos.UsuarioDAO;
 import com.example.telito.administrador.daos.AlertaDAO;
 import com.example.telito.util.EmailUtil;
+import com.example.telito.util.NotificacionService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -572,6 +573,42 @@ public class OrdenCompraServlet extends HttpServlet {
                 if (idOrdenCreada > 0) {
                     System.out.println("✓ SERVLET: Orden guardada exitosamente con ID: " + idOrdenCreada);
                     
+                    // ========== NOTIFICACIÓN WEB AL PRODUCTOR ==========
+                    try {
+                        // Obtener datos de la orden recién creada
+                        Object[] datosOrden = ordenCompraDao.obtenerDatosBasicosOrden(idOrdenCreada);
+                        if (datosOrden != null) {
+                            int productorIdOrd = (Integer) datosOrden[4];
+                            String numeroOrden = (String) datosOrden[0];
+                            String nombreProducto = (String) datosOrden[1];
+                            int cantidadOrd = (Integer) datosOrden[2];
+                            
+                            System.out.println("🔔 DEBUG: Creando notificación para productor ID: " + productorIdOrd);
+                            System.out.println("🔔 DEBUG: Orden: " + numeroOrden + ", Producto: " + nombreProducto + ", Cantidad: " + cantidadOrd);
+                            
+                            // Crear notificación web para el productor
+                            int notificacionesCreadas = NotificacionService.notificarOrdenCompraCreada(
+                                numeroOrden,
+                                idOrdenCreada,
+                                nombreProducto,
+                                cantidadOrd,
+                                productorIdOrd
+                            );
+                            
+                            if (notificacionesCreadas > 0) {
+                                System.out.println("✓ Notificación creada exitosamente para productor ID: " + productorIdOrd);
+                            } else {
+                                System.err.println("⚠ No se pudo crear la notificación para productor ID: " + productorIdOrd);
+                            }
+                        } else {
+                            System.err.println("⚠ No se pudieron obtener los datos de la orden ID: " + idOrdenCreada);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("⚠ Error al crear notificación web de orden: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    // ========== FIN NOTIFICACIÓN WEB ==========
+                    
                     // ========== ENVIAR NOTIFICACIÓN AL PRODUCTOR SOBRE LA NUEVA ORDEN ==========
                     try {
                         // Obtener datos de la orden recién creada
@@ -903,6 +940,18 @@ public class OrdenCompraServlet extends HttpServlet {
                                             cantidad,
                                             new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
                                         );
+                                    
+                                    // ========== NOTIFICACIÓN WEB AL PRODUCTOR ==========
+                                    try {
+                                        com.example.telito.util.NotificacionService.notificarOrdenRechazadaPorLogistica(
+                                            numeroOrden, idOrden, nombreProducto, productorId
+                                        );
+                                        System.out.println("✓ Notificación web creada para productor ID: " + productorId);
+                                    } catch (Exception e) {
+                                        System.err.println("⚠ Error al crear notificación web: " + e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                    // ========== FIN NOTIFICACIÓN WEB ==========
                                 }
                                 
                                 // Enviar correo HTML

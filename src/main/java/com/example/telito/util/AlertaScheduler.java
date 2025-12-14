@@ -2,8 +2,12 @@ package com.example.telito.util;
 
 import com.example.telito.administrador.daos.AlertaDAO;
 import com.example.telito.almacen.daos.PedidoDao;
+import com.example.telito.almacen.daos.LoteDao;
 import com.example.telito.almacen.beans.Pedido;
+import com.example.telito.almacen.beans.Lote;
+import com.example.telito.administrador.daos.StockMinimoDAO;
 import com.example.telito.util.EmailUtil;
+import com.example.telito.util.NotificacionService;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
@@ -169,6 +173,16 @@ public class AlertaScheduler implements ServletContextListener {
                     e.printStackTrace();
                 }
                 // ========== FIN RECORDATORIO DE PEDIDOS ==========
+                
+                // ========== NOTIFICACIONES WEB PERIÓDICAS ==========
+                // Evaluar stock crítico, vencimientos y crear notificaciones web
+                try {
+                    evaluarYNotificarStockYVencimientos();
+                } catch (Exception e) {
+                    System.err.println("⚠ Error al evaluar y notificar stock/vencimientos: " + e.getMessage());
+                    e.printStackTrace();
+                }
+                // ========== FIN NOTIFICACIONES WEB PERIÓDICAS ==========
                 
                 System.out.println("=== FIN EJECUCIÓN DE ALERTAS ===");
                 System.out.println("Total de correos enviados: " + totalCorreosEnviados);
@@ -355,6 +369,136 @@ public class AlertaScheduler implements ServletContextListener {
                 ));
             
             return html.toString();
+        }
+        
+        // Evalúa stock crítico y vencimientos, creando notificaciones web
+        private void evaluarYNotificarStockYVencimientos() {
+            try {
+                System.out.println("=== EVALUANDO STOCK Y VENCIMIENTOS PARA NOTIFICACIONES WEB ===");
+                
+                LoteDao loteDao = new LoteDao();
+                StockMinimoDAO stockMinimoDAO = new StockMinimoDAO();
+                
+                // Obtener todos los lotes registrados
+                ArrayList<Lote> lotes = loteDao.listarLotesRegistrados(1);
+                
+                java.util.Calendar hoy = java.util.Calendar.getInstance();
+                hoy.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                hoy.set(java.util.Calendar.MINUTE, 0);
+                hoy.set(java.util.Calendar.SECOND, 0);
+                hoy.set(java.util.Calendar.MILLISECOND, 0);
+                
+                int notificacionesStockCritico = 0;
+                int notificacionesStockMinimo = 0;
+                int notificacionesVencimiento7Dias = 0;
+                int notificacionesVencimiento3Dias = 0;
+                int notificacionesLoteVencido = 0;
+                
+                for (Lote lote : lotes) {
+                    try {
+                        // Verificar stock crítico y mínimo
+                        if (lote.getProductoId() > 0) {
+                            com.example.telito.administrador.beans.StockMinimoConfig config = 
+                                stockMinimoDAO.obtenerPorProducto(lote.getProductoId());
+                            
+                            if (config != null && config.isActivo()) {
+                                int paquetesDisponibles = lote.getPaquetesDisponibles();
+                                
+                                // Stock crítico
+                                if (config.getStockCriticoLote() > 0 && 
+                                    paquetesDisponibles <= config.getStockCriticoLote() && 
+                                    paquetesDisponibles > 0) {
+                                    NotificacionService.notificarStockCritico(
+                                        lote.getNombreProducto() != null ? lote.getNombreProducto() : "Producto",
+                                        lote.getProductoId(),
+                                        lote.getIdLote(),
+                                        lote.getStockActual(),
+                                        config.getStockCriticoLote()
+                                    );
+                                    notificacionesStockCritico++;
+                                }
+                                
+                                // Stock mínimo (solo si no es crítico)
+                                if (config.getStockMinimoLote() > 0 && 
+                                    paquetesDisponibles <= config.getStockMinimoLote() && 
+                                    paquetesDisponibles > config.getStockCriticoLote()) {
+                                    NotificacionService.notificarStockMinimo(
+                                        lote.getNombreProducto() != null ? lote.getNombreProducto() : "Producto",
+                                        lote.getProductoId(),
+                                        lote.getIdLote(),
+                                        lote.getStockActual(),
+                                        config.getStockMinimoLote()
+                                    );
+                                    notificacionesStockMinimo++;
+                                }
+                            }
+                        }
+                        
+                        // Verificar vencimientos
+                        if (lote.getFechaVencimiento() != null) {
+                            java.util.Calendar fechaVencimiento = java.util.Calendar.getInstance();
+                            fechaVencimiento.setTime(lote.getFechaVencimiento());
+                            fechaVencimiento.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                            fechaVencimiento.set(java.util.Calendar.MINUTE, 0);
+                            fechaVencimiento.set(java.util.Calendar.SECOND, 0);
+                            fechaVencimiento.set(java.util.Calendar.MILLISECOND, 0);
+                            
+                            long diferenciaMillis = fechaVencimiento.getTimeInMillis() - hoy.getTimeInMillis();
+                            int diasRestantes = (int) (diferenciaMillis / (1000 * 60 * 60 * 24));
+                            
+                            // Lote vencido
+                            if (diasRestantes < 0) {
+                                NotificacionService.notificarLoteVencido(
+                                    lote.getNombreProducto() != null ? lote.getNombreProducto() : "Producto",
+                                    lote.getCodigoLote(),
+                                    lote.getProductoId(),
+                                    lote.getIdLote(),
+                                    lote.getFechaVencimiento()
+                                );
+                                notificacionesLoteVencido++;
+                            }
+                            // Vencimiento en 3 días
+                            else if (diasRestantes <= 3 && diasRestantes >= 0) {
+                                NotificacionService.notificarVencimiento3Dias(
+                                    lote.getNombreProducto() != null ? lote.getNombreProducto() : "Producto",
+                                    lote.getCodigoLote(),
+                                    lote.getProductoId(),
+                                    lote.getIdLote(),
+                                    lote.getFechaVencimiento()
+                                );
+                                notificacionesVencimiento3Dias++;
+                            }
+                            // Vencimiento en 7 días
+                            else if (diasRestantes <= 7 && diasRestantes > 3) {
+                                NotificacionService.notificarVencimiento7Dias(
+                                    lote.getNombreProducto() != null ? lote.getNombreProducto() : "Producto",
+                                    lote.getCodigoLote(),
+                                    lote.getProductoId(),
+                                    lote.getIdLote(),
+                                    lote.getFechaVencimiento()
+                                );
+                                notificacionesVencimiento7Dias++;
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.err.println("⚠ Error al evaluar lote ID " + lote.getIdLote() + ": " + e.getMessage());
+                    }
+                }
+                
+                System.out.println("✓ Notificaciones web creadas:");
+                System.out.println("  - Stock crítico: " + notificacionesStockCritico);
+                System.out.println("  - Stock mínimo: " + notificacionesStockMinimo);
+                System.out.println("  - Vencimiento 7 días: " + notificacionesVencimiento7Dias);
+                System.out.println("  - Vencimiento 3 días: " + notificacionesVencimiento3Dias);
+                System.out.println("  - Lotes vencidos: " + notificacionesLoteVencido);
+                System.out.println("  - Total: " + (notificacionesStockCritico + notificacionesStockMinimo + 
+                                                   notificacionesVencimiento7Dias + notificacionesVencimiento3Dias + 
+                                                   notificacionesLoteVencido));
+                
+            } catch (Exception e) {
+                System.err.println("❌ Error al evaluar stock y vencimientos: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 }

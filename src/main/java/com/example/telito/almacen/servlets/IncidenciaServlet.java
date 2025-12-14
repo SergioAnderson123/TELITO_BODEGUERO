@@ -9,6 +9,7 @@ import com.example.telito.administrador.daos.UsuarioDAO;
 import com.example.telito.administrador.services.AuditoriaService;
 import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.EmailUtil;
+import com.example.telito.util.NotificacionService;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -268,7 +269,29 @@ public class IncidenciaServlet extends HttpServlet {
                 request
             );
             
-            // Enviar notificación al administrador
+            // Notificación a Administrador: Incidencia Reportada
+            try {
+                NotificacionService.crearNotificacionPorRol(
+                    "ADMINISTRADOR",
+                    "INCIDENCIA_REPORTADA",
+                    "Nueva Incidencia de Inventario Reportada",
+                    "El almacenero %s ha reportado una incidencia de tipo '%s' para el lote %s. Estado: Pendiente.".formatted(
+                        usuario.getNombres() + " " + usuario.getApellidos(), 
+                        incidencia.getTipoIncidencia(), 
+                        lote.getCodigoLote()),
+                    "WARNING",
+                    lote.getProductoId(),
+                    lote.getIdLote(),
+                    null,
+                    null,
+                    request.getContextPath() + "/administrador/auditoria.jsp?action=listar&modulo=ALMACEN&busqueda=" + idIncidencia,
+                    true // Enviar email
+                );
+            } catch (Exception e) {
+                System.err.println("⚠ Error al crear notificación de incidencia: " + e.getMessage());
+            }
+            
+            // También enviar email (mantener funcionalidad existente)
             enviarNotificacionAdministrador(incidencia, lote);
             
             session.setAttribute("successMsg", "Incidencia reportada exitosamente. El administrador será notificado.");

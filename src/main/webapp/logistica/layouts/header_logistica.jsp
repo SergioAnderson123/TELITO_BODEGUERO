@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.example.telito.administrador.beans.Usuario" %>
 <%
     Usuario usuarioHeader = (Usuario) session.getAttribute("usuario");
@@ -39,7 +40,7 @@
                         <span class="badge-notificacion" id="badgeNotificaciones" style="display: none;">0</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end notificaciones-dropdown" aria-labelledby="notificacionesDropdown" style="width: 380px;">
-                        <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, var(--turquoise-dark), var(--seafoam)); color: white; padding: 12px 20px;">
+                        <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; padding: 12px 20px;">
                             <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notificaciones</h6>
                             <button class="btn btn-sm btn-light" onclick="marcarTodasLeidas()" style="font-size: 0.75rem; padding: 2px 8px;">
                                 <i class="fas fa-check-double me-1"></i>Marcar todas
@@ -52,7 +53,7 @@
                             </div>
                         </div>
                         <div class="dropdown-divider m-0"></div>
-                        <a class="dropdown-item text-center text-primary fw-bold py-2" href="${pageContext.request.contextPath}/logistica/alertas">
+                        <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #00a896 !important;">
                             <i class="fas fa-list me-2"></i>Ver todas las notificaciones
                         </a>
                     </div>
@@ -213,11 +214,11 @@ document.addEventListener('DOMContentLoaded', function() {
     cargarContadorNotificaciones();
     cargarNotificacionesRecientes();
     
-    // Auto-refresh cada 2 minutos (120000ms)
+    // Auto-refresh cada 5 segundos (5000ms)
     setInterval(function() {
         cargarContadorNotificaciones();
         cargarNotificacionesRecientes();
-    }, 120000);
+    }, 5000);
 });
 
 // Cargar contador de notificaciones no leídas
@@ -253,6 +254,11 @@ function cargarNotificacionesRecientes() {
         if (data.exito) {
             const notifs = data.datos.notificaciones || [];
             mostrarNotificaciones(notifs);
+            
+            // Mostrar modal automáticamente si hay notificaciones nuevas
+            if (notifs.length > 0) {
+                mostrarModalNotificaciones(notifs);
+            }
         }
     })
     .catch(error => {
@@ -282,8 +288,9 @@ function mostrarNotificaciones(notificaciones) {
         const tiempoRelativo = obtenerTiempoRelativo(notif.fechaCreacion);
         const idNotif = notif.id || notif.idNotificacion;
         const nivelPrioridad = notif.nivel || notif.nivelPrioridad;
+        const tipoNotif = notif.tipo || notif.tipoNotificacion || '';
         
-        return '<div class="notificacion-item no-leida" onclick="verNotificacion(' + idNotif + ', \'' + (notif.urlAccion || '') + '\')">' +
+        return '<div class="notificacion-item no-leida" onclick="verNotificacion(' + idNotif + ', \'' + (notif.urlAccion || '') + '\', \'' + tipoNotif + '\')">' +
                 '<div class="d-flex gap-3">' +
                     '<div class="notificacion-icon ' + nivelPrioridad + '">' +
                         '<i class="' + iconoTipo + '"></i>' +
@@ -306,13 +313,30 @@ function mostrarNotificaciones(notificaciones) {
 // Obtener icono según tipo de notificación
 function obtenerIconoTipo(tipo) {
     const iconos = {
-        'STOCK_MINIMO': 'fas fa-box-open',
         'STOCK_CRITICO': 'fas fa-exclamation-triangle',
+        'STOCK_MINIMO': 'fas fa-box-open',
+        'VENCIMIENTO_7_DIAS': 'fas fa-calendar-times',
+        'VENCIMIENTO_3_DIAS': 'fas fa-bell',
+        'LOTE_VENCIDO': 'fas fa-times-circle',
+        'INCIDENCIA_REPORTADA': 'fas fa-exclamation-circle',
+        'AJUSTE_INVENTARIO': 'fas fa-exchange-alt',
+        'ENTRADA_REGISTRADA': 'fas fa-arrow-down',
+        'ORDEN_COMPRA_CREADA': 'fas fa-shopping-cart',
+        'ORDEN_LISTA': 'fas fa-check-circle',
+        'PLAN_TRANSPORTE_CREADO': 'fas fa-truck',
+        'PEDIDO_RECHAZADO': 'fas fa-times',
+        'PEDIDO_COMPLETADO': 'fas fa-check',
+        'ORDEN_CONFIRMADA': 'fas fa-check-circle',
+        'ORDEN_RECHAZADA': 'fas fa-times-circle',
+        'ORDEN_LISTA_PRODUCTOR': 'fas fa-check',
+        'PRODUCTO_NUEVO': 'fas fa-plus-circle',
+        'USUARIO_CREADO': 'fas fa-user-plus',
+        'ALERTA_CONFIGURADA': 'fas fa-cog',
+        'SISTEMA_ACTUALIZADO': 'fas fa-info-circle',
         'VENCIMIENTO_PROXIMO': 'fas fa-calendar-times',
         'VENCIMIENTO_URGENTE': 'fas fa-bell',
         'PRODUCTO_VENCIDO': 'fas fa-times-circle',
         'PEDIDO_PENDIENTE': 'fas fa-shopping-cart',
-        'INCIDENCIA_REPORTADA': 'fas fa-exclamation-circle',
         'ORDEN_COMPRA_APROBADA': 'fas fa-check-circle',
         'ALERTA_SISTEMA': 'fas fa-info-circle',
         'MOVIMIENTO_CRITICO': 'fas fa-exchange-alt'
@@ -322,7 +346,19 @@ function obtenerIconoTipo(tipo) {
 
 // Obtener tiempo relativo
 function obtenerTiempoRelativo(fechaStr) {
-    const fecha = new Date(fechaStr);
+    let fecha;
+    if (typeof fechaStr === 'number') {
+        fecha = new Date(fechaStr);
+    } else if (typeof fechaStr === 'string') {
+        fecha = new Date(fechaStr);
+    } else {
+        return 'Reciente';
+    }
+    
+    if (isNaN(fecha.getTime())) {
+        return 'Reciente';
+    }
+    
     const ahora = new Date();
     const diffMs = ahora - fecha;
     const diffMins = Math.floor(diffMs / 60000);
@@ -337,7 +373,7 @@ function obtenerTiempoRelativo(fechaStr) {
 }
 
 // Ver notificación (marcar como leída y redirigir)
-function verNotificacion(id, url) {
+function verNotificacion(id, url, tipoNotificacion) {
     fetch('${pageContext.request.contextPath}/NotificacionServlet?action=marcarLeida&id=' + id, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
@@ -346,8 +382,31 @@ function verNotificacion(id, url) {
     .then(data => {
         if (data.exito) {
             cargarContadorNotificaciones();
-            if (url && url.trim() !== '') {
-                window.location.href = url;
+            // Si es una notificación relacionada con órdenes de compra, redirigir a /orden-compra
+            if (tipoNotificacion && (tipoNotificacion.includes('ORDEN_COMPRA') || tipoNotificacion.includes('ORDEN_CONFIRMADA') || tipoNotificacion.includes('ORDEN_RECHAZADA') || tipoNotificacion.includes('ORDEN_LISTA') || tipoNotificacion.includes('ORDEN_LISTA_PRODUCTOR'))) {
+                window.location.href = '${pageContext.request.contextPath}/orden-compra';
+            } else if (tipoNotificacion && tipoNotificacion.includes('ENTRADA_REGISTRADA')) {
+                // Si es una notificación de entrada registrada, redirigir a planes de transporte
+                window.location.href = '${pageContext.request.contextPath}/planes-transporte';
+            } else if (tipoNotificacion && tipoNotificacion.includes('PEDIDO_COMPLETADO')) {
+                // Si es una notificación de pedido completado o plan de transporte despachado, redirigir según la URL
+                if (url && url.trim() !== '') {
+                    const contextPath = '${pageContext.request.contextPath}';
+                    // Si la URL es MovimientoProductoServlet, redirigir directamente
+                    if (url.includes('MovimientoProductoServlet')) {
+                        window.location.href = contextPath + '/MovimientoProductoServlet';
+                    } else {
+                        const finalUrl = url.startsWith('/') ? contextPath + url : url;
+                        window.location.href = finalUrl;
+                    }
+                } else {
+                    // Si no hay URL, redirigir a pedidos por defecto
+                    window.location.href = '${pageContext.request.contextPath}/logistica/pedidos';
+                }
+            } else if (url && url.trim() !== '') {
+                const contextPath = '${pageContext.request.contextPath}';
+                const finalUrl = url.startsWith('/') ? contextPath + url : url;
+                window.location.href = finalUrl;
             } else {
                 cargarNotificacionesRecientes();
             }
@@ -473,4 +532,400 @@ if (sidebarOverlay) {
             closeSidebar();
         }
     });
+
+// Variable para rastrear el ID de la última notificación mostrada en el modal
+let ultimaNotificacionMostradaId = null;
+
+// Mostrar modal de notificaciones automáticamente
+function mostrarModalNotificaciones(notificaciones) {
+    if (notificaciones.length === 0) {
+        return;
+    }
+    
+    // Filtrar solo notificaciones no leídas
+    const notificacionesNoLeidas = notificaciones.filter(notif => !notif.leida);
+    
+    if (notificacionesNoLeidas.length === 0) {
+        return;
+    }
+    
+    // Obtener la primera notificación no leída
+    const primeraNotificacion = notificacionesNoLeidas[0];
+    const notifId = primeraNotificacion.id || primeraNotificacion.idNotificacion;
+    
+    // Si ya se mostró esta notificación, no mostrar el modal de nuevo
+    if (ultimaNotificacionMostradaId === notifId) {
+        return;
+    }
+    
+    const iconoTipo = obtenerIconoTipo(primeraNotificacion.tipo || primeraNotificacion.tipoNotificacion);
+    const tiempoRelativo = obtenerTiempoRelativo(primeraNotificacion.fechaCreacion);
+    const nivelPrioridad = primeraNotificacion.nivel || primeraNotificacion.nivelPrioridad;
+    
+    // Configurar el contenido del modal
+    document.getElementById('modalNotificacionIcono').className = 'notificacion-icon-modal ' + nivelPrioridad;
+    document.getElementById('modalNotificacionIcono').innerHTML = '<i class="' + iconoTipo + '"></i>';
+    document.getElementById('modalNotificacionTitulo').textContent = primeraNotificacion.titulo;
+    document.getElementById('modalNotificacionMensaje').textContent = primeraNotificacion.mensaje;
+    document.getElementById('modalNotificacionTiempo').innerHTML = '<i class="far fa-clock me-1"></i>' + tiempoRelativo;
+    
+    // Guardar el ID de la notificación para marcarla como leída
+    document.getElementById('modalNotificacion').setAttribute('data-notificacion-id', notifId);
+    document.getElementById('modalNotificacion').setAttribute('data-notificacion-url', primeraNotificacion.urlAccion || '');
+    document.getElementById('modalNotificacion').setAttribute('data-tipo-notificacion', primeraNotificacion.tipo || primeraNotificacion.tipoNotificacion || '');
+    
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('modalNotificacion'));
+    modal.show();
+    
+    // Marcar que ya se mostró esta notificación
+    ultimaNotificacionMostradaId = notifId;
+    
+    // Marcar la notificación como leída automáticamente
+    if (notifId) {
+        fetch('${pageContext.request.contextPath}/NotificacionServlet?action=marcarLeida&id=' + notifId, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.exito) {
+                cargarContadorNotificaciones();
+            }
+        })
+        .catch(error => console.error('Error al marcar como leída:', error));
+    }
+}
+
+// Función para ir a la acción de la notificación
+function irANotificacion() {
+    const modal = document.getElementById('modalNotificacion');
+    const url = modal.getAttribute('data-notificacion-url');
+    const tipoNotificacion = modal.getAttribute('data-tipo-notificacion');
+    const modalInstance = bootstrap.Modal.getInstance(modal);
+    modalInstance.hide();
+    
+    // Si es una notificación relacionada con órdenes de compra, redirigir a /orden-compra
+    if (tipoNotificacion && (tipoNotificacion.includes('ORDEN_COMPRA') || tipoNotificacion.includes('ORDEN_CONFIRMADA') || tipoNotificacion.includes('ORDEN_RECHAZADA') || tipoNotificacion.includes('ORDEN_LISTA') || tipoNotificacion.includes('ORDEN_LISTA_PRODUCTOR'))) {
+        window.location.href = '${pageContext.request.contextPath}/orden-compra';
+    } else if (tipoNotificacion && tipoNotificacion.includes('ENTRADA_REGISTRADA')) {
+        // Si es una notificación de entrada registrada, redirigir a planes de transporte
+        window.location.href = '${pageContext.request.contextPath}/planes-transporte';
+    } else if (tipoNotificacion && tipoNotificacion.includes('PEDIDO_COMPLETADO')) {
+        // Si es una notificación de pedido completado o plan de transporte despachado, redirigir según la URL
+        if (url && url.trim() !== '') {
+            const contextPath = '${pageContext.request.contextPath}';
+            // Si la URL es MovimientoProductoServlet, redirigir directamente
+            if (url.includes('MovimientoProductoServlet')) {
+                window.location.href = contextPath + '/MovimientoProductoServlet';
+            } else {
+                const finalUrl = url.startsWith('/') ? contextPath + url : url;
+                window.location.href = finalUrl;
+            }
+        } else {
+            // Si no hay URL, redirigir a pedidos por defecto
+            window.location.href = '${pageContext.request.contextPath}/logistica/pedidos';
+        }
+    } else if (url && url.trim() !== '') {
+        const contextPath = '${pageContext.request.contextPath}';
+        const finalUrl = url.startsWith('/') ? contextPath + url : url;
+        window.location.href = finalUrl;
+    }
+}
+
+// Cargar y mostrar todas las notificaciones en el modal grande
+function mostrarModalTodasNotificaciones() {
+    // Cerrar el dropdown si está abierto
+    const dropdown = document.getElementById('notificacionesDropdown');
+    if (dropdown) {
+        const bsDropdown = bootstrap.Dropdown.getInstance(dropdown);
+        if (bsDropdown) bsDropdown.hide();
+    }
+    
+    // Mostrar loading en el modal
+    document.getElementById('listaTodasNotificaciones').innerHTML = 
+        '<div class="text-center py-5">' +
+            '<i class="fas fa-spinner fa-spin fa-2x mb-3 text-muted"></i>' +
+            '<p class="text-muted">Cargando notificaciones...</p>' +
+        '</div>';
+    
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('modalTodasNotificaciones'));
+    modal.show();
+    
+    // Cargar todas las notificaciones
+    fetch('${pageContext.request.contextPath}/NotificacionServlet?action=todas', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            const notifs = data.datos.notificaciones || [];
+            mostrarTodasNotificaciones(notifs);
+        } else {
+            document.getElementById('listaTodasNotificaciones').innerHTML = 
+                '<div class="text-center py-5 text-danger">' +
+                    '<i class="fas fa-exclamation-triangle fa-2x mb-3"></i>' +
+                    '<p>' + (data.mensaje || 'Error al cargar notificaciones') + '</p>' +
+                '</div>';
+        }
+    })
+    .catch(error => {
+        console.error('Error al cargar todas las notificaciones:', error);
+        document.getElementById('listaTodasNotificaciones').innerHTML = 
+            '<div class="text-center py-5 text-danger">' +
+                '<i class="fas fa-exclamation-triangle fa-2x mb-3"></i>' +
+                '<p>Error al cargar notificaciones</p>' +
+            '</div>';
+    });
+}
+
+// Mostrar todas las notificaciones en el modal grande
+function mostrarTodasNotificaciones(notificaciones) {
+    const lista = document.getElementById('listaTodasNotificaciones');
+    
+    if (notificaciones.length === 0) {
+        lista.innerHTML = '<div class="text-center py-5 text-muted">' +
+            '<i class="fas fa-bell-slash fa-3x mb-3"></i>' +
+            '<h5 class="mb-2">No tienes notificaciones</h5>' +
+            '<p class="mb-0">No hay notificaciones para mostrar</p>' +
+        '</div>';
+        return;
+    }
+    
+    const htmlArray = notificaciones.map(notif => {
+        const iconoTipo = obtenerIconoTipo(notif.tipo || notif.tipoNotificacion);
+        const tiempoRelativo = obtenerTiempoRelativo(notif.fechaCreacion);
+        const idNotif = notif.id || notif.idNotificacion;
+        const nivelPrioridad = notif.nivel || notif.nivelPrioridad;
+        const esLeida = notif.leida || false;
+        const claseLeida = esLeida ? '' : 'no-leida';
+        const tipoNotif = notif.tipo || notif.tipoNotificacion || '';
+        
+        return '<div class="notificacion-item-grande ' + claseLeida + '">' +
+                '<div class="d-flex gap-3 align-items-start">' +
+                    '<div class="notificacion-icon-grande ' + nivelPrioridad + '">' +
+                        '<i class="' + iconoTipo + '"></i>' +
+                    '</div>' +
+                    '<div class="notificacion-contenido-grande flex-grow-1">' +
+                        '<div class="d-flex justify-content-between align-items-start mb-2">' +
+                            '<div class="notificacion-titulo-grande">' + notif.titulo + '</div>' +
+                            (!esLeida ? '<span class="badge bg-primary rounded-pill" style="font-size: 0.7rem;">Nueva</span>' : '') +
+                        '</div>' +
+                        '<div class="notificacion-mensaje-grande">' + notif.mensaje + '</div>' +
+                        '<div class="notificacion-tiempo-grande mt-2">' +
+                            '<i class="far fa-clock me-1"></i>' + tiempoRelativo +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+    });
+    
+    lista.innerHTML = htmlArray.join('');
+    
+    // Actualizar contador en el modal
+    const contador = notificaciones.filter(n => !(n.leida || false)).length;
+    const contadorEl = document.getElementById('contadorModalNotificaciones');
+    if (contadorEl) {
+        contadorEl.textContent = contador > 0 ? contador + ' no leída' + (contador > 1 ? 's' : '') : 'Todas leídas';
+    }
+}
+
+// Marcar todas como leídas desde el modal
+function marcarTodasLeidasDesdeModal() {
+    fetch('${pageContext.request.contextPath}/NotificacionServlet?action=marcarTodasLeidas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            cargarContadorNotificaciones();
+            mostrarModalTodasNotificaciones(); // Recargar notificaciones
+            mostrarToast('success', 'Todas las notificaciones marcadas como leídas', 'fas fa-check-circle');
+        } else {
+            mostrarToast('danger', 'Error al marcar notificaciones', 'fas fa-exclamation-triangle');
+        }
+    })
+    .catch(error => {
+        console.error('Error al marcar todas como leídas:', error);
+        mostrarToast('danger', 'Error de conexión con el servidor', 'fas fa-exclamation-triangle');
+    });
+}
 </script>
+
+<!-- Modal de Notificaciones -->
+<div class="modal fade" id="modalNotificacion" tabindex="-1" aria-labelledby="modalNotificacionLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+                <h5 class="modal-title" id="modalNotificacionLabel" style="font-weight: 600;">
+                    <i class="fas fa-bell me-2"></i>Nueva Notificación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 30px;">
+                <div class="d-flex align-items-start gap-4">
+                    <div id="modalNotificacionIcono" class="notificacion-icon-modal" style="flex-shrink: 0;">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <h6 id="modalNotificacionTitulo" style="font-weight: 600; color: #212529; margin-bottom: 10px; font-size: 1.1rem;"></h6>
+                        <p id="modalNotificacionMensaje" style="color: #495057; margin-bottom: 15px; line-height: 1.6; font-size: 0.95rem;"></p>
+                        <div id="modalNotificacionTiempo" style="color: #6c757d; font-size: 0.85rem;">
+                            <i class="far fa-clock me-1"></i>Reciente
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e9ecef; padding: 20px; border-radius: 0 0 15px 15px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 8px 20px;">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="irANotificacion()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); border: none; border-radius: 8px; padding: 8px 20px;">
+                    <i class="fas fa-arrow-right me-2"></i>Ver Detalles
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .notificacion-icon-modal {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .notificacion-icon-modal.CRITICAL {
+        background: #fee;
+        color: #dc3545;
+    }
+    
+    .notificacion-icon-modal.WARNING {
+        background: #fff3cd;
+        color: #ffc107;
+    }
+    
+    .notificacion-icon-modal.INFO {
+        background: #d1ecf1;
+        color: #0dcaf0;
+    }
+    
+    #modalNotificacion .modal-content {
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    .notificacion-item-grande {
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        cursor: default;
+        background: white;
+        border-left: 4px solid transparent;
+    }
+    
+    .notificacion-item-grande:hover {
+        background: #f8f9fa;
+    }
+    
+    .notificacion-item-grande.no-leida {
+        background: #e8f4f8;
+        border-left-color: #00a896;
+    }
+    
+    .notificacion-icon-grande {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+    
+    .notificacion-icon-grande.CRITICAL {
+        background: #fee;
+        color: #dc3545;
+    }
+    
+    .notificacion-icon-grande.WARNING {
+        background: #fff3cd;
+        color: #ffc107;
+    }
+    
+    .notificacion-icon-grande.INFO {
+        background: #d1ecf1;
+        color: #0dcaf0;
+    }
+    
+    .notificacion-titulo-grande {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #212529;
+        margin-bottom: 8px;
+    }
+    
+    .notificacion-mensaje-grande {
+        font-size: 0.9rem;
+        color: #495057;
+        line-height: 1.5;
+        margin-bottom: 8px;
+    }
+    
+    .notificacion-tiempo-grande {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+
+<!-- Modal Grande para Todas las Notificaciones -->
+<div class="modal fade" id="modalTodasNotificaciones" tabindex="-1" aria-labelledby="modalTodasNotificacionesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+                <h5 class="modal-title" id="modalTodasNotificacionesLabel" style="font-weight: 600;">
+                    <i class="fas fa-bell me-2"></i>Todas las Notificaciones
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom" style="background: #f8f9fa;">
+                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
+                        <i class="fas fa-check-double me-1"></i>Marcar todas como leídas
+                    </button>
+                    <span class="text-muted" id="contadorModalNotificaciones"></span>
+                </div>
+                <div id="listaTodasNotificaciones" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+                    <div class="text-center py-5">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-3 text-muted"></i>
+                        <p class="text-muted">Cargando notificaciones...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e9ecef; padding: 15px 20px; border-radius: 0 0 15px 15px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 8px 20px;">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

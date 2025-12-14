@@ -8,6 +8,7 @@ import com.example.telito.productor.daos.ProductoDao;
 import com.example.telito.administrador.daos.UsuarioDAO;
 import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.EmailUtil;
+import com.example.telito.util.NotificacionService;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -472,6 +473,24 @@ public class ProductorServlet extends HttpServlet {
 
                 // 4. Llamamos al DAO para que guarde el objeto en la base de datos
                 productoDao.crearProducto(producto);
+                
+                // 4.5. ========== NOTIFICACIÓN A ADMINISTRADOR ==========
+                // Notificar al administrador sobre el nuevo producto
+                try {
+                    // Obtener el ID del producto recién creado por SKU
+                    Producto productoCreado = productoDao.obtenerProductoPorSku(producto.getCodigoSKU(), idProductor);
+                    if (productoCreado != null) {
+                        NotificacionService.notificarProductoNuevo(
+                            producto.getNombre(),
+                            productoCreado.getIdProducto(),
+                            producto.getCodigoSKU(),
+                            idProductor
+                        );
+                    }
+                } catch (Exception e) {
+                    System.err.println("⚠ Error al crear notificación de producto nuevo: " + e.getMessage());
+                }
+                // ========== FIN NOTIFICACIÓN ==========
 
                 // 5. Redirigimos al usuario a la lista principal para que vea el nuevo producto
                 response.sendRedirect(request.getContextPath() + "/ProductorServlet");
@@ -621,70 +640,47 @@ public class ProductorServlet extends HttpServlet {
                     if (actualizado) {
                         System.out.println("✓ Estado actualizado correctamente");
                         
+                        // ========== NOTIFICACIÓN WEB ==========
+                        try {
+                            OrdenCompraDao ordenDaoNotif = new OrdenCompraDao();
+                            Object[] datosOrdenNotif = ordenDaoNotif.obtenerDatosBasicosOrden(idOrden, idProductor);
+                            
+                            if (datosOrdenNotif != null) {
+                                String numeroOrden = (String) datosOrdenNotif[0];
+                                String nombreProducto = (String) datosOrdenNotif[1];
+                                
+                                // NOTA: La notificación de orden confirmada se envía cuando se asigna el lote y se envía
+                                // No se envía aquí al cambiar a "En Proceso"
+                                if ("Rechazado".equals(nuevoEstado)) {
+                                    // Orden rechazada
+                                    String motivo = request.getParameter("motivo");
+                                    if (motivo == null || motivo.trim().isEmpty()) {
+                                        motivo = "Sin motivo especificado";
+                                    }
+                                    NotificacionService.notificarOrdenRechazada(
+                                        numeroOrden, idOrden, nombreProducto, motivo
+                                    );
+                                } else if ("Pendiente".equals(nuevoEstado)) {
+                                    // Orden lista (marcada como lista)
+                                    NotificacionService.notificarOrdenListaProductor(
+                                        numeroOrden, idOrden, nombreProducto
+                                    );
+                                }
+                            }
+                        } catch (Exception e) {
+                            System.err.println("⚠ Error al crear notificación web: " + e.getMessage());
+                        }
+                        // ========== FIN NOTIFICACIÓN WEB ==========
+                        
                         // IMPORTANTE: Responder PRIMERO antes de enviar correo para no bloquear la respuesta
                         response.getWriter().write("{\"success\": true, \"message\": \"Estado actualizado correctamente\"}");
                         response.getWriter().flush();
                         System.out.println("✓ Respuesta JSON enviada al cliente");
                         
-                        // ========== ENVÍO DE CORREO AL USUARIO DE LOGÍSTICA (ASÍNCRONO) ==========
-                        // Enviar correo en un hilo separado para no bloquear la respuesta
-                        if ("En Proceso".equals(nuevoEstado)) {
-                            final int ordenIdFinal = idOrden;
-                            final int productorIdFinal = idProductor;
-                            
-                            new Thread(() -> {
-                                try {
-                                    System.out.println("=== INICIANDO ENVÍO DE CORREO EN HILO SEPARADO ===");
-                                    OrdenCompraDao ordenDaoEmail = new OrdenCompraDao();
-                                    Object[] datosOrden = ordenDaoEmail.obtenerDatosBasicosOrden(ordenIdFinal, productorIdFinal);
-                                    
-                                    if (datosOrden != null) {
-                                        String numeroOrden = (String) datosOrden[0];
-                                        String nombreProducto = (String) datosOrden[1];
-                                        int cantidad = (Integer) datosOrden[2];
-                                        double montoTotal = (Double) datosOrden[3];
-                                        int usuarioIdLogistica = (Integer) datosOrden[4];
-                                        
-                                        UsuarioDAO usuarioDAO = new UsuarioDAO();
-                                        String emailLogistica = usuarioDAO.obtenerEmailPorId(usuarioIdLogistica);
-                                        
-                                        if (emailLogistica != null && !emailLogistica.trim().isEmpty()) {
-                                            String asunto = "TELITO BODEGUERO - Orden de Compra Aceptada por Productor";
-                                            String mensaje = com.example.telito.util.EmailTemplates.generarCorreoOrdenAceptadaLogistica(
-                                                numeroOrden,
-                                                nombreProducto,
-                                                cantidad,
-                                                montoTotal,
-                                                new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
-                                            );
-                                            
-                                            boolean correoEnviado = EmailUtil.sendSystemAlertHTML(
-                                                emailLogistica,
-                                                asunto,
-                                                mensaje
-                                            );
-                                            
-                                            if (correoEnviado) {
-                                                System.out.println("✓✓✓ Correo enviado exitosamente al usuario de logística: " + emailLogistica);
-                                            } else {
-                                                System.err.println("⚠⚠⚠ No se pudo enviar el correo al usuario de logística: " + emailLogistica);
-                                            }
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    System.err.println("❌❌❌ Error al enviar correo de notificación (hilo separado): " + e.getMessage());
-                                    e.printStackTrace();
-                                }
-                            }).start();
-                        }
+                        // NOTA: El correo y la notificación web se envían cuando se asigna el lote y se envía,
+                        // no cuando se cambia el estado a "En Proceso"
+                        // Por lo tanto, no se envía correo ni notificación aquí para "En Proceso"
                         
-                        // El código de envío de correo anterior se eliminó porque ahora es asíncrono
-                        // Si el estado no es "En Proceso", no se envía correo
-                        if (!"En Proceso".equals(nuevoEstado)) {
-                            System.out.println("⚠ El estado no es 'En Proceso', no se enviará correo. Estado recibido: '" + nuevoEstado + "'");
-                        }
-                        
-                        // La respuesta ya se envió arriba, no necesitamos enviarla de nuevo
                         return;
                     } else {
                         // Si no se actualizó, enviar respuesta de error
@@ -812,6 +808,26 @@ public class ProductorServlet extends HttpServlet {
                     
                     if (asignado) {
                         System.out.println("✓ Lote asignado correctamente a la orden. Stock restante: " + nuevoStock + " unidades");
+                        
+                        // ========== NOTIFICACIÓN WEB A LOGÍSTICA ==========
+                        // Cuando se asigna un lote y se envía, notificar a logística que está lista para aprobar
+                        try {
+                            Object[] datosOrdenNotif = ordenCompraDao3.obtenerDatosBasicosOrden(idOrden2, idProductor);
+                            if (datosOrdenNotif != null) {
+                                String numeroOrden = (String) datosOrdenNotif[0];
+                                String nombreProducto = (String) datosOrdenNotif[1];
+                                
+                                System.out.println("🔔 Creando notificación web: Orden lista para aprobar - " + numeroOrden);
+                                NotificacionService.notificarOrdenListaProductor(
+                                    numeroOrden, idOrden2, nombreProducto
+                                );
+                                System.out.println("✓ Notificación web creada exitosamente");
+                            }
+                        } catch (Exception e) {
+                            System.err.println("⚠ Error al crear notificación web: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                        // ========== FIN NOTIFICACIÓN WEB ==========
                         
                         // ========== ENVÍO DE CORREO AL USUARIO DE LOGÍSTICA ==========
                         // Cuando se asigna un lote, el estado cambia a "Pendiente"

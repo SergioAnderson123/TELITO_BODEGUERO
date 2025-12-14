@@ -39,6 +39,9 @@ public class NotificacionServlet extends HttpServlet {
         if (action == null) {
             action = "obtener";
         }
+        
+        // Debug: Log para ver qué acción se está recibiendo
+        System.out.println("🔍 NotificacionServlet - Acción recibida: '" + action + "'");
 
         switch (action) {
             case "obtener":
@@ -50,8 +53,13 @@ public class NotificacionServlet extends HttpServlet {
             case "recientes":
                 obtenerRecientes(response, usuario);
                 break;
+            case "todas":
+                System.out.println("✅ Ejecutando acción 'todas'");
+                obtenerTodasNotificaciones(response, usuario);
+                break;
             default:
-                enviarRespuestaJSON(response, false, "Acción no válida", null);
+                System.err.println("❌ Acción no válida: '" + action + "'");
+                enviarRespuestaJSON(response, false, "Acción no válida: " + action, null);
                 break;
         }
     }
@@ -172,6 +180,33 @@ public class NotificacionServlet extends HttpServlet {
             System.err.println("ERROR al obtener notificaciones recientes: " + e.getMessage());
             e.printStackTrace();
             enviarRespuestaJSON(response, false, "Error al obtener notificaciones recientes", null);
+        }
+    }
+
+    /**
+     * Obtiene todas las notificaciones del usuario (sin paginación, para el modal grande)
+     */
+    private void obtenerTodasNotificaciones(HttpServletResponse response, Usuario usuario) throws IOException {
+        try {
+            // Obtener todas las notificaciones (sin filtro de leídas/no leídas)
+            List<Map<String, Object>> notificaciones = notificacionDAO.obtenerNotificacionesPorUsuario(
+                usuario.getIdUsuario(), 1000, 0, false
+            );
+            
+            int totalNoLeidas = notificacionDAO.contarNotificacionesNoLeidas(usuario.getIdUsuario());
+            int totalGeneral = notificacionDAO.contarNotificacionesPorUsuario(usuario.getIdUsuario());
+            
+            Map<String, Object> resultado = new HashMap<>();
+            resultado.put("notificaciones", notificaciones);
+            resultado.put("totalNoLeidas", totalNoLeidas);
+            resultado.put("totalGeneral", totalGeneral);
+            
+            enviarRespuestaJSON(response, true, "Todas las notificaciones obtenidas", resultado);
+            
+        } catch (Exception e) {
+            System.err.println("ERROR al obtener todas las notificaciones: " + e.getMessage());
+            e.printStackTrace();
+            enviarRespuestaJSON(response, false, "Error al obtener todas las notificaciones: " + e.getMessage(), null);
         }
     }
 
@@ -305,7 +340,7 @@ public class NotificacionServlet extends HttpServlet {
      */
     private void enviarRespuestaJSON(HttpServletResponse response, boolean exito, String mensaje, Object datos) 
             throws IOException {
-        response.setContentType("application/json");
+        response.setContentType("application/json; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
         
         Map<String, Object> respuesta = new HashMap<>();

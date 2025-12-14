@@ -7,6 +7,7 @@ import com.example.telito.util.EmailTemplateHelper;
 import com.example.telito.util.EmailUtil;
 import com.example.telito.util.EmailService;
 import com.example.telito.util.TokenService;
+import com.example.telito.util.NotificacionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +81,22 @@ public class UsuarioService {
                 
                 // Enviar correo de activación
                 enviarCorreoActivacion(usuarioCompleto, contextPath, request);
+                
+                // Crear notificación web para el nuevo usuario
+                try {
+                    String nombreRol = usuarioCompleto.getRol() != null ? usuarioCompleto.getRol().getNombre() : "Usuario";
+                    NotificacionService.notificarUsuarioCreado(
+                        usuarioCompleto.getIdUsuario(),
+                        usuarioCompleto.getEmail(),
+                        usuarioCompleto.getNombres(),
+                        usuarioCompleto.getApellidos(),
+                        nombreRol,
+                        passwordOriginal
+                    );
+                } catch (Exception e) {
+                    logger.warn("Error al crear notificación web de usuario creado: {}", e.getMessage());
+                }
+                
                 return new ResultadoCreacionUsuario(true, usuarioCompleto, null);
             } else {
                 String error = "Error al guardar el usuario en la base de datos";

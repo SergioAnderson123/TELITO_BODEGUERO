@@ -6,6 +6,7 @@ import com.example.telito.almacen.beans.Usuario;
 import com.example.telito.almacen.daos.LoteDao;
 import com.example.telito.almacen.daos.MovimientoDao;
 import com.example.telito.util.AuthorizationHelper;
+import com.example.telito.util.NotificacionService;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -184,6 +185,29 @@ public class LoteServlet extends HttpServlet {
 
                     movimientoDao.registrarMovimiento(movimiento);
                     loteDao.actualizarStock(idLote, cantidadContada);
+                    
+                    // Notificar ajuste significativo si es >= 10%
+                    if (stockOriginal > 0) {
+                        double porcentajeAjuste = Math.abs((double) diferencia / stockOriginal) * 100.0;
+                        if (porcentajeAjuste >= 10.0) {
+                            try {
+                                Lote lote = loteDao.buscarLotePorId(idLote);
+                                if (lote != null) {
+                                    NotificacionService.notificarAjusteInventario(
+                                        lote.getNombreProducto() != null ? lote.getNombreProducto() : "Producto",
+                                        lote.getCodigoLote(),
+                                        lote.getProductoId(),
+                                        idLote,
+                                        stockOriginal,
+                                        cantidadContada,
+                                        porcentajeAjuste
+                                    );
+                                }
+                            } catch (Exception e) {
+                                System.err.println("⚠ Error al crear notificación de ajuste: " + e.getMessage());
+                            }
+                        }
+                    }
                 }
 
                 response.sendRedirect(request.getContextPath() + "/almacen/LoteServlet");

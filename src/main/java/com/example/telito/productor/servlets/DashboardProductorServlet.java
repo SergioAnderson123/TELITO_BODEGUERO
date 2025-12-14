@@ -62,7 +62,6 @@ public class DashboardProductorServlet extends HttpServlet {
     }
     
     // Cuenta lotes registrados este mes
-     */
     private int contarLotesEsteMes(int idProductor) {
         // Si no existe fecha_creacion, usar id_lote como aproximación (lotes más recientes)
         String sql = """

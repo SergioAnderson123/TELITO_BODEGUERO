@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ page import="java.util.Map" %>
 
 <!doctype html>
 <html lang="es">
@@ -61,6 +62,32 @@
         /* Asegurar que no haya espacios en blanco en las tablas */
         .dataTables_wrapper {
             padding: 0;
+        }
+        
+        /* Estilos para tabs internos en acordeones */
+        .nav-tabs-sm .nav-link {
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs-sm .nav-link:hover {
+            color: #00a896;
+            border-bottom-color: rgba(0, 168, 150, 0.3);
+        }
+        
+        .nav-tabs-sm .nav-link.active {
+            color: #00a896;
+            background: transparent;
+            border-bottom-color: #00a896;
+            font-weight: 600;
+        }
+        
+        .nav-tabs-sm {
+            border-bottom: 2px solid #e9ecef;
         }
         
         /* Estilos para las tablas igual que gestión de usuarios */
@@ -343,14 +370,24 @@
                             <!-- Pestaña Productores -->
                             <div class="tab-pane fade" id="productores" role="tabpanel" aria-labelledby="productores-tab">
                                 <!-- Filtros -->
-                                <div class="filtros-container">
-                                    <form id="filtroProductores" class="row g-2 mb-0" style="margin-bottom: 0 !important;">
-                                        <div class="col-md-6">
-                                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
-                                            <input type="text" class="form-control form-control-sm shadow-sm" id="buscarProductores" placeholder="SKU, producto, categoría..." style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <div class="filtros-container mb-3">
+                                    <form id="filtroProductores" method="get" action="${pageContext.request.contextPath}/administrador/inventario-general" class="row g-2 mb-0" style="margin-bottom: 0 !important;">
+                                        <input type="hidden" name="tab" value="productores"/>
+                                        <div class="col-md-4">
+                                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-user me-1"></i>Filtrar por Productor</label>
+                                            <select class="form-select form-select-sm shadow-sm" id="filtroProductorSelect" name="filtroProductor" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                                <option value="">Todos los productores</option>
+                                                <c:forEach var="prod" items="${listaProductoresUsuarios}">
+                                                    <option value="${prod.id}" ${filtroProductor != null && filtroProductor == prod.id ? 'selected' : ''}>${prod.nombre}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar Producto</label>
+                                            <input type="text" class="form-control form-control-sm shadow-sm" id="buscarProductores" name="busquedaProductores" value="${busquedaProductores != null ? busquedaProductores : ''}" placeholder="SKU, producto, categoría..." style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                         </div>
                                         <div class="col-md-2 d-flex align-items-end">
-                                            <button type="button" class="btn btn-sm btn-primary shadow-sm w-100" id="btnBuscarProductores" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                            <button type="submit" class="btn btn-sm btn-primary shadow-sm w-100" id="btnBuscarProductores" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                                 <i class="fas fa-search me-1"></i>Buscar
                                             </button>
                                         </div>
@@ -361,43 +398,253 @@
                                         </div>
                                     </form>
                                 </div>
-                                <div class="table-responsive">
-                                    <table id="tablaProductores" class="table table-hover align-middle mb-0 inventario-table" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%;">
-                                        <thead class="table-light">
-                                        <tr>
-                                            <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-barcode me-1"></i>SKU</th>
-                                            <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-box me-1"></i>Producto</th>
-                                            <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-folder me-1"></i>Categoría</th>
-                                            <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-cubes me-1"></i>Stock Total</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <c:choose>
-                                            <c:when test="${empty listaProductores}">
-                                                <tr>
-                                                    <td colspan="4" class="text-center py-5 text-muted" style="font-size: 0.85rem;">
-                                                        <div class="text-muted">
-                                                            <i class="fas fa-inbox fa-3x mb-3 d-block" style="opacity: 0.3;"></i>
-                                                            <p class="mb-0">No hay datos de productores disponibles</p>
+                                
+                                <!-- Acordeón de Productores -->
+                                <div class="accordion" id="accordionProductores">
+                                    <c:choose>
+                                        <c:when test="${empty inventarioPorProductor}">
+                                            <div class="text-center py-5 text-muted">
+                                                <i class="fas fa-inbox fa-3x mb-3 d-block" style="opacity: 0.3;"></i>
+                                                <p class="mb-0">No hay datos de productores disponibles</p>
+                                            </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:forEach var="entry" items="${inventarioPorProductor}" varStatus="status">
+                                                <c:set var="productorId" value="${entry.key}"/>
+                                                <c:set var="datosProductor" value="${entry.value}"/>
+                                                <c:set var="productos" value="${datosProductor.productos}"/>
+                                                
+                                                <div class="accordion-item mb-2" style="border: 1px solid #e9ecef; border-radius: 8px;">
+                                                    <h2 class="accordion-header" id="heading${productorId}">
+                                                        <button class="accordion-button ${status.index == 0 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${productorId}" aria-expanded="${status.index == 0 ? 'true' : 'false'}" aria-controls="collapse${productorId}" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                                                            <div class="d-flex justify-content-between align-items-center w-100 me-3">
+                                                                <div class="d-flex align-items-center">
+                                                                    <i class="fas fa-user-tie me-2" style="color: #00a896;"></i>
+                                                                    <strong style="font-size: 0.95rem;">${datosProductor.nombre}</strong>
+                                                                </div>
+                                                                <div class="d-flex gap-3 align-items-center">
+                                                                    <span class="badge bg-info" style="font-size: 0.75rem;">
+                                                                        <i class="fas fa-box me-1"></i>${datosProductor.totalProductos} producto${datosProductor.totalProductos != 1 ? 's' : ''}${datosProductor.totalProductos >= 9 ? ' (mostrando 9)' : ''}
+                                                                    </span>
+                                                                    <span class="badge bg-success" style="font-size: 0.75rem;">
+                                                                        <i class="fas fa-cubes me-1"></i>Stock: ${datosProductor.totalStock}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </button>
+                                                    </h2>
+                                                    <div id="collapse${productorId}" class="accordion-collapse collapse ${status.index == 0 ? 'show' : ''}" aria-labelledby="heading${productorId}" data-bs-parent="#accordionProductores">
+                                                        <div class="accordion-body" style="padding: 1rem;">
+                                                            <!-- Tabs internos para Productos, Órdenes y Movimientos -->
+                                                            <ul class="nav nav-tabs nav-tabs-sm mb-3" id="tabsProductor${productorId}" role="tablist" style="border-bottom: 2px solid #e9ecef;">
+                                                                <li class="nav-item" role="presentation">
+                                                                    <button class="nav-link active" id="productos-tab-${productorId}" data-bs-toggle="tab" data-bs-target="#productos-${productorId}" type="button" role="tab" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                                                        <i class="fas fa-box me-1"></i>Productos <span class="badge bg-info ms-1">${datosProductor.totalProductos}</span>
+                                                                    </button>
+                                                                </li>
+                                                                <li class="nav-item" role="presentation">
+                                                                    <button class="nav-link" id="ordenes-tab-${productorId}" data-bs-toggle="tab" data-bs-target="#ordenes-${productorId}" type="button" role="tab" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                                                        <i class="fas fa-shopping-cart me-1"></i>Órdenes de Compra <span class="badge bg-warning ms-1">${datosProductor.totalOrdenes}</span>
+                                                                    </button>
+                                                                </li>
+                                                                <li class="nav-item" role="presentation">
+                                                                    <button class="nav-link" id="movimientos-tab-${productorId}" data-bs-toggle="tab" data-bs-target="#movimientos-${productorId}" type="button" role="tab" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                                                        <i class="fas fa-exchange-alt me-1"></i>Movimientos <span class="badge bg-success ms-1">${datosProductor.totalMovimientos}</span>
+                                                                    </button>
+                                                                </li>
+                                                            </ul>
+                                                            
+                                                            <div class="tab-content" id="tabContentProductor${productorId}">
+                                                                <!-- Tab Productos -->
+                                                                <div class="tab-pane fade show active" id="productos-${productorId}" role="tabpanel">
+                                                                    <c:choose>
+                                                                        <c:when test="${empty productos}">
+                                                                            <div class="text-center py-3 text-muted">
+                                                                                <i class="fas fa-box-open fa-2x mb-2" style="opacity: 0.3;"></i>
+                                                                                <p class="mb-0">Este productor no tiene productos registrados</p>
+                                                                            </div>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <div class="table-responsive">
+                                                                                <table class="table table-sm table-hover mb-0" style="font-size: 0.85rem;">
+                                                                                    <thead class="table-light">
+                                                                                    <tr>
+                                                                                        <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-barcode me-1"></i>SKU</th>
+                                                                                        <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-box me-1"></i>Producto</th>
+                                                                                        <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-folder me-1"></i>Categoría</th>
+                                                                                        <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-cubes me-1"></i>Stock Total</th>
+                                                                                        <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-dollar-sign me-1"></i>Precio</th>
+                                                                                    </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                    <c:forEach var="p" items="${productos}">
+                                                                                        <tr>
+                                                                                            <td style="padding: 0.4rem 0.5rem;">
+                                                                                                <span class="badge bg-secondary" style="font-size: 0.75rem;">${p.codigoSku}</span>
+                                                                                            </td>
+                                                                                            <td style="padding: 0.4rem 0.5rem;">${p.nombre}</td>
+                                                                                            <td style="padding: 0.4rem 0.5rem;">
+                                                                                                <span class="badge bg-light text-dark">${p.categoriaNombre != null ? p.categoriaNombre : 'Sin categoría'}</span>
+                                                                                            </td>
+                                                                                            <td style="padding: 0.4rem 0.5rem;">
+                                                                                                <span class="badge ${p.stock > 0 ? 'bg-success' : 'bg-danger'}">${p.stock}</span>
+                                                                                            </td>
+                                                                                            <td style="padding: 0.4rem 0.5rem;">
+                                                                                                S/. <fmt:formatNumber value="${p.precioActual}" minFractionDigits="2"/>
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    </c:forEach>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </div>
+                                                                
+                                                                <!-- Tab Órdenes de Compra -->
+                                                                <div class="tab-pane fade" id="ordenes-${productorId}" role="tabpanel">
+                                                                    <c:set var="ordenesCompra" value="${datosProductor.ordenesCompra}"/>
+                                                                    <c:choose>
+                                                                        <c:when test="${empty ordenesCompra}">
+                                                                            <div class="text-center py-3 text-muted">
+                                                                                <i class="fas fa-shopping-cart fa-2x mb-2" style="opacity: 0.3;"></i>
+                                                                                <p class="mb-0">No hay órdenes de compra registradas</p>
+                                                                            </div>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <div class="table-responsive">
+                                                                                <table class="table table-sm table-hover mb-0" style="font-size: 0.85rem;">
+                                                                                    <thead class="table-light">
+                                                                                    <tr>
+                                                                                        <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-hashtag me-1"></i>N° Orden</th>
+                                                                                        <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-box me-1"></i>Producto</th>
+                                                                                        <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-cubes me-1"></i>Cantidad</th>
+                                                                                        <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-dollar-sign me-1"></i>Monto</th>
+                                                                                        <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-user me-1"></i>Logística</th>
+                                                                                        <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-info-circle me-1"></i>Estado</th>
+                                                                                    </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                    <c:forEach var="orden" items="${ordenesCompra}">
+                                                                                        <tr>
+                                                                                            <td style="padding: 0.4rem 0.5rem;">
+                                                                                                <span class="badge" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; font-size: 0.75rem;">${orden[1]}</span>
+                                                                                            </td>
+                                                                                            <td style="padding: 0.4rem 0.5rem;">${orden[2]}</td>
+                                                                                            <td style="padding: 0.4rem 0.5rem;">${orden[3]} paquetes</td>
+                                                                                            <td style="padding: 0.4rem 0.5rem;">
+                                                                                                S/. <fmt:formatNumber value="${orden[4]}" minFractionDigits="2"/>
+                                                                                            </td>
+                                                                                            <td style="padding: 0.4rem 0.5rem; font-size: 0.8rem;">${orden[5]}</td>
+                                                                                            <td style="padding: 0.4rem 0.5rem;">
+                                                                                                <c:set var="estadoOrden" value="${orden[6]}"/>
+                                                                                                <c:choose>
+                                                                                                    <c:when test="${estadoOrden == 'Recibido'}">
+                                                                                                        <span class="badge bg-info">Recibido</span>
+                                                                                                    </c:when>
+                                                                                                    <c:when test="${estadoOrden == 'En Proceso'}">
+                                                                                                        <span class="badge bg-warning text-dark">En Proceso</span>
+                                                                                                    </c:when>
+                                                                                                    <c:when test="${estadoOrden == 'Rechazado'}">
+                                                                                                        <span class="badge bg-danger">Rechazado</span>
+                                                                                                    </c:when>
+                                                                                                    <c:otherwise>
+                                                                                                        <span class="badge bg-secondary">${estadoOrden}</span>
+                                                                                                    </c:otherwise>
+                                                                                                </c:choose>
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    </c:forEach>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </div>
+                                                                
+                                                                <!-- Tab Movimientos -->
+                                                                <div class="tab-pane fade" id="movimientos-${productorId}" role="tabpanel">
+                                                                    <c:set var="movimientosPorProducto" value="${datosProductor.movimientosPorProducto}"/>
+                                                                    <c:choose>
+                                                                        <c:when test="${empty movimientosPorProducto}">
+                                                                            <div class="text-center py-3 text-muted">
+                                                                                <i class="fas fa-exchange-alt fa-2x mb-2" style="opacity: 0.3;"></i>
+                                                                                <p class="mb-0">No hay movimientos de almacén registrados</p>
+                                                                            </div>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <c:forEach var="producto" items="${productos}">
+                                                                                <c:set var="movimientosProducto" value="${movimientosPorProducto[producto.idProducto]}"/>
+                                                                                <c:if test="${not empty movimientosProducto}">
+                                                                                    <div class="card mb-3" style="border: 1px solid #e9ecef;">
+                                                                                        <div class="card-header bg-light" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;">
+                                                                                            <strong><i class="fas fa-box me-1"></i>${producto.nombre}</strong>
+                                                                                            <span class="badge bg-secondary ms-2">${producto.codigoSku}</span>
+                                                                                        </div>
+                                                                                        <div class="card-body" style="padding: 0.75rem;">
+                                                                                            <div class="table-responsive">
+                                                                                                <table class="table table-sm table-hover mb-0" style="font-size: 0.8rem;">
+                                                                                                    <thead class="table-light">
+                                                                                                    <tr>
+                                                                                                        <th style="font-size: 0.75rem; padding: 0.3rem 0.4rem;"><i class="fas fa-calendar me-1"></i>Fecha</th>
+                                                                                                        <th style="font-size: 0.75rem; padding: 0.3rem 0.4rem;"><i class="fas fa-exchange-alt me-1"></i>Tipo</th>
+                                                                                                        <th style="font-size: 0.75rem; padding: 0.3rem 0.4rem;"><i class="fas fa-cubes me-1"></i>Cantidad</th>
+                                                                                                        <th style="font-size: 0.75rem; padding: 0.3rem 0.4rem;"><i class="fas fa-barcode me-1"></i>Lote</th>
+                                                                                                        <th style="font-size: 0.75rem; padding: 0.3rem 0.4rem;"><i class="fas fa-user me-1"></i>Usuario</th>
+                                                                                                        <th style="font-size: 0.75rem; padding: 0.3rem 0.4rem;"><i class="fas fa-info-circle me-1"></i>Motivo</th>
+                                                                                                    </tr>
+                                                                                                    </thead>
+                                                                                                    <tbody>
+                                                                                                    <c:forEach var="mov" items="${movimientosProducto}">
+                                                                                                        <tr>
+                                                                                                            <td style="padding: 0.3rem 0.4rem;">
+                                                                                                                <c:set var="fechaMov" value="${mov['fecha']}"/>
+                                                                                                                <c:if test="${not empty fechaMov}">
+                                                                                                                    <fmt:formatDate value="${fechaMov}" pattern="dd/MM/yyyy HH:mm"/>
+                                                                                                                </c:if>
+                                                                                                            </td>
+                                                                                                            <td style="padding: 0.3rem 0.4rem;">
+                                                                                                                <c:set var="tipoMov" value="${mov['tipo']}"/>
+                                                                                                                <c:choose>
+                                                                                                                    <c:when test="${tipoMov == 'Entrada'}">
+                                                                                                                        <span class="badge bg-success">Entrada</span>
+                                                                                                                    </c:when>
+                                                                                                                    <c:when test="${tipoMov == 'Salida'}">
+                                                                                                                        <span class="badge bg-danger">Salida</span>
+                                                                                                                    </c:when>
+                                                                                                                    <c:otherwise>
+                                                                                                                        <span class="badge bg-secondary">${tipoMov}</span>
+                                                                                                                    </c:otherwise>
+                                                                                                                </c:choose>
+                                                                                                            </td>
+                                                                                                            <td style="padding: 0.3rem 0.4rem;">${mov['cantidad']}</td>
+                                                                                                            <td style="padding: 0.3rem 0.4rem;">
+                                                                                                                <span class="badge bg-info">${mov['codigoLote']}</span>
+                                                                                                            </td>
+                                                                                                            <td style="padding: 0.3rem 0.4rem; font-size: 0.75rem;">${mov['nombreUsuario']}</td>
+                                                                                                            <td style="padding: 0.3rem 0.4rem; font-size: 0.75rem;">
+                                                                                                                <c:set var="motivoMov" value="${mov['motivo']}"/>
+                                                                                                                ${not empty motivoMov ? motivoMov : 'Sin motivo'}
+                                                                                                            </td>
+                                                                                                        </tr>
+                                                                                                    </c:forEach>
+                                                                                                    </tbody>
+                                                                                                </table>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </c:if>
+                                                                            </c:forEach>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </td>
-                                                </tr>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:forEach var="p" items="${listaProductores}">
-                                                    <tr class="align-middle">
-                                                        <td style="padding: 0.35rem 0.5rem;">
-                                                            <span class="badge bg-secondary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">${p.codigoSku}</span>
-                                                        </td>
-                                                        <td style="padding: 0.35rem 0.5rem; font-size: 0.85rem;">${p.nombre}</td>
-                                                        <td style="padding: 0.35rem 0.5rem; font-size: 0.85rem;">${p.categoriaNombre}</td>
-                                                        <td style="padding: 0.35rem 0.5rem; font-size: 0.85rem;">${p.stock}</td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </c:otherwise>
-                                        </c:choose>
-                                        </tbody>
-                                    </table>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
                         </div>
@@ -490,26 +737,25 @@
             }
             
             // Filtros para Logística
-            $('#btnBuscarLogistica').on('click', function() {
-                if (!tablaLogistica) initTablaLogistica();
-                if (tablaLogistica) {
-                    var busqueda = $('#buscarLogistica').val();
-                    var estado = $('#estadoLogistica').val();
-                    
-                    tablaLogistica.column(0).search(busqueda, false, false);
-                    tablaLogistica.column(1).search(busqueda, false, false);
-                    tablaLogistica.column(5).search(estado, false, false);
-                    tablaLogistica.draw();
-                }
+            // Filtro automático en Logística
+            $('#estadoLogistica').on('change', function() {
+                $('#filtroLogistica').submit();
             });
             
+            // Limpiar filtros de logística
             $('#btnLimpiarLogistica').on('click', function() {
-                if (!tablaLogistica) initTablaLogistica();
-                if (tablaLogistica) {
-                    $('#buscarLogistica').val('');
-                    $('#estadoLogistica').val('');
-                    tablaLogistica.search('').columns().search('').draw();
-                }
+                $('#buscarLogistica').val('');
+                $('#estadoLogistica').val('');
+                window.location.href = '${pageContext.request.contextPath}/administrador/inventario-general?tab=logistica';
+            });
+            
+            // Búsqueda con debounce para logística
+            let searchTimeoutLogistica = null;
+            $('#buscarLogistica').on('input', function() {
+                clearTimeout(searchTimeoutLogistica);
+                searchTimeoutLogistica = setTimeout(function() {
+                    $('#filtroLogistica').submit();
+                }, 500);
             });
             
             // Filtros para Almacén
@@ -536,25 +782,25 @@
                 }
             });
             
-            // Filtros para Productores
-            $('#btnBuscarProductores').on('click', function() {
-                if (!tablaProductores) initTablaProductores();
-                if (tablaProductores) {
-                    var busqueda = $('#buscarProductores').val();
-                    
-                    tablaProductores.column(0).search(busqueda, false, false);
-                    tablaProductores.column(1).search(busqueda, false, false);
-                    tablaProductores.column(2).search(busqueda, false, false);
-                    tablaProductores.draw();
-                }
+            // Filtro automático por productor
+            $('#filtroProductorSelect').on('change', function() {
+                $('#filtroProductores').submit();
             });
             
+            // Limpiar filtros de productores
             $('#btnLimpiarProductores').on('click', function() {
-                if (!tablaProductores) initTablaProductores();
-                if (tablaProductores) {
-                    $('#buscarProductores').val('');
-                    tablaProductores.search('').columns().search('').draw();
-                }
+                $('#filtroProductorSelect').val('');
+                $('#buscarProductores').val('');
+                window.location.href = '${pageContext.request.contextPath}/administrador/inventario-general?tab=productores';
+            });
+            
+            // Búsqueda con debounce para productores
+            let searchTimeoutProductores = null;
+            $('#buscarProductores').on('input', function() {
+                clearTimeout(searchTimeoutProductores);
+                searchTimeoutProductores = setTimeout(function() {
+                    $('#filtroProductores').submit();
+                }, 500);
             });
             
             // Inicializar DataTables al cambiar de pestaña

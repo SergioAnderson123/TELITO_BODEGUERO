@@ -111,6 +111,36 @@ public class DistritoDao extends DAOBase {
         return lista;
     }
     
+    // Obtiene un distrito por su ID
+    public DistritoBean obtenerDistritoPorId(int distritoId) {
+        String sql = "SELECT idDistrito, nombre FROM distritos WHERE idDistrito = ?";
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, distritoId);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                DistritoBean distrito = new DistritoBean();
+                distrito.setId(rs.getInt("idDistrito"));
+                distrito.setNombre(rs.getString("nombre"));
+                return distrito;
+            }
+        } catch (SQLException e) {
+            logger.error("Error al obtener distrito por ID: " + distritoId, e);
+            throw new RuntimeException("Error al obtener distrito por ID", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        
+        return null;
+    }
+    
     // ========== MÉTODOS DE VALIDACIÓN ==========
     
     /**

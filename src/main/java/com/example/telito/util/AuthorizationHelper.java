@@ -66,10 +66,6 @@ public class AuthorizationHelper {
     }
 
     // Verifica si el usuario puede eliminar/deshabilitar otro usuario (solo admin, no puede deshabilitarse a sí mismo)
-    // @param session Sesión HTTP
-     * @param idUsuarioAEliminar ID del usuario que se desea eliminar
-     * @return true si el usuario puede eliminar, false en caso contrario
-     */
     public static boolean puedeEliminarUsuario(HttpSession session, int idUsuarioAEliminar) {
         Usuario usuarioActual = obtenerUsuarioActual(session);
         
@@ -144,9 +140,6 @@ public class AuthorizationHelper {
     }
 
     // Verifica si el usuario puede acceder al módulo de administrador
-    // @param session Sesión HTTP
-     * @return true si el usuario puede acceder al módulo de administrador, false en caso contrario
-     */
     public static boolean puedeAccederAdministrador(HttpSession session) {
         return esAdministrador(session);
     }

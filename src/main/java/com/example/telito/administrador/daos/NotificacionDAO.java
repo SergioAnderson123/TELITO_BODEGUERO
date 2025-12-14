@@ -1,24 +1,22 @@
 package com.example.telito.administrador.daos;
 
+import com.example.telito.util.DAOBase;
+import com.example.telito.util.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * DAO para gestionar las notificaciones web en tiempo real.
- * Maneja operaciones CRUD sobre la tabla notificaciones_web.
- */
-public class NotificacionDAO {
+// DAO para gestionar notificaciones web en tiempo real
+public class NotificacionDAO extends DAOBase {
+    
+    private static final Logger logger = LoggerFactory.getLogger(NotificacionDAO.class);
 
-    private static final String URL = "jdbc:mysql://localhost:3306/telito_bodeguero";
-    private static final String USER = "root";
-    private static final String PASSWORD = "root";
-
-    /**
-     * Crea una nueva notificación para un usuario
-     */
+    // Crea nueva notificación para un usuario
     public boolean crearNotificacion(
             int usuarioId,
             String tipoNotificacion,
@@ -36,8 +34,15 @@ public class NotificacionDAO {
                 "producto_id, lote_id, pedido_id, orden_compra_id, url_accion) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            logger.debug("Intentando crear notificación - Usuario ID: {}, Tipo: {}, Título: {}", 
+                        usuarioId, tipoNotificacion, titulo);
+            
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             pstmt.setInt(1, usuarioId);
             pstmt.setString(2, tipoNotificacion);
@@ -51,18 +56,24 @@ public class NotificacionDAO {
             pstmt.setString(10, urlAccion);
 
             int filasAfectadas = pstmt.executeUpdate();
+            
+            if (filasAfectadas > 0) {
+                logger.info("✓ Notificación creada exitosamente - Usuario ID: {}, Tipo: {}", usuarioId, tipoNotificacion);
+            } else {
+                logger.warn("⚠ No se insertó ninguna fila - Usuario ID: {}, Tipo: {}", usuarioId, tipoNotificacion);
+            }
+            
             return filasAfectadas > 0;
 
         } catch (SQLException e) {
-            System.err.println("ERROR al crear notificación: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al crear notificación - Usuario ID: {}, Tipo: {}", usuarioId, tipoNotificacion, e);
             return false;
+        } finally {
+            closeResources(conn, pstmt, null);
         }
     }
 
-    /**
-     * Crea notificaciones masivas para múltiples usuarios
-     */
+    // Crea notificaciones masivas para múltiples usuarios (con todos los parámetros)
     public int crearNotificacionesMasivas(
             List<Integer> usuariosIds,
             String tipoNotificacion,
@@ -71,17 +82,26 @@ public class NotificacionDAO {
             String nivelPrioridad,
             Integer productoId,
             Integer loteId,
+            Integer pedidoId,
+            Integer ordenCompraId,
             String urlAccion
     ) {
+        if (usuariosIds == null || usuariosIds.isEmpty()) {
+            return 0;
+        }
+        
         String sql = "INSERT INTO notificaciones_web " +
                 "(usuario_id, tipo_notificacion, titulo, mensaje, nivel_prioridad, " +
-                "producto_id, lote_id, url_accion) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "producto_id, lote_id, pedido_id, orden_compra_id, url_accion) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         int notificacionesCreadas = 0;
+        Connection conn = null;
+        PreparedStatement pstmt = null;
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             for (Integer usuarioId : usuariosIds) {
                 pstmt.setInt(1, usuarioId);
@@ -91,7 +111,9 @@ public class NotificacionDAO {
                 pstmt.setString(5, nivelPrioridad);
                 pstmt.setObject(6, productoId);
                 pstmt.setObject(7, loteId);
-                pstmt.setString(8, urlAccion);
+                pstmt.setObject(8, pedidoId);
+                pstmt.setObject(9, ordenCompraId);
+                pstmt.setString(10, urlAccion);
                 
                 pstmt.addBatch();
             }
@@ -103,19 +125,18 @@ public class NotificacionDAO {
                 }
             }
 
-            System.out.println("✓ Se crearon " + notificacionesCreadas + " notificaciones masivas");
+            logger.info("Se crearon {} notificaciones masivas", notificacionesCreadas);
             return notificacionesCreadas;
 
         } catch (SQLException e) {
-            System.err.println("ERROR al crear notificaciones masivas: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al crear notificaciones masivas", e);
             return notificacionesCreadas;
+        } finally {
+            closeResources(conn, pstmt, null);
         }
     }
 
-    /**
-     * Obtiene todas las notificaciones de un usuario con paginación
-     */
+    // Obtiene todas las notificaciones de un usuario con paginación
     public List<Map<String, Object>> obtenerNotificacionesPorUsuario(
             int usuarioId, int limit, int offset, boolean soloNoLeidas
     ) {
@@ -139,296 +160,352 @@ public class NotificacionDAO {
         
         sql += "ORDER BY n.fecha_creacion DESC LIMIT ? OFFSET ?";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             pstmt.setInt(1, usuarioId);
             pstmt.setInt(2, limit);
             pstmt.setInt(3, offset);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Map<String, Object> notificacion = new HashMap<>();
-                    notificacion.put("id", rs.getInt("id_notificacion"));
-                    notificacion.put("tipo", rs.getString("tipo_notificacion"));
-                    notificacion.put("titulo", rs.getString("titulo"));
-                    notificacion.put("mensaje", rs.getString("mensaje"));
-                    notificacion.put("nivel", rs.getString("nivel_prioridad"));
-                    notificacion.put("leida", rs.getBoolean("leida"));
-                    notificacion.put("fechaCreacion", rs.getTimestamp("fecha_creacion").getTime());
-                    notificacion.put("urlAccion", rs.getString("url_accion"));
-                    
-                    // Datos relacionados (pueden ser null)
-                    notificacion.put("productoNombre", rs.getString("producto_nombre"));
-                    notificacion.put("loteCodigo", rs.getString("lote_codigo"));
-                    notificacion.put("pedidoNumero", rs.getObject("pedido_numero"));
-                    notificacion.put("ordenCompraNumero", rs.getString("orden_compra_numero"));
-                    
-                    notificaciones.add(notificacion);
-                }
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> notificacion = new HashMap<>();
+                notificacion.put("id", rs.getInt("id_notificacion"));
+                notificacion.put("tipo", rs.getString("tipo_notificacion"));
+                notificacion.put("titulo", rs.getString("titulo"));
+                notificacion.put("mensaje", rs.getString("mensaje"));
+                notificacion.put("nivel", rs.getString("nivel_prioridad"));
+                notificacion.put("leida", rs.getBoolean("leida"));
+                notificacion.put("fechaCreacion", rs.getTimestamp("fecha_creacion").getTime());
+                notificacion.put("urlAccion", rs.getString("url_accion"));
+                
+                // Datos relacionados (pueden ser null)
+                notificacion.put("productoNombre", rs.getString("producto_nombre"));
+                notificacion.put("loteCodigo", rs.getString("lote_codigo"));
+                notificacion.put("pedidoNumero", rs.getObject("pedido_numero"));
+                notificacion.put("ordenCompraNumero", rs.getString("orden_compra_numero"));
+                Integer ordenCompraId = rs.getObject("orden_compra_id") != null ? rs.getInt("orden_compra_id") : null;
+                notificacion.put("ordenCompraId", ordenCompraId);
+                
+                notificaciones.add(notificacion);
             }
 
         } catch (SQLException e) {
-            System.err.println("ERROR al obtener notificaciones: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al obtener notificaciones", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
 
         return notificaciones;
     }
 
-    /**
-     * Obtiene las últimas N notificaciones no leídas (para el dropdown)
-     */
+    // Obtiene últimas N notificaciones no leídas (para el dropdown)
     public List<Map<String, Object>> obtenerNotificacionesRecientes(int usuarioId, int limite) {
         List<Map<String, Object>> notificaciones = new ArrayList<>();
         
         String sql = "SELECT n.*, " +
                 "p.nombre AS producto_nombre, " +
-                "l.codigo_lote AS lote_codigo " +
+                "l.codigo_lote AS lote_codigo, " +
+                "n.orden_compra_id AS orden_compra_id " +
                 "FROM notificaciones_web n " +
                 "LEFT JOIN productos p ON n.producto_id = p.id_producto " +
                 "LEFT JOIN lotes l ON n.lote_id = l.id_lote " +
                 "WHERE n.usuario_id = ? AND n.leida = 0 " +
                 "ORDER BY n.fecha_creacion DESC LIMIT ?";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             pstmt.setInt(1, usuarioId);
             pstmt.setInt(2, limite);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Map<String, Object> notificacion = new HashMap<>();
-                    notificacion.put("id", rs.getInt("id_notificacion"));
-                    notificacion.put("tipo", rs.getString("tipo_notificacion"));
-                    notificacion.put("titulo", rs.getString("titulo"));
-                    notificacion.put("mensaje", rs.getString("mensaje"));
-                    notificacion.put("nivel", rs.getString("nivel_prioridad"));
-                    notificacion.put("fechaCreacion", rs.getTimestamp("fecha_creacion").getTime());
-                    notificacion.put("urlAccion", rs.getString("url_accion"));
-                    notificacion.put("productoNombre", rs.getString("producto_nombre"));
-                    notificacion.put("loteCodigo", rs.getString("lote_codigo"));
-                    
-                    notificaciones.add(notificacion);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> notificacion = new HashMap<>();
+                notificacion.put("id", rs.getInt("id_notificacion"));
+                notificacion.put("idNotificacion", rs.getInt("id_notificacion"));
+                notificacion.put("tipo", rs.getString("tipo_notificacion"));
+                notificacion.put("tipoNotificacion", rs.getString("tipo_notificacion"));
+                notificacion.put("titulo", rs.getString("titulo"));
+                notificacion.put("mensaje", rs.getString("mensaje"));
+                notificacion.put("nivel", rs.getString("nivel_prioridad"));
+                notificacion.put("nivelPrioridad", rs.getString("nivel_prioridad"));
+                
+                // Manejar fecha_creacion (puede ser null)
+                Timestamp fechaCreacion = rs.getTimestamp("fecha_creacion");
+                if (fechaCreacion != null) {
+                    notificacion.put("fechaCreacion", fechaCreacion.getTime());
+                    notificacion.put("fechaCreacionStr", fechaCreacion.toString());
+                } else {
+                    notificacion.put("fechaCreacion", System.currentTimeMillis());
+                    notificacion.put("fechaCreacionStr", new Timestamp(System.currentTimeMillis()).toString());
                 }
+                
+                notificacion.put("urlAccion", rs.getString("url_accion"));
+                notificacion.put("productoNombre", rs.getString("producto_nombre"));
+                notificacion.put("loteCodigo", rs.getString("lote_codigo"));
+                Integer ordenCompraId = rs.getObject("orden_compra_id") != null ? rs.getInt("orden_compra_id") : null;
+                notificacion.put("ordenCompraId", ordenCompraId);
+                
+                // Como la consulta filtra solo no leídas (leida = 0), todas son no leídas
+                notificacion.put("leida", false);
+                
+                notificaciones.add(notificacion);
             }
 
         } catch (SQLException e) {
-            System.err.println("ERROR al obtener notificaciones recientes: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al obtener notificaciones recientes", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
 
         return notificaciones;
     }
 
-    /**
-     * Cuenta las notificaciones no leídas de un usuario
-     */
+    // Cuenta notificaciones no leídas de un usuario
     public int contarNotificacionesNoLeidas(int usuarioId) {
         String sql = "SELECT COUNT(*) as total FROM notificaciones_web " +
                 "WHERE usuario_id = ? AND leida = 0";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             pstmt.setInt(1, usuarioId);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total");
-                }
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
             }
 
         } catch (SQLException e) {
-            System.err.println("ERROR al contar notificaciones no leídas: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al contar notificaciones no leídas", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
 
         return 0;
     }
 
-    /**
-     * Cuenta todas las notificaciones de un usuario
-     */
+    // Cuenta todas las notificaciones de un usuario
     public int contarNotificacionesPorUsuario(int usuarioId) {
         String sql = "SELECT COUNT(*) as total FROM notificaciones_web WHERE usuario_id = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             pstmt.setInt(1, usuarioId);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total");
-                }
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
             }
 
         } catch (SQLException e) {
-            System.err.println("ERROR al contar notificaciones: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al contar notificaciones", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
 
         return 0;
     }
 
-    /**
-     * Marca una notificación como leída
-     */
+    // Marca notificación como leída
     public boolean marcarComoLeida(int idNotificacion) {
         String sql = "UPDATE notificaciones_web SET leida = 1, fecha_lectura = CURRENT_TIMESTAMP " +
                 "WHERE id_notificacion = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             pstmt.setInt(1, idNotificacion);
             int filasAfectadas = pstmt.executeUpdate();
             return filasAfectadas > 0;
 
         } catch (SQLException e) {
-            System.err.println("ERROR al marcar notificación como leída: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al marcar notificación como leída", e);
             return false;
+        } finally {
+            closeResources(conn, pstmt, null);
         }
     }
 
-    /**
-     * Marca todas las notificaciones de un usuario como leídas
-     */
+    // Marca todas las notificaciones de un usuario como leídas
     public int marcarTodasComoLeidas(int usuarioId) {
         String sql = "UPDATE notificaciones_web SET leida = 1, fecha_lectura = CURRENT_TIMESTAMP " +
                 "WHERE usuario_id = ? AND leida = 0";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             pstmt.setInt(1, usuarioId);
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.err.println("ERROR al marcar todas como leídas: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al marcar todas como leídas", e);
             return 0;
+        } finally {
+            closeResources(conn, pstmt, null);
         }
     }
 
-    /**
-     * Elimina una notificación específica
-     */
+    // Elimina notificación específica
     public boolean eliminarNotificacion(int idNotificacion) {
         String sql = "DELETE FROM notificaciones_web WHERE id_notificacion = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             pstmt.setInt(1, idNotificacion);
             int filasAfectadas = pstmt.executeUpdate();
             return filasAfectadas > 0;
 
         } catch (SQLException e) {
-            System.err.println("ERROR al eliminar notificación: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al eliminar notificación", e);
             return false;
+        } finally {
+            closeResources(conn, pstmt, null);
         }
     }
 
-    /**
-     * Elimina todas las notificaciones leídas de un usuario
-     */
+    // Elimina todas las notificaciones leídas de un usuario
     public int eliminarNotificacionesLeidas(int usuarioId) {
         String sql = "DELETE FROM notificaciones_web WHERE usuario_id = ? AND leida = 1";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             pstmt.setInt(1, usuarioId);
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.err.println("ERROR al eliminar notificaciones leídas: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al eliminar notificaciones leídas", e);
             return 0;
+        } finally {
+            closeResources(conn, pstmt, null);
         }
     }
 
-    /**
-     * Verifica si una notificación pertenece a un usuario
-     */
+    // Verifica si notificación pertenece a un usuario
     public boolean notificacionPerteneceAUsuario(int idNotificacion, int usuarioId) {
         String sql = "SELECT COUNT(*) as existe FROM notificaciones_web " +
                 "WHERE id_notificacion = ? AND usuario_id = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             pstmt.setInt(1, idNotificacion);
             pstmt.setInt(2, usuarioId);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("existe") > 0;
-                }
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("existe") > 0;
             }
 
         } catch (SQLException e) {
-            System.err.println("ERROR al verificar pertenencia de notificación: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al verificar pertenencia de notificación", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
 
         return false;
     }
 
-    /**
-     * Obtiene los IDs de usuarios de un rol específico
-     */
+    // Obtiene IDs de usuarios de un rol específico (activos)
     public List<Integer> obtenerUsuariosPorRol(String nombreRol) {
         List<Integer> usuariosIds = new ArrayList<>();
         
         String sql = "SELECT u.id_usuario FROM usuarios u " +
                 "INNER JOIN roles r ON u.rol_id = r.id_rol " +
-                "WHERE r.nombre = ? AND u.activo = 1";
+                "WHERE UPPER(r.nombre) = UPPER(?) AND u.activo = 1";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             pstmt.setString(1, nombreRol);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    usuariosIds.add(rs.getInt("id_usuario"));
-                }
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                usuariosIds.add(rs.getInt("id_usuario"));
             }
 
         } catch (SQLException e) {
-            System.err.println("ERROR al obtener usuarios por rol: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al obtener usuarios por rol: " + nombreRol, e);
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
 
         return usuariosIds;
     }
 
-    /**
-     * Elimina notificaciones antiguas (más de 30 días y leídas)
-     */
+    // Elimina notificaciones antiguas (más de 30 días y leídas)
     public int limpiarNotificacionesAntiguas() {
         String sql = "DELETE FROM notificaciones_web " +
                 "WHERE leida = 1 AND fecha_creacion < DATE_SUB(NOW(), INTERVAL 30 DAY)";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
 
             int eliminadas = pstmt.executeUpdate();
             if (eliminadas > 0) {
-                System.out.println("✓ Se eliminaron " + eliminadas + " notificaciones antiguas");
+                logger.info("Se eliminaron {} notificaciones antiguas", eliminadas);
             }
             return eliminadas;
 
         } catch (SQLException e) {
-            System.err.println("ERROR al limpiar notificaciones antiguas: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al limpiar notificaciones antiguas", e);
             return 0;
+        } finally {
+            closeResources(conn, pstmt, null);
         }
     }
 }
