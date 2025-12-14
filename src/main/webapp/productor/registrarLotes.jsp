@@ -27,7 +27,7 @@
     <!-- Custom CSS -->
     <style>
         :root {
-            --turquoise-dark: #006d77; /* oscuro */
+            --turquoise-dark: #00a896; /* oscuro */
             --seafoam: #83c5be;        /* verde agua */
             --seafoam-light: #edf6f9;  /* fondo claro */
             --text-dark: #2b2d42;
@@ -175,8 +175,8 @@
         .form-text { color: var(--text-muted); font-size: 0.75rem; margin-top: 2px; }
         .invalid-feedback { font-size: 0.875rem; }
         .page-header { margin-bottom: 15px; }
-        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 5px; font-size: 1.3rem; }
-        .page-header p { color: var(--text-muted); font-size: 0.9rem; }
+        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 0; font-size: 1.4rem; line-height: 1.2; }
+        .page-header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem; margin-bottom: 0; }
         .pageheader-title {
             display: flex;
             align-items: center;
@@ -564,8 +564,8 @@
                 <!-- Page Header -->
                 <div class="page-header d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="pageheader-title mb-0"><i class="fas fa-boxes me-2"></i>Registrar Lotes</h2>
-                        <p class="text-muted mb-0">Registra los nuevos lotes de productos distribuidos en diferentes ubicaciones.</p>
+                        <h2 class="pageheader-title mb-0" style="font-size: 1.4rem; line-height: 1.2;"><i class="fas fa-boxes me-2"></i>Registrar Lotes</h2>
+                        <p class="text-muted mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Registra los nuevos lotes de productos distribuidos en diferentes ubicaciones.</p>
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
                         <div class="d-flex gap-2 flex-wrap">

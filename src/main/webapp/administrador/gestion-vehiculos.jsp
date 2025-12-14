@@ -8,19 +8,6 @@
         <jsp:param name="pageTitle" value="Gestión de Vehículos"/>
     </jsp:include>
     <style>
-        /* Estilos para stat-cards */
-        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
-        .stat-card {
-            background-color: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-        }
-        .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: #6c757d; font-weight: 600; }
-        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #00a896; }
-        @media (max-width: 768px) {
-            .stats-container { grid-template-columns: 1fr; }
-        }
         /* Estilo para el botón Limpiar */
         .btn-outline-secondary {
             color: #6c757d !important;
@@ -580,18 +567,24 @@
                 %>
 
                 <!-- ===================== Tarjetas de estadísticas ===================== -->
-                <div class="stats-container">
-                    <div class="stat-card">
-                        <h3>Total de Vehículos</h3>
-                        <p><%= totalVehiculos %></p>
+                <div class="row g-2 mb-3">
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Vehículos</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalVehiculos %></p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Con Planes Asignados</h3>
-                        <p><%= vehiculosConPlanes %></p>
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Con Planes Asignados</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= vehiculosConPlanes %></p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Sin Planes Asignados</h3>
-                        <p><%= vehiculosSinPlanes %></p>
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Sin Planes Asignados</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= vehiculosSinPlanes %></p>
+                        </div>
                     </div>
                 </div>
 

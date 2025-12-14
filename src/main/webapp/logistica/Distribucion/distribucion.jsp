@@ -525,18 +525,6 @@
             }
         }
         /* Estilos para stat-cards */
-        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
-        .stat-card {
-            background-color: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-        }
-        .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: #6c757d; font-weight: 600; }
-        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #00a896; }
-        @media (max-width: 768px) {
-            .stats-container { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body>
@@ -613,18 +601,24 @@
             %>
 
             <!-- ===================== Tarjetas de estadísticas ===================== -->
-            <div class="stats-container">
-                <div class="stat-card">
-                    <h3>Total de Planes</h3>
-                    <p><%= totalPlanes %></p>
+            <div class="row g-2 mb-3">
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Planes</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalPlanes %></p>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3>En Ruta</h3>
-                    <p><%= planesEnRuta %></p>
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">En Ruta</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= planesEnRuta %></p>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3>Entregados</h3>
-                    <p><%= planesEntregados %></p>
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Entregados</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= planesEntregados %></p>
+                    </div>
                 </div>
             </div>
 

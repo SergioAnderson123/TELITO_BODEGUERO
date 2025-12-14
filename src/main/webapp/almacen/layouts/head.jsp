@@ -113,15 +113,6 @@
     /* =====================
        Tarjetas/Tabla/Formularios
     ====================== */
-    .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
-    .stat-card {
-        background-color: var(--white);
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    }
-    .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: var(--text-muted); font-weight: 600; }
-    .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: var(--turquoise-dark); }
 
     /* Card principal */
     .card {

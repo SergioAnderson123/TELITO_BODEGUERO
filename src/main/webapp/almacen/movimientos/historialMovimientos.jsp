@@ -288,22 +288,30 @@
                 %>
 
                 <!-- ===================== Tarjetas de estadísticas ===================== -->
-                <div class="stats-container">
-                    <div class="stat-card">
-                        <h3>Total de Movimientos</h3>
-                        <p><%= totalMovimientos %></p>
+                <div class="row g-2 mb-3">
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Movimientos</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalMovimientos %></p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Entradas</h3>
-                        <p><%= movimientosEntrada %></p>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Entradas</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= movimientosEntrada %></p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Salidas</h3>
-                        <p><%= movimientosSalida %></p>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Salidas</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= movimientosSalida %></p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Ajustes</h3>
-                        <p><%= movimientosAjuste %></p>
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Ajustes</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= movimientosAjuste %></p>
+                        </div>
                     </div>
                 </div>
 
@@ -332,10 +340,12 @@
                                 </select>
                             </div>
                             <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
-                                <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-user me-1"></i>Vista</label>
-                                <select class="form-select form-select-sm shadow-sm" name="filtro" id="filtroFilter" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                    <option value="todos" <%= !"mios".equals(request.getParameter("filtro")) ? "selected" : "" %>>Todos</option>
-                                    <option value="mios" <%= "mios".equals(request.getParameter("filtro")) ? "selected" : "" %>>Mis Movimientos</option>
+                                <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-user me-1"></i>Responsable</label>
+                                <select class="form-select form-select-sm shadow-sm" name="responsable" id="responsableFilter" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                    <option value="" ${empty param.responsable ? 'selected' : ''}>Todos</option>
+                                    <c:forEach var="resp" items="${responsablesUnicos}">
+                                        <option value="${resp}" ${param.responsable == resp ? 'selected' : ''}>${resp}</option>
+                                    </c:forEach>
                                 </select>
                             </div>
                             <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6 d-flex align-items-end">
@@ -470,7 +480,7 @@
         const filterForm = document.getElementById('filterForm');
         const searchInput = document.getElementById('searchInput');
         const tipoFilter = document.getElementById('tipoFilter');
-        const filtroFilter = document.getElementById('filtroFilter');
+        const responsableFilter = document.getElementById('responsableFilter');
         
         // Aplicar filtros cuando cambien los selects
         if (tipoFilter && filterForm) {
@@ -479,8 +489,8 @@
             });
         }
         
-        if (filtroFilter && filterForm) {
-            filtroFilter.addEventListener('change', function() {
+        if (responsableFilter && filterForm) {
+            responsableFilter.addEventListener('change', function() {
                 filterForm.submit();
             });
         }

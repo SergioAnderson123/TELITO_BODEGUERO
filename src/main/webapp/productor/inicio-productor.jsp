@@ -18,7 +18,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --turquoise-dark: #006d77;
+            --turquoise-dark: #00a896;
             --seafoam: #83c5be;
             --seafoam-light: #edf6f9;
             --white: #ffffff;
@@ -368,8 +368,8 @@
                 <div class="col-12">
                     <div class="page-header pt-1 pb-1 d-flex justify-content-between align-items-center flex-wrap">
                         <div>
-                            <h2 class="pageheader-title mb-0" style="font-size: 1.4rem;"><i class="fas fa-chart-pie me-2"></i>¡Bienvenido, Productor!</h2>
-                            <p class="pageheader-text mb-0" style="font-size: 0.85rem;">Resumen de tus productos, lotes y órdenes.</p>
+                            <h2 class="pageheader-title mb-0" style="font-size: 1.4rem; line-height: 1.2;"><i class="fas fa-chart-pie me-2"></i>¡Bienvenido, Productor!</h2>
+                            <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Resumen de tus productos, lotes y órdenes.</p>
                         </div>
                     </div>
                 </div>

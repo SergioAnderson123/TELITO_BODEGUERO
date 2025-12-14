@@ -32,7 +32,7 @@
            Paleta y tokens
         ====================== */
         :root {
-            --turquoise-dark: #006d77;
+            --turquoise-dark: #00a896;
             --seafoam: #83c5be;
             --seafoam-light: #edf6f9;
             --white: #ffffff;
@@ -195,8 +195,8 @@
         .form-control, .form-select { border-radius: 8px; border: 2px solid var(--border-color); padding: 12px 15px; transition: all 0.3s ease; }
         .form-control:focus, .form-select:focus { border-color: var(--seafoam); box-shadow: 0 0 0 0.2rem rgba(131, 197, 190, 0.35); }
         .form-label { font-weight: 600; color: var(--text-dark); margin-bottom: 8px; }
-        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; }
-        .page-header p { color: var(--text-muted); font-size: 1.05rem; }
+        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 0; font-size: 1.4rem; line-height: 1.2; }
+        .page-header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem; margin-bottom: 0; }
         .pageheader-title {
             display: flex;
             align-items: center;
@@ -384,8 +384,8 @@
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
             <div class="page-header mb-3">
-                <h2 class="pageheader-title mb-1"><i class="fas fa-tags me-2"></i>Actualizar Precios</h2>
-                <p class="text-muted" style="font-size: 0.85rem;">Busca y actualiza el precio de tus productos de forma rápida y eficiente.</p>
+                <h2 class="pageheader-title mb-0" style="font-size: 1.4rem; line-height: 1.2;"><i class="fas fa-tags me-2"></i>Actualizar Precios</h2>
+                <p class="text-muted mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Busca y actualiza el precio de tus productos de forma rápida y eficiente.</p>
             </div>
 
             <!-- Mensajes de éxito/error -->

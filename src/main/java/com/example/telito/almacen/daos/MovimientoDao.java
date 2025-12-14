@@ -15,6 +15,11 @@ public class MovimientoDao extends DAOBase {
     
     // Contar con filtros de búsqueda, tipo de movimiento y usuario
     public int contarTotalMovimientos(String busqueda, String tipoMovimiento, String filtroUsuario) {
+        return contarTotalMovimientos(busqueda, tipoMovimiento, filtroUsuario, null);
+    }
+    
+    // Contar con filtros de búsqueda, tipo de movimiento, usuario y responsable
+    public int contarTotalMovimientos(String busqueda, String tipoMovimiento, String filtroUsuario, String responsable) {
         String sql = "SELECT COUNT(*) FROM movimientos_inventario m " +
                 "INNER JOIN lotes l ON (m.lote_id = l.id_lote) " +
                 "INNER JOIN productos p ON (l.producto_id = p.id_producto) " +
@@ -41,6 +46,11 @@ public class MovimientoDao extends DAOBase {
         
         if ("mios".equals(filtroUsuario)) {
             // Este filtro se maneja en el servlet pasando el usuarioId
+        }
+        
+        if (responsable != null && !responsable.trim().isEmpty()) {
+            sql += " AND CONCAT(u.nombres, ' ', u.apellidos) = ?";
+            params.add(responsable.trim());
         }
         
         Connection conn = null;
@@ -278,6 +288,10 @@ public class MovimientoDao extends DAOBase {
     }
     
     public ArrayList<Movimiento> listarMovimientosPaginado(int limit, int offset, String busqueda, String tipoMovimiento) {
+        return listarMovimientosPaginado(limit, offset, busqueda, tipoMovimiento, null);
+    }
+    
+    public ArrayList<Movimiento> listarMovimientosPaginado(int limit, int offset, String busqueda, String tipoMovimiento, String responsable) {
         ArrayList<Movimiento> listaMovimientos = new ArrayList<>();
 
         String sql = "SELECT " +
@@ -311,6 +325,11 @@ public class MovimientoDao extends DAOBase {
                 sql += " AND m.tipo = ?";
                 params.add(tipoMovimiento.trim());
             }
+        }
+        
+        if (responsable != null && !responsable.trim().isEmpty()) {
+            sql += " AND CONCAT(u.nombres, ' ', u.apellidos) = ?";
+            params.add(responsable.trim());
         }
         
         sql += " ORDER BY m.fecha DESC LIMIT ? OFFSET ?";
@@ -474,5 +493,36 @@ public class MovimientoDao extends DAOBase {
         int filasAfectadas = executeUpdate(sql, ordenCompraId);
         logger.info("Movimientos de salida eliminados para orden de compra {}: {} filas", ordenCompraId, filasAfectadas);
         return filasAfectadas > 0;
+    }
+
+    /**
+     * Obtiene la lista de responsables únicos que han realizado movimientos
+     */
+    public ArrayList<String> obtenerResponsablesUnicos() {
+        ArrayList<String> responsables = new ArrayList<>();
+        String sql = "SELECT DISTINCT CONCAT(u.nombres, ' ', u.apellidos) AS nombre_completo " +
+                "FROM movimientos_inventario m " +
+                "INNER JOIN usuarios u ON (m.usuario_id = u.id_usuario) " +
+                "ORDER BY nombre_completo ASC";
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                responsables.add(rs.getString("nombre_completo"));
+            }
+        } catch (SQLException e) {
+            logger.error("Error al obtener responsables únicos", e);
+            throw new RuntimeException("Error al obtener responsables únicos", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return responsables;
     }
 }

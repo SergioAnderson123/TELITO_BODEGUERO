@@ -66,6 +66,11 @@ public class MovimientoServlet extends HttpServlet {
                     String filtro = request.getParameter("filtro");
                     String busqueda = request.getParameter("busqueda");
                     String tipoMovimiento = request.getParameter("tipo");
+                    String responsable = request.getParameter("responsable");
+
+                    // Obtener lista de responsables únicos
+                    ArrayList<String> responsablesUnicos = movimientoDao.obtenerResponsablesUnicos();
+                    request.setAttribute("responsablesUnicos", responsablesUnicos);
 
                     int totalRegistros;
                     ArrayList<Movimiento> listaMovimientos;
@@ -80,12 +85,12 @@ public class MovimientoServlet extends HttpServlet {
                         int offset = (paginaActual - 1) * registrosPorPagina;
                         listaMovimientos = movimientoDao.listarMovimientosPorUsuarioPaginado(usuarioId, registrosPorPagina, offset, busqueda, tipoMovimiento);
                     } else {
-                        totalRegistros = movimientoDao.contarTotalMovimientos(busqueda, tipoMovimiento, filtro);
+                        totalRegistros = movimientoDao.contarTotalMovimientos(busqueda, tipoMovimiento, filtro, responsable);
                         int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
                         if (totalPaginas == 0) totalPaginas = 1;
                         if (paginaActual > totalPaginas) paginaActual = totalPaginas;
                         int offset = (paginaActual - 1) * registrosPorPagina;
-                        listaMovimientos = movimientoDao.listarMovimientosPaginado(registrosPorPagina, offset, busqueda, tipoMovimiento);
+                        listaMovimientos = movimientoDao.listarMovimientosPaginado(registrosPorPagina, offset, busqueda, tipoMovimiento, responsable);
                     }
 
                     int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
@@ -111,6 +116,7 @@ public class MovimientoServlet extends HttpServlet {
                     request.setAttribute("itemName", "movimientos");
                     request.setAttribute("busqueda", busqueda);
                     request.setAttribute("tipoFiltro", tipoMovimiento);
+                    request.setAttribute("responsableFiltro", responsable);
 
                     RequestDispatcher view = request.getRequestDispatcher("/almacen/movimientos/historialMovimientos.jsp");
                     view.forward(request, response);

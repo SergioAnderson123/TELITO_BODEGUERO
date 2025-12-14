@@ -111,18 +111,24 @@
                 %>
 
                 <!-- ===================== Tarjetas de estadísticas ===================== -->
-                <div class="stats-container">
-                    <div class="stat-card">
-                        <h3>Total de Incidencias</h3>
-                        <p><%= totalIncidencias %></p>
+                <div class="row g-2 mb-3">
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Incidencias</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalIncidencias %></p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Pendientes</h3>
-                        <p><%= incidenciasPendientes %></p>
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Pendientes</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= incidenciasPendientes %></p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Resueltas</h3>
-                        <p><%= incidenciasResueltas %></p>
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Resueltas</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= incidenciasResueltas %></p>
+                        </div>
                     </div>
                 </div>
 
