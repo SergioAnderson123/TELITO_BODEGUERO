@@ -6,10 +6,22 @@
     String planesDataJson = (String) request.getAttribute("planesDataJson");
     String productosSalidaLabelsJson = (String) request.getAttribute("productosSalidaLabelsJson");
     String productosSalidaDataJson = (String) request.getAttribute("productosSalidaDataJson");
-    String conductoresLabelsJson = (String) request.getAttribute("conductoresLabelsJson");
-    String conductoresDataJson = (String) request.getAttribute("conductoresDataJson");
-    String pedidosMesLabelsJson = (String) request.getAttribute("pedidosMesLabelsJson");
-    String pedidosMesDataJson = (String) request.getAttribute("pedidosMesDataJson");
+    // Reportes adicionales
+    String distritosLabelsJson = (String) request.getAttribute("distritosLabelsJson");
+    String distritosDataJson = (String) request.getAttribute("distritosDataJson");
+    String ordenesEstadoLabelsJson = (String) request.getAttribute("ordenesEstadoLabelsJson");
+    String ordenesEstadoDataJson = (String) request.getAttribute("ordenesEstadoDataJson");
+    String tendenciasLabelsJson = (String) request.getAttribute("tendenciasLabelsJson");
+    String tendenciasDataJson = (String) request.getAttribute("tendenciasDataJson");
+    // Nuevos reportes funcionales
+    String zonasLabelsJson = (String) request.getAttribute("zonasLabelsJson");
+    String zonasDataJson = (String) request.getAttribute("zonasDataJson");
+    String vehiculosLabelsJson = (String) request.getAttribute("vehiculosLabelsJson");
+    String vehiculosDataJson = (String) request.getAttribute("vehiculosDataJson");
+    String productosSolicitadosLabelsJson = (String) request.getAttribute("productosSolicitadosLabelsJson");
+    String productosSolicitadosDataJson = (String) request.getAttribute("productosSolicitadosDataJson");
+    String comparativaLabelsJson = (String) request.getAttribute("comparativaLabelsJson");
+    String comparativaDataJson = (String) request.getAttribute("comparativaDataJson");
 %>
 
 <!doctype html>
@@ -129,15 +141,45 @@
                     </div>
                 </div>
                 <div class="card">
-                    <h5 class="card-title">Rendimiento de Conductores (Entregas)</h5>
+                    <h5 class="card-title">Distribución de Planes por Distrito</h5>
                     <div class="chart-container">
-                        <canvas id="conductoresChart"></canvas>
+                        <canvas id="distritosChart"></canvas>
                     </div>
                 </div>
                 <div class="card">
-                    <h5 class="card-title">Historial de Pedidos Despachados</h5>
+                    <h5 class="card-title">Órdenes de Compra por Estado</h5>
                     <div class="chart-container">
-                        <canvas id="pedidosMesChart"></canvas>
+                        <canvas id="ordenesEstadoChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h5 class="card-title">Tendencias de Planes de Transporte (Últimos 6 Meses)</h5>
+                    <div class="chart-container">
+                        <canvas id="tendenciasChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h5 class="card-title">Distribución de Planes por Zona Geográfica</h5>
+                    <div class="chart-container">
+                        <canvas id="zonasChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h5 class="card-title">Vehículos Más Utilizados</h5>
+                    <div class="chart-container">
+                        <canvas id="vehiculosChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h5 class="card-title">Productos Más Solicitados en Órdenes de Compra</h5>
+                    <div class="chart-container">
+                        <canvas id="productosSolicitadosChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h5 class="card-title">Comparativa: Planes Pendientes vs Completados</h5>
+                    <div class="chart-container">
+                        <canvas id="comparativaChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -317,32 +359,34 @@
             });
         } catch (e) { console.error("Error al renderizar el Gráfico 2 (Salida):", e); }
 
+        // ========== GRÁFICO 5: Distribución de Planes por Distrito ==========
         try {
-            const conductoresLabels = JSON.parse('<%= conductoresLabelsJson != null ? conductoresLabelsJson : "[]" %>');
-            const conductoresData = JSON.parse('<%= conductoresDataJson != null ? conductoresDataJson : "[]" %>');
+            const distritosLabels = JSON.parse('<%= distritosLabelsJson != null ? distritosLabelsJson : "[]" %>');
+            const distritosData = JSON.parse('<%= distritosDataJson != null ? distritosDataJson : "[]" %>');
 
-            const ctx3 = document.getElementById('conductoresChart').getContext('2d');
-            const gradientGreen = ctx3.createLinearGradient(0, 0, 0, ctx3.canvas.height);
-            gradientGreen.addColorStop(0, 'rgba(40, 167, 69, 0.95)');
-            gradientGreen.addColorStop(1, 'rgba(32, 201, 151, 0.7)');
+            const ctx5 = document.getElementById('distritosChart').getContext('2d');
+            const gradientOrange = ctx5.createLinearGradient(0, 0, ctx5.canvas.width, 0);
+            gradientOrange.addColorStop(0, 'rgba(255, 159, 64, 0.9)');
+            gradientOrange.addColorStop(1, 'rgba(255, 99, 71, 0.9)');
 
-            new Chart(ctx3, {
+            new Chart(ctx5, {
                 type: 'bar',
                 data: {
-                    labels: conductoresLabels,
+                    labels: distritosLabels,
                     datasets: [{
-                        label: 'Entregas Realizadas',
-                        data: conductoresData,
-                        backgroundColor: gradientGreen,
-                        borderColor: 'rgba(40, 167, 69, 1)',
+                        label: 'Planes de Transporte',
+                        data: distritosData,
+                        backgroundColor: gradientOrange,
+                        borderColor: 'rgba(255, 159, 64, 1)',
                         borderWidth: 2,
                         borderRadius: 8,
                         borderSkipped: false,
-                        hoverBackgroundColor: 'rgba(40, 167, 69, 1)',
+                        hoverBackgroundColor: 'rgba(255, 159, 64, 1)',
                         hoverBorderWidth: 3
                     }]
                 },
                 options: {
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
@@ -353,18 +397,17 @@
                             bodyFont: { size: 14 },
                             padding: 15,
                             cornerRadius: 8,
-                            borderColor: '#28a745',
+                            borderColor: '#ff9f40',
                             borderWidth: 2,
                             callbacks: {
                                 label: function(context) {
-                                    return 'Entregas: ' + context.raw.toLocaleString() + ' realizadas';
+                                    return 'Planes: ' + context.raw.toLocaleString();
                                 }
                             }
                         }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
+                        x: {
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.05)',
                                 drawBorder: false,
@@ -375,13 +418,11 @@
                                 color: '#2b2d42'
                             }
                         },
-                        x: {
+                        y: {
                             grid: { display: false },
                             ticks: {
                                 font: { size: 13, weight: '600' },
-                                color: '#2b2d42',
-                                maxRotation: 45,
-                                minRotation: 0
+                                color: '#2b2d42'
                             }
                         }
                     },
@@ -391,36 +432,107 @@
                     }
                 }
             });
-        } catch (e) { console.error("Error al renderizar el Gráfico 3 (Conductores):", e); }
+        } catch (e) { console.error("Error al renderizar el Gráfico 5 (Distritos):", e); }
 
+        // ========== GRÁFICO 6: Órdenes de Compra por Estado ==========
         try {
-            const pedidosMesLabels = JSON.parse('<%= pedidosMesLabelsJson != null ? pedidosMesLabelsJson : "[]" %>');
-            const pedidosMesData = JSON.parse('<%= pedidosMesDataJson != null ? pedidosMesDataJson : "[]" %>');
+            const ordenesEstadoLabels = JSON.parse('<%= ordenesEstadoLabelsJson != null ? ordenesEstadoLabelsJson : "[]" %>');
+            const ordenesEstadoData = JSON.parse('<%= ordenesEstadoDataJson != null ? ordenesEstadoDataJson : "[]" %>');
 
-            const ctx4 = document.getElementById('pedidosMesChart').getContext('2d');
-            const gradientPurple = ctx4.createLinearGradient(0, 0, 0, ctx4.canvas.height);
-            gradientPurple.addColorStop(0, 'rgba(108, 99, 255, 0.7)');
-            gradientPurple.addColorStop(0.5, 'rgba(153, 102, 255, 0.4)');
-            gradientPurple.addColorStop(1, 'rgba(153, 102, 255, 0.1)');
+            new Chart(document.getElementById('ordenesEstadoChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ordenesEstadoLabels,
+                    datasets: [{
+                        data: ordenesEstadoData,
+                        backgroundColor: [
+                            'rgba(255, 193, 7, 0.85)',
+                            'rgba(23, 162, 184, 0.85)',
+                            'rgba(40, 167, 69, 0.85)',
+                            'rgba(220, 53, 69, 0.85)',
+                            'rgba(108, 117, 125, 0.85)',
+                            'rgba(255, 159, 64, 0.85)'
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 15,
+                        hoverBorderWidth: 3,
+                        hoverBorderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 14, weight: '600' },
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                color: '#2b2d42'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                            titleFont: { size: 15, weight: 'bold' },
+                            bodyFont: { size: 14 },
+                            padding: 15,
+                            cornerRadius: 8,
+                            borderColor: '#17a2b8',
+                            borderWidth: 2,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 1500,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        } catch (e) { console.error("Error al renderizar el Gráfico 6 (Órdenes Estado):", e); }
 
-            new Chart(ctx4, {
+        // ========== GRÁFICO 7: Tendencias de Planes de Transporte ==========
+        try {
+            const tendenciasLabels = JSON.parse('<%= tendenciasLabelsJson != null ? tendenciasLabelsJson : "[]" %>');
+            const tendenciasData = JSON.parse('<%= tendenciasDataJson != null ? tendenciasDataJson : "[]" %>');
+
+            const ctx7 = document.getElementById('tendenciasChart').getContext('2d');
+            const gradientTeal = ctx7.createLinearGradient(0, 0, 0, ctx7.canvas.height);
+            gradientTeal.addColorStop(0, 'rgba(0, 168, 150, 0.7)');
+            gradientTeal.addColorStop(0.5, 'rgba(0, 168, 150, 0.4)');
+            gradientTeal.addColorStop(1, 'rgba(0, 168, 150, 0.1)');
+
+            new Chart(ctx7, {
                 type: 'line',
                 data: {
-                    labels: pedidosMesLabels,
+                    labels: tendenciasLabels,
                     datasets: [{
-                        label: 'Pedidos Despachados',
-                        data: pedidosMesData,
+                        label: 'Planes de Transporte',
+                        data: tendenciasData,
                         fill: true,
-                        backgroundColor: gradientPurple,
-                        borderColor: 'rgba(108, 99, 255, 1)',
+                        backgroundColor: gradientTeal,
+                        borderColor: 'rgba(0, 168, 150, 1)',
                         borderWidth: 3,
                         tension: 0.4,
                         pointBackgroundColor: '#ffffff',
-                        pointBorderColor: 'rgba(108, 99, 255, 1)',
+                        pointBorderColor: 'rgba(0, 168, 150, 1)',
                         pointBorderWidth: 3,
-                        pointRadius: 5,
-                        pointHoverRadius: 8,
-                        pointHoverBackgroundColor: 'rgba(108, 99, 255, 1)',
+                        pointRadius: 6,
+                        pointHoverRadius: 9,
+                        pointHoverBackgroundColor: 'rgba(0, 168, 150, 1)',
                         pointHoverBorderColor: '#ffffff',
                         pointHoverBorderWidth: 3
                     }]
@@ -440,11 +552,11 @@
                             bodyFont: { size: 14 },
                             padding: 15,
                             cornerRadius: 8,
-                            borderColor: '#6c63ff',
+                            borderColor: '#00a896',
                             borderWidth: 2,
                             callbacks: {
                                 label: function(context) {
-                                    return 'Despachados: ' + context.raw.toLocaleString() + ' pedidos';
+                                    return 'Planes: ' + context.raw.toLocaleString();
                                 }
                             }
                         }
@@ -476,7 +588,292 @@
                     }
                 }
             });
-        } catch (e) { console.error("Error al renderizar el Gráfico 4 (Pedidos):", e); }
+        } catch (e) { console.error("Error al renderizar el Gráfico 7 (Tendencias):", e); }
+
+        // ========== GRÁFICO 8: Distribución de Planes por Zona Geográfica ==========
+        try {
+            const zonasLabels = JSON.parse('<%= zonasLabelsJson != null ? zonasLabelsJson : "[]" %>');
+            const zonasData = JSON.parse('<%= zonasDataJson != null ? zonasDataJson : "[]" %>');
+
+            new Chart(document.getElementById('zonasChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: zonasLabels,
+                    datasets: [{
+                        data: zonasData,
+                        backgroundColor: [
+                            'rgba(23, 162, 184, 0.85)',
+                            'rgba(40, 167, 69, 0.85)',
+                            'rgba(255, 193, 7, 0.85)',
+                            'rgba(220, 53, 69, 0.85)'
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 15,
+                        hoverBorderWidth: 3,
+                        hoverBorderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 14, weight: '600' },
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                color: '#2b2d42'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                            titleFont: { size: 15, weight: 'bold' },
+                            bodyFont: { size: 14 },
+                            padding: 15,
+                            cornerRadius: 8,
+                            borderColor: '#17a2b8',
+                            borderWidth: 2,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return label + ': ' + context.parsed + ' planes (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 1500,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        } catch (e) { console.error("Error al renderizar el Gráfico 8 (Zonas):", e); }
+
+        // ========== GRÁFICO 9: Vehículos Más Utilizados ==========
+        try {
+            const vehiculosLabels = JSON.parse('<%= vehiculosLabelsJson != null ? vehiculosLabelsJson : "[]" %>');
+            const vehiculosData = JSON.parse('<%= vehiculosDataJson != null ? vehiculosDataJson : "[]" %>');
+
+            const ctx9 = document.getElementById('vehiculosChart').getContext('2d');
+            const gradientBlue = ctx9.createLinearGradient(0, 0, ctx9.canvas.width, 0);
+            gradientBlue.addColorStop(0, 'rgba(23, 162, 184, 0.9)');
+            gradientBlue.addColorStop(1, 'rgba(0, 123, 255, 0.9)');
+
+            new Chart(ctx9, {
+                type: 'bar',
+                data: {
+                    labels: vehiculosLabels,
+                    datasets: [{
+                        label: 'Planes Asignados',
+                        data: vehiculosData,
+                        backgroundColor: gradientBlue,
+                        borderColor: 'rgba(23, 162, 184, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        hoverBackgroundColor: 'rgba(23, 162, 184, 1)',
+                        hoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                            titleFont: { size: 15, weight: 'bold' },
+                            bodyFont: { size: 14 },
+                            padding: 15,
+                            cornerRadius: 8,
+                            borderColor: '#17a2b8',
+                            borderWidth: 2,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Planes: ' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false,
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                font: { size: 13, weight: '600' },
+                                color: '#2b2d42'
+                            }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: {
+                                font: { size: 13, weight: '600' },
+                                color: '#2b2d42'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        } catch (e) { console.error("Error al renderizar el Gráfico 9 (Vehículos):", e); }
+
+        // ========== GRÁFICO 10: Productos Más Solicitados en Órdenes de Compra ==========
+        try {
+            const productosSolicitadosLabels = JSON.parse('<%= productosSolicitadosLabelsJson != null ? productosSolicitadosLabelsJson : "[]" %>');
+            const productosSolicitadosData = JSON.parse('<%= productosSolicitadosDataJson != null ? productosSolicitadosDataJson : "[]" %>');
+
+            const ctx10 = document.getElementById('productosSolicitadosChart').getContext('2d');
+            const gradientPink = ctx10.createLinearGradient(0, 0, 0, ctx10.canvas.height);
+            gradientPink.addColorStop(0, 'rgba(255, 99, 132, 0.9)');
+            gradientPink.addColorStop(1, 'rgba(255, 159, 64, 0.7)');
+
+            new Chart(ctx10, {
+                type: 'bar',
+                data: {
+                    labels: productosSolicitadosLabels,
+                    datasets: [{
+                        label: 'Órdenes de Compra',
+                        data: productosSolicitadosData,
+                        backgroundColor: gradientPink,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        hoverBackgroundColor: 'rgba(255, 99, 132, 1)',
+                        hoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                            titleFont: { size: 15, weight: 'bold' },
+                            bodyFont: { size: 14 },
+                            padding: 15,
+                            cornerRadius: 8,
+                            borderColor: '#ff6384',
+                            borderWidth: 2,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Órdenes: ' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false,
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                font: { size: 13, weight: '600' },
+                                color: '#2b2d42'
+                            }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: {
+                                font: { size: 13, weight: '600' },
+                                color: '#2b2d42'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        } catch (e) { console.error("Error al renderizar el Gráfico 10 (Productos Solicitados):", e); }
+
+        // ========== GRÁFICO 11: Comparativa Planes Pendientes vs Completados ==========
+        try {
+            const comparativaLabels = JSON.parse('<%= comparativaLabelsJson != null ? comparativaLabelsJson : "[]" %>');
+            const comparativaData = JSON.parse('<%= comparativaDataJson != null ? comparativaDataJson : "[]" %>');
+
+            new Chart(document.getElementById('comparativaChart'), {
+                type: 'pie',
+                data: {
+                    labels: comparativaLabels,
+                    datasets: [{
+                        data: comparativaData,
+                        backgroundColor: [
+                            'rgba(255, 193, 7, 0.85)',
+                            'rgba(40, 167, 69, 0.85)',
+                            'rgba(23, 162, 184, 0.85)',
+                            'rgba(108, 117, 125, 0.85)'
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 15,
+                        hoverBorderWidth: 3,
+                        hoverBorderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 14, weight: '600' },
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                color: '#2b2d42'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                            titleFont: { size: 15, weight: 'bold' },
+                            bodyFont: { size: 14 },
+                            padding: 15,
+                            cornerRadius: 8,
+                            borderColor: '#ffc107',
+                            borderWidth: 2,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return label + ': ' + context.parsed + ' planes (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 1500,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        } catch (e) { console.error("Error al renderizar el Gráfico 11 (Comparativa):", e); }
 
     });
 </script>

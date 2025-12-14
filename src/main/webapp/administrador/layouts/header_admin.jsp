@@ -138,7 +138,7 @@
         padding: 12px 20px;
         border-bottom: 1px solid #eee;
         transition: all 0.3s ease;
-        cursor: pointer;
+        cursor: default;
         background: white;
     }
     
@@ -305,7 +305,7 @@ function mostrarNotificaciones(notificaciones) {
             nivel: nivelPrioridad
         });
         
-        return '<div class="notificacion-item no-leida" onclick="verNotificacion(' + idNotif + ', \'' + (notif.urlAccion || '') + '\')">' +
+        return '<div class="notificacion-item no-leida">' +
                 '<div class="d-flex gap-3">' +
                     '<div class="notificacion-icon ' + nivelPrioridad + '">' +
                         '<i class="' + iconoTipo + '"></i>' +

@@ -117,15 +117,45 @@
         </div>
       </div>
       <div class="card">
-        <h5 class="card-title">Motivos de Ajuste de Inventario</h5>
-        <div class="chart-container">
-            <canvas id="ajustesChart"></canvas>
-        </div>
-      </div>
-      <div class="card">
         <h5 class="card-title">Actividad de Inventario (Últimos 30 días)</h5>
         <div class="chart-container">
             <canvas id="actividadDiariaChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h5 class="card-title">Distribución de Stock por Ubicación</h5>
+        <div class="chart-container">
+            <canvas id="stockUbicacionChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h5 class="card-title">Productos con Stock Mínimo/Crítico</h5>
+        <div class="chart-container">
+            <canvas id="productosStockMinimoChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h5 class="card-title">Almaceneros Más Activos (Últimos 30 días)</h5>
+        <div class="chart-container">
+            <canvas id="almacenerosActivosChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h5 class="card-title">Lotes Próximos a Vencer (60 días)</h5>
+        <div class="chart-container">
+            <canvas id="lotesVencerChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h5 class="card-title">Tendencias Entradas vs Salidas (Últimos 6 Meses)</h5>
+        <div class="chart-container">
+            <canvas id="tendenciasMesChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h5 class="card-title">Productos con Mayor Rotación (Últimos 30 días)</h5>
+        <div class="chart-container">
+            <canvas id="productosRotacionChart"></canvas>
         </div>
       </div>
     </div>
@@ -330,74 +360,7 @@
         });
       } catch (e) { console.error("Error al renderizar el Gráfico 2 (Almacén):", e); }
       
-      // --- GRÁFICO 3: Motivos de Ajuste ---
-      try {
-        const ajustesLabels = JSON.parse('<%= request.getAttribute("ajustesLabelsJson") != null ? request.getAttribute("ajustesLabelsJson") : "[]" %>');
-        const ajustesData = JSON.parse('<%= request.getAttribute("ajustesDataJson") != null ? request.getAttribute("ajustesDataJson") : "[]" %>');
-        
-        new Chart(document.getElementById('ajustesChart'), {
-            type: 'doughnut',
-            data: {
-                labels: ajustesLabels,
-                datasets: [{
-                    data: ajustesData,
-                    backgroundColor: [
-                        'rgba(253, 126, 20, 0.85)',
-                        'rgba(255, 193, 7, 0.85)',
-                        'rgba(108, 99, 255, 0.85)',
-                        'rgba(108, 117, 125, 0.85)'
-                    ],
-                    borderColor: '#ffffff',
-                    borderWidth: 3,
-                    hoverOffset: 15,
-                    hoverBorderWidth: 3,
-                    hoverBorderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '60%',
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            font: { size: 14, weight: '600' },
-                            padding: 20,
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            color: '#2b2d42'
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(43, 45, 66, 0.95)',
-                        titleFont: { size: 15, weight: 'bold' },
-                        bodyFont: { size: 14 },
-                        padding: 15,
-                        cornerRadius: 8,
-                        borderColor: '#ffc107',
-                        borderWidth: 2,
-                        displayColors: true,
-                        callbacks: {
-                            label: function(context) {
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((context.parsed / total) * 100).toFixed(1);
-                                return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
-                            }
-                        }
-                    }
-                },
-                animation: {
-                    animateScale: true,
-                    animateRotate: true,
-                    duration: 1500,
-                    easing: 'easeInOutQuart'
-                }
-            }
-        });
-      } catch (e) { console.error("Error al renderizar el Gráfico 3 (Almacén):", e); }
-      
-      // --- GRÁFICO 4: Actividad Diaria (30 días) ---
+      // --- GRÁFICO 3: Actividad Diaria (30 días) ---
       try {
         const actividadLabels = JSON.parse('<%= request.getAttribute("actividadLabelsJson") != null ? request.getAttribute("actividadLabelsJson") : "[]" %>');
         const actividadEntradas = JSON.parse('<%= request.getAttribute("actividadEntradasJson") != null ? request.getAttribute("actividadEntradasJson") : "[]" %>');
@@ -519,7 +482,465 @@
                 }
             }
         });
-      } catch (e) { console.error("Error al renderizar el Gráfico 4 (Almacén):", e); }
+      } catch (e) { console.error("Error al renderizar el Gráfico 3 (Almacén):", e); }
+
+      // ========== GRÁFICO 4: Distribución de Stock por Ubicación ==========
+      try {
+        const stockUbicacionLabels = JSON.parse('<%= request.getAttribute("stockUbicacionLabelsJson") != null ? request.getAttribute("stockUbicacionLabelsJson") : "[]" %>');
+        const stockUbicacionData = JSON.parse('<%= request.getAttribute("stockUbicacionDataJson") != null ? request.getAttribute("stockUbicacionDataJson") : "[]" %>');
+
+        const ctx4 = document.getElementById('stockUbicacionChart').getContext('2d');
+        const gradientBlue = ctx4.createLinearGradient(0, 0, ctx4.canvas.width, 0);
+        gradientBlue.addColorStop(0, 'rgba(23, 162, 184, 0.9)');
+        gradientBlue.addColorStop(1, 'rgba(0, 168, 150, 0.9)');
+
+        new Chart(ctx4, {
+            type: 'bar',
+            data: {
+                labels: stockUbicacionLabels,
+                datasets: [{
+                    label: 'Stock Total',
+                    data: stockUbicacionData,
+                    backgroundColor: gradientBlue,
+                    borderColor: 'rgba(23, 162, 184, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    hoverBackgroundColor: 'rgba(23, 162, 184, 1)',
+                    hoverBorderWidth: 3
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                        titleFont: { size: 15, weight: 'bold' },
+                        bodyFont: { size: 14 },
+                        padding: 15,
+                        cornerRadius: 8,
+                        borderColor: '#17a2b8',
+                        borderWidth: 2,
+                        callbacks: {
+                            label: function(context) {
+                                return 'Stock: ' + context.raw.toLocaleString() + ' unidades';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false,
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            font: { size: 13, weight: '600' },
+                            color: '#2b2d42'
+                        }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 13, weight: '600' },
+                            color: '#2b2d42'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+      } catch (e) { console.error("Error al renderizar el Gráfico 4 (Stock por Ubicación):", e); }
+
+      // ========== GRÁFICO 5: Productos con Stock Mínimo/Crítico ==========
+      try {
+        const productosStockMinimoLabels = JSON.parse('<%= request.getAttribute("productosStockMinimoLabelsJson") != null ? request.getAttribute("productosStockMinimoLabelsJson") : "[]" %>');
+        const productosStockMinimoData = JSON.parse('<%= request.getAttribute("productosStockMinimoDataJson") != null ? request.getAttribute("productosStockMinimoDataJson") : "[]" %>');
+
+        const ctx5 = document.getElementById('productosStockMinimoChart').getContext('2d');
+        const gradientRed = ctx5.createLinearGradient(0, 0, ctx5.canvas.width, 0);
+        gradientRed.addColorStop(0, 'rgba(220, 53, 69, 0.9)');
+        gradientRed.addColorStop(1, 'rgba(255, 99, 132, 0.9)');
+
+        new Chart(ctx5, {
+            type: 'bar',
+            data: {
+                labels: productosStockMinimoLabels,
+                datasets: [{
+                    label: 'Stock Actual',
+                    data: productosStockMinimoData,
+                    backgroundColor: gradientRed,
+                    borderColor: 'rgba(220, 53, 69, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    hoverBackgroundColor: 'rgba(220, 53, 69, 1)',
+                    hoverBorderWidth: 3
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                        titleFont: { size: 15, weight: 'bold' },
+                        bodyFont: { size: 14 },
+                        padding: 15,
+                        cornerRadius: 8,
+                        borderColor: '#dc3545',
+                        borderWidth: 2,
+                        callbacks: {
+                            label: function(context) {
+                                return 'Stock: ' + context.raw.toLocaleString() + ' unidades (⚠️ Requiere atención)';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false,
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            font: { size: 13, weight: '600' },
+                            color: '#2b2d42'
+                        }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 13, weight: '600' },
+                            color: '#2b2d42'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+      } catch (e) { console.error("Error al renderizar el Gráfico 5 (Productos Stock Mínimo):", e); }
+
+      // ========== GRÁFICO 6: Almaceneros Más Activos ==========
+      try {
+        const almacenerosActivosLabels = JSON.parse('<%= request.getAttribute("almacenerosActivosLabelsJson") != null ? request.getAttribute("almacenerosActivosLabelsJson") : "[]" %>');
+        const almacenerosActivosData = JSON.parse('<%= request.getAttribute("almacenerosActivosDataJson") != null ? request.getAttribute("almacenerosActivosDataJson") : "[]" %>');
+
+        const ctx6 = document.getElementById('almacenerosActivosChart').getContext('2d');
+        const gradientPurple = ctx6.createLinearGradient(0, 0, ctx6.canvas.width, 0);
+        gradientPurple.addColorStop(0, 'rgba(108, 99, 255, 0.9)');
+        gradientPurple.addColorStop(1, 'rgba(153, 102, 255, 0.9)');
+
+        new Chart(ctx6, {
+            type: 'bar',
+            data: {
+                labels: almacenerosActivosLabels,
+                datasets: [{
+                    label: 'Movimientos',
+                    data: almacenerosActivosData,
+                    backgroundColor: gradientPurple,
+                    borderColor: 'rgba(108, 99, 255, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    hoverBackgroundColor: 'rgba(108, 99, 255, 1)',
+                    hoverBorderWidth: 3
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                        titleFont: { size: 15, weight: 'bold' },
+                        bodyFont: { size: 14 },
+                        padding: 15,
+                        cornerRadius: 8,
+                        borderColor: '#6c63ff',
+                        borderWidth: 2,
+                        callbacks: {
+                            label: function(context) {
+                                return 'Movimientos: ' + context.raw.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false,
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            font: { size: 13, weight: '600' },
+                            color: '#2b2d42'
+                        }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 13, weight: '600' },
+                            color: '#2b2d42'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+      } catch (e) { console.error("Error al renderizar el Gráfico 6 (Almaceneros Activos):", e); }
+
+      // ========== GRÁFICO 7: Lotes Próximos a Vencer ==========
+      try {
+        const lotesVencerLabels = JSON.parse('<%= request.getAttribute("lotesVencerLabelsJson") != null ? request.getAttribute("lotesVencerLabelsJson") : "[]" %>');
+        const lotesVencerData = JSON.parse('<%= request.getAttribute("lotesVencerDataJson") != null ? request.getAttribute("lotesVencerDataJson") : "[]" %>');
+
+        new Chart(document.getElementById('lotesVencerChart'), {
+            type: 'doughnut',
+            data: {
+                labels: lotesVencerLabels,
+                datasets: [{
+                    data: lotesVencerData,
+                    backgroundColor: [
+                        'rgba(255, 193, 7, 0.85)',
+                        'rgba(253, 126, 20, 0.85)',
+                        'rgba(220, 53, 69, 0.85)',
+                        'rgba(108, 99, 255, 0.85)',
+                        'rgba(23, 162, 184, 0.85)',
+                        'rgba(40, 167, 69, 0.85)'
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 3,
+                    hoverOffset: 15,
+                    hoverBorderWidth: 3,
+                    hoverBorderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 14, weight: '600' },
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            color: '#2b2d42'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                        titleFont: { size: 15, weight: 'bold' },
+                        bodyFont: { size: 14 },
+                        padding: 15,
+                        cornerRadius: 8,
+                        borderColor: '#ffc107',
+                        borderWidth: 2,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return label + ': ' + context.parsed + ' lotes (' + percentage + '%)';
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true,
+                    duration: 1500,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+      } catch (e) { console.error("Error al renderizar el Gráfico 7 (Lotes a Vencer):", e); }
+
+      // ========== GRÁFICO 8: Tendencias Entradas vs Salidas por Mes ==========
+      try {
+        const tendenciasMesLabels = JSON.parse('<%= request.getAttribute("tendenciasMesLabelsJson") != null ? request.getAttribute("tendenciasMesLabelsJson") : "[]" %>');
+        const tendenciasMesEntradas = JSON.parse('<%= request.getAttribute("tendenciasMesEntradasJson") != null ? request.getAttribute("tendenciasMesEntradasJson") : "[]" %>');
+        const tendenciasMesSalidas = JSON.parse('<%= request.getAttribute("tendenciasMesSalidasJson") != null ? request.getAttribute("tendenciasMesSalidasJson") : "[]" %>');
+
+        new Chart(document.getElementById('tendenciasMesChart'), {
+            type: 'bar',
+            data: {
+                labels: tendenciasMesLabels,
+                datasets: [
+                    {
+                        label: 'Entradas',
+                        data: tendenciasMesEntradas,
+                        backgroundColor: 'rgba(40, 167, 69, 0.85)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 2,
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Salidas',
+                        data: tendenciasMesSalidas,
+                        backgroundColor: 'rgba(220, 53, 69, 0.85)',
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                        borderWidth: 2,
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: { size: 14, weight: '600' },
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            color: '#2b2d42'
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                        titleFont: { size: 15, weight: 'bold' },
+                        bodyFont: { size: 14 },
+                        padding: 15,
+                        cornerRadius: 8,
+                        borderColor: '#ffc107',
+                        borderWidth: 2,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw.toLocaleString() + ' movimientos';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 13, weight: '600' },
+                            color: '#2b2d42'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: { size: 13, weight: '600' },
+                            color: '#2b2d42'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+      } catch (e) { console.error("Error al renderizar el Gráfico 8 (Tendencias Mes):", e); }
+
+      // ========== GRÁFICO 9: Productos con Mayor Rotación ==========
+      try {
+        const productosRotacionLabels = JSON.parse('<%= request.getAttribute("productosRotacionLabelsJson") != null ? request.getAttribute("productosRotacionLabelsJson") : "[]" %>');
+        const productosRotacionData = JSON.parse('<%= request.getAttribute("productosRotacionDataJson") != null ? request.getAttribute("productosRotacionDataJson") : "[]" %>');
+
+        const ctx9 = document.getElementById('productosRotacionChart').getContext('2d');
+        const gradientOrange = ctx9.createLinearGradient(0, 0, ctx9.canvas.width, 0);
+        gradientOrange.addColorStop(0, 'rgba(255, 193, 7, 0.9)');
+        gradientOrange.addColorStop(1, 'rgba(253, 126, 20, 0.9)');
+
+        new Chart(ctx9, {
+            type: 'bar',
+            data: {
+                labels: productosRotacionLabels,
+                datasets: [{
+                    label: 'Movimientos',
+                    data: productosRotacionData,
+                    backgroundColor: gradientOrange,
+                    borderColor: 'rgba(255, 193, 7, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    hoverBackgroundColor: 'rgba(255, 193, 7, 1)',
+                    hoverBorderWidth: 3
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(43, 45, 66, 0.95)',
+                        titleFont: { size: 15, weight: 'bold' },
+                        bodyFont: { size: 14 },
+                        padding: 15,
+                        cornerRadius: 8,
+                        borderColor: '#ffc107',
+                        borderWidth: 2,
+                        callbacks: {
+                            label: function(context) {
+                                return 'Movimientos: ' + context.raw.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false,
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            font: { size: 13, weight: '600' },
+                            color: '#2b2d42'
+                        }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 13, weight: '600' },
+                            color: '#2b2d42'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+      } catch (e) { console.error("Error al renderizar el Gráfico 9 (Productos Rotación):", e); }
 
     });
   </script>
