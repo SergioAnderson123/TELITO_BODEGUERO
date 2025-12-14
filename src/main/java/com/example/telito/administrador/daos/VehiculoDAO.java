@@ -6,19 +6,20 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de vehículos
 public class VehiculoDAO extends DAOBase {
 
-    // Listar todos los vehículos (compat) -> por defecto página 1, tamaño 10
+    // Listar todos (compatibilidad - página 1, tamaño 10)
     public ArrayList<Vehiculo> listarVehiculos() {
         return listarVehiculos(1, 10);
     }
 
-    // Listar vehículos con paginación
+    // Listar con paginación
     public ArrayList<Vehiculo> listarVehiculos(int page, int size) {
         return listarVehiculos(null, page, size);
     }
     
-    // Listar vehículos con filtros y paginación
+    // Listar con filtros y paginación
     public ArrayList<Vehiculo> listarVehiculos(String busqueda, int page, int size) {
         ArrayList<Vehiculo> lista = new ArrayList<>();
         String sql = "SELECT id_vehiculo, placa, marca, modelo, capacidad_kg FROM vehiculos WHERE 1=1";
@@ -69,12 +70,12 @@ public class VehiculoDAO extends DAOBase {
         return lista;
     }
 
-    // Contar vehículos para paginación
+    // Contar total (sin filtros)
     public int contarVehiculos() {
         return contarVehiculos(null);
     }
     
-    // Contar vehículos con filtros
+    // Contar con filtros
     public int contarVehiculos(String busqueda) {
         String sql = "SELECT COUNT(*) FROM vehiculos WHERE 1=1";
         

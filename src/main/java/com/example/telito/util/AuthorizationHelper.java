@@ -6,10 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Helper para verificar permisos y autorización de usuarios.
- * Centraliza la lógica de autorización del sistema.
- */
+// Helper para verificar permisos y autorización de usuarios
 public class AuthorizationHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthorizationHelper.class);
@@ -21,12 +18,7 @@ public class AuthorizationHelper {
     public static final int ROL_ALMACEN = 4;
     public static final int ROL_GERENTE_TIENDA = 7;
 
-    /**
-     * Obtiene el usuario actual de la sesión.
-     * 
-     * @param session Sesión HTTP
-     * @return Usuario de la sesión o null si no existe
-     */
+    // Obtiene el usuario actual de la sesión
     public static Usuario obtenerUsuarioActual(HttpSession session) {
         if (session == null) {
             return null;
@@ -34,12 +26,7 @@ public class AuthorizationHelper {
         return (Usuario) session.getAttribute("usuario");
     }
 
-    /**
-     * Verifica si el usuario actual tiene permisos de administrador.
-     * 
-     * @param session Sesión HTTP
-     * @return true si el usuario es administrador, false en caso contrario
-     */
+    // Verifica si el usuario es administrador
     public static boolean esAdministrador(HttpSession session) {
         Usuario usuario = obtenerUsuarioActual(session);
         if (usuario == null || usuario.getRol() == null) {
@@ -48,26 +35,12 @@ public class AuthorizationHelper {
         return usuario.getRol().getIdRol() == ROL_ADMINISTRADOR;
     }
 
-    /**
-     * Verifica si el usuario actual puede gestionar usuarios.
-     * Solo los administradores pueden gestionar usuarios.
-     * 
-     * @param session Sesión HTTP
-     * @return true si el usuario puede gestionar usuarios, false en caso contrario
-     */
+    // Verifica si el usuario puede gestionar usuarios (solo administradores)
     public static boolean puedeGestionarUsuarios(HttpSession session) {
         return esAdministrador(session);
     }
 
-    /**
-     * Verifica si el usuario puede editar un usuario específico.
-     * Un administrador puede editar cualquier usuario.
-     * Un usuario normal solo puede editar su propio perfil.
-     * 
-     * @param session Sesión HTTP
-     * @param idUsuarioAEditar ID del usuario que se desea editar
-     * @return true si el usuario puede editar, false en caso contrario
-     */
+    // Verifica si el usuario puede editar otro usuario (admin puede editar cualquiera, usuario solo su perfil)
     public static boolean puedeEditarUsuario(HttpSession session, int idUsuarioAEditar) {
         Usuario usuarioActual = obtenerUsuarioActual(session);
         
@@ -76,12 +49,12 @@ public class AuthorizationHelper {
             return false;
         }
 
-        // Si es administrador, puede editar cualquier usuario
+        // Admin puede editar cualquiera
         if (esAdministrador(session)) {
             return true;
         }
 
-        // Si no es administrador, solo puede editar su propio perfil
+        // Usuario normal solo puede editar su propio perfil
         boolean puedeEditar = usuarioActual.getIdUsuario() == idUsuarioAEditar;
         
         if (!puedeEditar) {
@@ -92,12 +65,8 @@ public class AuthorizationHelper {
         return puedeEditar;
     }
 
-    /**
-     * Verifica si el usuario puede eliminar/deshabilitar un usuario.
-     * Solo los administradores pueden deshabilitar usuarios.
-     * Un usuario no puede deshabilitarse a sí mismo.
-     * 
-     * @param session Sesión HTTP
+    // Verifica si el usuario puede eliminar/deshabilitar otro usuario (solo admin, no puede deshabilitarse a sí mismo)
+    // @param session Sesión HTTP
      * @param idUsuarioAEliminar ID del usuario que se desea eliminar
      * @return true si el usuario puede eliminar, false en caso contrario
      */
@@ -125,23 +94,12 @@ public class AuthorizationHelper {
         return true;
     }
 
-    /**
-     * Verifica si el usuario está autenticado.
-     * 
-     * @param session Sesión HTTP
-     * @return true si el usuario está autenticado, false en caso contrario
-     */
+    // Verifica si el usuario está autenticado
     public static boolean estaAutenticado(HttpSession session) {
         return obtenerUsuarioActual(session) != null;
     }
 
-    /**
-     * Verifica si el usuario tiene un rol específico.
-     * 
-     * @param session Sesión HTTP
-     * @param rolId ID del rol a verificar
-     * @return true si el usuario tiene el rol, false en caso contrario
-     */
+    // Verifica si el usuario tiene un rol específico
     public static boolean tieneRol(HttpSession session, int rolId) {
         Usuario usuario = obtenerUsuarioActual(session);
         if (usuario == null || usuario.getRol() == null) {
@@ -150,84 +108,43 @@ public class AuthorizationHelper {
         return usuario.getRol().getIdRol() == rolId;
     }
 
-    /**
-     * Verifica si el usuario actual tiene permisos de almacenero.
-     * 
-     * @param session Sesión HTTP
-     * @return true si el usuario es almacenero, false en caso contrario
-     */
+    // Verifica si el usuario es almacenero
     public static boolean esAlmacenero(HttpSession session) {
         return tieneRol(session, ROL_ALMACEN);
     }
 
-    /**
-     * Verifica si el usuario actual tiene permisos de logística.
-     * 
-     * @param session Sesión HTTP
-     * @return true si el usuario es de logística, false en caso contrario
-     */
+    // Verifica si el usuario es de logística
     public static boolean esLogistica(HttpSession session) {
         return tieneRol(session, ROL_LOGISTICA);
     }
 
-    /**
-     * Verifica si el usuario actual tiene permisos de productor.
-     * 
-     * @param session Sesión HTTP
-     * @return true si el usuario es productor, false en caso contrario
-     */
+    // Verifica si el usuario es productor
     public static boolean esProductor(HttpSession session) {
         return tieneRol(session, ROL_PRODUCTOR);
     }
     
-    /**
-     * Verifica si el usuario actual tiene permisos de gerente de tienda.
-     * 
-     * @param session Sesión HTTP
-     * @return true si el usuario es gerente de tienda, false en caso contrario
-     */
+    // Verifica si el usuario es gerente de tienda
     public static boolean esGerenteTienda(HttpSession session) {
         return tieneRol(session, ROL_GERENTE_TIENDA);
     }
 
-    /**
-     * Verifica si el usuario puede acceder al módulo de almacén.
-     * Solo los usuarios con rol de almacenero pueden acceder.
-     * 
-     * @param session Sesión HTTP
-     * @return true si el usuario puede acceder al módulo de almacén, false en caso contrario
-     */
+    // Verifica si el usuario puede acceder al módulo de almacén
     public static boolean puedeAccederAlmacen(HttpSession session) {
         return esAlmacenero(session);
     }
 
-    /**
-     * Verifica si el usuario puede acceder al módulo de logística.
-     * Solo los usuarios con rol de logística pueden acceder.
-     * 
-     * @param session Sesión HTTP
-     * @return true si el usuario puede acceder al módulo de logística, false en caso contrario
-     */
+    // Verifica si el usuario puede acceder al módulo de logística
     public static boolean puedeAccederLogistica(HttpSession session) {
         return esLogistica(session);
     }
 
-    /**
-     * Verifica si el usuario puede acceder al módulo de productor.
-     * Solo los usuarios con rol de productor pueden acceder.
-     * 
-     * @param session Sesión HTTP
-     * @return true si el usuario puede acceder al módulo de productor, false en caso contrario
-     */
+    // Verifica si el usuario puede acceder al módulo de productor
     public static boolean puedeAccederProductor(HttpSession session) {
         return esProductor(session);
     }
 
-    /**
-     * Verifica si el usuario puede acceder al módulo de administrador.
-     * Solo los usuarios con rol de administrador pueden acceder.
-     * 
-     * @param session Sesión HTTP
+    // Verifica si el usuario puede acceder al módulo de administrador
+    // @param session Sesión HTTP
      * @return true si el usuario puede acceder al módulo de administrador, false en caso contrario
      */
     public static boolean puedeAccederAdministrador(HttpSession session) {

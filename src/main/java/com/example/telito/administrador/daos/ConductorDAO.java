@@ -6,19 +6,20 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de conductores
 public class ConductorDAO extends DAOBase {
 
-    // Listar todos los conductores (compat) -> por defecto página 1, tamaño 10
+    // Listar todos (compatibilidad - página 1, tamaño 10)
     public ArrayList<Conductor> listarConductores() {
         return listarConductores(1, 10);
     }
 
-    // Listar conductores con paginación
+    // Listar con paginación
     public ArrayList<Conductor> listarConductores(int page, int size) {
         return listarConductores(null, page, size);
     }
     
-    // Listar conductores con filtros y paginación
+    // Listar con filtros y paginación
     public ArrayList<Conductor> listarConductores(String busqueda, int page, int size) {
         ArrayList<Conductor> lista = new ArrayList<>();
         String sql = "SELECT id_conductor, nombre_completo, licencia FROM conductores WHERE 1=1";
@@ -66,12 +67,12 @@ public class ConductorDAO extends DAOBase {
         return lista;
     }
 
-    // Contar conductores para paginación
+    // Contar total (sin filtros)
     public int contarConductores() {
         return contarConductores(null);
     }
     
-    // Contar conductores con filtros
+    // Contar con filtros
     public int contarConductores(String busqueda) {
         String sql = "SELECT COUNT(*) FROM conductores WHERE 1=1";
         

@@ -9,16 +9,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Esta clase se encarga de todas las operaciones relacionadas con
- * los lotes en la base de datos.
- */
+// DAO para gestión de lotes desde perspectiva del productor
 public class LoteDao extends DAOBase {
 
-    /**
-     * Genera un nuevo código de lote automático en formato L--0001, L--0002, etc.
-     * @return String con el nuevo código generado (ej: "L--0016")
-     */
+    // Genera código de lote automático en formato L--0001, L--0002, etc.
     public String generarNuevoCodigoLote() {
         String sql = "SELECT codigo_lote FROM lotes WHERE codigo_lote LIKE 'L--%' ORDER BY id_lote DESC LIMIT 1";
         
@@ -33,13 +27,13 @@ public class LoteDao extends DAOBase {
             
             if (rs.next()) {
                 String ultimoCodigo = rs.getString("codigo_lote");
-                // Extraer el número del código (ej: "L--0015" -> 15)
+                // Extraer número del código (ej: "L--0015" -> 15)
                 String numeroStr = ultimoCodigo.replaceAll("[^0-9]", "");
                 
                 if (!numeroStr.isEmpty()) {
                     int ultimoNumero = Integer.parseInt(numeroStr);
                     int nuevoNumero = ultimoNumero + 1;
-                    // Formatear con ceros a la izquierda (4 dígitos)
+                    // Formatear con 4 dígitos
                     return String.format("L--%04d", nuevoNumero);
                 }
             }
@@ -49,23 +43,17 @@ public class LoteDao extends DAOBase {
             
         } catch (SQLException e) {
             logger.error("Error al generar nuevo código de lote", e);
-            // En caso de error, generar código con timestamp
+            // Fallback: usar timestamp
             return "L--" + System.currentTimeMillis();
         } finally {
             closeResources(conn, pstmt, rs);
         }
     }
 
-    /**
-     * MÉTODO CORREGIDO
-     * Registra un nuevo lote creado por un productor.
-     * Asigna el estado 'No Registrado' por defecto.
-     * Ahora requiere los IDs de ubicación y distrito.
-     */
+    // Registra un nuevo lote creado por el productor (estado 'No Registrado' por defecto)
     public boolean registrarLote(String codigoLote, int productoId, int cantidadStock,
                                  String fechaCaducidad, int ubicacionId, int distritoId, Double costoProduccion) {
 
-        // Se añaden las columnas 'distrito_id', 'estado' y 'costo_produccion' al INSERT
         String sql = "INSERT INTO lotes (codigo_lote, producto_id, stock_actual, fecha_vencimiento, ubicacion_id, distrito_id, estado, costo_produccion) " +
                 "VALUES (?, ?, ?, ?, ?, ?, 'No Registrado', ?)";
 

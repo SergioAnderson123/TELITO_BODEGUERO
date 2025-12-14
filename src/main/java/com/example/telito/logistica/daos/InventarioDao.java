@@ -6,14 +6,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// DAO para gestión de inventario desde perspectiva de logística
 public class InventarioDao extends DAOBase {
 
-    // === MÉTODO MODIFICADO PARA MOSTRAR LOTES INDIVIDUALES (como Almacenero) ===
+    // Obtiene inventario por lotes individuales (como almacén) con cálculo de paquetes
     public ArrayList<InventarioBean> obtenerInventario(String busqueda, String estado, String lotes) {
         ArrayList<InventarioBean> listaInventario = new ArrayList<>();
 
-        // Consulta SQL igual que el Almacenero (por lote individual) + cálculo de paquetes
-        // IMPORTANTE: Solo mostrar lotes del almacén (con ubicacion_id asignada), no del productor
+        // Solo lotes del almacén (con ubicación asignada)
         String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, l.estado, " +
                      "p.nombre AS nombre_producto, p.codigo_sku AS codigo_sku, p.unidades_por_paquete, " +
                      "FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes_disponibles, " +
@@ -22,11 +22,11 @@ public class InventarioDao extends DAOBase {
                      "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                      "INNER JOIN ubicaciones u ON l.ubicacion_id = u.id_ubicacion " +
                      "WHERE l.estado = 'Registrado' " +
-                     "AND l.ubicacion_id IS NOT NULL "; // Solo lotes del almacén
+                     "AND l.ubicacion_id IS NOT NULL ";
 
         List<Object> params = new ArrayList<>();
 
-        // Filtro por búsqueda (SKU o Producto)
+        // Filtro por búsqueda (SKU o nombre de producto)
         if (busqueda != null && !busqueda.trim().isEmpty()) {
             sql += "AND (p.codigo_sku LIKE ? OR p.nombre LIKE ?) ";
             String busquedaParam = "%" + busqueda.trim() + "%";
@@ -34,7 +34,7 @@ public class InventarioDao extends DAOBase {
             params.add(busquedaParam);
         }
 
-        // Filtro por estado de stock (adaptado a stock_actual)
+        // Filtro por estado de stock
         if (estado != null && !estado.trim().isEmpty()) {
             if (estado.equals("En stock")) {
                 sql += "AND l.stock_actual > 0 ";

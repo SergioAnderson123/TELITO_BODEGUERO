@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+// Gestión de órdenes de compra - CRUD completo con filtros y paginación
 @WebServlet(name = "OrdenCompraServlet", value = "/orden-compra")
 public class OrdenCompraServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(OrdenCompraServlet.class.getName());
@@ -34,7 +35,7 @@ public class OrdenCompraServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de logística
+        // Solo logística
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederLogistica(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de logística intentó acceder a OrdenCompraServlet desde: " + 
@@ -56,14 +57,12 @@ public class OrdenCompraServlet extends HttpServlet {
 
         switch (action) {
             case "listar":
-                // === SECCIÓN MODIFICADA PARA MANEJAR FILTROS Y PAGINACIÓN ===
-
-                // 1. Leemos los parámetros del formulario de búsqueda
+                // Obtener parámetros de búsqueda
                 String busqueda = request.getParameter("busqueda");
                 String proveedorId = request.getParameter("proveedor");
                 String estado = request.getParameter("estado");
 
-                // 2. Parámetros de paginación
+                // Paginación
                 int page = 1;
                 int size = 5;
                 try { 
@@ -75,24 +74,24 @@ public class OrdenCompraServlet extends HttpServlet {
                 if (page < 1) page = 1;
                 if (size < 1) size = 5;
 
-                // 3. Obtenemos el total y calculamos páginas
+                // Calcular totales y páginas
                 int totalRows = ordenCompraDao.contarOrdenes(busqueda, proveedorId, estado);
                 int totalPages = (int) Math.ceil(totalRows / (double) size);
                 if (totalPages == 0) totalPages = 1;
                 if (page > totalPages) page = totalPages;
 
-                // 4. Obtenemos la lista de órdenes (ahora paginada)
+                // Obtener lista paginada
                 ArrayList<OrdenCompraBean> listaOrdenes = ordenCompraDao.obtenerOrdenes(busqueda, proveedorId, estado, page, size);
 
-                // 5. Calculamos estadísticas (sin filtros para obtener totales reales)
+                // Estadísticas generales (sin filtros)
                 int totalOrdenes = ordenCompraDao.contarOrdenes(null, null, null);
                 int ordenesPendientes = ordenCompraDao.contarOrdenes(null, null, "Pendiente");
                 int ordenesAprobadas = ordenCompraDao.contarOrdenes(null, null, "Aprobado");
 
-                // 6. Obtenemos la lista de proveedores (productores) para el menú del filtro
+                // Cargar proveedores para filtro
                 request.setAttribute("listaProveedores", proveedorDao.listarProductores());
 
-                // 7. Enviamos datos a la vista
+                // Pasar datos a la vista
                 request.setAttribute("listaOrdenes", listaOrdenes);
                 request.setAttribute("busqueda", busqueda);
                 request.setAttribute("proveedorFiltro", proveedorId);

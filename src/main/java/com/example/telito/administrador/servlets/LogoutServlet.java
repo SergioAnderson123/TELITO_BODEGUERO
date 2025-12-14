@@ -11,19 +11,19 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+// Maneja el cierre de sesión
 @WebServlet(name = "LogoutServlet", value = "/LogoutServlet")
 public class LogoutServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Invalidar la sesión
         HttpSession session = request.getSession(false);
         if (session != null) {
-            // Obtener el usuario de la sesión antes de invalidarla
+            // Obtener usuario antes de invalidar
             Usuario usuario = (Usuario) session.getAttribute("usuario");
             
             if (usuario != null) {
-                // Eliminar sesión del registro de SecurityManager
+                // Limpiar registro de sesión activa
                 String sessionId = session.getId();
                 SecurityManager.eliminarSesion(usuario.getIdUsuario(), sessionId);
                 System.out.println("✓ Logout: Usuario ID " + usuario.getIdUsuario() + " cerró sesión");
@@ -32,7 +32,6 @@ public class LogoutServlet extends HttpServlet {
             session.invalidate();
         }
         
-        // Redirigir al login
         response.sendRedirect(request.getContextPath() + "/acceso/login");
     }
 

@@ -14,12 +14,13 @@ import com.example.telito.logistica.daos.InventarioDao;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// Gestión de inventario desde perspectiva de logística (agrupado por producto)
 @WebServlet(name = "InventarioServlet", value = "/InventarioServlet")
 public class InventarioServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) throws IOException, ServletException {
-        // Verificar que el usuario tenga rol de logística
+        // Solo logística
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederLogistica(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de logística intentó acceder a InventarioServlet desde: " + 
@@ -35,7 +36,7 @@ public class InventarioServlet extends HttpServlet {
         String busqueda = request.getParameter("busqueda");
         String estado = request.getParameter("estado");
 
-        // Parámetros de paginación
+        // Paginación
         int page = 1;
         int size = 5;
         try { 
@@ -47,7 +48,7 @@ public class InventarioServlet extends HttpServlet {
         if (page < 1) page = 1;
         if (size < 1) size = 5;
 
-        // Obtener datos agrupados por producto desde el DAO
+        // Obtener inventario agrupado por producto
         InventarioDao inventarioDao = new InventarioDao();
         int totalRows = inventarioDao.contarInventarioAgrupado(busqueda, estado);
         int totalPages = (int) Math.ceil(totalRows / (double) size);
@@ -56,7 +57,7 @@ public class InventarioServlet extends HttpServlet {
         
         ArrayList<InventarioBean> listaInventario = inventarioDao.obtenerInventarioAgrupado(busqueda, estado, page, size);
 
-        // Enviar datos a la JSP
+        // Pasar datos a la vista
         request.setAttribute("listaInventario", listaInventario);
         request.setAttribute("busqueda", busqueda);
         request.setAttribute("estadoFiltro", estado);
@@ -67,7 +68,6 @@ public class InventarioServlet extends HttpServlet {
         request.setAttribute("baseUrl", request.getContextPath() + "/InventarioServlet");
         request.setAttribute("itemName", "productos");
 
-        // Forward a la JSP
         String vista = "/logistica/Inventario/inventario.jsp";
         RequestDispatcher rd = request.getRequestDispatcher(vista);
         rd.forward(request, response);
@@ -75,8 +75,7 @@ public class InventarioServlet extends HttpServlet {
 
     public void doPost(HttpServletRequest request,
                        HttpServletResponse response) throws IOException, ServletException {
-        // Por ahora solo manejamos GET para mostrar datos
-        // POST se puede implementar después para actualizar stock o agregar lotes
+        // Redirigir a GET por ahora
         doGet(request, response);
     }
 }

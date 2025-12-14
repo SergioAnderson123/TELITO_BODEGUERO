@@ -21,23 +21,19 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+// Gestión de planes de transporte - CRUD completo con filtros y paginación
 @WebServlet(name = "PlanTransporteServlet", value = "/planes-transporte")
 public class PlanTransporteServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
         super.init();
-        System.out.println("=== PlanTransporteServlet INICIALIZADO ===");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("=== DEBUG PlanTransporteServlet - INICIO doGet ===");
-        System.out.println("URL: " + request.getRequestURL());
-        System.out.println("Query String: " + request.getQueryString());
-        
-        // Verificar que el usuario tenga rol de logística
+        // Solo logística
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederLogistica(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de logística intentó acceder a PlanTransporteServlet desde: " + 
@@ -47,13 +43,10 @@ public class PlanTransporteServlet extends HttpServlet {
             return;
         }
 
-        System.out.println("✓ Usuario autorizado, continuando...");
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action") == null ? "listar" : request.getParameter("action");
-        System.out.println("=== DEBUG PlanTransporteServlet ===");
-        System.out.println("Action recibida: " + action);
 
         PlanTransporteDao planTransporteDao = new PlanTransporteDao();
         LoteDao loteDao = new LoteDao();
@@ -64,7 +57,7 @@ public class PlanTransporteServlet extends HttpServlet {
 
         switch (action) {
             case "listar":
-                System.out.println("✓ Entrando en case 'listar'");
+                // Obtener parámetros de búsqueda
                 String busqueda = request.getParameter("busqueda");
                 String conductorId = request.getParameter("conductor");
                 String estado = request.getParameter("estado");
@@ -84,14 +77,14 @@ public class PlanTransporteServlet extends HttpServlet {
                 if (totalPages == 0) totalPages = 1;
                 if (page > totalPages) page = totalPages;
 
-                // Calcular estadísticas (sin filtros para obtener totales reales)
+                // Estadísticas generales (sin filtros)
                 int totalPlanes = planTransporteDao.contarPlanes(null, null, null, null, null);
                 int planesEnRuta = planTransporteDao.contarPlanes(null, null, "En Ruta", null, null);
                 int planesEntregados = planTransporteDao.contarPlanes(null, null, "Entregado", null, null);
 
                 ArrayList<PlanTransporteBean> listaPlanes = planTransporteDao.listarPlanesDeTransporte(busqueda, conductorId, estado, fechaDesde, fechaHasta, page, size);
 
-                // Cargar datos para el modal de Agregar Plan y filtros
+                // Cargar datos para modales y filtros
                 request.setAttribute("listaConductores", conductorDao.listarConductores());
                 request.setAttribute("listaPlanes", listaPlanes);
                 request.setAttribute("listaLotes", loteDao.listarLotesDisponibles());

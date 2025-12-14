@@ -2,9 +2,7 @@ package com.example.telito.administrador.beans;
 
 import java.sql.Timestamp;
 
-/**
- * Bean para representar una configuración del sistema.
- */
+// Bean para configuraciones del sistema (clave-valor)
 public class ConfiguracionSistema {
     
     private int idConfig;
@@ -18,7 +16,6 @@ public class ConfiguracionSistema {
     private Timestamp fechaActualizacion;
     private Integer usuarioActualizacion;
     
-    // Constructores
     public ConfiguracionSistema() {
     }
     
@@ -31,7 +28,6 @@ public class ConfiguracionSistema {
         this.editable = true;
     }
     
-    // Getters y Setters
     public int getIdConfig() {
         return idConfig;
     }

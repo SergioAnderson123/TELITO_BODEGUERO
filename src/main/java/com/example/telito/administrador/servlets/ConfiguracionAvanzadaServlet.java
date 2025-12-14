@@ -16,13 +16,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+// Gestión de configuraciones avanzadas del sistema
 @WebServlet(name = "ConfiguracionAvanzadaServlet", value = "/ConfiguracionAvanzadaServlet")
 public class ConfiguracionAvanzadaServlet extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de administrador
+        // Solo administradores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a ConfiguracionAvanzadaServlet desde: " + 
@@ -46,7 +47,7 @@ public class ConfiguracionAvanzadaServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de administrador
+        // Solo administradores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a ConfiguracionAvanzadaServlet (POST) desde: " + 
@@ -62,10 +63,10 @@ public class ConfiguracionAvanzadaServlet extends HttpServlet {
         String action = request.getParameter("action");
         
         if ("actualizar".equals(action)) {
-            // Obtener todas las configuraciones del formulario
+            // Recopilar todas las configuraciones del formulario
             Map<String, String> configuraciones = new HashMap<>();
             
-            // Configuraciones de Email
+            // Configuraciones de email
             String emailHost = request.getParameter("email.smtp.host");
             String emailPort = request.getParameter("email.smtp.port");
             String emailFrom = request.getParameter("email.from");

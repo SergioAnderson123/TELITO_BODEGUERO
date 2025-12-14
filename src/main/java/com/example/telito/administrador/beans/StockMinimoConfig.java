@@ -2,19 +2,19 @@ package com.example.telito.administrador.beans;
 
 import java.sql.Timestamp;
 
+// Bean para configuración de stock mínimo por producto
 public class StockMinimoConfig {
 
     private int idStockMinimo;
     private Producto producto;
-    private int stockMinimoProducto;  // Stock mínimo para evaluación por producto (Logística)
-    private int stockCriticoProducto; // Stock crítico para evaluación por producto (Logística)
-    private int stockMinimoLote;      // Stock mínimo para evaluación por lote (Almacén)
-    private int stockCriticoLote;     // Stock crítico para evaluación por lote (Almacén)
+    private int stockMinimoProducto;  // Mínimo por producto (Logística)
+    private int stockCriticoProducto; // Crítico por producto (Logística)
+    private int stockMinimoLote;      // Mínimo por lote (Almacén)
+    private int stockCriticoLote;     // Crítico por lote (Almacén)
     private boolean activo;
     private Timestamp fechaCreacion;
     private Timestamp fechaActualizacion;
 
-    // Constructores
     public StockMinimoConfig() {}
 
     public StockMinimoConfig(Producto producto, int stockMinimoProducto, int stockCriticoProducto, 
@@ -27,7 +27,6 @@ public class StockMinimoConfig {
         this.activo = true;
     }
 
-    // Getters y Setters
     public int getIdStockMinimo() {
         return idStockMinimo;
     }

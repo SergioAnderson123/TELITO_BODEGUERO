@@ -6,8 +6,10 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de distritos
 public class DistritoDao extends DAOBase {
 
+    // Lista todos los distritos ordenados por nombre
     public ArrayList<DistritoBean> listarDistritos() {
         ArrayList<DistritoBean> lista = new ArrayList<>();
         String sql = "SELECT idDistrito, nombre FROM distritos ORDER BY nombre ASC";
@@ -36,7 +38,7 @@ public class DistritoDao extends DAOBase {
         return lista;
     }
     
-    // Listar distritos por zona
+    // Lista distritos filtrados por zona
     public ArrayList<DistritoBean> listarDistritosPorZona(int zonaId) {
         ArrayList<DistritoBean> lista = new ArrayList<>();
         String sql = "SELECT idDistrito, nombre FROM distritos WHERE zona_id = ? ORDER BY nombre ASC";

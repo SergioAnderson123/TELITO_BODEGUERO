@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+// Exportación de reportes de movimientos de inventario a Excel
 @WebServlet(name = "MovimientoReporteServlet", value = "/almacen/MovimientoReporteServlet")
 public class MovimientoReporteServlet extends HttpServlet {
 
@@ -27,7 +28,7 @@ public class MovimientoReporteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que el usuario tenga rol de almacenero
+        // Solo almaceneros
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a MovimientoReporteServlet desde: " + 

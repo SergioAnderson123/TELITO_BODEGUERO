@@ -13,6 +13,7 @@ public class PlanTransporte {
     private String nombreDestino;
     private int stockDisponible;
     private int paquetesDisponibles;
+    private java.sql.Timestamp fechaCreacion;
 
     // Constructor vacío
     public PlanTransporte() {
@@ -113,6 +114,14 @@ public class PlanTransporte {
 
     public void setPaquetesDisponibles(int paquetesDisponibles) {
         this.paquetesDisponibles = paquetesDisponibles;
+    }
+
+    public java.sql.Timestamp getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(java.sql.Timestamp fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
     }
 }
 

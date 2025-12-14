@@ -16,6 +16,7 @@ import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 
+// Gestión del perfil de usuario - todos los roles pueden acceder
 @WebServlet(name = "PerfilServlet", value = "/perfil")
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024,    // 1 MB
@@ -28,7 +29,7 @@ public class PerfilServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         
-        // Verificar que el usuario esté autenticado (todos los roles pueden acceder a su perfil)
+        // Cualquier usuario autenticado puede ver su perfil
         if (session == null || session.getAttribute("usuario") == null) {
             response.sendRedirect(request.getContextPath() + "/acceso/login");
             return;
@@ -52,13 +53,13 @@ public class PerfilServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         
-        // Verificar que el usuario esté autenticado (todos los roles pueden actualizar su perfil)
+        // Cualquier usuario autenticado puede actualizar su perfil
         if (session == null || session.getAttribute("usuario") == null) {
             response.sendRedirect(request.getContextPath() + "/acceso/login");
             return;
         }
 
-        // Manejar solicitud de limpiar referer
+        // Limpiar referer si se solicita (para navegación)
         String clearReferer = request.getParameter("clearReferer");
         if ("true".equals(clearReferer)) {
             session.removeAttribute("perfilReferer");
@@ -68,12 +69,12 @@ public class PerfilServlet extends HttpServlet {
 
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         
-        // Obtener los datos del formulario
+        // Obtener datos del formulario
         String nombres = request.getParameter("nombres");
         String apellidos = request.getParameter("apellidos");
         String fotoPerfilUrl = request.getParameter("fotoPerfil");
         
-        // Validaciones básicas
+        // Validar campos obligatorios
         if (nombres == null || nombres.trim().isEmpty() || 
             apellidos == null || apellidos.trim().isEmpty()) {
             request.setAttribute("error", "Los nombres y apellidos son obligatorios");
@@ -88,16 +89,15 @@ public class PerfilServlet extends HttpServlet {
             Part filePart = request.getPart("fotoPerfilArchivo");
             
             if (filePart != null && filePart.getSize() > 0) {
-                // Se subió un archivo local
                 String uploadPath = getServletContext().getRealPath("/");
                 
-                // Eliminar foto anterior si existe y no es URL externa
+                // Eliminar foto anterior si no es URL externa
                 String fotoAnterior = usuario.getFotoPerfil();
                 if (fotoAnterior != null && !fotoAnterior.startsWith("http")) {
                     FileUploadUtil.deleteProfilePhoto(fotoAnterior, uploadPath);
                 }
                 
-                // Guardar el nuevo archivo
+                // Guardar nueva foto
                 fotoPerfil = FileUploadUtil.saveProfilePhoto(filePart, uploadPath);
                 
             } else if (fotoPerfilUrl != null && !fotoPerfilUrl.trim().isEmpty()) {

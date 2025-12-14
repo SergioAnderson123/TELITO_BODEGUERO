@@ -15,10 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Scheduler que ejecuta alertas automáticas de forma programada.
- * Ejecuta alertas diariamente a las 8:00 AM.
- */
+// Scheduler que ejecuta alertas automáticas diariamente a las 8:00 AM
 @WebListener
 public class AlertaScheduler implements ServletContextListener {
 
@@ -36,7 +33,7 @@ public class AlertaScheduler implements ServletContextListener {
         // Calcular delay inicial hasta las 8:00 AM
         long delayInicial = calcularDelayInicial();
         
-        // Ejecutar la primera vez después del delay inicial
+        // Ejecutar primera vez después del delay inicial
         scheduler.schedule(new TareaAlertas(), delayInicial, TimeUnit.MILLISECONDS);
         
         // Luego ejecutar cada 24 horas
@@ -59,9 +56,7 @@ public class AlertaScheduler implements ServletContextListener {
         }
     }
 
-    /**
-     * Calcula el delay inicial hasta la próxima ejecución programada (8:00 AM)
-     */
+    // Calcula delay inicial hasta la próxima ejecución programada (8:00 AM)
     private long calcularDelayInicial() {
         java.util.Calendar ahora = java.util.Calendar.getInstance();
         java.util.Calendar proximaEjecucion = java.util.Calendar.getInstance();

@@ -6,8 +6,10 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de vehículos desde perspectiva de logística
 public class VehiculoDao extends DAOBase {
 
+    // Lista todos los vehículos ordenados por placa
     public ArrayList<VehiculoBean> listarVehiculos() {
         ArrayList<VehiculoBean> lista = new ArrayList<>();
         String sql = "SELECT id_vehiculo, placa FROM vehiculos ORDER BY placa ASC";

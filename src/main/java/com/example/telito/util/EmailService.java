@@ -8,20 +8,7 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Properties;
 
-/**
- * Servicio mejorado para el envío de correos electrónicos.
- * 
- * MEJORAS SOBRE TELITO_RRHH:
- * - Templates HTML más profesionales y modernos
- * - Diseño responsive
- * - Mejor organización del código
- * - Soporte para múltiples tipos de email
- * - Logging detallado
- * - Manejo de errores mejorado
- * 
- * @author Telito Bodeguero
- * @version 2.0
- */
+// Servicio mejorado para envío de correos (templates HTML profesionales y responsive)
 public class EmailService {
     
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
@@ -39,9 +26,7 @@ public class EmailService {
         loadEmailConfig();
     }
     
-    /**
-     * Carga la configuración de email desde email.properties.
-     */
+    // Carga configuración de email desde email.properties
     private static void loadEmailConfig() {
         try {
             java.io.InputStream input = EmailService.class.getClassLoader()
@@ -64,15 +49,7 @@ public class EmailService {
         }
     }
     
-    /**
-     * Envía un correo de activación de cuenta.
-     * 
-     * @param destinatario Email del destinatario
-     * @param nombreUsuario Nombre del usuario
-     * @param tokenActivacion Token de activación
-     * @param contextPath Context path de la aplicación
-     * @return true si se envió correctamente
-     */
+    // Envía correo de activación de cuenta
     public static boolean enviarCorreoActivacion(String destinatario, String nombreUsuario, 
                                                  String tokenActivacion, String contextPath) {
         // Usar APPLICATION_BASE_URL del archivo de propiedades (siempre se carga)
@@ -97,15 +74,7 @@ public class EmailService {
         return enviarCorreo(destinatario, asunto, htmlContent);
     }
     
-    /**
-     * Envía un correo de recuperación de contraseña.
-     * 
-     * @param destinatario Email del destinatario
-     * @param nombreUsuario Nombre del usuario
-     * @param tokenRecuperacion Token de recuperación
-     * @param contextPath Context path de la aplicación
-     * @return true si se envió correctamente
-     */
+    // Envía correo de recuperación de contraseña
     public static boolean enviarCorreoRecuperacion(String destinatario, String nombreUsuario, 
                                                    String tokenRecuperacion, String contextPath) {
         // Usar APPLICATION_BASE_URL del archivo de propiedades (siempre se carga)
@@ -130,14 +99,7 @@ public class EmailService {
         return enviarCorreo(destinatario, asunto, htmlContent);
     }
     
-    /**
-     * Envía un correo genérico.
-     * 
-     * @param destinatario Email del destinatario
-     * @param asunto Asunto del correo
-     * @param contenidoHTML Contenido HTML del correo
-     * @return true si se envió correctamente
-     */
+    // Envía correo genérico (HTML)
     public static boolean enviarCorreo(String destinatario, String asunto, String contenidoHTML) {
         if (EMAIL_FROM == null || EMAIL_FROM.isEmpty() || 
             EMAIL_PASSWORD == null || EMAIL_PASSWORD.isEmpty()) {
@@ -183,9 +145,7 @@ public class EmailService {
         }
     }
     
-    /**
-     * Genera el template HTML para activación de cuenta.
-     */
+    // Genera template HTML para activación de cuenta
     private static String generarTemplateActivacion(String nombreUsuario, String linkActivacion, String tokenBackup) {
         return "<!DOCTYPE html>" +
                "<html lang='es'>" +

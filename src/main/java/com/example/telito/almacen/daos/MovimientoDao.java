@@ -5,12 +5,15 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de movimientos de inventario
 public class MovimientoDao extends DAOBase {
 
+    // Contar total sin filtros
     public int contarTotalMovimientos() {
         return contarTotalMovimientos(null, null, null);
     }
     
+    // Contar con filtros de búsqueda, tipo de movimiento y usuario
     public int contarTotalMovimientos(String busqueda, String tipoMovimiento, String filtroUsuario) {
         String sql = "SELECT COUNT(*) FROM movimientos_inventario m " +
                 "INNER JOIN lotes l ON (m.lote_id = l.id_lote) " +
@@ -63,16 +66,12 @@ public class MovimientoDao extends DAOBase {
         return 0;
     }
 
-    /**
-     * Cuenta movimientos de tipo 'Entrada'
-     */
+    // Contar movimientos de tipo Entrada
     public int contarMovimientosEntrada(String busqueda) {
         return contarTotalMovimientos(busqueda, "Entrada", null);
     }
 
-    /**
-     * Cuenta movimientos de tipo 'Salida'
-     */
+    // Contar movimientos de tipo Salida
     public int contarMovimientosSalida(String busqueda) {
         return contarTotalMovimientos(busqueda, "Salida", null);
     }

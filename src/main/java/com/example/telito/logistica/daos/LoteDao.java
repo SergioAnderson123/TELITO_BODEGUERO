@@ -6,11 +6,13 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de lotes desde perspectiva de logística
 public class LoteDao extends DAOBase {
 
+    // Lista lotes disponibles del almacén (con ubicación asignada y stock > 0)
     public ArrayList<LoteBean> listarLotesDisponibles() {
         ArrayList<LoteBean> lista = new ArrayList<>();
-        // Solo listar lotes del almacén (con ubicacion_id asignada), no del productor
+        // Solo lotes del almacén, no del productor
         String sql = """
             SELECT l.id_lote, l.codigo_lote, p.nombre AS nombre_producto, l.stock_actual, l.estado, l.ubicacion_id
             FROM lotes l
@@ -46,10 +48,9 @@ public class LoteDao extends DAOBase {
             }
             logger.info("Total de lotes disponibles encontrados: {}", count);
             
-            // Si no se encontraron lotes, hacer un log de depuración
+            // Log de depuración si no hay lotes
             if (count == 0) {
                 logger.warn("⚠️ No se encontraron lotes disponibles. Verificando lotes en la BD...");
-                // Hacer una consulta de depuración para ver qué lotes hay
                 String sqlDebug = "SELECT l.id_lote, l.codigo_lote, p.nombre AS nombre_producto, " +
                                  "l.stock_actual, l.estado, l.ubicacion_id " +
                                  "FROM lotes l " +

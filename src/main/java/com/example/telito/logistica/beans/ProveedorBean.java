@@ -1,5 +1,6 @@
 package com.example.telito.logistica.beans;
 
+// Bean para representar un proveedor (productor)
 public class ProveedorBean {
     private int id;
     private String nombre;

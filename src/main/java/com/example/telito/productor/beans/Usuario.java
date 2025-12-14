@@ -1,5 +1,6 @@
 package com.example.telito.productor.beans;
 
+// Bean para representar un usuario (versión simplificada para productor)
 public class Usuario {
 
     private int idUsuario;

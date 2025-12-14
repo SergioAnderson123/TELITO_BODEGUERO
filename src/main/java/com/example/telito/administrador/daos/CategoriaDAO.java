@@ -6,9 +6,10 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de categorías
 public class CategoriaDAO extends DAOBase {
 
-    // Listar todas las categorías
+    // Lista todas las categorías ordenadas por nombre
     public ArrayList<Categoria> listarCategorias() {
         ArrayList<Categoria> lista = new ArrayList<>();
         String sql = "SELECT * FROM categorias ORDER BY nombre";

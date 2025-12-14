@@ -1,5 +1,6 @@
 package com.example.telito.productor.beans;
 
+// Bean para representar un rol de usuario
 public class Rol {
 
     private int idRol;

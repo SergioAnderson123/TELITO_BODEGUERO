@@ -11,9 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import com.example.telito.util.DatabaseConnection;
 
-/**
- * Evaluador especializado para alertas de vencimiento de productos.
- */
+// Evalúa alertas de vencimiento de productos por fecha de caducidad
 public class VencimientoAlertaEvaluator {
     
     private final LoteDao loteDao;
@@ -22,14 +20,12 @@ public class VencimientoAlertaEvaluator {
         this.loteDao = loteDao;
     }
     
-    /**
-     * Evalúa las alertas de vencimiento según la regla configurada.
-     */
+    // Evalúa alertas de vencimiento según la regla configurada
     public List<AlertaService.AlertaGenerada> evaluarVencimientos(AlertaConfig regla, Map<String, Object> config) {
         List<AlertaService.AlertaGenerada> alertas = new ArrayList<>();
         
         try {
-            // Obtener todos los lotes registrados con fecha de vencimiento
+            // Obtener todos los lotes registrados
             ArrayList<Lote> lotes = loteDao.listarLotesRegistrados(1);
             
             // Obtener umbrales de días desde la configuración o la regla
@@ -44,7 +40,7 @@ public class VencimientoAlertaEvaluator {
             
             for (Lote lote : lotes) {
                 if (lote.getFechaVencimiento() == null) {
-                    continue; // Lote sin fecha de vencimiento
+                    continue; // Saltar lotes sin fecha
                 }
                 
                 Calendar fechaVencimiento = Calendar.getInstance();

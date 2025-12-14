@@ -6,23 +6,12 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-/**
- * Helper para manejar transacciones de base de datos de forma explícita.
- * Proporciona métodos para iniciar, confirmar y revertir transacciones.
- */
+// Helper para manejar transacciones de base de datos (commit/rollback automático)
 public class TransactionHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionHelper.class);
 
-    /**
-     * Ejecuta una operación dentro de una transacción.
-     * Si la operación lanza una excepción, se hace rollback automáticamente.
-     * 
-     * @param operation Operación a ejecutar dentro de la transacción
-     * @param <T> Tipo de retorno de la operación
-     * @return Resultado de la operación
-     * @throws SQLException Si ocurre un error en la transacción
-     */
+    // Ejecuta operación dentro de una transacción (rollback automático si hay error)
     public static <T> T executeInTransaction(TransactionOperation<T> operation) throws SQLException {
         Connection conn = null;
         boolean originalAutoCommit = true;
@@ -73,12 +62,7 @@ public class TransactionHelper {
         }
     }
 
-    /**
-     * Ejecuta una operación que no retorna valor dentro de una transacción.
-     * 
-     * @param operation Operación a ejecutar
-     * @throws SQLException Si ocurre un error en la transacción
-     */
+    // Ejecuta operación sin retorno dentro de una transacción
     public static void executeInTransactionVoid(TransactionOperationVoid operation) throws SQLException {
         executeInTransaction(conn -> {
             operation.execute(conn);
@@ -86,17 +70,13 @@ public class TransactionHelper {
         });
     }
 
-    /**
-     * Interfaz funcional para operaciones que retornan un valor.
-     */
+    // Interfaz funcional para operaciones que retornan un valor
     @FunctionalInterface
     public interface TransactionOperation<T> {
         T execute(Connection conn) throws SQLException;
     }
 
-    /**
-     * Interfaz funcional para operaciones que no retornan valor.
-     */
+    // Interfaz funcional para operaciones que no retornan valor
     @FunctionalInterface
     public interface TransactionOperationVoid {
         void execute(Connection conn) throws SQLException;

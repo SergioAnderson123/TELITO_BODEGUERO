@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+// Exportación de reportes de lotes a Excel
 @WebServlet(name = "LoteReporteServlet", value = "/almacen/LoteReporteServlet")
 public class LoteReporteServlet extends HttpServlet {
 
@@ -27,7 +28,7 @@ public class LoteReporteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que el usuario tenga rol de almacenero
+        // Solo almaceneros
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a LoteReporteServlet desde: " + 

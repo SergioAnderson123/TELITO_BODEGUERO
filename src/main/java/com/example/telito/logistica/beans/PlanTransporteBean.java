@@ -1,5 +1,6 @@
 package com.example.telito.logistica.beans;
 
+// Bean para representar un plan de transporte
 public class PlanTransporteBean {
 
     private String numeroViaje;
@@ -8,16 +9,14 @@ public class PlanTransporteBean {
     private String estado;
     private String nombreConductor;
     private String placaVehiculo;
-    private String fechaEntrega; // Usamos String para la fecha ya formateada
-    private String fechaSalida; // Fecha de salida para reportes
+    private String fechaEntrega; // Fecha formateada como String
+    private String fechaSalida; // Para reportes
     private String nombreDestino;
-    private int cantidadLotes; // Cantidad de lotes por viaje
+    private int cantidadLotes; // Cantidad de lotes en el viaje
 
-    // Constructor vacío
     public PlanTransporteBean() {
     }
 
-    // Constructor completo
     public PlanTransporteBean(String numeroViaje, String nombreProducto, String codigoLote, String estado, String nombreConductor, String placaVehiculo, String fechaEntrega, String nombreDestino) {
         this.numeroViaje = numeroViaje;
         this.nombreProducto = nombreProducto;
@@ -29,7 +28,6 @@ public class PlanTransporteBean {
         this.nombreDestino = nombreDestino;
     }
 
-    // Getters y Setters
     public String getNumeroViaje() {
         return numeroViaje;
     }

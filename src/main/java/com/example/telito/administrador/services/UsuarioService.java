@@ -13,10 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import jakarta.servlet.http.HttpServletRequest;
 
-/**
- * Servicio para manejar la lógica de negocio relacionada con usuarios.
- * Extrae la lógica del servlet para mejorar la separación de responsabilidades.
- */
+// Lógica de negocio para usuarios - separada del servlet
 public class UsuarioService {
 
     private static final Logger logger = LoggerFactory.getLogger(UsuarioService.class);
@@ -26,22 +23,14 @@ public class UsuarioService {
         this.usuarioDAO = new UsuarioDAO();
     }
 
-    /**
-     * Crea un nuevo usuario o reactiva uno inactivo si existe.
-     * 
-     * @param usuarioNuevo Usuario a crear
-     * @param passwordOriginal Contraseña original antes de encriptar
-     * @param contextPath Context path de la aplicación para los emails
-     * @param request HttpServletRequest para obtener IP y User Agent (puede ser null)
-     * @return Resultado de la operación con el usuario creado/reactivado
-     */
+    // Crea un nuevo usuario o reactiva uno inactivo si existe
     public ResultadoCreacionUsuario crearOReactivarUsuario(Usuario usuarioNuevo, String passwordOriginal, String contextPath, HttpServletRequest request) {
         String email = usuarioNuevo.getEmail();
         boolean creado = false;
         Usuario usuarioFinal = null;
 
         try {
-            // Verificar si existe un usuario inactivo con ese email para reactivarlo
+            // Buscar usuario inactivo con ese email para reactivarlo
             int idUsuarioInactivo = usuarioDAO.obtenerIdUsuarioPorEmail(email);
             
             if (idUsuarioInactivo > 0) {
@@ -49,17 +38,17 @@ public class UsuarioService {
                 Usuario usuarioExistente = usuarioDAO.obtenerUsuarioPorId(idUsuarioInactivo);
                 
                 if (usuarioExistente != null && !usuarioExistente.isActivo()) {
-                    // Asegurar que el email esté asignado correctamente
+                    // Asegurar que el email esté asignado
                     if (usuarioExistente.getEmail() == null || usuarioExistente.getEmail().trim().isEmpty()) {
                         usuarioExistente.setEmail(email);
                     }
                     
-                    // Actualizar datos del usuario existente
+                    // Actualizar datos y reactivar
                     usuarioExistente.setNombres(usuarioNuevo.getNombres());
                     usuarioExistente.setApellidos(usuarioNuevo.getApellidos());
                     usuarioExistente.setPassword(usuarioNuevo.getPassword());
                     usuarioExistente.setRol(usuarioNuevo.getRol());
-                    usuarioExistente.setActivo(true); // Reactivar
+                    usuarioExistente.setActivo(true);
                     
                     creado = usuarioDAO.actualizarUsuarioConPassword(usuarioExistente);
                     
@@ -75,7 +64,7 @@ public class UsuarioService {
             }
             
             if (!creado) {
-                // No existe usuario inactivo, crear uno nuevo
+                // Crear usuario nuevo
                 creado = usuarioDAO.crearUsuario(usuarioNuevo);
                 if (creado) {
                     usuarioFinal = usuarioNuevo;
@@ -83,10 +72,9 @@ public class UsuarioService {
             }
             
             if (creado && usuarioFinal != null) {
-                // Obtener el usuario completo de la base de datos para tener el ID correcto
+                // Obtener usuario completo de la BD para tener el ID correcto
                 Usuario usuarioCompleto = usuarioDAO.obtenerUsuarioPorEmail(usuarioFinal.getEmail());
                 if (usuarioCompleto == null) {
-                    // Si no se encuentra, usar el que acabamos de crear
                     usuarioCompleto = usuarioFinal;
                 }
                 

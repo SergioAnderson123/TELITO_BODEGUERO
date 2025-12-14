@@ -22,14 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * Servlet para gestionar usuarios.
- * Refactorizado para mejorar la separación de responsabilidades:
- * - Usa UsuarioService para la lógica de negocio
- * - Usa UsuarioValidator para las validaciones
- * - Usa AuthorizationHelper para permisos
- * - Usa logging profesional (SLF4J)
- */
+// Gestión de usuarios: CRUD completo con validaciones y permisos
 @WebServlet(name = "UsuarioServlet", value = "/UsuarioServlet")
 public class UsuarioServlet extends HttpServlet {
 
@@ -67,6 +60,7 @@ public class UsuarioServlet extends HttpServlet {
                 break;
 
             case "formCrear":
+                // Verificar permisos específicos para crear usuarios
                 if (!AuthorizationHelper.puedeGestionarUsuarios(session)) {
                     logger.warn("Intento de acceder a formulario de creación sin permisos");
                     session.setAttribute("errorMsg", "No tienes permisos para crear usuarios.");
@@ -126,38 +120,36 @@ public class UsuarioServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Lista usuarios con paginación, filtros y ordenamiento.
-     */
+    // Lista usuarios con paginación, filtros y ordenamiento
     private void listarUsuarios(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
         try {
-            // Recoger parámetros de filtros
-                String busqueda = request.getParameter("busqueda");
-                String rolId = request.getParameter("rol");
-                String estado = request.getParameter("estado");
-                // Normalizar: si estado es cadena vacía, tratarlo como null (Todos)
-                if (estado != null && estado.trim().isEmpty()) {
-                    estado = null;
-                }
-                String sortBy = request.getParameter("sortBy");
-                String sortOrder = request.getParameter("sortOrder");
+            // Obtener parámetros de filtros
+            String busqueda = request.getParameter("busqueda");
+            String rolId = request.getParameter("rol");
+            String estado = request.getParameter("estado");
+            // Si estado está vacío, tratarlo como null (mostrar todos)
+            if (estado != null && estado.trim().isEmpty()) {
+                estado = null;
+            }
+            String sortBy = request.getParameter("sortBy");
+            String sortOrder = request.getParameter("sortOrder");
             
-                // Paginación - máximo 5 usuarios por página
+            // Paginación - máximo 5 por página
             int page = parseInteger(request.getParameter("page"), 1);
             int size = parseInteger(request.getParameter("size"), 5);
-                if (page < 1) page = 1;
-                if (size < 1) size = 5;
-                if (size > 5) size = 5; // Limitar máximo a 5
+            if (page < 1) page = 1;
+            if (size < 1) size = 5;
+            if (size > 5) size = 5; // Límite máximo
 
-            // Obtener datos
-                int totalRows = usuarioDAO.contarUsuarios(busqueda, rolId, estado);
-                int totalPages = (int) Math.ceil(totalRows / (double) size);
-                if (totalPages == 0) totalPages = 1;
-                if (page > totalPages) page = totalPages;
+            // Calcular paginación
+            int totalRows = usuarioDAO.contarUsuarios(busqueda, rolId, estado);
+            int totalPages = (int) Math.ceil(totalRows / (double) size);
+            if (totalPages == 0) totalPages = 1;
+            if (page > totalPages) page = totalPages;
             
-            // Calcular estadísticas (sin filtros para obtener totales reales)
+            // Estadísticas generales (sin filtros)
                 int totalUsuarios = 0;
                 int usuariosActivos = 0;
                 int usuariosInactivos = 0;
@@ -183,18 +175,18 @@ public class UsuarioServlet extends HttpServlet {
                     logger.error("Error al contar usuarios inactivos", e);
                 }
                 
-                // Log para depuración
-                logger.info("Estadísticas de usuarios - Total: {}, Activos: {}, Inactivos: {}", 
-                    totalUsuarios, usuariosActivos, usuariosInactivos);
+            logger.info("Estadísticas de usuarios - Total: {}, Activos: {}, Inactivos: {}", 
+                totalUsuarios, usuariosActivos, usuariosInactivos);
             
+            // Obtener lista paginada
             ArrayList<Usuario> listaUsuarios = usuarioDAO.listarUsuarios(
                 busqueda, rolId, estado, sortBy, sortOrder, page, size);
 
-            // Cargar distritos para el select de Gerente de Tienda
+            // Cargar distritos para el formulario (necesario para Gerente de Tienda)
             DistritoDao distritoDao = new DistritoDao();
             request.setAttribute("distritos", distritoDao.listar());
             
-            // Establecer atributos en el request
+            // Pasar datos a la vista
                 request.setAttribute("lista", listaUsuarios);
                 request.setAttribute("busqueda", busqueda);
                 request.setAttribute("rolFiltro", rolId);
@@ -207,10 +199,10 @@ public class UsuarioServlet extends HttpServlet {
                 request.setAttribute("totalRows", totalRows);
                 request.setAttribute("totalUsuarios", totalUsuarios);
                 request.setAttribute("usuariosActivos", usuariosActivos);
-                request.setAttribute("usuariosInactivos", usuariosInactivos);
-                
-                // Atributos para componente de paginación reutilizable
-                request.setAttribute("baseUrl", request.getContextPath() + "/UsuarioServlet");
+            request.setAttribute("usuariosInactivos", usuariosInactivos);
+            
+            // Parámetros para el componente de paginación
+            request.setAttribute("baseUrl", request.getContextPath() + "/UsuarioServlet");
                 request.setAttribute("param1Name", "action");
                 request.setAttribute("param1Value", "listar");
                 request.setAttribute("param2Name", "busqueda");

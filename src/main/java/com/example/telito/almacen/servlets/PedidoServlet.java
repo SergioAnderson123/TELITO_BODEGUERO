@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+// Gestión de pedidos y planes de transporte para salidas del almacén
 @WebServlet("/almacen/PedidoServlet")
 public class PedidoServlet extends HttpServlet {
 
@@ -28,7 +29,7 @@ public class PedidoServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que el usuario tenga rol de almacenero
+        // Solo almaceneros
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a PedidoServlet desde: " + 
@@ -38,7 +39,6 @@ public class PedidoServlet extends HttpServlet {
             return;
         }
 
-        // --- TU MÉTODO doGet ESTÁ PERFECTO, NO NECESITA CAMBIOS ---
         String action = request.getParameter("action") == null ? "lista" : request.getParameter("action");
         PedidoDao pedidoDao = new PedidoDao();
         RequestDispatcher view;
@@ -48,7 +48,7 @@ public class PedidoServlet extends HttpServlet {
                 try {
                     int registrosPorPagina = 5;
                     
-                    // Paginación para PEDIDOS
+                    // Paginación para pedidos
                     String pageStr = request.getParameter("page");
                     int paginaActual = 1;
                     try {
@@ -60,7 +60,7 @@ public class PedidoServlet extends HttpServlet {
                     }
                     if (paginaActual < 1) paginaActual = 1;
 
-                    // Parámetros de filtros
+                    // Filtros
                     String busqueda = request.getParameter("busqueda");
                     String estado = request.getParameter("estado");
 
@@ -69,16 +69,23 @@ public class PedidoServlet extends HttpServlet {
                     if (totalPaginas == 0) totalPaginas = 1;
                     if (paginaActual > totalPaginas) paginaActual = totalPaginas;
                     
-                    // Calcular estadísticas (sin filtros para obtener totales reales)
+                    PlanTransporteDao planTransporteDao = new PlanTransporteDao();
+                    
+                    // Estadísticas generales (sin filtros)
                     int totalPedidos = pedidoDao.contarTotalPedidos();
                     int pedidosPendientes = pedidoDao.contarPedidosPendientes();
                     int pedidosDespachados = pedidoDao.contarPedidosDespachados();
                     
+                    // Contar planes despachados (estado "Salida")
+                    int planesDespachados = planTransporteDao.contarPlanesDespachados();
+                    
+                    // Total despachados = pedidos + planes
+                    int totalDespachados = pedidosDespachados + planesDespachados;
+                    
                     int offset = (paginaActual - 1) * registrosPorPagina;
                     ArrayList<Pedido> listaPaginada = pedidoDao.listarPedidosPaginados(offset, registrosPorPagina, busqueda, estado);
 
-                    // Paginación para PLANES DE TRANSPORTE
-                    PlanTransporteDao planTransporteDao = new PlanTransporteDao();
+                    // Paginación para planes de transporte
                     String pagePlanesStr = request.getParameter("pagePlanes");
                     int paginaPlanes = 1;
                     try {
@@ -119,7 +126,7 @@ public class PedidoServlet extends HttpServlet {
                     // Estadísticas
                     request.setAttribute("totalPedidos", totalPedidos);
                     request.setAttribute("pedidosPendientes", pedidosPendientes);
-                    request.setAttribute("pedidosDespachados", pedidosDespachados);
+                    request.setAttribute("pedidosDespachados", totalDespachados); // Incluye pedidos + planes despachados
                     
                     // Filtros
                     request.setAttribute("busqueda", busqueda);
@@ -358,6 +365,15 @@ public class PedidoServlet extends HttpServlet {
             if (lote != null && lote.getStockActual() > 0) {
                 // Todo el stock del lote se considera para el plan de transporte
                 int cantidadADespachar = lote.getStockActual();
+                
+                // Validación adicional: asegurar que el stock es positivo
+                if (cantidadADespachar <= 0) {
+                    request.setAttribute("error", "El lote no tiene stock disponible para despachar.");
+                    request.setAttribute("plan", plan);
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("/almacen/pedidos/prepararPlanTransporte.jsp");
+                    dispatcher.forward(request, response);
+                    return;
+                }
 
                 // 1. Descontar todo el stock del lote (dejar en 0)
                 loteDao.actualizarStock(plan.getIdLote(), 0);

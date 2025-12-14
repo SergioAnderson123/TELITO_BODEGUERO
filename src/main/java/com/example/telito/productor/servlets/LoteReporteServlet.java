@@ -19,19 +19,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+// Exportación de reportes de lotes a Excel
 @WebServlet(name = "ProductorLoteReporteServlet", value = "/productor/LoteReporteServlet")
 public class LoteReporteServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
         super.init();
-        System.out.println("=== LoteReporteServlet inicializado correctamente ===");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de productor
+        // Solo productores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederProductor(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de productor intentó acceder a LoteReporteServlet desde: " + 
@@ -41,7 +41,6 @@ public class LoteReporteServlet extends HttpServlet {
             return;
         }
 
-        System.out.println("=== LoteReporteServlet.doGet() llamado ===");
         String action = request.getParameter("action");
         if (action == null) {
             action = "exportar";

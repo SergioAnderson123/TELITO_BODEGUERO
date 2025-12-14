@@ -3,13 +3,7 @@ package com.example.telito.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Plantillas HTML profesionales para correos electrónicos del sistema.
- * Diseño moderno, responsive y con identidad visual turquesa.
- * 
- * @author Telito Bodeguero
- * @version 2.0
- */
+// Plantillas HTML profesionales para correos (diseño moderno, responsive, identidad visual turquesa)
 public class EmailTemplates {
     
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -24,9 +18,7 @@ public class EmailTemplates {
     private static final String COLOR_WARNING = "#ffc107";
     private static final String COLOR_DANGER = "#dc3545";
     
-    /**
-     * Template base HTML con diseño responsive y moderno.
-     */
+    // Template base HTML con diseño responsive y moderno
     private static String getBaseTemplate(String headerColor, String headerIcon, String headerTitle, 
                                          String content, String footerNote) {
         return """

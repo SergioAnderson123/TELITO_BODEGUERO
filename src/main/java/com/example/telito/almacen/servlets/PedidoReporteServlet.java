@@ -1,7 +1,9 @@
 package com.example.telito.almacen.servlets;
 
 import com.example.telito.almacen.beans.Pedido;
+import com.example.telito.almacen.beans.PlanTransporte;
 import com.example.telito.almacen.daos.PedidoDao;
+import com.example.telito.almacen.daos.PlanTransporteDao;
 import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.ExcelUtil;
 import com.example.telito.util.EmailUtil;
@@ -20,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+// Exportación de reportes de pedidos y planes de transporte a Excel
 @WebServlet(name = "PedidoReporteServlet", value = "/almacen/PedidoReporteServlet")
 public class PedidoReporteServlet extends HttpServlet {
 
@@ -27,7 +30,7 @@ public class PedidoReporteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que el usuario tenga rol de almacenero
+        // Solo almaceneros
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a PedidoReporteServlet desde: " + 
@@ -55,7 +58,7 @@ public class PedidoReporteServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que el usuario tenga rol de almacenero
+        // Solo almaceneros
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a PedidoReporteServlet (POST) desde: " + 
@@ -76,12 +79,24 @@ public class PedidoReporteServlet extends HttpServlet {
     private void exportarExcel(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        PedidoDao pedidoDao = new PedidoDao();
+        try {
+            PedidoDao pedidoDao = new PedidoDao();
+            PlanTransporteDao planTransporteDao = new PlanTransporteDao();
 
-        // Obtener todos los pedidos sin paginación
-        ArrayList<Pedido> listaPedidos = pedidoDao.listarTodosLosPedidos();
+            // Obtener todos los pedidos sin paginación
+            ArrayList<Pedido> listaPedidos = pedidoDao.listarTodosLosPedidos();
+            
+            // Obtener todos los planes de transporte despachados (estado "Salida")
+            ArrayList<PlanTransporte> listaPlanesDespachados = planTransporteDao.listarTodosPlanesDespachados();
+            
+            System.out.println("📊 Total de pedidos obtenidos para Excel: " + listaPedidos.size());
+            System.out.println("📊 Total de planes de transporte despachados obtenidos para Excel: " + listaPlanesDespachados.size());
+            
+            if (listaPedidos.isEmpty() && listaPlanesDespachados.isEmpty()) {
+                System.out.println("⚠️ ADVERTENCIA: No se encontraron pedidos ni planes de transporte despachados en la base de datos. El Excel estará vacío.");
+            }
 
-        String filtrosInfo = "Todos los pedidos de salida";
+            String filtrosInfo = "Todos los pedidos y planes de transporte de salida";
 
         String fecha = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String nombreArchivo = "Reporte_Pedidos_Salida_Almacen_" + fecha + ".xlsx";
@@ -90,14 +105,24 @@ public class PedidoReporteServlet extends HttpServlet {
         response.setHeader("Content-Disposition", "attachment; filename=\"" + nombreArchivo + "\"");
         response.setCharacterEncoding("UTF-8");
 
-        try (OutputStream out = response.getOutputStream()) {
-            ExcelUtil.generarExcelPedidos(listaPedidos, out, filtrosInfo);
-            out.flush();
+            try (OutputStream out = response.getOutputStream()) {
+                ExcelUtil.generarExcelPedidosYPlanes(listaPedidos, listaPlanesDespachados, out, filtrosInfo);
+                out.flush();
+            } catch (Exception e) {
+                System.err.println("Error al generar Excel de pedidos y planes: " + e.getMessage());
+                e.printStackTrace();
+                if (!response.isCommitted()) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        "Error al generar el archivo Excel: " + e.getMessage());
+                }
+            }
         } catch (Exception e) {
-            System.err.println("Error al generar Excel de pedidos: " + e.getMessage());
+            System.err.println("Error en exportarExcel: " + e.getMessage());
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                "Error al generar el archivo Excel: " + e.getMessage());
+            if (!response.isCommitted()) {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Error al procesar la solicitud: " + e.getMessage());
+            }
         }
     }
 
@@ -142,8 +167,13 @@ public class PedidoReporteServlet extends HttpServlet {
             String nombreArchivo = "Reporte_Pedidos_Salida_Almacen_" + fecha + ".xlsx";
             tempFile = new File(tempDirFile, nombreArchivo);
 
+            // Obtener también los planes de transporte despachados
+            PlanTransporteDao planTransporteDao = new PlanTransporteDao();
+            ArrayList<com.example.telito.almacen.beans.PlanTransporte> listaPlanesDespachados = 
+                planTransporteDao.listarTodosPlanesDespachados();
+
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-                ExcelUtil.generarExcelPedidos(listaPedidos, fos, filtrosInfo);
+                ExcelUtil.generarExcelPedidosYPlanes(listaPedidos, listaPlanesDespachados, fos, filtrosInfo);
                 fos.flush();
             }
 

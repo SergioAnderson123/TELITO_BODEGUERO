@@ -11,10 +11,7 @@ import com.example.telito.administrador.daos.ProductoDAO;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Servicio unificado para la gestión de alertas del sistema.
- * Centraliza toda la lógica de evaluación, generación y gestión de alertas.
- */
+// Servicio unificado para gestión de alertas - evalúa reglas y genera alertas
 public class AlertaService {
     
     private final AlertaDAO alertaDAO;
@@ -35,14 +32,11 @@ public class AlertaService {
         this.configManager = new AlertaConfigManager();
     }
     
-    /**
-     * Evalúa todas las reglas de alerta activas y genera las alertas correspondientes.
-     * @return Lista de alertas generadas
-     */
+    // Evalúa todas las reglas activas y genera alertas
     public List<AlertaGenerada> evaluarTodasLasAlertas() {
         List<AlertaGenerada> alertasGeneradas = new ArrayList<>();
         
-        // Obtener todas las reglas activas
+        // Obtener solo reglas activas
         List<AlertaConfig> reglasActivas = alertaDAO.listarTodasAlertas()
             .stream()
             .filter(AlertaConfig::isActivo)
@@ -61,9 +55,7 @@ public class AlertaService {
         return alertasGeneradas;
     }
     
-    /**
-     * Evalúa una regla de alerta específica.
-     */
+    // Evalúa una regla específica según su tipo
     private List<AlertaGenerada> evaluarRegla(AlertaConfig regla) {
         List<AlertaGenerada> alertas = new ArrayList<>();
         String tipoAlerta = regla.getTipoAlerta();

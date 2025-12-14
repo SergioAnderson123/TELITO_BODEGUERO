@@ -14,12 +14,14 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+// Maneja el login y logout del sistema
 @WebServlet(name = "LoginServlet", value = "/acceso/login")
 public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
+        // Si viene el parámetro logout, invalidar sesión y redirigir
         if ("logout".equals(action)) {
             HttpSession session = request.getSession(false);
             if (session != null) {
@@ -27,10 +29,11 @@ public class LoginServlet extends HttpServlet {
                 Usuario usuario = (Usuario) session.getAttribute("usuario");
                 if (usuario != null) {
                     String sessionId = session.getId();
+                    // Limpiar registro de sesión activa
                     SecurityManager.eliminarSesion(usuario.getIdUsuario(), sessionId);
                     System.out.println("✓ Logout: Usuario ID " + usuario.getIdUsuario() + " cerró sesión");
                     
-                    // Registrar logout en auditoría
+                    // Guardar en auditoría antes de invalidar
                     AuditoriaService.registrarAccion(
                         usuario,
                         AuditoriaService.ACCION_LOGOUT,
@@ -45,29 +48,26 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // Verificar si hay sesión activa en ESTA petición (NO redirigir automáticamente desde login)
-        // Si el usuario quiere acceder a otras páginas, el AuthFilter se encargará de validar
-        // Pero desde la página de login, SIEMPRE debe mostrar el formulario de login
+        // Si ya hay sesión activa y válida, redirigir al módulo correspondiente
+        // Si no, mostrar el formulario de login
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("usuario") != null) {
             Usuario usuario = (Usuario) session.getAttribute("usuario");
             
-            // Si hay una sesión válida Y está autorizada en SecurityManager
             if (usuario != null && usuario.isActivo()) {
                 String sessionId = session.getId();
-                // Verificar que la sesión esté autorizada (registrada en SecurityManager)
+                // Verificar que la sesión esté registrada en SecurityManager
                 if (SecurityManager.sesionAutorizada(usuario.getIdUsuario(), sessionId)) {
-                    // Sesión válida y autorizada, redirigir al módulo correspondiente
                     redirigirSegunRol(request, response, usuario.getRol().getNombre());
                     return;
                 } else {
-                    // Sesión no autorizada (posible ventana incógnita o sesión inválida)
+                    // Sesión no autorizada, posible ventana incógnita
                     System.err.println("🚨 SEGURIDAD: Sesión no autorizada detectada en login - Usuario ID " + 
                                      usuario.getIdUsuario() + ", Sesión: " + sessionId);
                     session.invalidate();
                 }
             } else {
-                // Usuario inactivo o nulo, invalidar sesión
+                // Usuario inactivo, limpiar todo
                 if (usuario != null) {
                     SecurityManager.eliminarSesion(usuario.getIdUsuario(), session.getId());
                 }
@@ -75,10 +75,7 @@ public class LoginServlet extends HttpServlet {
             }
         }
         
-        // Si llegamos aquí, NO hay sesión válida o no está autorizada - MOSTRAR LOGIN
-
-        // No hay sesión activa o fue invalidada, mostrar login
-        // Generar token CSRF para el formulario de login
+        // Mostrar formulario de login con token CSRF
         HttpSession nuevaSession = request.getSession(true);
         String csrfToken = SecurityManager.generarTokenCSRF(nuevaSession);
         request.setAttribute("csrfToken", csrfToken);
@@ -93,20 +90,18 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         String csrfToken = request.getParameter("csrfToken");
 
-        // ========== VALIDACIONES DE SEGURIDAD ==========
-        
-        // 1. Validar campos vacíos
+        // Validaciones de seguridad antes de autenticar
+        // Campos vacíos
         if (emailOUsuario == null || emailOUsuario.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             request.setAttribute("errorMsg", "Por favor, complete todos los campos.");
             generarTokenYMostrarLogin(request, response);
             return;
         }
         
-        // 2. Validar token CSRF
-        // IMPORTANTE: Primero intentar obtener la sesión existente sin crear una nueva
+        // Validar token CSRF - obtener sesión sin crear una nueva
         HttpSession sessionActual = request.getSession(false);
         
-        // Si no hay sesión, significa que expiró - regenerar formulario con nuevo token
+        // Si no hay sesión, expiró - mostrar login de nuevo
         if (sessionActual == null) {
             System.err.println("⚠ SEGURIDAD: Sesión expiró antes del login desde: " + request.getRemoteAddr());
             request.setAttribute("errorMsg", "Su sesión ha expirado. Por favor, intente nuevamente.");
@@ -114,7 +109,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-        // Validar que el token CSRF coincida con el de la sesión
+        // Verificar que el token CSRF sea válido
         if (!SecurityManager.validarTokenCSRF(sessionActual, csrfToken)) {
             System.err.println("🚨 SEGURIDAD: Token CSRF inválido desde: " + request.getRemoteAddr() + 
                              " - Token recibido: [" + (csrfToken != null ? csrfToken : "null") + 
@@ -124,7 +119,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-        // 3. Verificar si la cuenta está bloqueada por múltiples intentos fallidos
+        // Verificar bloqueo por intentos fallidos
         if (SecurityManager.estaBloqueada(emailOUsuario)) {
             int minutosRestantes = SecurityManager.obtenerTiempoBloqueoRestante(emailOUsuario);
             System.err.println("🚨 SEGURIDAD: Intento de login con cuenta bloqueada: " + emailOUsuario);
@@ -135,26 +130,21 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-        // ========== INTENTO DE AUTENTICACIÓN ==========
-        
+        // Intentar autenticar usuario
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         Usuario usuario = usuarioDAO.autenticarUsuario(emailOUsuario.trim(), password.trim());
 
         if (usuario != null && usuario.isActivo()) {
-            // ========== VALIDAR ACTIVACIÓN DE CUENTA ==========
-            // Solo validar activación si la cuenta fue creada después de implementar el sistema de activación
-            // Si cuenta_activada es false pero el usuario es antiguo (sin fecha_activacion), permitir login
+            // Validar activación de cuenta
+            // Usuarios antiguos (sin fecha_activacion) se activan automáticamente
             if (!usuario.isCuentaActivada()) {
-                // Verificar si es un usuario antiguo (creado antes del sistema de activación)
-                // Si fecha_activacion es NULL, es un usuario antiguo y se permite el login
                 java.sql.Timestamp fechaActivacion = usuario.getFechaActivacion();
                 if (fechaActivacion == null) {
-                    // Usuario antiguo sin fecha_activacion - activar automáticamente y permitir login
+                    // Usuario antiguo, activar automáticamente
                     System.out.println("ℹ Usuario antiguo detectado - activando cuenta automáticamente: " + usuario.getEmail());
                     usuarioDAO.actualizarEstadoActivacion(usuario.getIdUsuario(), true);
-                    // Continuar con el login normalmente
                 } else {
-                    // Usuario nuevo con fecha_activacion pero cuenta no activada - bloquear
+                    // Usuario nuevo sin activar, bloquear login
                     System.err.println("⚠ SEGURIDAD: Intento de login con cuenta no activada - Usuario ID " + 
                                      usuario.getIdUsuario() + " desde " + request.getRemoteAddr());
                     
@@ -166,12 +156,10 @@ public class LoginServlet extends HttpServlet {
                 }
             }
             
-            // ========== LOGIN EXITOSO ==========
-            
-            // Resetear intentos fallidos
+            // Login exitoso - configurar sesión
             SecurityManager.resetearIntentosFallidos(emailOUsuario);
             
-            // Invalidar cualquier sesión anterior del mismo navegador si existe
+            // Invalidar sesión anterior si existe
             if (sessionActual != null) {
                 sessionActual.invalidate();
             }
@@ -180,15 +168,12 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession(true);
             String sessionId = session.getId();
             
-            // Verificar si el usuario ya tiene otra sesión activa
+            // Verificar si ya hay otra sesión activa (evitar múltiples sesiones)
             if (SecurityManager.tieneOtraSesionActiva(usuario.getIdUsuario(), sessionId)) {
-                // Ya existe otra sesión activa para este usuario - RECHAZAR EL LOGIN
                 System.err.println("🚨 SEGURIDAD: Intento de login con sesión activa existente - Usuario ID " + 
                                  usuario.getIdUsuario() + " desde " + request.getRemoteAddr());
                 
-                // Invalidar la sesión que acabamos de crear
                 session.invalidate();
-                
                 request.setAttribute("errorMsg", 
                     "Ya existe una sesión activa para este usuario en otro navegador o ventana. " +
                     "Por favor, cierre la otra sesión primero desde el menú de usuario, o espere a que expire (30 minutos de inactividad).");
@@ -196,10 +181,10 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
             
-            // Configurar timeout de sesión (30 minutos de inactividad)
+            // Timeout de 30 minutos de inactividad
             session.setMaxInactiveInterval(30 * 60);
             
-            // Guardar información de seguridad en sesión
+            // Guardar datos en sesión
             session.setAttribute("usuario", usuario);
             session.setAttribute("usuarioNombre", usuario.getNombres() + " " + usuario.getApellidos());
             session.setAttribute("usuarioRol", usuario.getRol().getNombre());
@@ -209,11 +194,11 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("userAgent", request.getHeader("User-Agent"));
             session.setAttribute("ultimaActividad", System.currentTimeMillis());
             
-            // Registrar sesión en SecurityManager (previene múltiples sesiones)
+            // Registrar sesión en SecurityManager
             boolean sesionRegistrada = SecurityManager.registrarSesion(usuario.getIdUsuario(), sessionId);
             
             if (!sesionRegistrada) {
-                // Este caso no debería ocurrir porque ya verificamos arriba, pero por seguridad...
+                // No debería pasar, pero por seguridad...
                 System.err.println("🚨 SEGURIDAD: Error al registrar sesión - Usuario ID " + usuario.getIdUsuario());
                 session.invalidate();
                 request.setAttribute("errorMsg", 
@@ -222,13 +207,13 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
             
-            // Generar nuevo token CSRF para la sesión activa
+            // Generar token CSRF para esta sesión
             SecurityManager.generarTokenCSRF(session);
             
             System.out.println("✓ Login exitoso: Usuario ID " + usuario.getIdUsuario() + 
                              " (" + usuario.getEmail() + ") desde " + request.getRemoteAddr());
             
-            // Registrar login exitoso en auditoría
+            // Registrar en auditoría
             AuditoriaService.registrarAccion(
                 usuario,
                 AuditoriaService.ACCION_LOGIN,
@@ -239,9 +224,7 @@ public class LoginServlet extends HttpServlet {
             
             redirigirSegunRol(request, response, usuario.getRol().getNombre());
         } else {
-            // ========== LOGIN FALLIDO ==========
-            
-            // Registrar intento fallido
+            // Login fallido - registrar intento y mostrar error
             SecurityManager.registrarIntentoFallido(emailOUsuario);
             
             int intentosRestantes = SecurityManager.obtenerIntentosRestantes(emailOUsuario);
@@ -258,7 +241,7 @@ public class LoginServlet extends HttpServlet {
             System.err.println("⚠ SEGURIDAD: Intento de login fallido para: " + emailOUsuario + 
                              " desde " + request.getRemoteAddr());
             
-            // Registrar intento de login fallido en auditoría (sin usuario, ya que no se autenticó)
+            // Registrar en auditoría (sin usuario porque no se autenticó)
             AuditoriaService.registrarAccion(
                 null, // Usuario no autenticado
                 AuditoriaService.ACCION_LOGIN,
@@ -276,9 +259,7 @@ public class LoginServlet extends HttpServlet {
         }
     }
     
-    /**
-     * Genera un token CSRF y muestra la página de login.
-     */
+    // Genera token CSRF y muestra el formulario de login
     private void generarTokenYMostrarLogin(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         HttpSession session = request.getSession(true);
@@ -289,6 +270,7 @@ public class LoginServlet extends HttpServlet {
         view.forward(request, response);
     }
 
+    // Redirige al dashboard según el rol del usuario
     private void redirigirSegunRol(HttpServletRequest request, HttpServletResponse response, String rolNombre) throws IOException {
         String contextPath = request.getContextPath();
 

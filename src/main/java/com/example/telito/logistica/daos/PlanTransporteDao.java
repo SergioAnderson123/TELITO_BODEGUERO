@@ -7,14 +7,15 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// DAO para gestión de planes de transporte
 public class PlanTransporteDao extends DAOBase {
 
-    // Método sin paginación para compatibilidad
+    // Listar todas (compatibilidad - sin paginación)
     public ArrayList<PlanTransporteBean> listarPlanesDeTransporte(String busqueda, String conductorId, String estado, String fechaDesde, String fechaHasta) {
         return listarPlanesDeTransporte(busqueda, conductorId, estado, fechaDesde, fechaHasta, 1, Integer.MAX_VALUE);
     }
 
-    // Método con paginación
+    // Listar con filtros y paginación
     public ArrayList<PlanTransporteBean> listarPlanesDeTransporte(String busqueda, String conductorId, String estado, String fechaDesde, String fechaHasta, int page, int size) {
         ArrayList<PlanTransporteBean> listaPlanes = new ArrayList<>();
         String sql = """
@@ -69,7 +70,7 @@ public class PlanTransporteDao extends DAOBase {
                 pstmt.setObject(paramIndex++, param);
             }
             
-            // Parámetros de paginación
+            // Aplicar paginación
             int limit = Math.max(1, size);
             int offset = Math.max(0, (Math.max(1, page) - 1) * size);
             pstmt.setInt(paramIndex++, limit);

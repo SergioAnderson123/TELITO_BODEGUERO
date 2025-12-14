@@ -19,19 +19,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+// Exportación de reportes de órdenes de compra a Excel
 @WebServlet(name = "ProductorOrdenCompraReporteServlet", value = "/productor/OrdenCompraReporteServlet")
 public class OrdenCompraReporteServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
         super.init();
-        System.out.println("=== OrdenCompraReporteServlet inicializado correctamente ===");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de productor
+        // Solo productores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederProductor(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de productor intentó acceder a OrdenCompraReporteServlet desde: " + 
@@ -41,9 +41,7 @@ public class OrdenCompraReporteServlet extends HttpServlet {
             return;
         }
 
-        System.out.println("=== OrdenCompraReporteServlet.doGet() llamado ===");
         String action = request.getParameter("action");
-        System.out.println("Action recibido: " + action);
         
         if (action == null) {
             action = "exportar";
@@ -51,11 +49,9 @@ public class OrdenCompraReporteServlet extends HttpServlet {
 
         switch (action) {
             case "exportar":
-                System.out.println("Ejecutando exportarExcel...");
                 exportarExcel(request, response);
                 break;
             case "formEnviar":
-                System.out.println("Ejecutando mostrarFormularioEnvio...");
                 mostrarFormularioEnvio(request, response);
                 break;
             default:

@@ -1,11 +1,10 @@
 package com.example.telito.administrador.beans;
 
+// Bean para representar una categoría de producto
 public class Categoria {
 
     private int idCategoria;
     private String nombre;
-
-    // Getters y Setters
 
     public int getIdCategoria() {
         return idCategoria;

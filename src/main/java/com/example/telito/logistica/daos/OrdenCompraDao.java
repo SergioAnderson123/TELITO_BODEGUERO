@@ -6,14 +6,15 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// DAO para gestión de órdenes de compra
 public class OrdenCompraDao extends DAOBase {
 
-    // === MÉTODO MODIFICADO PARA ACEPTAR FILTROS (sin paginación, para compatibilidad) ===
+    // Listar todas (compatibilidad - sin paginación)
     public ArrayList<OrdenCompraBean> obtenerOrdenes(String busqueda, String proveedorId, String estado) {
         return obtenerOrdenes(busqueda, proveedorId, estado, 1, Integer.MAX_VALUE);
     }
 
-    // === MÉTODO CON PAGINACIÓN PARA OBTENER ÓRDENES DE COMPRA ===
+    // Listar con filtros y paginación
     public ArrayList<OrdenCompraBean> obtenerOrdenes(String busqueda, String proveedorId, String estado, int page, int size) {
 
         ArrayList<OrdenCompraBean> listaOrdenes = new ArrayList<>();
@@ -60,7 +61,7 @@ public class OrdenCompraDao extends DAOBase {
 
         sql += ") AS ordenes_filtradas WHERE 1=1";
         
-        // Filtrar por el estado calculado (no el original)
+        // Filtrar por estado calculado (no el original de BD)
         if (estado != null && !estado.trim().isEmpty()) {
             sql += " AND estado = ?";
             params.add(estado.trim());

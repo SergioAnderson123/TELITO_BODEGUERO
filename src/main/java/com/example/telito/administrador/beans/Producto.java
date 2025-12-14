@@ -1,5 +1,6 @@
 package com.example.telito.administrador.beans;
 
+// Bean para representar un producto
 public class Producto {
 
     private int idProducto;
@@ -9,15 +10,13 @@ public class Producto {
     private double precioActual;
     private int stockMinimo;
     private int stock;
-    private int unidadesPorPaquete; // <-- AÑADIDO
-    private int productorId;      // <-- AÑADIDO
-    private int categoriaId;      // <-- AÑADIDO
-    private String categoriaNombre; // <-- AÑADIDO
-    private boolean activo;       // <-- AÑADIDO
-    private int numeroLotes;      // <-- AÑADIDO para mostrar cantidad de lotes
-    private Categoria categoria;  // <-- AÑADIDO objeto Categoria completo
-
-    // Getters y Setters
+    private int unidadesPorPaquete;
+    private int productorId;
+    private int categoriaId;
+    private String categoriaNombre;
+    private boolean activo;
+    private int numeroLotes; // Cantidad de lotes asociados
+    private Categoria categoria;
 
     public int getIdProducto() {
         return idProducto;

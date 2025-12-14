@@ -12,13 +12,14 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+// Visualización de registros de auditoría con filtros
 @WebServlet(name = "AuditoriaServlet", value = "/AuditoriaServlet")
 public class AuditoriaServlet extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de administrador
+        // Solo administradores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a AuditoriaServlet desde: " + 
@@ -55,12 +56,12 @@ public class AuditoriaServlet extends HttpServlet {
         }
         if (size < 1) size = 5;
         
-        // Obtener registros de auditoría
+        // Obtener registros paginados
         var listaAuditoria = auditoriaDAO.listarAuditoria(
             usuarioId, accion, modulo, estado, fechaDesde, fechaHasta, page, size
         );
         
-        // Contar total de registros
+        // Calcular totales para paginación
         int totalRegistros = auditoriaDAO.contarAuditoria(
             usuarioId, accion, modulo, estado, fechaDesde, fechaHasta
         );
@@ -69,13 +70,13 @@ public class AuditoriaServlet extends HttpServlet {
         if (totalPages == 0) totalPages = 1;
         if (page > totalPages) page = totalPages;
         
-        // Calcular estadísticas (sin filtros para obtener totales reales)
+        // Estadísticas generales (sin filtros)
         java.util.Map<String, Integer> stats = auditoriaDAO.obtenerEstadisticas();
         int totalRegistrosAuditoria = auditoriaDAO.contarAuditoria(null, null, null, null, null, null);
         int accionesHoy = stats.getOrDefault("accionesHoy", 0);
         int accionesFallidas = stats.getOrDefault("accionesFallidas", 0);
         
-        // Atributos para el JSP
+        // Pasar datos a la vista
         request.setAttribute("listaAuditoria", listaAuditoria);
         request.setAttribute("totalRegistros", totalRegistros);
         request.setAttribute("page", page);

@@ -2,6 +2,7 @@ package com.example.telito.administrador.beans;
 
 import com.example.telito.administrador.beans.Rol;
 
+// Bean para representar un usuario del sistema
 public class Usuario {
 
     private int idUsuario;
@@ -12,12 +13,10 @@ public class Usuario {
     private Integer distritoId; // ID del distrito asignado (para Gerente de Tienda)
     private String password;
     private boolean activo;
-    private boolean cuentaActivada; // Indica si la cuenta ha sido activada por email
-    private java.sql.Timestamp fechaActivacion; // Fecha en que se activó la cuenta
-    private Rol rol; // Objeto Rol para representar la llave foránea
+    private boolean cuentaActivada; // Si la cuenta fue activada por email
+    private java.sql.Timestamp fechaActivacion; // Fecha de activación
+    private Rol rol; // Rol del usuario
     private String fotoPerfil;
-    
-    // Getters y Setters
     public int getIdUsuario() {
         return idUsuario;
     }

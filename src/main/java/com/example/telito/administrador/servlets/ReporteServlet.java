@@ -18,12 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+// Visualización de reportes y estadísticas del sistema
 @WebServlet(name = "ReporteServlet", value = "/administrador/reportes")
 public class ReporteServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de administrador
+        // Solo administradores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a ReporteServlet desde: " + 
@@ -59,7 +60,7 @@ public class ReporteServlet extends HttpServlet {
             }
 
             case "logistica": {
-                // --- LÓGICA PARA REPORTE LOGÍSTICA ---
+                // Reporte de logística con gráficos
                 Map<String, Integer> conteoPlanes = reporteDAO.obtenerConteoPlanesPorEstado();
                 request.setAttribute("planesLabelsJson", gson.toJson(new ArrayList<>(conteoPlanes.keySet())));
                 request.setAttribute("planesDataJson", gson.toJson(new ArrayList<>(conteoPlanes.values())));

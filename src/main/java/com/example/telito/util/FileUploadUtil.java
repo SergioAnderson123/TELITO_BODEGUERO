@@ -10,66 +10,54 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-/**
- * Utilidad para manejo de carga de archivos
- */
+// Utilidad para manejo de carga de archivos (fotos de perfil)
 public class FileUploadUtil {
     
     private static final String UPLOAD_DIR = "uploads/perfiles";
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final String[] ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"};
     
-    /**
-     * Guarda un archivo de foto de perfil
-     * @param part El archivo subido
-     * @param uploadPath Ruta base donde se guardarán los archivos
-     * @return Nombre del archivo guardado (relativo)
-     * @throws IOException Si hay error al guardar
-     */
+    // Guarda archivo de foto de perfil (valida tamaño y extensión, genera nombre único)
     public static String saveProfilePhoto(Part part, String uploadPath) throws IOException {
-        // Validar que el archivo no sea nulo
+        // Validar archivo
         if (part == null || part.getSize() == 0) {
             throw new IOException("No se ha seleccionado ningún archivo");
         }
         
-        // Validar el tamaño
+        // Validar tamaño (máximo 5MB)
         if (part.getSize() > MAX_FILE_SIZE) {
             throw new IOException("El archivo excede el tamaño máximo de 5MB");
         }
         
-        // Obtener el nombre original del archivo
+        // Obtener nombre original
         String fileName = getFileName(part);
         
-        // Validar la extensión
+        // Validar extensión
         if (!isValidExtension(fileName)) {
             throw new IOException("Formato de archivo no permitido. Use: JPG, PNG, GIF o WEBP");
         }
         
-        // Generar un nombre único para evitar conflictos
+        // Generar nombre único
         String extension = fileName.substring(fileName.lastIndexOf("."));
         String uniqueFileName = UUID.randomUUID().toString() + extension;
         
-        // Crear el directorio si no existe
+        // Crear directorio si no existe
         Path uploadDir = Paths.get(uploadPath, UPLOAD_DIR);
         if (!Files.exists(uploadDir)) {
             Files.createDirectories(uploadDir);
         }
         
-        // Guardar el archivo
+        // Guardar archivo
         Path filePath = uploadDir.resolve(uniqueFileName);
         try (InputStream input = part.getInputStream()) {
             Files.copy(input, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
         
-        // Retornar la ruta relativa (para guardar en BD)
+        // Retornar ruta relativa (para guardar en BD)
         return UPLOAD_DIR + "/" + uniqueFileName;
     }
     
-    /**
-     * Elimina una foto de perfil anterior
-     * @param photoPath Ruta de la foto a eliminar
-     * @param uploadPath Ruta base de uploads
-     */
+    // Elimina foto de perfil anterior
     public static void deleteProfilePhoto(String photoPath, String uploadPath) {
         if (photoPath == null || photoPath.trim().isEmpty()) {
             return;

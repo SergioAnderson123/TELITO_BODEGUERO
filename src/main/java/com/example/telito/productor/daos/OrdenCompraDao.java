@@ -5,19 +5,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// DAO para gestión de órdenes de compra desde perspectiva del productor
 public class OrdenCompraDao extends DAOBase {
 
-    /**
-     * Obtener todas las órdenes de compra dirigidas a un productor específico con paginación
-     * @param productorId ID del usuario productor
-     * @param offset Número de registros a saltar
-     * @param limit Número máximo de registros a retornar
-     * @return Lista de objetos con datos de la orden
-     */
+    // Lista órdenes de compra dirigidas al productor con paginación
     public List<Object[]> listarOrdenesPorProductor(int productorId, int offset, int limit) {
         List<Object[]> ordenes = new ArrayList<>();
         
-        // Primero actualizamos solo las órdenes Pendientes SIN lote asignado a Recibido
+        // Actualizar órdenes Pendientes sin lote asignado a Recibido
         String updateSql = "UPDATE ordenes_compra oc " +
                           "INNER JOIN productos p ON oc.producto_id = p.id_producto " +
                           "SET oc.estado = 'Recibido' " +
@@ -45,7 +40,7 @@ public class OrdenCompraDao extends DAOBase {
 
         try {
             conn = getConnection();
-            // Actualizar órdenes pendientes a recibido
+            // Actualizar órdenes pendientes
             updateStmt = conn.prepareStatement(updateSql);
             updateStmt.setInt(1, productorId);
             int updated = updateStmt.executeUpdate();
@@ -53,11 +48,11 @@ public class OrdenCompraDao extends DAOBase {
                 logger.info("Órdenes actualizadas de Pendiente a Recibido: {}", updated);
             }
             
-            // Luego obtener todas las órdenes con paginación
+            // Obtener órdenes con paginación
             selectStmt = conn.prepareStatement(selectSql);
             selectStmt.setInt(1, productorId);
-            selectStmt.setInt(2, limit);  // LIMIT primero
-            selectStmt.setInt(3, offset); // OFFSET segundo
+            selectStmt.setInt(2, limit);
+            selectStmt.setInt(3, offset);
             rs = selectStmt.executeQuery();
 
             while (rs.next()) {

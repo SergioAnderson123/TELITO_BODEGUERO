@@ -9,19 +9,21 @@ import com.example.telito.util.EmailUtil;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de configuraciones de alertas
 public class AlertaDAO extends DAOBase {
 
-    // Cuenta las reglas de alerta que están activas para el contador del menú.
+    // Cuenta reglas activas para el contador del menú
     public int contarReglasDeAlertaActivas() {
         String sql = "SELECT COUNT(*) FROM alertas_configuracion WHERE activo = 1";
         return count(sql);
     }
 
-    // Carga la lista de alertas para la tabla de gestión.
+    // Lista todas (compatibilidad - página 1, tamaño 10)
     public ArrayList<AlertaConfig> listarAlertas() {
         return listarAlertas(1, 10);
     }
 
+    // Lista con paginación
     public ArrayList<AlertaConfig> listarAlertas(int page, int size) {
         ArrayList<AlertaConfig> listaAlertas = new ArrayList<>();
         String sql = "SELECT a.*, c.nombre AS nombre_categoria " +
@@ -55,12 +57,13 @@ public class AlertaDAO extends DAOBase {
         return listaAlertas;
     }
 
+    // Contar total de alertas
     public int contarAlertas() {
         String sql = "SELECT COUNT(*) FROM alertas_configuracion";
         return count(sql);
     }
 
-    // Obtiene una alerta específica para poder editarla.
+    // Obtener alerta por ID para edición
     public AlertaConfig obtenerAlertaPorId(int id) {
         AlertaConfig alerta = null;
         String sql = "SELECT a.*, c.nombre AS nombre_categoria " +

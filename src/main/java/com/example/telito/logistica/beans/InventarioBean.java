@@ -2,9 +2,10 @@ package com.example.telito.logistica.beans;
 
 import java.sql.Date;
 
+// Bean para representar inventario (por lote individual o agrupado por producto)
 public class InventarioBean {
 
-    // Propiedades como Almacenero (por lote individual)
+    // Propiedades básicas por lote
     private int idLote;
     private String codigoLote;
     private String codigoSKU;
@@ -15,17 +16,15 @@ public class InventarioBean {
     private Date fechaVencimiento;
     private String estado;
     
-    // Propiedades adicionales para vista agrupada de Logística
+    // Propiedades adicionales para vista agrupada
     private int idProducto;
     private double precioPorPaquete;
     private double costoPorUnidad;
     private String estadoStock; // "En Stock", "Poco Stock", "Sin Stock", "No configurado"
 
-    // Constructor vacío
     public InventarioBean() {
     }
 
-    // Getters y Setters
     public int getIdLote() {
         return idLote;
     }

@@ -4,25 +4,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-/**
- * Clase helper para generar plantillas de correo HTML.
- * Extrae la construcción de mensajes HTML del código del servlet.
- */
+// Helper para generar plantillas de correo HTML (extrae construcción de mensajes del código del servlet)
 public class EmailTemplateHelper {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-    /**
-     * Genera el mensaje HTML de bienvenida para nuevos usuarios.
-     * 
-     * @param nombres Nombre del usuario
-     * @param apellidos Apellidos del usuario
-     * @param email Email del usuario
-     * @param passwordContraseña temporal
-     * @param nombreRol Nombre del rol asignado
-     * @param contextPath Context path de la aplicación
-     * @return Mensaje HTML formateado
-     */
+    // Genera mensaje HTML de bienvenida para nuevos usuarios (incluye credenciales)
     public static String generarMensajeBienvenida(String nombres, String apellidos, String email, 
                                                    String password, String nombreRol, String contextPath) {
         return """

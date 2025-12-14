@@ -18,12 +18,13 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// Vista consolidada de inventario desde todas las perspectivas (Logística, Almacén, Productores)
 @WebServlet(name = "InventarioGeneralServlet", value = "/administrador/inventario-general")
 public class InventarioGeneralServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de administrador
+        // Solo administradores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a InventarioGeneralServlet desde: " + 
@@ -33,17 +34,17 @@ public class InventarioGeneralServlet extends HttpServlet {
             return;
         }
         
-        // Logística (inventario agrupado por producto)
+        // Inventario desde perspectiva de Logística (agrupado por producto)
         InventarioDao inventarioDao = new InventarioDao();
         ArrayList<InventarioBean> listaLogistica = inventarioDao.obtenerInventarioAgrupado(null, null, 1, 100);
         request.setAttribute("listaLogistica", listaLogistica);
 
-        // Almacén (primer página de lotes registrados)
+        // Inventario desde perspectiva de Almacén (lotes registrados)
         LoteDao loteDao = new LoteDao();
         ArrayList<Lote> listaAlmacen = loteDao.listarLotesRegistrados(1);
         request.setAttribute("listaAlmacen", listaAlmacen);
 
-        // Productores (todos los productos activos)
+        // Inventario desde perspectiva de Productores (productos activos)
         ProductoDAO productoDao = new ProductoDAO();
         ArrayList<Producto> listaProductores = productoDao.listarProductos();
         request.setAttribute("listaProductores", listaProductores);

@@ -1,5 +1,6 @@
 package com.example.telito.administrador.beans;
 
+// Bean para representar un vehículo
 public class Vehiculo {
     private int idVehiculo;
     private String placa;
@@ -7,11 +8,9 @@ public class Vehiculo {
     private String modelo;
     private int capacidadKg;
 
-    // Constructor vacío
     public Vehiculo() {
     }
 
-    // Constructor con parámetros
     public Vehiculo(int idVehiculo, String placa, String marca, String modelo, int capacidadKg) {
         this.idVehiculo = idVehiculo;
         this.placa = placa;
@@ -20,7 +19,6 @@ public class Vehiculo {
         this.capacidadKg = capacidadKg;
     }
 
-    // Getters y Setters
     public int getIdVehiculo() {
         return idVehiculo;
     }

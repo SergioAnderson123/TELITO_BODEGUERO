@@ -7,9 +7,10 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de configuraciones de stock mínimo
 public class StockMinimoDAO extends DAOBase {
 
-    // Listar todas las configuraciones de stock mínimo
+    // Lista todas las configuraciones activas
     public ArrayList<StockMinimoConfig> listarConfiguraciones() {
         ArrayList<StockMinimoConfig> lista = new ArrayList<>();
         String sql = "SELECT smc.*, p.nombre as producto_nombre, p.codigo_sku as producto_codigo " +
@@ -56,7 +57,7 @@ public class StockMinimoDAO extends DAOBase {
         return lista;
     }
 
-    // Obtener configuración por ID de producto
+    // Obtener configuración específica por ID de producto
     public StockMinimoConfig obtenerPorProducto(int productoId) {
         String sql = "SELECT * FROM stock_minimo_config WHERE producto_id = ? AND activo = 1";
 

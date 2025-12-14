@@ -2,13 +2,11 @@ package com.example.telito.administrador.beans;
 
 import java.sql.Timestamp;
 
-/**
- * Bean para representar un registro de auditoría del sistema.
- */
+// Bean para representar un registro de auditoría
 public class AuditoriaLog {
     
     private int idAuditoria;
-    private Integer usuarioId; // Cambiado a Integer para permitir NULL
+    private Integer usuarioId; // Puede ser null para acciones sin usuario
     private String usuarioNombre;
     private String accion;
     private String modulo;
@@ -20,8 +18,6 @@ public class AuditoriaLog {
     private Timestamp fechaAccion;
     private String estado; // EXITOSO, FALLIDO, ERROR
     private String mensajeError;
-    
-    // Constructores
     public AuditoriaLog() {
     }
     

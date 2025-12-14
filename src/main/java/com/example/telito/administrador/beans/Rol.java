@@ -1,11 +1,10 @@
 package com.example.telito.administrador.beans;
 
+// Bean para representar un rol de usuario
 public class Rol {
 
     private int idRol;
     private String nombre;
-
-    // Getters y Setters:
     public int getIdRol() {
         return idRol;
     }

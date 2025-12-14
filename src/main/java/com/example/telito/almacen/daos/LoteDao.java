@@ -5,20 +5,15 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de lotes desde perspectiva del almacén
 public class LoteDao extends DAOBase {
 
-    /**
-     * MÉTODO MODIFICADO: Renombrado y filtrado.
-     * Lista únicamente los lotes que ya han sido marcados como "Registrado" en el almacén.
-     * Ahora soporta filtros de búsqueda y estado de stock.
-     */
+    // Lista lotes registrados (sin filtros)
     public ArrayList<Lote> listarLotesRegistrados(int pagina) {
         return listarLotesRegistrados(pagina, null, null);
     }
     
-    /**
-     * Lista lotes registrados con filtros opcionales.
-     */
+    // Lista lotes registrados con filtros de búsqueda y estado de stock
     public ArrayList<Lote> listarLotesRegistrados(int pagina, String busqueda, String estadoStock) {
         ArrayList<Lote> lista = new ArrayList<>();
         int registrosPorPagina = 5;
@@ -46,7 +41,7 @@ public class LoteDao extends DAOBase {
         java.util.List<Object> params = new java.util.ArrayList<>();
         int paramIndex = 1;
 
-        // Filtro por búsqueda (SKU o Producto)
+        // Filtro por búsqueda (SKU, nombre de producto o código de lote)
         if (busqueda != null && !busqueda.trim().isEmpty()) {
             sql += "AND (p.codigo_sku LIKE ? OR p.nombre LIKE ? OR l.codigo_lote LIKE ?) ";
             String busquedaParam = "%" + busqueda.trim() + "%";

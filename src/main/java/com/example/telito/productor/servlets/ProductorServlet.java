@@ -24,20 +24,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Este Servlet actúa como el Controlador para todas las acciones
- * relacionadas con el rol de Productor.
- */
+// Controlador principal para todas las acciones del rol Productor
 @WebServlet("/ProductorServlet")
 public class ProductorServlet extends HttpServlet {
 
-    /**
-     * Maneja las peticiones GET (generalmente para mostrar páginas).
-     * Ej: /ProductorServlet?action=listarProductos
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de productor
+        // Solo productores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederProductor(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de productor intentó acceder a ProductorServlet desde: " + 
@@ -47,10 +40,10 @@ public class ProductorServlet extends HttpServlet {
             return;
         }
 
-        // Si no se especifica una acción, la acción por defecto será 'listarProductos'
+        // Acción por defecto: listar productos
         String action = request.getParameter("action") == null ? "listarProductos" : request.getParameter("action");
 
-        // Obtener el ID del productor desde la sesión
+        // Obtener ID del productor desde la sesión
         com.example.telito.administrador.beans.Usuario usuarioSesion = 
             (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
         
@@ -68,7 +61,7 @@ public class ProductorServlet extends HttpServlet {
 
         switch (action) {
             case "inicio":
-                // Obtener métricas del dashboard usando la misma lógica que DashboardProductorServlet
+                // Dashboard con métricas
                 DashboardProductorServlet.MetricasProductor metricas = obtenerMetricasProductor(idProductor, productoDao, loteDao, ordenCompraDao);
                 request.setAttribute("metricas", metricas);
                 view = request.getRequestDispatcher("productor/inicio-productor.jsp");
@@ -90,10 +83,10 @@ public class ProductorServlet extends HttpServlet {
 
                 int offsetProductos = (pageProductos - 1) * sizeProductos;
                 
-                // Obtener la lista de productos del productor logueado con paginación
+                // Lista de productos del productor con paginación
                 ArrayList<Producto> listaProductos = productoDao.listarProductosPorProductor(idProductor, offsetProductos, sizeProductos);
 
-                // Obtener estadísticas del productor
+                // Estadísticas del productor
                 int totalProductos = productoDao.contarTotalProductos(idProductor);
                 int fueraDeStock = productoDao.contarProductosFueraDeStock(idProductor);
                 int totalCategorias = productoDao.contarTotalCategorias(idProductor);
@@ -176,11 +169,20 @@ public class ProductorServlet extends HttpServlet {
                 List<Object[]> listaOrdenes = ordenCompraDao.listarOrdenesPorProductor(idProductor, offsetOrdenes, sizeOrdenes);
                 int totalOrdenes = ordenCompraDao.contarOrdenesPorProductor(idProductor);
                 
+                // Calcular estadísticas completas (no solo de la página actual)
+                String sqlCompletadas = "SELECT COUNT(*) as total FROM ordenes_compra WHERE productor_id = ? AND estado = 'Recibido'";
+                int ordenesCompletadas = ejecutarCountSQL(sqlCompletadas, idProductor);
+                
+                String sqlPendientes = "SELECT COUNT(*) as total FROM ordenes_compra WHERE productor_id = ? AND (estado = 'Pendiente' OR estado = 'Aprobado')";
+                int ordenesPendientes = ejecutarCountSQL(sqlPendientes, idProductor);
+                
                 // Calcular paginación
                 int totalPagesOrdenes = (int) Math.ceil((double) totalOrdenes / sizeOrdenes);
                 if (totalPagesOrdenes == 0) totalPagesOrdenes = 1;
                 
                 request.setAttribute("listaOrdenes", listaOrdenes);
+                request.setAttribute("ordenesCompletadas", ordenesCompletadas);
+                request.setAttribute("ordenesPendientes", ordenesPendientes);
                 
                 // Atributos de paginación
                 request.setAttribute("currentPage", pageOrdenes);
@@ -960,6 +962,10 @@ public class ProductorServlet extends HttpServlet {
         // Órdenes en proceso
         String sqlEnProceso = "SELECT COUNT(*) as total FROM ordenes_compra WHERE productor_id = ? AND estado = 'En Proceso'";
         metricas.ordenesEnProceso = ejecutarCountSQL(sqlEnProceso, idProductor);
+        
+        // Órdenes completadas (Recibido)
+        String sqlCompletadas = "SELECT COUNT(*) as total FROM ordenes_compra WHERE productor_id = ? AND estado = 'Recibido'";
+        metricas.ordenesCompletadas = ejecutarCountSQL(sqlCompletadas, idProductor);
         
         // Total de órdenes
         String sqlTotal = "SELECT COUNT(*) as total FROM ordenes_compra WHERE productor_id = ?";

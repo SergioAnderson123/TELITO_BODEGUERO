@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// Gestión de vehículos - CRUD completo
 @WebServlet(name = "VehiculoServlet", value = "/administrador/VehiculoServlet")
 public class VehiculoServlet extends HttpServlet {
 
@@ -21,7 +22,7 @@ public class VehiculoServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que el usuario tenga rol de administrador
+        // Solo administradores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a VehiculoServlet desde: " + 
@@ -53,7 +54,7 @@ public class VehiculoServlet extends HttpServlet {
                 if (totalPages == 0) totalPages = 1;
                 if (page > totalPages) page = totalPages;
 
-                // Calcular estadísticas (sin filtros para obtener totales reales)
+                // Estadísticas generales (sin filtros)
                 int totalVehiculos = vehiculoDAO.contarTotalVehiculos();
                 int vehiculosConPlanes = vehiculoDAO.contarVehiculosConPlanes();
                 int vehiculosSinPlanes = vehiculoDAO.contarVehiculosSinPlanes();

@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// Gestión de conductores - CRUD completo
 @WebServlet(name = "ConductorServlet", value = "/administrador/ConductorServlet")
 public class ConductorServlet extends HttpServlet {
 
@@ -21,7 +22,7 @@ public class ConductorServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que el usuario tenga rol de administrador
+        // Solo administradores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a ConductorServlet desde: " + 
@@ -53,7 +54,7 @@ public class ConductorServlet extends HttpServlet {
                 if (totalPages == 0) totalPages = 1;
                 if (page > totalPages) page = totalPages;
 
-                // Calcular estadísticas (sin filtros para obtener totales reales)
+                // Estadísticas generales (sin filtros)
                 int totalConductores = conductorDAO.contarTotalConductores();
                 int conductoresConPlanes = conductorDAO.contarConductoresConPlanes();
                 int conductoresSinPlanes = conductorDAO.contarConductoresSinPlanes();

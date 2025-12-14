@@ -2,10 +2,7 @@ package com.example.telito.administrador.beans;
 
 import java.sql.Timestamp;
 
-/**
- * Bean que representa una notificación web.
- * Corresponde a la tabla notificaciones_web en la base de datos.
- */
+// Bean para representar una notificación web
 public class Notificacion {
     
     private int idNotificacion;
@@ -23,17 +20,15 @@ public class Notificacion {
     private Timestamp fechaCreacion;
     private Timestamp fechaLectura;
     
-    // Campos adicionales para relaciones
+    // Campos adicionales para mostrar en la vista
     private String productoNombre;
     private String loteCodigo;
     private String pedidoNumero;
     private String ordenCompraNumero;
 
-    // Constructor vacío
     public Notificacion() {
     }
 
-    // Constructor completo
     public Notificacion(int usuarioId, String tipoNotificacion, String titulo, String mensaje, 
                        String nivelPrioridad, String urlAccion) {
         this.usuarioId = usuarioId;
@@ -45,7 +40,6 @@ public class Notificacion {
         this.leida = false;
     }
 
-    // Getters y Setters
     public int getIdNotificacion() {
         return idNotificacion;
     }

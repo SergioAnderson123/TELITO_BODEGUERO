@@ -25,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import com.example.telito.util.DatabaseConnection;
 
+// Dashboard principal de logística con métricas y actividad reciente
 @WebServlet("/logistica/DashboardLogisticaServlet")
 public class DashboardLogisticaServlet extends HttpServlet {
     
@@ -32,6 +33,7 @@ public class DashboardLogisticaServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        // Solo logística
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederLogistica(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de logística intentó acceder a DashboardLogisticaServlet desde: " + 
@@ -42,14 +44,14 @@ public class DashboardLogisticaServlet extends HttpServlet {
         }
         
         try {
-            // Obtener métricas del dashboard
+            // Obtener métricas principales
             MetricasLogistica metricas = obtenerMetricas();
             
-            // Obtener actividad reciente
+            // Actividad reciente
             java.util.List<OrdenCompraBean> ultimasOrdenes = obtenerUltimasOrdenes(5);
             java.util.List<MovimientoInventarioBean> ultimosMovimientos = obtenerUltimosMovimientos(5);
             
-            // Obtener datos para gráfico (órdenes por mes - últimos 6 meses)
+            // Datos para gráfico (órdenes por mes - últimos 6 meses)
             Map<String, Integer> ordenesPorMes = obtenerOrdenesPorMes(6);
             
             request.setAttribute("metricas", metricas);
@@ -69,9 +71,7 @@ public class DashboardLogisticaServlet extends HttpServlet {
         }
     }
     
-    /**
-     * Obtiene todas las métricas para el dashboard logístico.
-     */
+    // Obtiene todas las métricas para el dashboard
     private MetricasLogistica obtenerMetricas() {
         MetricasLogistica metricas = new MetricasLogistica();
         

@@ -267,6 +267,12 @@
                 </div>
 
                 <%
+                    // Obtener mensajes de éxito/error de la sesión
+                    String successMsg = (String) session.getAttribute("successMsg");
+                    String errorMsg = (String) session.getAttribute("errorMsg");
+                    if (successMsg != null) session.removeAttribute("successMsg");
+                    if (errorMsg != null) session.removeAttribute("errorMsg");
+                    
                     // Obtener estadísticas del servlet
                     Integer totalOrdenesAttr = (Integer) request.getAttribute("totalOrdenes");
                     Integer ordenesPendientesAttr = (Integer) request.getAttribute("ordenesPendientes");
@@ -275,6 +281,20 @@
                     int ordenesPendientes = (ordenesPendientesAttr != null) ? ordenesPendientesAttr : 0;
                     int ordenesRegistradas = (ordenesRegistradasAttr != null) ? ordenesRegistradasAttr : 0;
                 %>
+
+                <!-- ===================== Mensajes de éxito/error ===================== -->
+                <% if (successMsg != null) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert" style="padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; font-size: 0.85rem;">
+                    <i class="fas fa-check-circle me-2"></i><%= successMsg %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" style="font-size: 0.7rem;"></button>
+                </div>
+                <% } %>
+                <% if (errorMsg != null) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; font-size: 0.85rem;">
+                    <i class="fas fa-exclamation-circle me-2"></i><%= errorMsg %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" style="font-size: 0.7rem;"></button>
+                </div>
+                <% } %>
 
                 <!-- ===================== Tarjetas de estadísticas ===================== -->
                 <div class="stats-container">

@@ -10,9 +10,7 @@ import com.example.telito.administrador.beans.Producto;
 
 import java.util.*;
 
-/**
- * Evaluador especializado para alertas de stock mínimo y crítico.
- */
+// Evalúa alertas de stock mínimo y crítico (por lote o por producto total)
 public class StockAlertaEvaluator {
     
     private final StockMinimoDAO stockMinimoDAO;
@@ -25,21 +23,19 @@ public class StockAlertaEvaluator {
         this.productoDAO = productoDAO;
     }
     
-    /**
-     * Evalúa las alertas de stock según la regla configurada.
-     */
+    // Evalúa alertas de stock según la regla configurada
     public List<AlertaService.AlertaGenerada> evaluarStock(AlertaConfig regla, Map<String, Object> config) {
         List<AlertaService.AlertaGenerada> alertas = new ArrayList<>();
         
         String tipoAlerta = regla.getTipoAlerta();
         
         if ("STOCK_MINIMO".equals(tipoAlerta) || "STOCK_CRITICO".equals(tipoAlerta)) {
-            // Evaluar por lote
+            // Evaluar por lote individual
             if (config.containsKey("stock_minimo_lote") || config.containsKey("stock_critico_lote")) {
                 alertas.addAll(evaluarStockPorLote(regla, config));
             }
             
-            // Evaluar por producto total
+            // Evaluar por stock total del producto
             if (config.containsKey("stock_minimo_producto") || config.containsKey("stock_critico_producto")) {
                 alertas.addAll(evaluarStockPorProducto(regla, config));
             }
@@ -48,9 +44,7 @@ public class StockAlertaEvaluator {
         return alertas;
     }
     
-    /**
-     * Evalúa stock mínimo/crítico por lote individual.
-     */
+    // Evalúa stock por lote individual
     private List<AlertaService.AlertaGenerada> evaluarStockPorLote(AlertaConfig regla, Map<String, Object> config) {
         List<AlertaService.AlertaGenerada> alertas = new ArrayList<>();
         

@@ -6,10 +6,7 @@ import com.google.gson.JsonParser;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Gestor de configuración de alertas usando JSON en el campo mensaje_personalizado.
- * Permite almacenar configuración adicional sin modificar la estructura de BD.
- */
+// Parsea configuración JSON de alertas desde el campo mensaje_personalizado
 public class AlertaConfigManager {
     
     private final Gson gson;
@@ -18,10 +15,7 @@ public class AlertaConfigManager {
         this.gson = new Gson();
     }
     
-    /**
-     * Parsea la configuración JSON del campo mensaje_personalizado.
-     * Si no es JSON válido, retorna un mapa vacío.
-     */
+    // Parsea JSON del campo mensaje_personalizado - retorna mapa vacío si no es válido
     public Map<String, Object> parsearConfiguracion(String mensajePersonalizado) {
         Map<String, Object> config = new HashMap<>();
         
@@ -33,7 +27,7 @@ public class AlertaConfigManager {
             // Intentar parsear como JSON
             JsonObject json = JsonParser.parseString(mensajePersonalizado).getAsJsonObject();
             
-            // Extraer valores comunes
+            // Extraer valores de configuración
             if (json.has("stock_minimo_lote")) {
                 config.put("stock_minimo_lote", json.get("stock_minimo_lote").getAsInt());
             }

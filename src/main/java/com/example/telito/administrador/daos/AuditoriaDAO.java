@@ -6,14 +6,10 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
-/**
- * DAO para gestionar los registros de auditoría del sistema.
- */
+// DAO para gestionar registros de auditoría
 public class AuditoriaDAO extends DAOBase {
     
-    /**
-     * Registra una acción en el log de auditoría.
-     */
+    // Registra una acción en el log de auditoría
     public int registrarAccion(AuditoriaLog log) {
         String sql = """
             INSERT INTO auditoria_sistema 
@@ -37,15 +33,14 @@ public class AuditoriaDAO extends DAOBase {
         );
     }
     
-    /**
-     * Lista los registros de auditoría con filtros y paginación.
-     */
+    // Lista registros de auditoría con filtros y paginación
     public ArrayList<AuditoriaLog> listarAuditoria(String usuarioId, String accion, 
                                                    String modulo, String estado,
                                                    String fechaDesde, String fechaHasta,
                                                    int page, int size) {
         ArrayList<AuditoriaLog> lista = new ArrayList<>();
         
+        // Construir consulta base
         StringBuilder sql = new StringBuilder("""
             SELECT id_auditoria, usuario_id, usuario_nombre, accion, modulo, descripcion,
                    datos_anteriores, datos_nuevos, ip_address, user_agent, 
@@ -56,6 +51,7 @@ public class AuditoriaDAO extends DAOBase {
         
         ArrayList<Object> params = new ArrayList<>();
         
+        // Agregar filtros dinámicamente
         if (usuarioId != null && !usuarioId.trim().isEmpty()) {
             sql.append(" AND usuario_id = ?");
             params.add(Integer.parseInt(usuarioId));

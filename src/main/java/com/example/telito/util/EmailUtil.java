@@ -13,11 +13,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Clase utilitaria para el envío de correos electrónicos.
- * Implementa el sistema de notificaciones por email del sistema TELITO_BODEGUERO.
- * Basado en Jakarta Mail API 2.0.1.
- */
+// Utilidad para envío de correos electrónicos (notificaciones del sistema)
 public class EmailUtil {
     
     private static final Logger logger = Logger.getLogger(EmailUtil.class.getName());
@@ -34,10 +30,7 @@ public class EmailUtil {
         loadEmailConfig();
     }
     
-    /**
-     * Carga la configuración de email desde un archivo de propiedades.
-     * Si no existe el archivo, usa valores por defecto.
-     */
+    // Carga configuración de email desde email.properties (o usa valores por defecto)
     private static void loadEmailConfig() {
         Properties props = new Properties();
         try (InputStream input = EmailUtil.class.getClassLoader()
@@ -62,34 +55,16 @@ public class EmailUtil {
         }
     }
     
-    /**
-     * Constructor privado para evitar instanciación
-     */
+    // Constructor privado (clase utilitaria)
     private EmailUtil() {
-        // No se permite instanciar esta clase
     }
     
-    /**
-     * Envía un correo electrónico de texto plano.
-     * 
-     * @param to Dirección de correo del destinatario
-     * @param subject Asunto del correo
-     * @param messageBody Cuerpo del mensaje (texto plano)
-     * @return true si el correo se envió exitosamente, false en caso contrario
-     */
+    // Envía correo de texto plano
     public static boolean sendEmail(String to, String subject, String messageBody) {
         return sendEmail(to, subject, messageBody, false);
     }
     
-    /**
-     * Envía un correo electrónico.
-     * 
-     * @param to Dirección de correo del destinatario
-     * @param subject Asunto del correo
-     * @param messageBody Cuerpo del mensaje
-     * @param isHtml true si el mensaje es HTML, false si es texto plano
-     * @return true si el correo se envió exitosamente, false en caso contrario
-     */
+    // Envía correo (texto plano o HTML según parámetro)
     public static boolean sendEmail(String to, String subject, String messageBody, boolean isHtml) {
         if (EMAIL_FROM == null || EMAIL_FROM.isEmpty() || 
             EMAIL_PASSWORD == null || EMAIL_PASSWORD.isEmpty()) {

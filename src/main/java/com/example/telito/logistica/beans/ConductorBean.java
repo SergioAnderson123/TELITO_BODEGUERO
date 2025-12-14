@@ -1,10 +1,9 @@
 package com.example.telito.logistica.beans;
 
+// Bean para representar un conductor (versión simplificada)
 public class ConductorBean {
     private int id;
     private String nombreCompleto;
-
-    // Getters y Setters
     public int getId() {
         return id;
     }

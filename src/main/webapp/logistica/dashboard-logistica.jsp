@@ -17,18 +17,86 @@
         <jsp:param name="pageTitle" value="Dashboard Logístico"/>
     </jsp:include>
     <style>
-        /* Sobrescribir estilos globales para que las stat-card tengan el mismo tamaño que en Productor */
+        /* CRÍTICO: Eliminar TODAS las restricciones y forzar el mismo tamaño que Productor */
+        .dashboard-wrapper {
+            width: calc(100% - 250px) !important;
+        }
+        .dashboard-content {
+            padding: 30px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        .dashboard-content .container-fluid {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            box-sizing: border-box !important;
+        }
+        /* Asegurar box-sizing consistente */
+        .dashboard-content .row,
+        .dashboard-content .row > [class*="col-"],
         .dashboard-content .stat-card {
+            box-sizing: border-box !important;
+        }
+        /* CRÍTICO: Eliminar completamente el padding de 30px que tiene .card en el CSS global */
+        .dashboard-content .stat-card,
+        .dashboard-content .stat-card.card {
             padding: 0 !important;
+            margin: 0 !important;
             margin-bottom: 0 !important;
+            height: 100% !important;
+            width: 100% !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+            background: var(--white) !important;
+            border-radius: 15px !important;
         }
         .dashboard-content .stat-card .card-body {
             padding: 0.5rem !important;
             padding-top: 0.75rem !important;
             padding-bottom: 0.75rem !important;
+            width: 100% !important;
+        }
+        /* Asegurar que las filas ocupen todo el ancho disponible */
+        .dashboard-content .row.g-2 {
+            --bs-gutter-x: 0.5rem;
+            --bs-gutter-y: 0.5rem;
+            margin-left: calc(var(--bs-gutter-x) * -0.5) !important;
+            margin-right: calc(var(--bs-gutter-x) * -0.5) !important;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        .dashboard-content .row.g-2 > [class*="col-"] {
+            padding-left: calc(var(--bs-gutter-x) * 0.5) !important;
+            padding-right: calc(var(--bs-gutter-x) * 0.5) !important;
+        }
+        /* CRÍTICO: Forzar que las columnas col-xl-3 ocupen exactamente 25% del ancho - igual que productor */
+        @media (min-width: 1200px) {
+            .dashboard-content .row.g-2 .col-xl-3 {
+                flex: 0 0 25% !important;
+                max-width: 25% !important;
+                width: 25% !important;
+                min-width: 0 !important;
+            }
+        }
+        /* Asegurar que en todas las pantallas grandes el ancho sea consistente */
+        @media (min-width: 1400px) {
+            .dashboard-content .container-fluid {
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+            .dashboard-content .row.g-2 .col-xl-3 {
+                flex: 0 0 25% !important;
+                max-width: 25% !important;
+                width: 25% !important;
+            }
         }
         /* Sobrescribir estilos globales para que los quick-link-card tengan el mismo tamaño que en Productor */
-        .dashboard-content .quick-link-card {
+        .dashboard-content .quick-link-card,
+        .dashboard-content .quick-link-card.card {
             padding: 0 !important;
             margin-bottom: 0 !important;
         }
@@ -75,7 +143,7 @@
 
                 <!-- Primera fila: Órdenes de Compra -->
                 <div class="row g-2 mb-3">
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="card stat-card shadow-sm border-start border-warning border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                             <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -91,7 +159,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="card stat-card shadow-sm border-start border-info border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                             <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -107,7 +175,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="card stat-card shadow-sm border-start border-success border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                             <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -123,7 +191,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="card stat-card shadow-sm border-start border-danger border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                             <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -143,7 +211,7 @@
 
                 <!-- Segunda fila: Planes de Transporte y Alertas -->
                 <div class="row g-2 mb-3">
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="card stat-card shadow-sm border-start border-warning border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                             <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -159,7 +227,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="card stat-card shadow-sm border-start border-info border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                             <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -175,7 +243,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="card stat-card shadow-sm border-start border-success border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                             <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -191,7 +259,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="card stat-card shadow-sm border-start border-warning border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                             <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -212,7 +280,7 @@
                 <!-- Tercera fila: Alertas Críticas (solo si hay alertas) -->
                 <% if (metricas.getAlertasCriticas() > 0) { %>
                 <div class="row g-2 mb-3">
-                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="card stat-card shadow-sm border border-danger border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                             <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">

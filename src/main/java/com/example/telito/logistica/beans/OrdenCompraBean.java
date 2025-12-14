@@ -1,21 +1,18 @@
 package com.example.telito.logistica.beans;
 
+// Bean para representar una orden de compra
 public class OrdenCompraBean {
-    // Campos ajustados a la tabla real de la BD
     private String numeroOrden;
     private String nombreProveedor;
     private String nombreProducto;
     private int cantidadPaquetes;
-    // private String fechaEntregaFormateada; // CAMPO ELIMINADO - No existe en la tabla ordenes_compra
     private String personalResponsable;
     private String estado;
     private String montoTotal;
 
-    // Constructor vacío
     public OrdenCompraBean() {
     }
 
-    // CONSTRUCTOR CORREGIDO - Se ha eliminado el parámetro "fechaEntregaFormateada"
     public OrdenCompraBean(String numeroOrden, String nombreProveedor, String nombreProducto,
                            int cantidadPaquetes, String personalResponsable,
                            String estado, String montoTotal) {
@@ -28,7 +25,6 @@ public class OrdenCompraBean {
         this.montoTotal = montoTotal;
     }
 
-    // Getters y Setters (los de fechaEntregaFormateada han sido eliminados)
     public String getNumeroOrden() {
         return numeroOrden;
     }

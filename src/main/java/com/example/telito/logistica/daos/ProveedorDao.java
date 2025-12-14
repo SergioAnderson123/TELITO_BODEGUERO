@@ -5,8 +5,10 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de proveedores (productores)
 public class ProveedorDao extends DAOBase {
 
+    // Lista proveedores de la tabla proveedores (legacy)
     public ArrayList<ProveedorBean> listarProveedores() {
         ArrayList<ProveedorBean> listaProveedores = new ArrayList<>();
         String sql = "SELECT id_proveedor, nombre FROM proveedores ORDER BY nombre ASC";
@@ -35,7 +37,7 @@ public class ProveedorDao extends DAOBase {
         return listaProveedores;
     }
     
-    // Listar solo productores (usuarios con rol_id = 3) como proveedores
+    // Lista productores (usuarios con rol Productor) como proveedores
     public ArrayList<ProveedorBean> listarProductores() {
         ArrayList<ProveedorBean> listaProductores = new ArrayList<>();
         String sql = "SELECT u.id_usuario, CONCAT(u.nombres, ' ', u.apellidos) as nombre_completo " +
@@ -70,12 +72,7 @@ public class ProveedorDao extends DAOBase {
         return listaProductores;
     }
     
-    /**
-     * Busca productores por texto (para autocompletado)
-     * @param busqueda Texto de búsqueda (nombre o apellido)
-     * @param limit Límite de resultados (máximo 20)
-     * @return Lista de productores que coinciden con la búsqueda
-     */
+    // Busca productores por texto (para autocompletado)
     public ArrayList<ProveedorBean> buscarProductores(String busqueda, int limit) {
         ArrayList<ProveedorBean> listaProductores = new ArrayList<>();
         String sql = "SELECT u.id_usuario, CONCAT(u.nombres, ' ', u.apellidos) as nombre_completo " +

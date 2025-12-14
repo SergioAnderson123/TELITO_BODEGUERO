@@ -12,12 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-/**
- * Servlet para manejar la activación de cuentas por email.
- * 
- * @author Telito Bodeguero
- * @version 2.0
- */
+// Activación de cuentas mediante tokens enviados por email
 @WebServlet(name = "ActivacionServlet", value = "/acceso/activar")
 public class ActivacionServlet extends HttpServlet {
     
@@ -30,14 +25,14 @@ public class ActivacionServlet extends HttpServlet {
         String token = request.getParameter("token");
         
         if (token == null || token.trim().isEmpty()) {
-            // No hay token, mostrar formulario de solicitud de reenvío
+            // Sin token, mostrar formulario de reenvío
             request.setAttribute("error", "Token de activación no proporcionado.");
             RequestDispatcher view = request.getRequestDispatcher("/acceso/activacion.jsp");
             view.forward(request, response);
             return;
         }
         
-        // Validar y usar el token
+        // Validar token
         String ipAddress = request.getRemoteAddr();
         String userAgent = request.getHeader("User-Agent");
         

@@ -1,5 +1,6 @@
 package com.example.telito.productor.beans;
 
+// Bean para representar una categoría de producto
 public class Categoria {
 
     private int idCategoria;

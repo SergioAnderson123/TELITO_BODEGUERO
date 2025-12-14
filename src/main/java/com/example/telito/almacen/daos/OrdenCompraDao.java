@@ -5,16 +5,20 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de órdenes de compra desde perspectiva del almacén
 public class OrdenCompraDao extends DAOBase {
 
+    // Contar total sin filtros
     public int contarOrdenesPendientes() {
         return contarOrdenesPendientes(null, null, null);
     }
     
+    // Contar con filtros de búsqueda y proveedor
     public int contarOrdenesPendientes(String busqueda, String proveedorId) {
         return contarOrdenesPendientes(busqueda, proveedorId, null);
     }
     
+    // Contar con todos los filtros (búsqueda, proveedor, estado)
     public int contarOrdenesPendientes(String busqueda, String proveedorId, String estado) {
         String sql = "SELECT COUNT(*) FROM (" +
                 "SELECT oc.id_orden_compra, " +
@@ -369,12 +373,11 @@ public class OrdenCompraDao extends DAOBase {
         String sql = "SELECT oc.id_orden_compra, " +
                 "IFNULL(oc.numero_Orden, CONCAT('OC', LPAD(oc.id_orden_compra, 3, '0'))) AS numero_orden, " +
                 "prod.nombre AS producto_nombre, " +
-                "prod.sku AS producto_sku, " +
+                "prod.codigo_sku AS producto_sku, " +
                 "CONCAT(productor.nombres, ' ', productor.apellidos) AS nombre_productor, " +
                 "oc.cantidad, " +
-                "oc.fecha_pedido, " +
-                "oc.fecha_entrega_esperada, " +
-                "oc.costo_total, " +
+                "oc.monto_total AS costo_total, " +
+                "oc.fecha_creacion, " +
                 "CASE " +
                 "    WHEN EXISTS (SELECT 1 FROM movimientos_inventario mi WHERE mi.orden_compra_id = oc.id_orden_compra AND mi.tipo = 'Entrada') " +
                 "    THEN 'Registrado' " +
@@ -404,18 +407,18 @@ public class OrdenCompraDao extends DAOBase {
                 oc.setNombreProveedor(rs.getString("nombre_productor"));
                 oc.setCantidad(rs.getInt("cantidad"));
                 
-                // Manejo de fechas que pueden ser NULL
-                Date fechaPedido = rs.getDate("fecha_pedido");
-                if (fechaPedido != null) {
-                    oc.setFechaPedido(fechaPedido);
+                // Usar fecha_creacion como fecha_pedido (si existe)
+                java.sql.Timestamp fechaCreacion = rs.getTimestamp("fecha_creacion");
+                if (fechaCreacion != null) {
+                    oc.setFechaPedido(new java.sql.Date(fechaCreacion.getTime()));
+                } else {
+                    oc.setFechaPedido(null);
                 }
                 
-                Date fechaEntrega = rs.getDate("fecha_entrega_esperada");
-                if (fechaEntrega != null) {
-                    oc.setFechaEntregaEsperada(fechaEntrega);
-                }
+                // fecha_entrega_esperada no existe en la tabla, se deja como null
+                oc.setFechaEntregaEsperada(null);
                 
-                // Manejo de BigDecimal que puede ser NULL
+                // Manejo de BigDecimal que puede ser NULL (usando monto_total de la tabla)
                 java.math.BigDecimal costo = rs.getBigDecimal("costo_total");
                 if (costo != null) {
                     oc.setCostoTotal(costo);

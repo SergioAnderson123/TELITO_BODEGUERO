@@ -13,21 +13,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
-/**
- * Clase utilitaria para generar archivos Excel.
- * Proporciona métodos para crear archivos Excel con formato, filtros automáticos y estilos.
- */
+// Utilidad para generar archivos Excel con formato, filtros automáticos y estilos
 public class ExcelUtil {
     
-    /**
-     * Genera un archivo Excel con la lista de usuarios.
-     * Incluye filtros automáticos en las columnas y formato profesional.
-     * 
-     * @param listaUsuarios Lista de usuarios a exportar
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con lista de usuarios (filtros automáticos y formato profesional)
     public static void generarExcelUsuarios(ArrayList<?> listaUsuarios, OutputStream outputStream, String filtrosInformacion) throws IOException {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             // Crear hoja de cálculo
@@ -148,9 +137,7 @@ public class ExcelUtil {
         }
     }
     
-    /**
-     * Crea un estilo para los encabezados de la tabla.
-     */
+    // Crea estilo para encabezados (azul oscuro, texto blanco)
     private static CellStyle crearEstiloEncabezado(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
@@ -176,10 +163,7 @@ public class ExcelUtil {
         return style;
     }
     
-    /**
-     * Crea un estilo para los encabezados de la tabla con color verde (#28a745).
-     * Similar al color usado en los sidebars de administrador.
-     */
+    // Crea estilo para encabezados con color verde (#28a745) usado en sidebars
     private static CellStyle crearEstiloEncabezadoVerde(Workbook workbook) {
         if (!(workbook instanceof XSSFWorkbook)) {
             // Si no es XSSFWorkbook, usar el estilo estándar
@@ -216,9 +200,7 @@ public class ExcelUtil {
         return style;
     }
     
-    /**
-     * Crea un estilo para los datos de la tabla.
-     */
+    // Crea estilo para celdas de datos (bordes grises, fondo blanco)
     private static CellStyle crearEstiloDatos(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         
@@ -240,9 +222,7 @@ public class ExcelUtil {
         return style;
     }
     
-    /**
-     * Crea un estilo para el título del reporte.
-     */
+    // Crea estilo para títulos de reporte (negrita, azul oscuro, tamaño 16)
     private static CellStyle crearEstiloTitulo(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
@@ -258,15 +238,7 @@ public class ExcelUtil {
         return style;
     }
     
-    /**
-     * Genera un archivo Excel con la lista de conductores.
-     * Incluye filtros automáticos en las columnas y formato profesional.
-     * 
-     * @param listaConductores Lista de conductores a exportar
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con lista de conductores
     public static void generarExcelConductores(ArrayList<?> listaConductores, OutputStream outputStream, String filtrosInformacion) throws IOException {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             // Crear hoja de cálculo
@@ -364,15 +336,7 @@ public class ExcelUtil {
         }
     }
     
-    /**
-     * Genera un archivo Excel con la lista de alertas.
-     * Incluye filtros automáticos en las columnas y formato profesional.
-     * 
-     * @param listaAlertas Lista de alertas a exportar
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con lista de alertas
     public static void generarExcelAlertas(ArrayList<?> listaAlertas, OutputStream outputStream, String filtrosInformacion) throws IOException {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             // Crear hoja de cálculo
@@ -528,18 +492,7 @@ public class ExcelUtil {
         }
     }
     
-    /**
-     * Genera un archivo Excel con el Inventario General consolidado.
-     * Incluye tres hojas separadas: Logística, Almacén y Productores.
-     * Cada hoja tiene filtros automáticos y formato profesional.
-     * 
-     * @param listaLogistica Lista de inventario de logística
-     * @param listaAlmacen Lista de lotes del almacén
-     * @param listaProductores Lista de productos de productores
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con inventario general (3 hojas: Logística, Almacén, Productores)
     public static void generarExcelInventarioGeneral(ArrayList<?> listaLogistica, 
                                                       ArrayList<?> listaAlmacen, 
                                                       ArrayList<?> listaProductores,
@@ -774,15 +727,7 @@ public class ExcelUtil {
         }
     }
     
-    /**
-     * Genera un archivo Excel con la lista de configuraciones de Stock Mínimo.
-     * Incluye filtros automáticos en las columnas y formato profesional.
-     *
-     * @param listaStockMinimo Lista de configuraciones de stock mínimo a exportar
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con configuraciones de stock mínimo
     public static void generarExcelStockMinimo(ArrayList<?> listaStockMinimo, OutputStream outputStream, String filtrosInformacion) throws IOException {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             // Crear hoja de cálculo
@@ -921,15 +866,7 @@ public class ExcelUtil {
         }
     }
 
-    /**
-     * Genera un archivo Excel con el inventario de logística.
-     * Incluye filtros automáticos en las columnas y formato profesional.
-     * 
-     * @param listaInventario Lista de inventario a exportar
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con inventario de logística (incluye valor total)
     public static void generarExcelInventarioLogistica(ArrayList<?> listaInventario, 
                                                        OutputStream outputStream, 
                                                        String filtrosInformacion) throws IOException {
@@ -1066,15 +1003,7 @@ public class ExcelUtil {
         }
     }
 
-    /**
-     * Genera un archivo Excel con las órdenes de compra del módulo de almacén.
-     * Incluye filtros automáticos en las columnas y formato profesional.
-     * 
-     * @param listaOrdenes Lista de órdenes de compra a exportar
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con órdenes de compra del almacén
     public static void generarExcelOrdenesCompra(ArrayList<?> listaOrdenes, 
                                                  OutputStream outputStream, 
                                                  String filtrosInformacion) throws IOException {
@@ -1095,14 +1024,14 @@ public class ExcelUtil {
             Cell titleCell = titleRow.createCell(0);
             titleCell.setCellValue("REPORTE DE ÓRDENES DE COMPRA - TELITO BODEGUERO");
             titleCell.setCellStyle(titleStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 8));
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 7));
 
             // Fecha de generación
             Row dateRow = sheet.createRow(rowNum++);
             Cell dateCell = dateRow.createCell(0);
             dateCell.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
             dateCell.setCellStyle(dataStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
 
             // Filtros aplicados (si existen)
             if (filtrosInformacion != null && !filtrosInformacion.trim().isEmpty()) {
@@ -1110,7 +1039,7 @@ public class ExcelUtil {
                 Cell filterCell = filterRow.createCell(0);
                 filterCell.setCellValue("Filtros aplicados: " + filtrosInformacion);
                 filterCell.setCellStyle(dataStyle);
-                sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 8));
+                sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7));
             }
 
             // Fila en blanco
@@ -1120,7 +1049,7 @@ public class ExcelUtil {
             int headerRowIndex = rowNum;
             Row headerRow = sheet.createRow(rowNum++);
             String[] headers = {"N° de Orden", "SKU", "Producto", "Proveedor", "Cantidad", 
-                               "Costo Total", "Fecha Pedido", "Fecha Entrega", "Estado"};
+                               "Costo Total", "Fecha Creación", "Estado"};
             int colNum = 0;
             for (String header : headers) {
                 Cell cell = headerRow.createCell(colNum++);
@@ -1170,7 +1099,7 @@ public class ExcelUtil {
                     cell.setCellValue(monto);
                     cell.setCellStyle(currencyStyle);
 
-                    // Fecha de Pedido
+                    // Fecha de Creación (Fecha Pedido)
                     cell = row.createCell(6);
                     if (orden.getFechaPedido() != null) {
                         cell.setCellValue(new java.text.SimpleDateFormat("dd/MM/yyyy").format(orden.getFechaPedido()));
@@ -1179,17 +1108,8 @@ public class ExcelUtil {
                     }
                     cell.setCellStyle(dataStyle);
 
-                    // Fecha de Entrega Esperada
-                    cell = row.createCell(7);
-                    if (orden.getFechaEntregaEsperada() != null) {
-                        cell.setCellValue(new java.text.SimpleDateFormat("dd/MM/yyyy").format(orden.getFechaEntregaEsperada()));
-                    } else {
-                        cell.setCellValue("");
-                    }
-                    cell.setCellStyle(dataStyle);
-
                     // Estado
-                    cell = row.createCell(8);
+                    cell = row.createCell(7);
                     cell.setCellValue(orden.getEstado() != null ? orden.getEstado() : "");
                     cell.setCellStyle(dataStyle);
 
@@ -1230,16 +1150,7 @@ public class ExcelUtil {
         }
     }
 
-    /**
-     * Genera un archivo Excel con los movimientos de inventario.
-     * Incluye filtros automáticos en las columnas y formato profesional.
-     * Incluye totales por tipo de movimiento.
-     * 
-     * @param listaMovimientos Lista de movimientos de inventario a exportar
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con movimientos de inventario (incluye totales por tipo)
     public static void generarExcelMovimientosInventario(ArrayList<?> listaMovimientos, 
                                                          OutputStream outputStream, 
                                                          String filtrosInformacion) throws IOException {
@@ -1350,22 +1261,55 @@ public class ExcelUtil {
 
                     // Lote
                     cell = row.createCell(4);
-                    cell.setCellValue((String) obj.getClass().getMethod("getCodigoLote").invoke(obj));
+                    String codigoLote = (String) obj.getClass().getMethod("getCodigoLote").invoke(obj);
+                    cell.setCellValue(codigoLote != null ? codigoLote : "");
                     cell.setCellStyle(dataStyle);
 
-                    // Destino/Origen
+                    // Destino/Origen - construir basado en referencias disponibles
                     cell = row.createCell(5);
-                    cell.setCellValue((String) obj.getClass().getMethod("getDestino").invoke(obj));
+                    String destinoOrigen = "";
+                    try {
+                        String numeroPedido = (String) obj.getClass().getMethod("getNumeroPedido").invoke(obj);
+                        String numeroOrdenCompra = (String) obj.getClass().getMethod("getNumeroOrdenCompra").invoke(obj);
+                        if (numeroPedido != null && !numeroPedido.isEmpty()) {
+                            destinoOrigen = "Pedido: " + numeroPedido;
+                        } else if (numeroOrdenCompra != null && !numeroOrdenCompra.isEmpty()) {
+                            destinoOrigen = "OC: " + numeroOrdenCompra;
+                        } else {
+                            destinoOrigen = "N/A";
+                        }
+                    } catch (Exception e) {
+                        destinoOrigen = "N/A";
+                    }
+                    cell.setCellValue(destinoOrigen);
                     cell.setCellStyle(dataStyle);
 
                     // Personal Responsable
                     cell = row.createCell(6);
-                    cell.setCellValue((String) obj.getClass().getMethod("getResponsable").invoke(obj));
+                    String responsable = "";
+                    try {
+                        responsable = (String) obj.getClass().getMethod("getNombreUsuario").invoke(obj);
+                        if (responsable == null) {
+                            responsable = "";
+                        }
+                    } catch (Exception e) {
+                        responsable = "";
+                    }
+                    cell.setCellValue(responsable);
                     cell.setCellStyle(dataStyle);
 
                     // Observaciones
                     cell = row.createCell(7);
-                    cell.setCellValue((String) obj.getClass().getMethod("getObservaciones").invoke(obj));
+                    String observaciones = "";
+                    try {
+                        observaciones = (String) obj.getClass().getMethod("getMotivo").invoke(obj);
+                        if (observaciones == null) {
+                            observaciones = "";
+                        }
+                    } catch (Exception e) {
+                        observaciones = "";
+                    }
+                    cell.setCellValue(observaciones);
                     cell.setCellStyle(dataStyle);
 
                 } catch (Exception e) {
@@ -1453,9 +1397,7 @@ public class ExcelUtil {
         }
     }
 
-    /**
-     * Crea un estilo de celda para valores monetarios.
-     */
+    // Crea estilo para celdas con formato de moneda
     private static CellStyle crearEstiloMoneda(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
@@ -1467,9 +1409,7 @@ public class ExcelUtil {
         return style;
     }
 
-    /**
-     * Crea un estilo de celda para resúmenes y totales.
-     */
+    // Crea estilo para secciones de resumen/estadísticas (fondo verde claro)
     private static CellStyle crearEstiloResumen(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
@@ -1484,16 +1424,7 @@ public class ExcelUtil {
         return style;
     }
 
-    /**
-     * Genera un archivo Excel con los planes de distribución y transporte.
-     * Incluye filtros automáticos en las columnas y formato profesional.
-     * Incluye estadísticas por conductor y vehículo.
-     * 
-     * @param listaPlanes Lista de planes de transporte agrupados por viaje
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con planes de distribución y transporte (incluye estadísticas por conductor y vehículo)
     public static void generarExcelDistribucionTransporte(ArrayList<?> listaPlanes, 
                                                          OutputStream outputStream, 
                                                          String filtrosInformacion) throws IOException {
@@ -1760,15 +1691,7 @@ public class ExcelUtil {
         }
     }
 
-    /**
-     * Genera un archivo Excel con la lista de productos del productor.
-     * Incluye filtros automáticos en las columnas y formato profesional.
-     * 
-     * @param listaProductos Lista de productos del productor a exportar
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con productos del productor
     public static void generarExcelProductosProductor(ArrayList<?> listaProductos, OutputStream outputStream, String filtrosInformacion) throws IOException {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Mis Productos");
@@ -1900,15 +1823,7 @@ public class ExcelUtil {
         }
     }
 
-    /**
-     * Genera un archivo Excel con la lista de lotes del productor.
-     * Incluye filtros automáticos en las columnas y formato profesional.
-     * 
-     * @param listaLotes Lista de lotes del productor a exportar
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con lotes del productor
     public static void generarExcelLotesProductor(ArrayList<?> listaLotes, OutputStream outputStream, String filtrosInformacion) throws IOException {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Mis Lotes");
@@ -2086,15 +2001,7 @@ public class ExcelUtil {
         }
     }
 
-    /**
-     * Genera un archivo Excel con la lista de lotes del almacén.
-     * Incluye filtros automáticos en las columnas y formato profesional.
-     * 
-     * @param listaLotes Lista de lotes del almacén a exportar
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con lotes del almacén
     public static void generarExcelLotesAlmacen(ArrayList<?> listaLotes, OutputStream outputStream, String filtrosInformacion) throws IOException {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Lotes Almacén");
@@ -2241,15 +2148,7 @@ public class ExcelUtil {
         }
     }
 
-    /**
-     * Genera un archivo Excel con la lista de órdenes de compra del productor.
-     * Incluye filtros automáticos en las columnas y formato profesional.
-     * 
-     * @param listaOrdenes Lista de órdenes de compra del productor a exportar
-     * @param outputStream Stream de salida donde se escribirá el archivo Excel
-     * @param filtrosInformacion Texto descriptivo de los filtros aplicados (opcional)
-     * @throws IOException Si ocurre un error al escribir el archivo
-     */
+    // Genera Excel con órdenes de compra del productor
     public static void generarExcelOrdenesCompraProductor(ArrayList<?> listaOrdenes, OutputStream outputStream, String filtrosInformacion) throws IOException {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Órdenes de Compra");
@@ -2373,9 +2272,7 @@ public class ExcelUtil {
         }
     }
 
-    /**
-     * Genera un archivo Excel con la lista de pedidos del almacén
-     */
+    // Genera Excel con pedidos del almacén
     public static void generarExcelPedidos(ArrayList<?> listaPedidos, OutputStream outputStream, String filtrosInformacion) throws IOException {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Pedidos de Salida");
@@ -2508,6 +2405,219 @@ public class ExcelUtil {
                 int cantidadProductos = pedido.getItems() != null ? pedido.getItems().size() : 0;
                 c5.setCellValue(cantidadProductos + " producto(s)");
                 c5.setCellStyle(numberStyle);
+            }
+
+            // ===== AJUSTAR ANCHO DE COLUMNAS =====
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+                int currentWidth = sheet.getColumnWidth(i);
+                sheet.setColumnWidth(i, currentWidth + 1000);
+            }
+
+            // Aplicar filtro automático
+            sheet.setAutoFilter(new CellRangeAddress(headerRowIndex, headerRowIndex, 0, headers.length - 1));
+            
+            // Congelar paneles
+            sheet.createFreezePane(0, headerRowIndex + 1);
+
+            // Escribir al stream
+            workbook.write(outputStream);
+        }
+    }
+
+    // Genera Excel combinando pedidos y planes de transporte despachados
+    public static void generarExcelPedidosYPlanes(
+            ArrayList<com.example.telito.almacen.beans.Pedido> listaPedidos,
+            ArrayList<com.example.telito.almacen.beans.PlanTransporte> listaPlanes,
+            OutputStream outputStream, 
+            String filtrosInformacion) throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Pedidos de Salida");
+
+            // ===== ESTILOS =====
+            CellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(IndexedColors.DARK_TEAL.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            headerStyle.setAlignment(HorizontalAlignment.CENTER);
+            headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+            headerStyle.setBorderBottom(BorderStyle.THIN);
+            headerStyle.setBorderTop(BorderStyle.THIN);
+            headerStyle.setBorderLeft(BorderStyle.THIN);
+            headerStyle.setBorderRight(BorderStyle.THIN);
+
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerFont.setColor(IndexedColors.WHITE.getIndex());
+            headerFont.setFontHeightInPoints((short) 12);
+            headerStyle.setFont(headerFont);
+
+            CellStyle titleStyle = workbook.createCellStyle();
+            Font titleFont = workbook.createFont();
+            titleFont.setBold(true);
+            titleFont.setFontHeightInPoints((short) 16);
+            titleFont.setColor(IndexedColors.DARK_TEAL.getIndex());
+            titleStyle.setFont(titleFont);
+            titleStyle.setAlignment(HorizontalAlignment.CENTER);
+
+            CellStyle infoStyle = workbook.createCellStyle();
+            Font infoFont = workbook.createFont();
+            infoFont.setItalic(true);
+            infoFont.setFontHeightInPoints((short) 10);
+            infoFont.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
+            infoStyle.setFont(infoFont);
+
+            CellStyle dataStyle = workbook.createCellStyle();
+            dataStyle.setAlignment(HorizontalAlignment.LEFT);
+            dataStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+            dataStyle.setBorderBottom(BorderStyle.THIN);
+            dataStyle.setBorderTop(BorderStyle.THIN);
+            dataStyle.setBorderLeft(BorderStyle.THIN);
+            dataStyle.setBorderRight(BorderStyle.THIN);
+
+            CellStyle numberStyle = workbook.createCellStyle();
+            numberStyle.cloneStyleFrom(dataStyle);
+            numberStyle.setAlignment(HorizontalAlignment.RIGHT);
+
+            CellStyle dateStyle = workbook.createCellStyle();
+            dateStyle.cloneStyleFrom(dataStyle);
+            dateStyle.setAlignment(HorizontalAlignment.CENTER);
+            CreationHelper createHelper = workbook.getCreationHelper();
+            dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/mm/yyyy hh:mm"));
+
+            // ===== TÍTULO =====
+            int rowIndex = 0;
+            Row titleRow = sheet.createRow(rowIndex++);
+            titleRow.setHeightInPoints(25);
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("📦 REPORTE DE PEDIDOS DE SALIDA - ALMACÉN");
+            titleCell.setCellStyle(titleStyle);
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 6));
+
+            // ===== INFORMACIÓN DE FILTROS =====
+            Row infoRow1 = sheet.createRow(rowIndex++);
+            Cell infoCell1 = infoRow1.createCell(0);
+            infoCell1.setCellValue("Filtros aplicados: " + filtrosInformacion);
+            infoCell1.setCellStyle(infoStyle);
+            sheet.addMergedRegion(new CellRangeAddress(rowIndex - 1, rowIndex - 1, 0, 6));
+
+            Row infoRow2 = sheet.createRow(rowIndex++);
+            Cell infoCell2 = infoRow2.createCell(0);
+            infoCell2.setCellValue("Fecha de generación: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date()));
+            infoCell2.setCellStyle(infoStyle);
+            sheet.addMergedRegion(new CellRangeAddress(rowIndex - 1, rowIndex - 1, 0, 6));
+
+            rowIndex++; // Fila vacía
+
+            // ===== ENCABEZADOS =====
+            int headerRowIndex = rowIndex;
+            Row headerRow = sheet.createRow(rowIndex++);
+            headerRow.setHeightInPoints(20);
+
+            String[] headers = {
+                "Tipo",
+                "N° Pedido/Plan", 
+                "Cliente/Producto", 
+                "Destino", 
+                "Fecha Creación", 
+                "Estado", 
+                "Detalles"
+            };
+
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // ===== DATOS - PEDIDOS =====
+            for (com.example.telito.almacen.beans.Pedido pedido : listaPedidos) {
+                Row dataRow = sheet.createRow(rowIndex++);
+
+                Cell c0 = dataRow.createCell(0);
+                c0.setCellValue("Pedido");
+                c0.setCellStyle(dataStyle);
+
+                Cell c1 = dataRow.createCell(1);
+                c1.setCellValue(pedido.getNumeroPedido());
+                c1.setCellStyle(dataStyle);
+
+                Cell c2 = dataRow.createCell(2);
+                c2.setCellValue(pedido.getCliente() != null ? pedido.getCliente().getNombre() : "");
+                c2.setCellStyle(dataStyle);
+
+                Cell c3 = dataRow.createCell(3);
+                c3.setCellValue(pedido.getDestino() != null ? pedido.getDestino() : "");
+                c3.setCellStyle(dataStyle);
+
+                Cell c4 = dataRow.createCell(4);
+                if (pedido.getFechaCreacion() != null) {
+                    c4.setCellValue(pedido.getFechaCreacion());
+                    c4.setCellStyle(dateStyle);
+                } else {
+                    c4.setCellValue("");
+                    c4.setCellStyle(dataStyle);
+                }
+
+                Cell c5 = dataRow.createCell(5);
+                c5.setCellValue(pedido.getEstadoPreparacion() != null ? pedido.getEstadoPreparacion() : "");
+                c5.setCellStyle(dataStyle);
+
+                Cell c6 = dataRow.createCell(6);
+                int cantidadProductos = pedido.getItems() != null ? pedido.getItems().size() : 0;
+                c6.setCellValue(cantidadProductos + " producto(s)");
+                c6.setCellStyle(numberStyle);
+            }
+
+            // ===== DATOS - PLANES DE TRANSPORTE =====
+            for (com.example.telito.almacen.beans.PlanTransporte plan : listaPlanes) {
+                Row dataRow = sheet.createRow(rowIndex++);
+
+                Cell c0 = dataRow.createCell(0);
+                c0.setCellValue("Plan de Transporte");
+                c0.setCellStyle(dataStyle);
+
+                Cell c1 = dataRow.createCell(1);
+                c1.setCellValue(plan.getNumeroPlan());
+                c1.setCellStyle(dataStyle);
+
+                Cell c2 = dataRow.createCell(2);
+                c2.setCellValue(plan.getNombreProducto() != null ? plan.getNombreProducto() : "N/A");
+                c2.setCellStyle(dataStyle);
+
+                Cell c3 = dataRow.createCell(3);
+                c3.setCellValue(plan.getNombreDestino() != null ? plan.getNombreDestino() : "N/A");
+                c3.setCellStyle(dataStyle);
+
+                Cell c4 = dataRow.createCell(4);
+                // La tabla planes_transporte no tiene fecha_creacion, usar fecha_entrega como referencia
+                if (plan.getFechaEntrega() != null && !plan.getFechaEntrega().equals("N/A")) {
+                    try {
+                        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                        java.util.Date fecha = sdf.parse(plan.getFechaEntrega());
+                        c4.setCellValue(fecha);
+                        c4.setCellStyle(dateStyle);
+                    } catch (Exception e) {
+                        c4.setCellValue(plan.getFechaEntrega());
+                        c4.setCellStyle(dataStyle);
+                    }
+                } else {
+                    c4.setCellValue("");
+                    c4.setCellStyle(dataStyle);
+                }
+
+                Cell c5 = dataRow.createCell(5);
+                c5.setCellValue(plan.getEstado() != null ? plan.getEstado() : "");
+                c5.setCellStyle(dataStyle);
+
+                Cell c6 = dataRow.createCell(6);
+                String detalles = String.format("Lote: %s | Conductor: %s | Vehículo: %s | Paquetes: %d | Fecha Entrega: %s",
+                    plan.getCodigoLote() != null ? plan.getCodigoLote() : "N/A",
+                    plan.getNombreConductor() != null ? plan.getNombreConductor() : "N/A",
+                    plan.getPlacaVehiculo() != null ? plan.getPlacaVehiculo() : "N/A",
+                    plan.getPaquetesDisponibles(),
+                    plan.getFechaEntrega() != null ? plan.getFechaEntrega() : "N/A");
+                c6.setCellValue(detalles);
+                c6.setCellStyle(dataStyle);
             }
 
             // ===== AJUSTAR ANCHO DE COLUMNAS =====

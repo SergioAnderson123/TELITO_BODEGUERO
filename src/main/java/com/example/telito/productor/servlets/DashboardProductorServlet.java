@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import com.example.telito.util.DatabaseConnection;
 
+// Dashboard del productor - redirige a ProductorServlet
 @WebServlet("/productor/DashboardProductorServlet")
 public class DashboardProductorServlet extends HttpServlet {
     
@@ -26,6 +27,7 @@ public class DashboardProductorServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        // Solo productores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederProductor(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de productor intentó acceder a DashboardProductorServlet desde: " + 
@@ -35,13 +37,11 @@ public class DashboardProductorServlet extends HttpServlet {
             return;
         }
         
-        // Redirigir al dashboard correcto (inicio-productor.jsp a través de ProductorServlet)
+        // Redirigir a ProductorServlet con acción inicio
         response.sendRedirect(request.getContextPath() + "/ProductorServlet?action=inicio");
     }
     
-    /**
-     * Obtiene todas las métricas para el dashboard del productor.
-     */
+    // Obtiene todas las métricas para el dashboard
     private MetricasProductor obtenerMetricas(int idProductor) {
         MetricasProductor metricas = new MetricasProductor();
         
@@ -49,32 +49,19 @@ public class DashboardProductorServlet extends HttpServlet {
         LoteDao loteDao = new LoteDao();
         OrdenCompraDao ordenCompraDao = new OrdenCompraDao();
         
-        // Productos activos
         metricas.productosActivos = productoDao.contarProductosPorProductor(idProductor);
-        
-        // Lotes registrados este mes
         metricas.lotesEsteMes = contarLotesEsteMes(idProductor);
-        
-        // Órdenes pendientes
         metricas.ordenesPendientes = contarOrdenesPendientes(idProductor);
-        
-        // Órdenes en proceso
         metricas.ordenesEnProceso = contarOrdenesEnProceso(idProductor);
-        
-        // Total de órdenes
+        metricas.ordenesCompletadas = contarOrdenesCompletadas(idProductor);
         metricas.totalOrdenes = contarTotalOrdenes(idProductor);
-        
-        // Stock total
         metricas.stockTotal = calcularStockTotal(idProductor);
-        
-        // Lotes próximos a vencer (próximos 30 días)
         metricas.lotesProximosVencer = contarLotesProximosVencer(idProductor);
         
         return metricas;
     }
     
-    /**
-     * Cuenta los lotes registrados este mes por el productor.
+    // Cuenta lotes registrados este mes
      */
     private int contarLotesEsteMes(int idProductor) {
         // Si no existe fecha_creacion, usar id_lote como aproximación (lotes más recientes)
@@ -140,6 +127,18 @@ public class DashboardProductorServlet extends HttpServlet {
             SELECT COUNT(*) as total
             FROM ordenes_compra
             WHERE productor_id = ? AND estado = 'En Proceso'
+            """;
+        return ejecutarCount(sql, idProductor);
+    }
+    
+    /**
+     * Cuenta las órdenes completadas (Recibido) del productor.
+     */
+    private int contarOrdenesCompletadas(int idProductor) {
+        String sql = """
+            SELECT COUNT(*) as total
+            FROM ordenes_compra
+            WHERE productor_id = ? AND estado = 'Recibido'
             """;
         return ejecutarCount(sql, idProductor);
     }
@@ -224,6 +223,7 @@ public class DashboardProductorServlet extends HttpServlet {
         public int lotesEsteMes;
         public int ordenesPendientes;
         public int ordenesEnProceso;
+        public int ordenesCompletadas;
         public int totalOrdenes;
         public int stockTotal;
         public int lotesProximosVencer;
@@ -233,6 +233,7 @@ public class DashboardProductorServlet extends HttpServlet {
         public int getLotesEsteMes() { return lotesEsteMes; }
         public int getOrdenesPendientes() { return ordenesPendientes; }
         public int getOrdenesEnProceso() { return ordenesEnProceso; }
+        public int getOrdenesCompletadas() { return ordenesCompletadas; }
         public int getTotalOrdenes() { return totalOrdenes; }
         public int getStockTotal() { return stockTotal; }
         public int getLotesProximosVencer() { return lotesProximosVencer; }

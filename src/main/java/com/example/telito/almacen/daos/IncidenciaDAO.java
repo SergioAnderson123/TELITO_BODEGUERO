@@ -6,11 +6,10 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de incidencias del almacén
 public class IncidenciaDAO extends DAOBase {
     
-    /**
-     * Crea una nueva incidencia.
-     */
+    // Crea una nueva incidencia reportada por un almacenero
     public int crearIncidencia(Incidencia incidencia) {
         String sql = "INSERT INTO incidencias_almacen " +
                 "(lote_id, producto_id, tipo_incidencia, cantidad_reportada, cantidad_sistema, " +
@@ -52,16 +51,12 @@ public class IncidenciaDAO extends DAOBase {
         return generatedId;
     }
     
-    /**
-     * Lista todas las incidencias con información detallada.
-     */
+    // Lista incidencias con filtros de estado y tipo (sin búsqueda)
     public ArrayList<Incidencia> listarIncidencias(String estado, String tipo, int page, int size) {
         return listarIncidencias(estado, tipo, null, page, size);
     }
     
-    /**
-     * Lista todas las incidencias con información detallada y búsqueda.
-     */
+    // Lista incidencias con filtros de estado, tipo y búsqueda
     public ArrayList<Incidencia> listarIncidencias(String estado, String tipo, String busqueda, int page, int size) {
         ArrayList<Incidencia> incidencias = new ArrayList<>();
         StringBuilder sql = new StringBuilder(

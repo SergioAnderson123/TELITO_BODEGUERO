@@ -6,8 +6,10 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de conductores desde perspectiva de logística
 public class ConductorDao extends DAOBase {
 
+    // Lista todos los conductores ordenados por nombre
     public ArrayList<ConductorBean> listarConductores() {
         ArrayList<ConductorBean> lista = new ArrayList<>();
         String sql = "SELECT id_conductor, nombre_completo FROM conductores ORDER BY nombre_completo ASC";

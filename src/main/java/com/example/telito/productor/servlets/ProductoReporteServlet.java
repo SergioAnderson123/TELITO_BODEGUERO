@@ -20,13 +20,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+// Exportación de reportes de productos a Excel
 @WebServlet(name = "ProductoReporteServlet", value = "/productor/ProductoReporteServlet")
 public class ProductoReporteServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de productor
+        // Solo productores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederProductor(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de productor intentó acceder a ProductoReporteServlet desde: " + 
@@ -56,7 +57,7 @@ public class ProductoReporteServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de productor
+        // Solo productores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederProductor(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de productor intentó acceder a ProductoReporteServlet (POST) desde: " + 

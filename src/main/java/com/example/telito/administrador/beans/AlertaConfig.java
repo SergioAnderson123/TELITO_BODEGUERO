@@ -3,18 +3,17 @@ package com.example.telito.administrador.beans;
 import com.example.telito.administrador.beans.Categoria;
 import com.example.telito.administrador.beans.Rol;
 
+// Bean para representar una configuración de alerta
 public class AlertaConfig {
 
     private int idAlertaConfig;
     private String nombre;
     private String tipoAlerta;
-    private Integer umbralDias; // Usamos Integer para permitir valores nulos
-    private Categoria categoria; // Reutilizamos el bean Categoria
-    private Rol rolANotificar; // Reutilizamos el bean Rol
+    private Integer umbralDias; // Puede ser null
+    private Categoria categoria;
+    private Rol rolANotificar;
     private String mensajePersonalizado;
     private boolean activo;
-
-    // Getters y Setters
 
     public int getIdAlertaConfig() {
         return idAlertaConfig;

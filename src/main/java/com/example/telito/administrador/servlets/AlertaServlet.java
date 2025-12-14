@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// Gestión de configuraciones de alertas
 @WebServlet(name = "AlertaServlet", value = "/AlertaServlet")
 public class AlertaServlet extends HttpServlet {
 
@@ -24,7 +25,7 @@ public class AlertaServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de administrador
+        // Solo administradores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a AlertaServlet desde: " + 
@@ -60,7 +61,7 @@ public class AlertaServlet extends HttpServlet {
                 mostrarFormularioEdicion(request, response);
                 break;
             case "borrar": {
-                // Soporta borrado lógico vía GET para el enlace de la tabla
+                // Borrado lógico vía GET (deshabilitar)
                 try {
                     int id = Integer.parseInt(request.getParameter("id"));
                     alertaDAO.deshabilitarAlerta(id);

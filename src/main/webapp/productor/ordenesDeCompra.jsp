@@ -24,20 +24,12 @@
     Integer totalOrdenesAttr = (Integer) request.getAttribute("totalRows");
     int totalOrdenes = (totalOrdenesAttr != null) ? totalOrdenesAttr : listaOrdenes.size();
     
-    // Calcular estadísticas desde la lista paginada (solo para mostrar en la página actual)
-    // Nota: Las estadísticas completas deberían calcularse en el servlet si se necesitan
-    int ordenesPendientes = 0;
-    int ordenesCompletadas = 0;
+    // Obtener estadísticas completas del servlet (calculadas sobre TODAS las órdenes, no solo la página actual)
+    Integer ordenesCompletadasAttr = (Integer) request.getAttribute("ordenesCompletadas");
+    int ordenesCompletadas = (ordenesCompletadasAttr != null) ? ordenesCompletadasAttr : 0;
     
-    for (Object[] orden : listaOrdenes) {
-        String estado = (String) orden[6]; // índice 6 = estado
-        if ("Pendiente".equals(estado) || "Aprobado".equals(estado)) {
-            ordenesPendientes++;
-        } else if ("Recibido".equals(estado)) {
-            ordenesCompletadas++;
-        }
-        // Rechazado no se cuenta en ninguna categoría
-    }
+    Integer ordenesPendientesAttr = (Integer) request.getAttribute("ordenesPendientes");
+    int ordenesPendientes = (ordenesPendientesAttr != null) ? ordenesPendientesAttr : 0;
 %>
 
 <!DOCTYPE html>

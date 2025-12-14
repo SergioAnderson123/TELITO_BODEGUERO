@@ -4,10 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * Clase centralizada para gestionar las conexiones a la base de datos.
- * Implementa el patrón Singleton para mantener configuración única.
- */
+// Gestión centralizada de conexiones a la base de datos
 public class DatabaseConnection {
     
     // Configuración de la base de datos
@@ -26,19 +23,11 @@ public class DatabaseConnection {
         }
     }
     
-    /**
-     * Constructor privado para evitar instanciación
-     */
+    // Constructor privado (clase utilitaria)
     private DatabaseConnection() {
-        // No se permite instanciar esta clase
     }
     
-    /**
-     * Obtiene una nueva conexión a la base de datos.
-     * 
-     * @return Connection objeto de conexión a la base de datos
-     * @throws SQLException si hay un error al conectar
-     */
+    // Obtiene nueva conexión a la base de datos
     public static Connection getConnection() throws SQLException {
         try {
             Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -51,11 +40,7 @@ public class DatabaseConnection {
         }
     }
     
-    /**
-     * Cierra una conexión de forma segura.
-     * 
-     * @param conn Conexión a cerrar
-     */
+    // Cierra conexión de forma segura
     public static void closeConnection(Connection conn) {
         if (conn != null) {
             try {
@@ -68,11 +53,7 @@ public class DatabaseConnection {
         }
     }
     
-    /**
-     * Verifica si la conexión a la base de datos está disponible.
-     * 
-     * @return true si la conexión es exitosa, false en caso contrario
-     */
+    // Verifica si la conexión a la base de datos está disponible
     public static boolean testConnection() {
         try (Connection conn = getConnection()) {
             return conn != null && !conn.isClosed();

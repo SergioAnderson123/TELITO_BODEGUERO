@@ -8,9 +8,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// DAO para gestión de plantillas de carga masiva
 public class PlantillaDAO extends DAOBase {
 
-    // Carga la lista de plantillas para la tabla principal, pero sin los detalles de mapeo.
+    // Lista todas las plantillas (sin detalles de mapeo)
     public ArrayList<PlantillaConfig> listarPlantillas() {
         ArrayList<PlantillaConfig> listaPlantillas = new ArrayList<>();
         String sql = "SELECT * FROM plantillas_config ORDER BY nombre";
@@ -41,7 +42,7 @@ public class PlantillaDAO extends DAOBase {
         return listaPlantillas;
     }
 
-    // Trae una plantilla con todos sus mapeos para el formulario de edición.
+    // Obtiene una plantilla completa con todos sus mapeos de columnas
     public PlantillaConfig obtenerPlantillaPorId(int id) {
         PlantillaConfig plantilla = null;
         String sqlPlantilla = "SELECT * FROM plantillas_config WHERE id_plantilla = ?";

@@ -16,11 +16,12 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Map;
 
+// Dashboard principal del administrador con estadísticas del sistema
 @WebServlet(name = "MenuPrincipalServlet", value = "/inicio")
 public class MenuPrincipalServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de administrador
+        // Solo administradores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a MenuPrincipalServlet desde: " + 
@@ -37,13 +38,13 @@ public class MenuPrincipalServlet extends HttpServlet {
         ReporteDAO reporteDAO = new ReporteDAO();
         AuditoriaDAO auditoriaDAO = new AuditoriaDAO();
 
-        // Estadísticas básicas
+        // Estadísticas de usuarios
         int totalUsuarios = usuarioDAO.contarTotalUsuarios();
         int usuariosBaneados = usuarioDAO.contarUsuariosBaneados();
         int usuariosActivos = totalUsuarios - usuariosBaneados;
         int alertasAbiertas = alertaDAO.contarAlertasAbiertas();
         
-        // Métricas adicionales del sistema
+        // Métricas del sistema
         int totalProductos = reporteDAO.contarProductos();
         int totalLotes = reporteDAO.contarLotes();
         int eficienciaLogistica = reporteDAO.calcularEficienciaLogistica();
@@ -55,11 +56,11 @@ public class MenuPrincipalServlet extends HttpServlet {
         int accionesSemana = statsAuditoria.getOrDefault("accionesSemana", 0);
         int accionesFallidas = statsAuditoria.getOrDefault("accionesFallidas", 0);
         
-        // Calcular porcentaje de usuarios activos
+        // Porcentaje de usuarios activos
         double porcentajeActivos = totalUsuarios > 0 ? 
             (usuariosActivos * 100.0 / totalUsuarios) : 0;
 
-        // Atributos para el JSP
+        // Pasar datos a la vista
         request.setAttribute("totalUsuarios", totalUsuarios);
         request.setAttribute("usuariosBaneados", usuariosBaneados);
         request.setAttribute("usuariosActivos", usuariosActivos);
@@ -73,7 +74,6 @@ public class MenuPrincipalServlet extends HttpServlet {
         request.setAttribute("accionesSemana", accionesSemana);
         request.setAttribute("accionesFallidas", accionesFallidas);
 
-        // Enviamos la petición al JSP para que renderice la vista
         RequestDispatcher dispatcher = request.getRequestDispatcher("/administrador/menu-principal.jsp");
         dispatcher.forward(request, response);
     }

@@ -9,14 +9,14 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-// NOTA: Este filtro está configurado en web.xml para garantizar el orden de ejecución
-// y asegurar que se ejecute ANTES que otros filtros que puedan crear sesiones
-// NO usar @WebFilter aquí para evitar conflictos con web.xml
+// Filtro de autenticación - valida sesiones antes de permitir acceso
+// Configurado en web.xml para controlar el orden de ejecución
+// NO usar @WebFilter para evitar conflictos
 public class AuthFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        // Inicialización del filtro
+        // Sin inicialización necesaria
     }
 
     @Override
@@ -26,12 +26,11 @@ public class AuthFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         
-        // URLs que no requieren autenticación
+        // Rutas públicas que no requieren autenticación
         String requestURI = httpRequest.getRequestURI();
         String contextPath = httpRequest.getContextPath();
         String path = requestURI.substring(contextPath.length());
         
-        // Permitir acceso sin autenticación solo a estas rutas específicas
         if (path.equals("/") || 
             path.equals("/acceso/login") ||
             path.equals("/login") ||
@@ -46,26 +45,22 @@ public class AuthFilter implements Filter {
             return;
         }
         
-        // TODAS LAS DEMÁS RUTAS REQUIEREN AUTENTICACIÓN - CONTINUAR CON VALIDACIÓN
-        
-        // ========== VALIDACIÓN PRINCIPAL DE SESIÓN ==========
-        // IMPORTANTE: getSession(false) NO crea una sesión nueva si no existe
-        // En ventana incógnita NO debería haber cookie de sesión, así que retornará null
+        // Validar sesión - getSession(false) no crea sesión nueva
         HttpSession session = httpRequest.getSession(false);
         
-        // 1. PRIMERO: Verificar que exista una sesión HTTP (cookie de sesión)
+        // Verificar que exista sesión HTTP
         if (session == null) {
-            // NO hay cookie de sesión (ventana incógnita o sesión expirada)
+            // Sin cookie de sesión (ventana incógnita o expirada)
             System.err.println("🚨 SEGURIDAD: Acceso denegado - No hay sesión HTTP (posible ventana incógnita) desde: " + 
                              httpRequest.getRemoteAddr() + " | URI: " + requestURI);
             httpResponse.sendRedirect(contextPath + "/acceso/login");
             return;
         }
         
-        // 2. Verificar que la sesión tenga los atributos necesarios
+        // Verificar atributos de autenticación
         if (session.getAttribute("usuario") == null || 
             session.getAttribute("sesionActiva") == null) {
-            // Sesión existe pero NO está autenticada (no tiene atributos de usuario)
+            // Sesión existe pero no está autenticada
             System.err.println("🚨 SEGURIDAD: Acceso denegado - Sesión sin autenticación desde: " + 
                              httpRequest.getRemoteAddr() + " | Sesión ID: " + session.getId());
             session.invalidate();
@@ -73,10 +68,9 @@ public class AuthFilter implements Filter {
             return;
         }
         
-        // 2. Verificar que el usuario esté activo
+        // Verificar que el usuario esté activo
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null || !usuario.isActivo()) {
-            // Usuario nulo o inactivo
             if (usuario != null) {
                 SecurityManager.eliminarSesion(usuario.getIdUsuario(), session.getId());
                 System.err.println("🚨 SEGURIDAD: Usuario inactivo intentando acceder - Usuario ID " + 
@@ -87,9 +81,7 @@ public class AuthFilter implements Filter {
             return;
         }
         
-        // ========== VALIDACIONES DE SEGURIDAD ADICIONALES ==========
-        
-        // 1. Verificar que la sesión esté autorizada (previene sesiones duplicadas o no válidas)
+        // Validar que la sesión esté autorizada (previene sesiones duplicadas)
         String sessionId = session.getId();
         if (!SecurityManager.sesionAutorizada(usuario.getIdUsuario(), sessionId)) {
             System.err.println("🚨 SEGURIDAD: Sesión no autorizada detectada - Usuario ID " + 

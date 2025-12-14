@@ -15,16 +15,15 @@ import jakarta.servlet.http.HttpSession; // Importa HttpSession
 import java.io.IOException;
 import java.util.ArrayList;
 
+// Gestión de movimientos de inventario (historial de entradas y salidas)
 @WebServlet("/almacen/MovimientoServlet")
 public class MovimientoServlet extends HttpServlet {
-
-// En tu archivo: MovimientoServlet.java
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que el usuario tenga rol de almacenero
+        // Solo almaceneros
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a MovimientoServlet desde: " + 
@@ -36,11 +35,11 @@ public class MovimientoServlet extends HttpServlet {
         String action = request.getParameter("action") == null ? "listar" : request.getParameter("action");
         MovimientoDao movimientoDao = new MovimientoDao();
 
-        // Obtener el usuario de la sesión (establecido por LoginServlet y protegido por AuthFilter)
+        // Obtener usuario de la sesión
         com.example.telito.administrador.beans.Usuario usuarioSesion = 
             (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
         
-        // Crear un bean compatible para este módulo si es necesario
+        // Crear bean compatible para este módulo
         Usuario usuarioLogueado = null;
         if (usuarioSesion != null) {
             usuarioLogueado = new Usuario();
@@ -63,7 +62,7 @@ public class MovimientoServlet extends HttpServlet {
                     }
                     if (paginaActual < 1) paginaActual = 1;
 
-                    // Parámetros de filtros
+                    // Filtros
                     String filtro = request.getParameter("filtro");
                     String busqueda = request.getParameter("busqueda");
                     String tipoMovimiento = request.getParameter("tipo");
@@ -71,6 +70,7 @@ public class MovimientoServlet extends HttpServlet {
                     int totalRegistros;
                     ArrayList<Movimiento> listaMovimientos;
 
+                    // Filtrar por usuario si se solicita
                     if ("mios".equals(filtro) && usuarioLogueado != null) {
                         int usuarioId = usuarioLogueado.getIdUsuario();
                         totalRegistros = movimientoDao.contarMovimientosPorUsuario(usuarioId, busqueda, tipoMovimiento);

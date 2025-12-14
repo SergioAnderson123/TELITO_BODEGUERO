@@ -1,5 +1,6 @@
 package com.example.telito.productor.beans;
 
+// Bean para representar un producto desde perspectiva del productor
 public class Producto {
 
     private int idProducto;
@@ -14,7 +15,6 @@ public class Producto {
     private int categoriaId;
     private int numeroLotes;
     private double stockTotal;
-    // Y sus respectivos getter y setter
 
 
     public double getStockTotal() {

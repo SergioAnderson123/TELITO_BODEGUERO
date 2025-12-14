@@ -13,6 +13,9 @@
     <jsp:include page="/logistica/layouts/head.jsp">
         <jsp:param name="pageTitle" value="Distribucion y Transporte"/>
     </jsp:include>
+    <!-- Select2 CSS para mejorar el dropdown de búsqueda -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     <style>
         /* Estilo para el encabezado de la tabla igual que en productor */
         .table-card .card-header {
@@ -348,6 +351,116 @@
             border-color: #28a745;
             outline: none;
             box-shadow: 0 0 0 3px rgba(40,167,69,0.1);
+        }
+        
+        /* ===================== Estilos para Select2 en el modal ===================== */
+        #agregarPlanModal .select2-container {
+            width: 100% !important;
+        }
+        #agregarPlanModal .select2-selection--single {
+            height: auto !important;
+            min-height: 48px;
+            border: 2px solid #e9ecef !important;
+            border-radius: 8px !important;
+            padding: 10px 14px !important;
+            background: white !important;
+            transition: all 0.3s ease !important;
+        }
+        #agregarPlanModal .select2-selection--single:focus,
+        #agregarPlanModal .select2-container--open .select2-selection--single {
+            border-color: #28a745 !important;
+            box-shadow: 0 0 0 3px rgba(40,167,69,0.1) !important;
+        }
+        #agregarPlanModal .select2-selection__rendered {
+            padding: 0 !important;
+            line-height: 1.5 !important;
+            color: #2b2d42 !important;
+            font-size: 0.95rem !important;
+        }
+        #agregarPlanModal .select2-selection__arrow {
+            height: 100% !important;
+            right: 12px !important;
+        }
+        #agregarPlanModal .select2-selection__arrow b {
+            border-color: #6c757d transparent transparent transparent !important;
+            border-width: 6px 5px 0 5px !important;
+        }
+        #agregarPlanModal .select2-container--open .select2-selection__arrow b {
+            border-color: transparent transparent #6c757d transparent !important;
+            border-width: 0 5px 6px 5px !important;
+        }
+        #agregarPlanModal .select2-dropdown {
+            border: 2px solid #e9ecef !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            z-index: 9999 !important;
+            margin-top: 4px !important;
+        }
+        #agregarPlanModal .select2-search--dropdown {
+            padding: 12px !important;
+            background: #f8f9fa !important;
+            border-bottom: 2px solid #e9ecef !important;
+        }
+        #agregarPlanModal .select2-search--dropdown .select2-search__field {
+            border: 2px solid #e9ecef !important;
+            border-radius: 6px !important;
+            padding: 8px 12px !important;
+            font-size: 0.9rem !important;
+            transition: all 0.3s ease !important;
+        }
+        #agregarPlanModal .select2-search--dropdown .select2-search__field:focus {
+            border-color: #28a745 !important;
+            box-shadow: 0 0 0 3px rgba(40,167,69,0.1) !important;
+            outline: none !important;
+        }
+        #agregarPlanModal .select2-results {
+            max-height: 250px !important;
+            overflow-y: auto !important;
+        }
+        #agregarPlanModal .select2-results__option {
+            padding: 12px 14px !important;
+            font-size: 0.95rem !important;
+            color: #2b2d42 !important;
+            transition: all 0.2s ease !important;
+        }
+        #agregarPlanModal .select2-results__option--highlighted {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            color: #ffffff !important;
+        }
+        #agregarPlanModal .select2-results__option--highlighted * {
+            color: #ffffff !important;
+        }
+        #agregarPlanModal .select2-results__option[aria-selected="true"] {
+            background-color: #e8f5e9 !important;
+            color: #28a745 !important;
+            font-weight: 600 !important;
+        }
+        /* Asegurar que el texto sea visible en todos los estados */
+        #agregarPlanModal .select2-results__option:hover {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            color: #ffffff !important;
+        }
+        #agregarPlanModal .select2-results__option:hover * {
+            color: #ffffff !important;
+        }
+        /* Scrollbar personalizado para el dropdown */
+        #agregarPlanModal .select2-results::-webkit-scrollbar {
+            width: 8px;
+        }
+        #agregarPlanModal .select2-results::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        #agregarPlanModal .select2-results::-webkit-scrollbar-thumb {
+            background: #28a745;
+            border-radius: 4px;
+        }
+        #agregarPlanModal .select2-results::-webkit-scrollbar-thumb:hover {
+            background: #20c997;
+        }
+        /* Ocultar campo de búsqueda en el dropdown de distrito */
+        #agregarPlanModal .distrito-select + .select2-container .select2-search--dropdown {
+            display: none !important;
         }
         #agregarPlanModal .form-hint {
             margin-top: 6px;
@@ -922,6 +1035,60 @@
             agregarPlanModal.classList.add('show');
             agregarPlanModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            
+            // Inicializar Select2 en los dropdowns después de abrir el modal
+            setTimeout(function() {
+                inicializarSelect2Lote();
+                inicializarSelect2Distrito();
+            }, 100);
+        }
+        
+        // Función para inicializar Select2 en el dropdown de lotes
+        function inicializarSelect2Lote() {
+            const selectLote = $('#modalLote');
+            if (selectLote.length && !selectLote.hasClass('select2-hidden-accessible')) {
+                selectLote.select2({
+                    theme: 'bootstrap-5',
+                    placeholder: {
+                        id: '',
+                        text: 'Seleccione un lote...'
+                    },
+                    allowClear: true,
+                    dropdownParent: $('#agregarPlanModal'),
+                    width: '100%',
+                    language: {
+                        noResults: function() {
+                            return "No se encontraron lotes";
+                        },
+                        searching: function() {
+                            return "Buscando...";
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Función para inicializar Select2 en el dropdown de distrito (sin búsqueda)
+        function inicializarSelect2Distrito() {
+            const selectDistrito = $('#modalDestino');
+            if (selectDistrito.length && !selectDistrito.hasClass('select2-hidden-accessible')) {
+                selectDistrito.select2({
+                    theme: 'bootstrap-5',
+                    placeholder: {
+                        id: '',
+                        text: 'Seleccione un destino...'
+                    },
+                    allowClear: true,
+                    dropdownParent: $('#agregarPlanModal'),
+                    width: '100%',
+                    minimumResultsForSearch: Infinity, // Desactiva la búsqueda
+                    language: {
+                        noResults: function() {
+                            return "No se encontraron destinos";
+                        }
+                    }
+                });
+            }
         }
         
         // ===================== Cargar lotes por productor =====================
@@ -930,6 +1097,17 @@
         
         // Función para cerrar el modal
         function cerrarModalAgregarPlan() {
+            // Destruir Select2 antes de cerrar
+            const selectLote = $('#modalLote');
+            if (selectLote.length && selectLote.hasClass('select2-hidden-accessible')) {
+                selectLote.select2('destroy');
+            }
+            
+            const selectDistrito = $('#modalDestino');
+            if (selectDistrito.length && selectDistrito.hasClass('select2-hidden-accessible')) {
+                selectDistrito.select2('destroy');
+            }
+            
             agregarPlanModal.classList.remove('show');
             agregarPlanModal.style.display = 'none';
             document.body.style.overflow = '';
@@ -1009,7 +1187,7 @@
                         <i class="fas fa-box"></i>
                         Producto y Lote a Transportar <span class="text-danger">*</span>
                     </label>
-                    <select class="form-control" id="modalLote" name="lote_id" required>
+                    <select class="form-control lote-select" id="modalLote" name="lote_id" required>
                         <option value="" selected disabled>Seleccione un lote...</option>
                         <%
                             ArrayList<LoteBean> lotesModal = (ArrayList<LoteBean>) request.getAttribute("listaLotes");
@@ -1112,7 +1290,7 @@
                                 <i class="fas fa-map-marker-alt"></i>
                                 Destino (Distrito) <span class="text-danger">*</span>
                             </label>
-                            <select class="form-control" id="modalDestino" name="distrito_id" required>
+                            <select class="form-control distrito-select" id="modalDestino" name="distrito_id" required>
                                 <option value="" selected disabled>Seleccione un destino...</option>
                                 <%
                                     ArrayList<DistritoBean> distritosModal = (ArrayList<DistritoBean>) request.getAttribute("listaDistritos");
@@ -1230,6 +1408,10 @@
         </form>
     </div>
 </div>
+
+<!-- jQuery y Select2 JS para mejorar el dropdown de búsqueda -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 </body>
 </html>

@@ -7,42 +7,22 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Clase base abstracta para todos los DAOs del sistema.
- * Proporciona métodos comunes para el manejo de conexiones, transacciones
- * y operaciones de base de datos.
- * 
- * @author Telito Bodeguero
- * @version 1.0
- */
+// Clase base abstracta para todos los DAOs (métodos comunes de conexión y operaciones)
 public abstract class DAOBase {
     
     protected static final Logger logger = LoggerFactory.getLogger(DAOBase.class);
     
-    /**
-     * Obtiene una conexión a la base de datos.
-     * 
-     * @return Connection objeto de conexión
-     * @throws SQLException si hay un error al conectar
-     */
+    // Obtiene conexión a la base de datos
     protected Connection getConnection() throws SQLException {
         return DatabaseConnection.getConnection();
     }
     
-    /**
-     * Cierra una conexión de forma segura.
-     * 
-     * @param conn Conexión a cerrar
-     */
+    // Cierra conexión de forma segura
     protected void closeConnection(Connection conn) {
         DatabaseConnection.closeConnection(conn);
     }
     
-    /**
-     * Cierra un PreparedStatement de forma segura.
-     * 
-     * @param pstmt PreparedStatement a cerrar
-     */
+    // Cierra PreparedStatement de forma segura
     protected void closePreparedStatement(PreparedStatement pstmt) {
         if (pstmt != null) {
             try {
@@ -53,11 +33,7 @@ public abstract class DAOBase {
         }
     }
     
-    /**
-     * Cierra un Statement de forma segura.
-     * 
-     * @param stmt Statement a cerrar
-     */
+    // Cierra Statement de forma segura
     protected void closeStatement(Statement stmt) {
         if (stmt != null) {
             try {
@@ -68,11 +44,7 @@ public abstract class DAOBase {
         }
     }
     
-    /**
-     * Cierra un ResultSet de forma segura.
-     * 
-     * @param rs ResultSet a cerrar
-     */
+    // Cierra ResultSet de forma segura
     protected void closeResultSet(ResultSet rs) {
         if (rs != null) {
             try {
@@ -83,49 +55,26 @@ public abstract class DAOBase {
         }
     }
     
-    /**
-     * Cierra todos los recursos de forma segura.
-     * 
-     * @param conn Conexión
-     * @param stmt Statement
-     * @param rs ResultSet
-     */
+    // Cierra todos los recursos (Connection, Statement, ResultSet)
     protected void closeResources(Connection conn, Statement stmt, ResultSet rs) {
         closeResultSet(rs);
         closeStatement(stmt);
         closeConnection(conn);
     }
     
-    /**
-     * Cierra todos los recursos de forma segura (sobrecarga para PreparedStatement).
-     * 
-     * @param conn Conexión
-     * @param pstmt PreparedStatement
-     * @param rs ResultSet
-     */
+    // Cierra todos los recursos (Connection, PreparedStatement, ResultSet)
     protected void closeResources(Connection conn, PreparedStatement pstmt, ResultSet rs) {
         closeResultSet(rs);
         closePreparedStatement(pstmt);
         closeConnection(conn);
     }
     
-    /**
-     * Ejecuta una consulta SELECT y retorna el número de filas encontradas.
-     * 
-     * @param sql Consulta SQL
-     * @return Número de filas
-     */
+    // Ejecuta consulta SELECT y retorna número de filas (sin parámetros)
     protected int count(String sql) {
         return count(sql, null);
     }
     
-    /**
-     * Ejecuta una consulta SELECT con parámetros y retorna el número de filas encontradas.
-     * 
-     * @param sql Consulta SQL con placeholders (?)
-     * @param params Parámetros para la consulta
-     * @return Número de filas
-     */
+    // Ejecuta consulta SELECT con parámetros y retorna número de filas
     protected int count(String sql, Object... params) {
         int count = 0;
         Connection conn = null;
@@ -154,23 +103,12 @@ public abstract class DAOBase {
         return count;
     }
     
-    /**
-     * Ejecuta una consulta INSERT, UPDATE o DELETE.
-     * 
-     * @param sql Consulta SQL
-     * @return Número de filas afectadas
-     */
+    // Ejecuta INSERT/UPDATE/DELETE (sin parámetros)
     protected int executeUpdate(String sql) {
         return executeUpdate(sql, null);
     }
     
-    /**
-     * Ejecuta una consulta INSERT, UPDATE o DELETE con parámetros.
-     * 
-     * @param sql Consulta SQL con placeholders (?)
-     * @param params Parámetros para la consulta
-     * @return Número de filas afectadas
-     */
+    // Ejecuta INSERT/UPDATE/DELETE con parámetros
     protected int executeUpdate(String sql, Object... params) {
         Connection conn = null;
         PreparedStatement pstmt = null;

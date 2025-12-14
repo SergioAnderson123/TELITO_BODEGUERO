@@ -10,12 +10,15 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de pedidos desde perspectiva del almacén
 public class PedidoDao extends DAOBase {
 
+    // Contar total sin filtros
     public int contarPedidos() {
         return contarPedidos(null, null);
     }
     
+    // Contar con filtros de búsqueda y estado
     public int contarPedidos(String busqueda, String estado) {
         String sql = "SELECT COUNT(*) FROM pedidos p " +
                 "LEFT JOIN clientes c ON p.cliente_id = c.id_cliente " +
@@ -59,10 +62,12 @@ public class PedidoDao extends DAOBase {
         return 0;
     }
     
+    // Listar sin filtros
     public ArrayList<Pedido> listarPedidosPaginados(int offset, int limit) {
         return listarPedidosPaginados(offset, limit, null, null);
     }
     
+    // Listar con filtros de búsqueda y estado
     public ArrayList<Pedido> listarPedidosPaginados(int offset, int limit, String busqueda, String estado) {
         ArrayList<Pedido> listaPedidos = new ArrayList<>();
         String sql = "SELECT p.id_pedido, p.numero_pedido, p.destino, p.estado_preparacion, " +
@@ -290,6 +295,7 @@ public class PedidoDao extends DAOBase {
 
     /**
      * Método para obtener todos los pedidos sin paginación (para reportes)
+     * Incluye los items de cada pedido
      */
     public ArrayList<Pedido> listarTodosLosPedidos() {
         ArrayList<Pedido> listaPedidos = new ArrayList<>();
@@ -299,9 +305,16 @@ public class PedidoDao extends DAOBase {
                 "LEFT JOIN clientes c ON p.cliente_id = c.id_cliente " +
                 "ORDER BY p.id_pedido DESC";
 
+        String sqlItems = "SELECT pi.producto_id, pi.cantidad_requerida, prod.codigo_sku, prod.nombre AS nombre_producto " +
+                "FROM pedido_items pi " +
+                "INNER JOIN productos prod ON (pi.producto_id = prod.id_producto) " +
+                "WHERE pi.pedido_id = ?";
+
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
+        PreparedStatement pstmtItems = null;
+        ResultSet rsItems = null;
 
         try {
             conn = getConnection();
@@ -322,6 +335,34 @@ public class PedidoDao extends DAOBase {
                 cliente.setNombre(rs.getString("nombre_cliente"));
                 pedido.setCliente(cliente);
                 
+                // Cargar items del pedido
+                ArrayList<PedidoItem> listaItems = new ArrayList<>();
+                try {
+                    pstmtItems = conn.prepareStatement(sqlItems);
+                    pstmtItems.setInt(1, pedido.getIdPedido());
+                    rsItems = pstmtItems.executeQuery();
+                    
+                    while (rsItems.next()) {
+                        PedidoItem item = new PedidoItem();
+                        item.setProductoId(rsItems.getInt("producto_id"));
+                        item.setCantidadRequerida(rsItems.getInt("cantidad_requerida"));
+                        item.setCodigoProducto(rsItems.getString("codigo_sku"));
+                        item.setNombreProducto(rsItems.getString("nombre_producto"));
+                        listaItems.add(item);
+                    }
+                } catch (SQLException e) {
+                    logger.warn("Error al cargar items del pedido " + pedido.getIdPedido() + ": " + e.getMessage());
+                    // Continuar sin items si hay error
+                } finally {
+                    if (rsItems != null) {
+                        try { rsItems.close(); } catch (SQLException e) {}
+                    }
+                    if (pstmtItems != null) {
+                        try { pstmtItems.close(); } catch (SQLException e) {}
+                    }
+                }
+                
+                pedido.setItems(listaItems);
                 listaPedidos.add(pedido);
             }
         } catch (SQLException e) {

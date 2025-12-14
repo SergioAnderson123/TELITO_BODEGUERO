@@ -16,19 +16,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
- * Servlet para manejar la recuperación de contraseñas.
- * 
- * MEJORAS SOBRE TELITO_RRHH:
- * - Validación de fortaleza de contraseña
- * - Confirmación de contraseña
- * - Hash seguro de contraseñas (SHA-256)
- * - Validación de token más robusta
- * - Mejor manejo de errores
- * 
- * @author Telito Bodeguero
- * @version 2.0
- */
+// Recuperación de contraseñas mediante tokens seguros
 @WebServlet(name = "PasswordResetServlet", value = "/acceso/recuperar")
 public class PasswordResetServlet extends HttpServlet {
     
@@ -41,7 +29,7 @@ public class PasswordResetServlet extends HttpServlet {
         String action = request.getParameter("action");
         String token = request.getParameter("token");
         
-        // Si hay un token pero no hay action, asumir que se debe verificar el token
+        // Si hay token sin action, asumir verificación
         if (action == null && token != null && !token.trim().isEmpty()) {
             action = "verificarToken";
         }
@@ -52,12 +40,12 @@ public class PasswordResetServlet extends HttpServlet {
         
         switch (action) {
             case "solicitar":
-                // Mostrar formulario de solicitud de recuperación
+                // Mostrar formulario de solicitud
                 mostrarFormularioSolicitud(request, response);
                 break;
                 
             case "verificarToken":
-                // Verificar token y mostrar formulario de cambio de contraseña
+                // Verificar token y mostrar formulario de cambio
                 if (token == null || token.trim().isEmpty()) {
                     request.setAttribute("error", "Token de recuperación no proporcionado.");
                     mostrarFormularioSolicitud(request, response);
@@ -70,7 +58,7 @@ public class PasswordResetServlet extends HttpServlet {
                 int usuarioId = TokenService.validarTokenRecuperacion(token.trim(), ipAddress, userAgent);
                 
                 if (usuarioId > 0) {
-                    // Token válido, mostrar formulario de cambio de contraseña
+                    // Token válido
                     request.setAttribute("token", token);
                     request.setAttribute("tokenValido", true);
                     RequestDispatcher view = request.getRequestDispatcher("/acceso/recuperar-contrasena.jsp");

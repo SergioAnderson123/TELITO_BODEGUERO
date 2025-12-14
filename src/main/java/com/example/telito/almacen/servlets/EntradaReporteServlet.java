@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+// Exportación de reportes de entradas (órdenes de compra) a Excel
 @WebServlet(name = "EntradaReporteServlet", value = "/almacen/EntradaReporteServlet")
 public class EntradaReporteServlet extends HttpServlet {
 
@@ -27,7 +28,7 @@ public class EntradaReporteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que el usuario tenga rol de almacenero
+        // Solo almaceneros
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a EntradaReporteServlet desde: " + 
@@ -55,7 +56,7 @@ public class EntradaReporteServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que el usuario tenga rol de almacenero
+        // Solo almaceneros
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a EntradaReporteServlet (POST) desde: " + 
@@ -76,28 +77,40 @@ public class EntradaReporteServlet extends HttpServlet {
     private void exportarExcel(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        OrdenCompraDao ordenDao = new OrdenCompraDao();
+        try {
+            OrdenCompraDao ordenDao = new OrdenCompraDao();
 
-        // Obtener todas las órdenes sin paginación (creamos un método para obtener todas)
-        ArrayList<OrdenCompra> listaOrdenes = ordenDao.listarTodasLasOrdenes();
+            // Obtener todas las órdenes sin paginación (creamos un método para obtener todas)
+            ArrayList<OrdenCompra> listaOrdenes = ordenDao.listarTodasLasOrdenes();
 
-        String filtrosInfo = "Todas las órdenes de compra";
+            String filtrosInfo = "Todas las órdenes de compra";
 
-        String fecha = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String nombreArchivo = "Reporte_Ordenes_Compra_Almacen_" + fecha + ".xlsx";
+            String fecha = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String nombreArchivo = "Reporte_Ordenes_Compra_Almacen_" + fecha + ".xlsx";
 
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + nombreArchivo + "\"");
-        response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + nombreArchivo + "\"");
+            response.setCharacterEncoding("UTF-8");
 
-        try (OutputStream out = response.getOutputStream()) {
-            ExcelUtil.generarExcelOrdenesCompra(listaOrdenes, out, filtrosInfo);
-            out.flush();
+            try (OutputStream out = response.getOutputStream()) {
+                ExcelUtil.generarExcelOrdenesCompra(listaOrdenes, out, filtrosInfo);
+                out.flush();
+            } catch (Exception e) {
+                System.err.println("Error al generar Excel de órdenes de compra: " + e.getMessage());
+                e.printStackTrace();
+                // Si la respuesta ya fue comprometida, no podemos enviar un error
+                if (!response.isCommitted()) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        "Error al generar el archivo Excel: " + e.getMessage());
+                }
+            }
         } catch (Exception e) {
-            System.err.println("Error al generar Excel de órdenes de compra: " + e.getMessage());
+            System.err.println("Error en exportarExcel: " + e.getMessage());
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                "Error al generar el archivo Excel: " + e.getMessage());
+            if (!response.isCommitted()) {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Error al procesar la solicitud: " + e.getMessage());
+            }
         }
     }
 

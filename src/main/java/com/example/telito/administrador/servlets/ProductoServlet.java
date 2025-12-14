@@ -14,11 +14,12 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// Gestión de productos e inventario general
 @WebServlet(name = "ProductoServlet", value = "/ProductoServlet")
 public class ProductoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de administrador
+        // Solo administradores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a ProductoServlet desde: " + 
@@ -51,7 +52,7 @@ public class ProductoServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de administrador
+        // Solo administradores
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAdministrador(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a ProductoServlet (POST) desde: " + 

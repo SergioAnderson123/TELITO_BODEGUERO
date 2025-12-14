@@ -11,20 +11,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-/**
- * Esta clase se encarga de todas las operaciones relacionadas con
- * los productos en la base de datos.
- */
+// DAO para gestión de productos desde perspectiva del productor
 public class ProductoDao extends DAOBase {
 
-    /**
-     * Lista productos de un productor con paginación, incluyendo su categoría,
-     * stock total y número de lotes. Optimizado para evitar consultas N+1.
-     * @param productorId El ID del usuario productor.
-     * @param offset Número de registros a saltar.
-     * @param limit Número máximo de registros a retornar.
-     * @return Una lista de objetos Producto.
-     */
+    // Lista productos del productor con paginación (incluye categoría, stock total y número de lotes)
     public ArrayList<Producto> listarProductosPorProductor(int productorId, int offset, int limit) {
         ArrayList<Producto> listaProductos = new ArrayList<>();
 

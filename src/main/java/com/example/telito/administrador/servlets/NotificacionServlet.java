@@ -16,15 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Servlet para gestionar las notificaciones web en tiempo real.
- * Endpoints disponibles:
- * - GET /NotificacionServlet?action=obtener : Obtiene notificaciones del usuario
- * - GET /NotificacionServlet?action=contador : Obtiene el contador de no leídas
- * - POST /NotificacionServlet?action=marcarLeida&id=X : Marca una notificación como leída
- * - POST /NotificacionServlet?action=marcarTodasLeidas : Marca todas como leídas
- * - POST /NotificacionServlet?action=eliminar&id=X : Elimina una notificación
- */
+// Gestión de notificaciones web en tiempo real - API JSON
 @WebServlet(name = "NotificacionServlet", value = "/NotificacionServlet")
 public class NotificacionServlet extends HttpServlet {
 

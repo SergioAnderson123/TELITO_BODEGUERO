@@ -8,29 +8,28 @@ import java.util.ArrayList;
 
 public class UsuarioDAO extends DAOBase {
 
-    // Este método es para la tabla principal de usuarios, con todos los filtros.
+    // Lista usuarios con filtros, ordenamiento y paginación
     public ArrayList<Usuario> listarUsuarios(String busqueda, String rolId, String estado, String sortBy, String sortOrder, int page, int size) {
 
         ArrayList<Usuario> listaUsuarios = new ArrayList<>();
-        // La consulta base une usuarios con roles para mostrar el nombre del rol.
+        // Consulta base con JOIN a roles para obtener nombre del rol
         String sql = "SELECT u.id_usuario, u.nombres, u.apellidos, u.email, u.codigo_productor, u.activo, u.rol_id, u.foto_perfil, u.distrito_id, r.nombre AS nombre_rol FROM usuarios u " +
                 "INNER JOIN roles r ON u.rol_id = r.id_rol WHERE 1=1";
 
-        // Voy añadiendo a la consulta los filtros que el usuario haya usado.
+        // Construir filtros dinámicamente
         if (busqueda != null && !busqueda.trim().isEmpty()) {
             sql += " AND (u.nombres LIKE ? OR u.apellidos LIKE ? OR u.email LIKE ?)";
         }
         if (rolId != null && !rolId.trim().isEmpty()) {
             sql += " AND u.rol_id = ?";
         }
-        // Solo filtrar por estado si se especifica un valor (1=activo, 0=inactivo)
-        // Si es null o vacío, significa "Todos" y no se aplica filtro
+        // Filtrar por estado solo si se especifica (1=activo, 0=inactivo)
+        // Si es null o vacío, mostrar todos
         if (estado != null && !estado.trim().isEmpty()) {
             sql += " AND u.activo = ?";
         }
 
-        // Lógica para ordenar la tabla según la columna que se elija.
-        // Por defecto, ordenar por ID descendente para que los usuarios más recientes aparezcan primero
+        // Ordenamiento - por defecto ID descendente (más recientes primero)
         String columnaOrden = "u.id_usuario";
         String direccionOrden = "DESC";
 
@@ -56,7 +55,7 @@ public class UsuarioDAO extends DAOBase {
             pstmt = conn.prepareStatement(sql);
 
             int parameterIndex = 1;
-            // Asigno los valores a los '?' de la consulta que armé arriba.
+            // Asignar valores a los parámetros de la consulta
             if (busqueda != null && !busqueda.trim().isEmpty()) {
                 String busquedaConWildcards = "%" + busqueda + "%";
                 pstmt.setString(parameterIndex++, busquedaConWildcards);
@@ -70,7 +69,7 @@ public class UsuarioDAO extends DAOBase {
                 pstmt.setInt(parameterIndex++, Integer.parseInt(estado));
             }
 
-            // Pagination parameters
+            // Parámetros de paginación
             int limit = Math.max(1, size);
             int offset = Math.max(0, (Math.max(1, page) - 1) * size);
             pstmt.setInt(parameterIndex++, limit);
@@ -85,18 +84,18 @@ public class UsuarioDAO extends DAOBase {
                 usuario.setEmail(rs.getString("email"));
                 usuario.setActivo(rs.getBoolean("activo"));
 
-                // Intentar obtener codigo_productor si existe la columna
+                // Obtener codigo_productor si existe (puede ser null)
                 try {
                     usuario.setCodigoProductor(rs.getString("codigo_productor"));
                 } catch (SQLException e) {
                     usuario.setCodigoProductor(null);
                 }
 
-                // Intentar obtener foto_perfil si existe la columna
+                // Obtener foto_perfil si existe
                 try {
                     usuario.setFotoPerfil(rs.getString("foto_perfil"));
                 } catch (SQLException e) {
-                    // Columna foto_perfil no existe, usar valor por defecto
+                    // Columna no existe, usar null
                     usuario.setFotoPerfil(null);
                 }
                 

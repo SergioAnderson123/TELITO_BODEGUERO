@@ -8,10 +8,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-// Este DAO es solo para las consultas de los reportes. No hay inserts ni updates aquí.
+// DAO solo para consultas de reportes - sin inserts ni updates
 public class ReporteDAO extends DAOBase {
 
-    // --- Indicadores agregados para tarjetas dinámicas de Reportes Globales ---
+    // Contar rutas activas (planes no entregados)
     public int contarRutasActivas() {
         String sql = "SELECT COUNT(*) FROM planes_transporte WHERE estado IS NOT NULL AND estado <> 'Entregado'";
         Connection conn = null;
@@ -32,6 +32,7 @@ public class ReporteDAO extends DAOBase {
         return 0;
     }
 
+    // Calcula porcentaje de planes entregados vs total
     public int calcularEficienciaLogistica() {
         String sql = "SELECT SUM(CASE WHEN estado = 'Entregado' THEN 1 ELSE 0 END) AS entregados, COUNT(*) AS total FROM planes_transporte";
         Connection conn = null;

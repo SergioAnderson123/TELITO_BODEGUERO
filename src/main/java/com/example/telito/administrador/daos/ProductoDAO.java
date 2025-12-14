@@ -5,9 +5,10 @@ import com.example.telito.util.DAOBase;
 import java.sql.*;
 import java.util.ArrayList;
 
+// DAO para gestión de productos
 public class ProductoDAO extends DAOBase {
 
-    // Para la tabla de inventario general, carga todos los productos.
+    // Lista todos los productos activos con stock total calculado desde lotes
     public ArrayList<Producto> listarProductos() {
         ArrayList<Producto> listaProductos = new ArrayList<>();
         String sql = "SELECT p.*, c.nombre as categoria_nombre, " +
@@ -35,7 +36,7 @@ public class ProductoDAO extends DAOBase {
                 producto.setNombre(rs.getString("nombre"));
                 producto.setDescripcion(rs.getString("descripcion"));
                 producto.setPrecioActual(rs.getDouble("precio_actual"));
-                producto.setStock(rs.getInt("stock_total")); // Stock calculado desde lotes
+                producto.setStock(rs.getInt("stock_total")); // Stock sumado desde lotes
                 producto.setUnidadesPorPaquete(rs.getInt("unidades_por_paquete"));
                 producto.setProductorId(rs.getInt("productor_id"));
                 producto.setCategoriaId(rs.getInt("categoria_id"));
@@ -51,23 +52,19 @@ public class ProductoDAO extends DAOBase {
         return listaProductos;
     }
 
-    // Permite cambiar el stock mínimo de un producto desde la tabla de inventario.
+    // Actualiza el stock mínimo de un producto
     public void actualizarStockMinimo(int productoId, int stockMinimo) {
         String sql = "UPDATE productos SET stock_minimo = ? WHERE id_producto = ?";
         executeUpdate(sql, stockMinimo, productoId);
     }
 
-    // Este es para una de las alertas, cuenta productos con stock por debajo del mínimo.
+    // Cuenta productos con stock por debajo del mínimo (para alertas)
     public int contarProductosConAlertaDeStock() {
         String sql = "SELECT COUNT(*) FROM productos WHERE stock <= stock_minimo AND stock_minimo > 0";
         return count(sql);
     }
     
-    /**
-     * Verifica si existe un producto activo con el SKU especificado.
-     * @param codigoSKU Código SKU del producto
-     * @return true si existe, false en caso contrario
-     */
+    // Verifica si existe un producto activo con el SKU dado
     public boolean existeProductoPorSKU(String codigoSKU) {
         String sql = "SELECT COUNT(*) FROM productos WHERE codigo_sku = ? AND activo = 1";
         

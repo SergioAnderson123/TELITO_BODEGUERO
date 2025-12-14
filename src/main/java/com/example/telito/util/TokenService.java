@@ -11,20 +11,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
-/**
- * Servicio para la gestión segura de tokens de activación y recuperación de contraseña.
- * 
- * MEJORAS SOBRE TELITO_RRHH:
- * - Tokens hasheados (SHA-256) para mayor seguridad
- * - Rate limiting para prevenir abuso
- * - Auditoría completa de operaciones
- * - Validación de expiración más robusta
- * - Prevención de reutilización de tokens
- * - Tracking de IPs y User Agents
- * 
- * @author Telito Bodeguero
- * @version 2.0
- */
+// Servicio para gestión segura de tokens (activación y recuperación de contraseña)
+// Tokens hasheados SHA-256, rate limiting, auditoría y prevención de reutilización
 public class TokenService {
     
     private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
@@ -37,11 +25,7 @@ public class TokenService {
     private static final int MAX_INTENTOS_ACTIVACION = 5; // Máximo 5 intentos de activación
     private static final int MAX_TOKENS_PENDIENTES = 3; // Máximo 3 tokens pendientes por usuario
     
-    /**
-     * Genera un token único y seguro.
-     * 
-     * @return Token único de 64 caracteres
-     */
+    // Genera token único y seguro (128 caracteres)
     public static String generarToken() {
         // Combinar UUID + timestamp + random para mayor seguridad
         String token = UUID.randomUUID().toString().replace("-", "") +
@@ -57,12 +41,7 @@ public class TokenService {
         return token.substring(0, 128);
     }
     
-    /**
-     * Genera un hash SHA-256 de un token para almacenamiento seguro.
-     * 
-     * @param token Token original
-     * @return Hash SHA-256 del token
-     */
+    // Genera hash SHA-256 de un token para almacenamiento seguro
     public static String hashToken(String token) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -84,14 +63,7 @@ public class TokenService {
         }
     }
     
-    /**
-     * Crea un token de activación para un usuario.
-     * 
-     * @param usuarioId ID del usuario
-     * @param ipAddress IP desde donde se solicita
-     * @param userAgent User agent del navegador
-     * @return Token original (sin hashear) para enviar por email
-     */
+    // Crea token de activación para un usuario (retorna token original para enviar por email)
     public static String crearTokenActivacion(int usuarioId, String ipAddress, String userAgent) {
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -122,7 +94,7 @@ public class TokenService {
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, usuarioId);
             pstmt.setString(2, tokenHash);
-            pstmt.setString(3, tokenOriginal); // Guardamos el original para comparación
+            pstmt.setString(3, tokenOriginal); // Guardar original para comparación
             pstmt.setTimestamp(4, fechaExpiracion);
             pstmt.setString(5, ipAddress);
             pstmt.setString(6, userAgent);
@@ -135,7 +107,7 @@ public class TokenService {
             
             logger.info("✓ Token de activación creado para usuario ID: {}", usuarioId);
             
-            return tokenOriginal; // Retornar el token original (sin hash) para enviar por email
+            return tokenOriginal; // Retornar token original (sin hash) para enviar por email
             
         } catch (SQLException e) {
             logger.error("Error al crear token de activación", e);
@@ -148,14 +120,7 @@ public class TokenService {
         }
     }
     
-    /**
-     * Valida y usa un token de activación.
-     * 
-     * @param token Token original (sin hash)
-     * @param ipAddress IP desde donde se usa
-     * @param userAgent User agent del navegador
-     * @return ID del usuario si el token es válido, -1 si no es válido
-     */
+    // Valida y usa un token de activación (retorna ID del usuario si es válido, -1 si no)
     public static int validarYUsarTokenActivacion(String token, String ipAddress, String userAgent) {
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -166,7 +131,7 @@ public class TokenService {
             
             conn = DatabaseConnection.getConnection();
             
-            // Buscar token válido
+            // Buscar token válido (no usado)
             String sql = "SELECT usuario_id, fecha_expiracion, usado " +
                         "FROM tokens_activacion " +
                         "WHERE token = ? AND usado = FALSE";

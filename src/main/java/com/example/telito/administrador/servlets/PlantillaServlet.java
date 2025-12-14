@@ -17,13 +17,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Gestión de plantillas para carga masiva de datos
 @WebServlet(name = "PlantillaServlet", value = "/PlantillaServlet")
 public class PlantillaServlet extends HttpServlet {
 
-    // doGet para mostrar las páginas o para acciones que no sean de formularios (como deshabilitar).
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Verificar que el usuario tenga rol de administrador
+        // Solo administradores
         HttpSession session = request.getSession(false);
         if (session == null || !AuthorizationHelper.puedeAccederAdministrador(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de administrador intentó acceder a PlantillaServlet desde: " + 
@@ -47,7 +47,7 @@ public class PlantillaServlet extends HttpServlet {
 
         switch (action) {
             case "listar":
-                // Carga la lista de plantillas para la tabla de gestión.
+                // Listar todas las plantillas
                 ArrayList<PlantillaConfig> listaPlantillas = plantillaDAO.listarPlantillas();
                 request.setAttribute("listaPlantillas", listaPlantillas);
                 view = request.getRequestDispatcher("/administrador/gestion-plantillas.jsp");
@@ -55,13 +55,13 @@ public class PlantillaServlet extends HttpServlet {
                 break;
 
             case "formCrear":
-                // Muestra el formulario para crear una plantilla nueva.
+                // Mostrar formulario de creación
                 view = request.getRequestDispatcher("/administrador/form-plantilla.jsp");
                 view.forward(request, response);
                 break;
 
             case "editar":
-                // Carga los datos de una plantilla para rellenar el formulario de edición.
+                // Cargar datos para edición
                 try {
                     int idPlantilla = Integer.parseInt(request.getParameter("id"));
                     PlantillaConfig plantilla = plantillaDAO.obtenerPlantillaPorId(idPlantilla);

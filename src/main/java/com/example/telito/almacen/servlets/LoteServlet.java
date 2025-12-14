@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// Gestión de lotes registrados en el almacén (gestión de stock)
 @WebServlet("/almacen/LoteServlet")
 public class LoteServlet extends HttpServlet {
 
@@ -24,7 +25,7 @@ public class LoteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que el usuario tenga rol de almacenero
+        // Solo almaceneros
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a LoteServlet desde: " + 
@@ -39,20 +40,20 @@ public class LoteServlet extends HttpServlet {
 
         switch (action) {
             case "lista":
-                // Parámetros de paginación
+                // Paginación
                 String pageStr = request.getParameter("page");
                 int page = (pageStr == null || pageStr.isEmpty()) ? 1 : Integer.parseInt(pageStr);
                 if (page < 1) page = 1;
 
-                // Parámetros de filtros
+                // Filtros
                 String busqueda = request.getParameter("busqueda");
                 String estado = request.getParameter("estado");
 
-                // Se llaman a los métodos del DAO con filtros
+                // Obtener lotes con filtros
                 ArrayList<Lote> listaLotes = loteDao.listarLotesRegistrados(page, busqueda, estado);
                 int totalRegistros = loteDao.contarTotalLotesRegistrados(busqueda, estado);
 
-                // Calcular estadísticas (sin filtros para obtener totales reales)
+                // Estadísticas generales (sin filtros)
                 int totalLotes = loteDao.contarTotalLotesRegistrados(null, null);
                 int enStock = loteDao.contarTotalLotesRegistrados(null, "En stock");
                 int sinStock = loteDao.contarTotalLotesRegistrados(null, "Sin stock");

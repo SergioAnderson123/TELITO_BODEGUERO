@@ -6,50 +6,38 @@ import com.example.telito.administrador.daos.AuditoriaDAO;
 import com.example.telito.administrador.daos.ConfiguracionSistemaDAO;
 import jakarta.servlet.http.HttpServletRequest;
 
-/**
- * Servicio para registrar acciones en el log de auditoría.
- */
+// Servicio para registrar acciones en el log de auditoría
 public class AuditoriaService {
     
     private static final AuditoriaDAO auditoriaDAO = new AuditoriaDAO();
     private static final ConfiguracionSistemaDAO configDAO = new ConfiguracionSistemaDAO();
     
-    /**
-     * Verifica si la auditoría está habilitada.
-     */
+    // Verifica si la auditoría está habilitada en la configuración
     private static boolean isAuditoriaHabilitada() {
         return configDAO.obtenerValorBoolean("sistema.auditoria.enabled", true);
     }
     
-    /**
-     * Registra una acción en el log de auditoría.
-     */
+    // Registra una acción exitosa básica
     public static void registrarAccion(Usuario usuario, String accion, String modulo, 
                                       String descripcion, HttpServletRequest request) {
         registrarAccionInterno(usuario, accion, modulo, descripcion, null, null, "EXITOSO", null, request);
     }
     
-    /**
-     * Registra una acción con datos adicionales.
-     */
+    // Registra una acción con datos anteriores y nuevos (para actualizaciones)
     public static void registrarAccion(Usuario usuario, String accion, String modulo, 
                                       String descripcion, String datosAnteriores, 
                                       String datosNuevos, HttpServletRequest request) {
         registrarAccionInterno(usuario, accion, modulo, descripcion, datosAnteriores, datosNuevos, "EXITOSO", null, request);
     }
     
-    /**
-     * Registra una acción fallida.
-     */
+    // Registra una acción fallida
     public static void registrarAccionFallida(Usuario usuario, String accion, String modulo, 
                                              String descripcion, String mensajeError, 
                                              HttpServletRequest request) {
         registrarAccionInterno(usuario, accion, modulo, descripcion, null, null, "FALLIDO", mensajeError, request);
     }
     
-    /**
-     * Registra una acción con todos los parámetros (método público completo).
-     */
+    // Método completo con todos los parámetros
     public static void registrarAccion(Usuario usuario, String accion, String modulo, 
                                       String descripcion, String datosAnteriores, 
                                       String datosNuevos, String estado, String mensajeError,
@@ -57,15 +45,13 @@ public class AuditoriaService {
         registrarAccionInterno(usuario, accion, modulo, descripcion, datosAnteriores, datosNuevos, estado, mensajeError, request);
     }
     
-    /**
-     * Método principal para registrar acciones (privado).
-     */
+    // Método interno que hace el registro real
     private static void registrarAccionInterno(Usuario usuario, String accion, String modulo, 
                                        String descripcion, String datosAnteriores, 
                                        String datosNuevos, String estado, String mensajeError,
                                        HttpServletRequest request) {
         
-        // Verificar si la auditoría está habilitada
+        // Si la auditoría está deshabilitada, no registrar nada
         if (!isAuditoriaHabilitada()) {
             return;
         }

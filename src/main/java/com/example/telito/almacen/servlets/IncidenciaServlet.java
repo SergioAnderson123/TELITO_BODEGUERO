@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+// Gestión de incidencias del almacén (almaceneros reportan, administradores resuelven)
 @WebServlet("/almacen/IncidenciaServlet")
 public class IncidenciaServlet extends HttpServlet {
     
@@ -30,8 +31,8 @@ public class IncidenciaServlet extends HttpServlet {
         
         HttpSession session = request.getSession(false);
         
-        // Verificar permisos: almacenero puede reportar y ver sus incidencias
-        // Administrador puede ver todas y resolver
+        // Almaceneros pueden reportar y ver sus incidencias
+        // Administradores pueden ver todas y resolver
         if (session == null || session.getAttribute("usuario") == null) {
             response.sendRedirect(request.getContextPath() + "/acceso/login");
             return;

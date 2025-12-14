@@ -21,17 +21,15 @@ import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+// Gestión de entradas de productos al almacén (recepción de órdenes de compra)
 @WebServlet("/almacen/EntradaServlet")
 public class EntradaServlet extends HttpServlet {
 
-    /**
-     * El método doGet no necesita cambios.
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que el usuario tenga rol de almacenero
+        // Solo almaceneros
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederAlmacen(session)) {
             System.err.println("🚨 ACCESO DENEGADO: Usuario sin rol de almacenero intentó acceder a EntradaServlet desde: " + 
@@ -48,7 +46,7 @@ public class EntradaServlet extends HttpServlet {
         switch (action) {
             case "lista":
                 try {
-                    // Parámetros de paginación
+                    // Paginación
                     int registrosPorPagina = 5;
                     String pageStr = request.getParameter("page");
                     int paginaActual = 1;
@@ -61,18 +59,18 @@ public class EntradaServlet extends HttpServlet {
                     }
                     if (paginaActual < 1) paginaActual = 1;
 
-                    // Parámetros de filtros
+                    // Filtros
                     String busqueda = request.getParameter("busqueda");
                     String proveedorId = request.getParameter("proveedor");
                     String estado = request.getParameter("estado");
 
-                    // Contar total con filtros
+                    // Calcular totales y páginas
                     int totalRegistros = ordenCompraDao.contarOrdenesPendientes(busqueda, proveedorId, estado);
                     int totalPaginas = (int) Math.ceil((double) totalRegistros / registrosPorPagina);
                     if (totalPaginas == 0) totalPaginas = 1;
                     if (paginaActual > totalPaginas) paginaActual = totalPaginas;
                     
-                    // Calcular estadísticas (sin filtros para obtener totales reales)
+                    // Estadísticas generales (sin filtros)
                     int totalOrdenes = ordenCompraDao.contarTotalOrdenes();
                     int ordenesPendientes = ordenCompraDao.contarOrdenesPendientes(null, null, null);
                     int ordenesRegistradas = ordenCompraDao.contarOrdenesRegistradas();
@@ -80,7 +78,7 @@ public class EntradaServlet extends HttpServlet {
                     int offset = (paginaActual - 1) * registrosPorPagina;
                     ArrayList<OrdenCompra> listaPaginada = ordenCompraDao.listarOrdenesPaginadas(offset, registrosPorPagina, busqueda, proveedorId, estado);
 
-                    // Obtener lista de productores para el filtro
+                    // Cargar productores para filtro
                     request.setAttribute("listaProductores", ordenCompraDao.listarProductores());
 
                     request.setAttribute("listaOrdenes", listaPaginada);
@@ -445,12 +443,13 @@ public class EntradaServlet extends HttpServlet {
             System.out.println("✓ Lote actualizado - Nueva ubicación: " + idUbicacion + " | Estado: Registrado | Stock restaurado: " + nuevoStock + " unidades");
 
             // 7. Registramos el movimiento de entrada (usando el lote existente)
+            // IMPORTANTE: Registrar la cantidad en UNIDADES, no en paquetes, para consistencia
             Movimiento movimiento = new Movimiento();
             movimiento.setLoteId(loteProductorId); // Usar el lote existente
             movimiento.setUsuarioId(usuarioId);
             movimiento.setOrdenCompraId(idOrden);
             movimiento.setTipoMovimiento("Entrada");
-            movimiento.setCantidad(cantidadRecibida);
+            movimiento.setCantidad(cantidadRecibidaUnidades); // Registrar en unidades, no en paquetes
             movimiento.setMotivo("Recepción de OC: " + oc.getNumeroOrden());
             movimientoDao.registrarMovimiento(movimiento);
 
@@ -524,7 +523,10 @@ public class EntradaServlet extends HttpServlet {
             }
             // ========== FIN ENVÍO DE CORREO A LOGÍSTICA ==========
 
-            // 10. Redirigimos de vuelta al módulo de Registrar Entradas
+            // 11. Establecer mensaje de éxito en la sesión
+            session.setAttribute("successMsg", "✓ Recepción de productos en el almacén según la orden de compra confirmada exitosamente.");
+
+            // 12. Redirigimos de vuelta al módulo de Registrar Entradas
             response.sendRedirect(request.getContextPath() + "/almacen/EntradaServlet?action=lista");
 
         } catch (Exception e) {
