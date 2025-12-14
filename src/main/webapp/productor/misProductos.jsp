@@ -40,7 +40,7 @@
            Paleta y tokens
         ====================== */
         :root {
-            --turquoise-dark: #006d77;
+            --turquoise-dark: #00a896;
             --seafoam: #83c5be;
             --seafoam-light: #edf6f9;
             --white: #ffffff;

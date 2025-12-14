@@ -41,6 +41,7 @@
             box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.5) !important;
         }
         
+        
         /* ===================== Estilos para Modal de Enviar por Correo ===================== */
         #sendMovimientosModal.modal { 
             display: none; 

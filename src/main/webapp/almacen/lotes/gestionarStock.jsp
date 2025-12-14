@@ -283,18 +283,24 @@
                 %>
 
                 <!-- ===================== Tarjetas de estadísticas ===================== -->
-                <div class="stats-container">
-                    <div class="stat-card">
-                        <h3>Total de Lotes</h3>
-                        <p><%= totalLotes %></p>
+                <div class="row g-2 mb-3">
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Lotes</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalLotes %></p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>En Stock</h3>
-                        <p><%= enStock %></p>
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">En Stock</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= enStock %></p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Sin Stock</h3>
-                        <p><%= sinStock %></p>
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Sin Stock</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= sinStock %></p>
+                        </div>
                     </div>
                 </div>
 
@@ -383,14 +389,7 @@
                                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">${lote.codigoSKU}</td>
                                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">${lote.nombreProducto}</td>
                                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong>${lote.codigoLote}</strong></td>
-                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                                    <button type="button" 
-                                                            class="btn btn-link text-decoration-none fw-bold" 
-                                                            onclick="mostrarResumenLotes(${lote.productoId}, '${lote.nombreProducto}')"
-                                                                    style="cursor: pointer; color: #ffffff !important; font-size: 0.85rem; padding: 0.4rem 0.8rem !important; background-color: #28a745; border-radius: 6px; border: none;">
-                                                        ${lote.paquetesDisponibles} paquetes
-                                                    </button>
-                                                </td>
+                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">${lote.paquetesDisponibles} paquetes</td>
                                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">${lote.nombreUbicacion}</td>
                                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">${lote.fechaVencimiento}</td>
                                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
@@ -406,7 +405,7 @@
                                                                     </span>
                                                         </c:when>
                                                         <c:when test="${lote.estadoStock == 'En Stock'}">
-                                                                    <span class="badge text-bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.4rem 0.9rem;">
+                                                                    <span class="badge text-bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                                         <i class="fas fa-check-circle me-1"></i>En Stock
                                                                     </span>
                                                         </c:when>

@@ -275,18 +275,24 @@
                 %>
 
                 <!-- ===================== Tarjetas de estadísticas ===================== -->
-                <div class="stats-container">
-                    <div class="stat-card">
-                        <h3>Total de Pedidos</h3>
-                        <p><%= totalPedidos %></p>
+                <div class="row g-2 mb-3">
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Pedidos</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalPedidos %></p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Pendientes</h3>
-                        <p><%= pedidosPendientes %></p>
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Pendientes</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= pedidosPendientes %></p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Despachados</h3>
-                        <p><%= pedidosDespachados %></p>
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Despachados</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= pedidosDespachados %></p>
+                        </div>
                     </div>
                 </div>
 
@@ -320,113 +326,6 @@
                             </div>
                         </div>
                     </form>
-                </div>
-
-                <!-- ===================== Card: Tabla de pedidos ===================== -->
-                <div class="table-card shadow-sm mb-4">
-                    <div class="card-header" style="padding: 0.5rem 0.75rem;">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div>
-                                <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-clipboard-list me-2"></i>Pedidos Pendientes</h5>
-                                <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona los pedidos pendientes de preparación</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body" style="padding: 0.75rem;">
-                        <div class="table-responsive">
-                            <table id="pedidosTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
-                                <thead class="table-light">
-                                <tr>
-                                    <th onclick="sortTable(0)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
-                                        <i class="fas fa-hashtag me-1"></i>N° Pedido
-                                    </th>
-                                    <th onclick="sortTable(1)" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
-                                        <i class="fas fa-user me-1"></i>Cliente
-                                    </th>
-                                    <th onclick="sortTable(2)" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
-                                        <i class="fas fa-map-marker-alt me-1"></i>Destino
-                                    </th>
-                                    <th onclick="sortTable(3)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
-                                        <i class="fas fa-toggle-on me-1"></i>Estado
-                                    </th>
-                                    <th style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold text-center">
-                                        <i class="fas fa-cogs me-1"></i>Acciones
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody id="pedidosTableBody">
-                                <c:choose>
-                                    <c:when test="${not empty listaPedidos}">
-                                        <c:forEach var="pedido" items="${listaPedidos}">
-                                            <tr class="align-middle" style="padding: 0;">
-                                                <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                                    <span class="badge text-bg-primary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">${pedido.numeroPedido}</span>
-                                                </td>
-                                                <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">${pedido.cliente != null ? pedido.cliente.nombre : 'N/A'}</td>
-                                                <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">${pedido.destino}</td>
-                                                <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                                    <c:choose>
-                                                        <c:when test="${pedido.estadoPreparacion == 'Pendiente'}">
-                                                            <span class="badge text-bg-warning text-dark shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                                                <i class="fas fa-hourglass-half me-1"></i>Pendiente
-                                                            </span>
-                                                        </c:when>
-                                                        <c:when test="${pedido.estadoPreparacion == 'Despachado'}">
-                                                            <span class="badge text-bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                                                <i class="fas fa-check-circle me-1"></i>Despachado
-                                                            </span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="badge text-bg-secondary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                                                <i class="fas fa-question-circle me-1"></i>${pedido.estadoPreparacion}
-                                                            </span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                                <td class="text-center" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                                    <c:if test="${pedido.estadoPreparacion == 'Pendiente'}">
-                                                        <a href="PedidoServlet?action=preparar&id=${pedido.idPedido}" class="btn btn-sm btn-primary shadow-sm" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
-                                                            <i class="fas fa-box-open me-1"></i>Preparar
-                                                        </a>
-                                                    </c:if>
-                                                    <c:if test="${pedido.estadoPreparacion != 'Pendiente'}">
-                                                        <span class="text-muted" style="font-size: 0.8rem;"><i class="fas fa-check-circle me-1"></i>Ya preparado</span>
-                                                    </c:if>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <tr>
-                                            <td colspan="5" class="text-center py-5">
-                                                <div class="text-muted">
-                                                    <i class="fas fa-box-open fa-3x mb-3 d-block" style="opacity: 0.3;"></i>
-                                                    <p class="mb-0">No se encontraron pedidos con los filtros aplicados.</p>
-                                                    <small>Intenta ajustar los filtros de búsqueda</small>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </c:otherwise>
-                                </c:choose>
-                                </tbody>
-                            </table>
-                            <!-- Paginación para PEDIDOS -->
-                            <jsp:include page="/WEB-INF/includes/pagination.jsp">
-                                <jsp:param name="currentPage" value="${currentPage}" />
-                                <jsp:param name="totalPages" value="${totalPages}" />
-                                <jsp:param name="totalRows" value="${totalRows}" />
-                                <jsp:param name="size" value="${size}" />
-                                <jsp:param name="baseUrl" value="${baseUrl}" />
-                                <jsp:param name="itemName" value="${itemName}" />
-                                <jsp:param name="param1Name" value="busqueda" />
-                                <jsp:param name="param1Value" value="${busqueda}" />
-                                <jsp:param name="param2Name" value="estado" />
-                                <jsp:param name="param2Value" value="${estadoFiltro}" />
-                                <jsp:param name="param3Name" value="pagePlanes" />
-                                <jsp:param name="param3Value" value="${currentPagePlanes}" />
-                            </jsp:include>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- TABLA DE PLANES DE TRANSPORTE -->
@@ -569,10 +468,9 @@
         }
     });
 
-    let sortDirections = {};
     let sortDirectionsPlanes = {};
 
-    function sortTable(columnIndex, tableId = 'pedidosTable') {
+    function sortTable(columnIndex, tableId = 'planesTable') {
         const table = document.getElementById(tableId);
         if (!table) return;
 
@@ -583,7 +481,7 @@
         if (rows.length === 0) return;
 
         const sortKey = tableId + '_' + columnIndex;
-        const sortDir = sortDirections[sortKey] || sortDirectionsPlanes[sortKey] || 'asc';
+        const sortDir = sortDirectionsPlanes[sortKey] || 'asc';
 
         rows.sort((a, b) => {
             const aText = a.cells[columnIndex]?.textContent.trim() || '';
@@ -605,11 +503,7 @@
         rows.forEach(row => tbody.appendChild(row));
 
         const newSortDir = sortDir === 'asc' ? 'desc' : 'asc';
-        if (tableId === 'pedidosTable') {
-            sortDirections[sortKey] = newSortDir;
-        } else {
-            sortDirectionsPlanes[sortKey] = newSortDir;
-        }
+        sortDirectionsPlanes[sortKey] = newSortDir;
 
         updateSortIndicators(table, columnIndex, newSortDir);
     }
@@ -641,23 +535,19 @@
 </script>
 
 <style>
-    #pedidosTable thead th,
     #planesTable thead th {
         position: relative;
         user-select: none;
         transition: background-color 0.2s ease;
     }
-    #pedidosTable thead th:hover,
     #planesTable thead th:hover {
         background-color: #83c5be !important;
     }
-    #pedidosTable thead th.sort-asc::after,
     #planesTable thead th.sort-asc::after {
         content: ' ▲';
         font-size: 0.7em;
         color: var(--turquoise-dark);
     }
-    #pedidosTable thead th.sort-desc::after,
     #planesTable thead th.sort-desc::after {
         content: ' ▼';
         font-size: 0.7em;

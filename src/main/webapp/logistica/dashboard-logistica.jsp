@@ -121,10 +121,10 @@
                     <div class="col-12">
                         <div class="page-header pt-1 pb-1 d-flex justify-content-between align-items-center flex-wrap">
                             <div>
-                                <h2 class="pageheader-title mb-0" style="font-size: 1.4rem;">
+                                <h2 class="pageheader-title mb-0" style="font-size: 1.4rem; line-height: 1.2;">
                                     <i class="fas fa-chart-line me-2"></i>Dashboard Logístico
                                 </h2>
-                                <p class="pageheader-text mb-0" style="font-size: 0.85rem;">
+                                <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">
                                     Resumen de operaciones logísticas y métricas clave.
                                 </p>
                             </div>
