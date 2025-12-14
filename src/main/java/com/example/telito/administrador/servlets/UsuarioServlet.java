@@ -75,6 +75,10 @@ public class UsuarioServlet extends HttpServlet {
                 editarUsuario(request, response, session);
                 break;
 
+            case "obtenerUsuarioJson":
+                obtenerUsuarioJson(request, response, session);
+                break;
+
             case "borrar":
                 borrarUsuario(request, response, session);
                 break;
@@ -262,6 +266,56 @@ public class UsuarioServlet extends HttpServlet {
                     session.setAttribute("errorMsg", "El ID del usuario no es válido.");
                     response.sendRedirect(request.getContextPath() + "/UsuarioServlet");
                 }
+    }
+
+    /**
+     * Obtiene los datos de un usuario en formato JSON para el modal de edición.
+     */
+    private void obtenerUsuarioJson(HttpServletRequest request, HttpServletResponse response, 
+                                    HttpSession session) throws IOException {
+        try {
+            int idUsuario = Integer.parseInt(request.getParameter("id"));
+            
+            // Verificar permisos
+            if (!AuthorizationHelper.puedeEditarUsuario(session, idUsuario)) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\":\"No tienes permisos para editar este usuario.\"}");
+                return;
+            }
+            
+            Usuario usuario = usuarioDAO.obtenerUsuarioPorId(idUsuario);
+            if (usuario != null) {
+                // Crear un objeto simple con los datos necesarios
+                java.util.Map<String, Object> usuarioData = new java.util.HashMap<>();
+                usuarioData.put("idUsuario", usuario.getIdUsuario());
+                usuarioData.put("nombres", usuario.getNombres());
+                usuarioData.put("apellidos", usuario.getApellidos());
+                usuarioData.put("email", usuario.getEmail());
+                usuarioData.put("rolId", usuario.getRol() != null ? usuario.getRol().getIdRol() : null);
+                usuarioData.put("codigoProductor", usuario.getCodigoProductor());
+                usuarioData.put("distritoId", usuario.getDistritoId());
+                usuarioData.put("activo", usuario.isActivo());
+                
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                Gson gson = new Gson();
+                response.getWriter().write(gson.toJson(usuarioData));
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\":\"Usuario no encontrado.\"}");
+            }
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"ID de usuario inválido.\"}");
+        } catch (Exception e) {
+            logger.error("Error al obtener usuario en JSON: {}", e.getMessage(), e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"Error al obtener los datos del usuario.\"}");
+        }
     }
 
     /**

@@ -509,6 +509,186 @@
             }
         }
         
+        /* ===================== Estilos para Modal de Editar Usuario ===================== */
+        #editUserModal.modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1050; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #editUserModal.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #editUserModal .modal-content { 
+            background-color: #ffffff; 
+            width: 100%;
+            max-width: 700px; 
+            max-height: 90vh; 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        #editUserModal .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); 
+            padding: 20px 25px; 
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+        }
+        #editUserModal .modal-header h2 { 
+            margin: 0; 
+            color: white; 
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #editUserModal .modal-header h2 i {
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        #editUserModal .modal-close { 
+            color: white; 
+            font-size: 24px; 
+            font-weight: normal; 
+            cursor: pointer; 
+            opacity: 0.9; 
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        #editUserModal .modal-close:hover { 
+            opacity: 1; 
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        #editUserModal .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(90vh - 160px);
+        }
+        #editUserModal .form-group {
+            margin-bottom: 1rem;
+        }
+        #editUserModal .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2b2d42;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #editUserModal .form-group label i {
+            color: #00a896;
+            font-size: 0.85rem;
+        }
+        #editUserModal .form-group input,
+        #editUserModal .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        #editUserModal .form-group input:focus,
+        #editUserModal .form-group select:focus {
+            border-color: #00a896;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        #editUserModal .form-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-top: 6px;
+            padding: 8px 12px;
+            background: rgba(0,168,150,0.05);
+            border-radius: 6px;
+        }
+        #editUserModal .form-hint i {
+            color: #00a896;
+            flex-shrink: 0;
+        }
+        #editUserModal .modal-footer { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 12px; 
+            padding: 20px 25px; 
+            border-top: 2px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 0 0 16px 16px;
+        }
+        #editUserModal .modal-footer button {
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #editUserModal .modal-footer .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        #editUserModal .modal-footer .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+        }
+        #editUserModal .modal-footer button[type="submit"] {
+            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+        }
+        #editUserModal .modal-footer button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+        }
+        @media (max-width: 768px) {
+            #editUserModal .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: 95vh;
+                margin: 10px;
+            }
+            #editUserModal.show {
+                padding: 10px;
+            }
+        }
+        
         /* Eliminar scroll horizontal de la tabla */
         #userTable {
             width: 100% !important;
@@ -811,7 +991,7 @@
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 180px; font-size: 0.9rem; border-radius: 8px; padding: 8px 0; margin-top: 8px;">
                                             <li>
-                                                <a class="dropdown-item d-flex align-items-center py-2 px-3" href="<%= request.getContextPath() %>/UsuarioServlet?action=editar&id=<%= usuario.getIdUsuario() %>" style="transition: all 0.2s ease; color: #495057;" onmouseover="this.style.background='#e3f2fd'; this.style.color='#1976d2'; this.style.paddingLeft='20px';" onmouseout="this.style.background='transparent'; this.style.color='#495057'; this.style.paddingLeft='12px';">
+                                                <a class="dropdown-item d-flex align-items-center py-2 px-3" href="#" onclick="editarUsuario(<%= usuario.getIdUsuario() %>); return false;" style="transition: all 0.2s ease; color: #495057;" onmouseover="this.style.background='#e3f2fd'; this.style.color='#1976d2'; this.style.paddingLeft='20px';" onmouseout="this.style.background='transparent'; this.style.color='#495057'; this.style.paddingLeft='12px';">
                                                     <i class="fas fa-edit me-3" style="width: 20px; color: #1976d2; font-size: 1rem;"></i>
                                                     <span style="font-weight: 500;">Editar</span>
                                                 </a>
@@ -1166,7 +1346,209 @@
             if (event.key === 'Escape' && sendEmailModal && sendEmailModal.classList.contains('show')) {
                 cerrarModalEnviarCorreo();
             }
+            if (event.key === 'Escape' && editUserModal && editUserModal.classList.contains('show')) {
+                cerrarModalEditarUsuario();
+            }
         });
+        
+        // ===================== Manejo del Modal de Editar Usuario =====================
+        const editUserModal = document.getElementById('editUserModal');
+        const closeEditModalBtn = document.querySelector('#editUserModal .modal-close');
+        const cancelEditModalBtn = document.querySelector('#editUserModal .modal-cancel');
+        const editRolSelect = document.getElementById('editRol');
+        const editCodigoProductorContainer = document.getElementById('editCodigoProductorContainer');
+        const editCodigoProductorInput = document.getElementById('editCodigoProductor');
+        const editDistritoContainer = document.getElementById('editDistritoContainer');
+        const editDistritoSelect = document.getElementById('editDistrito');
+        
+        // Función para abrir el modal de edición
+        function abrirModalEditarUsuario() {
+            if (editUserModal) {
+                editUserModal.classList.add('show');
+                editUserModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        // Función para cerrar el modal de edición
+        function cerrarModalEditarUsuario() {
+            if (editUserModal) {
+                editUserModal.classList.remove('show');
+                editUserModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Función para mostrar/ocultar campos según el rol
+        function toggleEditCodigoProductor() {
+            if (editRolSelect.value === '3') {
+                editCodigoProductorContainer.style.display = 'block';
+                editCodigoProductorInput.removeAttribute('disabled');
+            } else {
+                editCodigoProductorContainer.style.display = 'none';
+                editCodigoProductorInput.setAttribute('disabled', 'disabled');
+            }
+        }
+        
+        function toggleEditDistrito() {
+            if (editRolSelect.value === '7') {
+                editDistritoContainer.style.display = 'block';
+                editDistritoSelect.removeAttribute('disabled');
+                editDistritoSelect.setAttribute('required', 'required');
+            } else {
+                editDistritoContainer.style.display = 'none';
+                editDistritoSelect.setAttribute('disabled', 'disabled');
+                editDistritoSelect.removeAttribute('required');
+            }
+        }
+        
+        // Event listeners para el modal de edición
+        if (closeEditModalBtn) {
+            closeEditModalBtn.addEventListener('click', cerrarModalEditarUsuario);
+        }
+        
+        if (cancelEditModalBtn) {
+            cancelEditModalBtn.addEventListener('click', cerrarModalEditarUsuario);
+        }
+        
+        if (editRolSelect) {
+            editRolSelect.addEventListener('change', function() {
+                toggleEditCodigoProductor();
+                toggleEditDistrito();
+            });
+        }
+        
+        // Actualizar icono del toggle cuando cambie el checkbox
+        const editActivoCheckbox = document.getElementById('editActivo');
+        if (editActivoCheckbox) {
+            editActivoCheckbox.addEventListener('change', function() {
+                const toggleLabel = this.closest('.form-check');
+                if (toggleLabel) {
+                    const toggleIcon = toggleLabel.querySelector('i');
+                    if (toggleIcon) {
+                        toggleIcon.className = this.checked ? 'fas fa-toggle-on me-2 text-success' : 'fas fa-toggle-off me-2 text-secondary';
+                    }
+                }
+            });
+        }
+        
+        // Manejar envío del formulario de edición
+        const formEditarUsuario = document.getElementById('formEditarUsuario');
+        if (formEditarUsuario) {
+            formEditarUsuario.addEventListener('submit', function(e) {
+                // El formulario se enviará normalmente, el servlet redirigirá después
+                // No necesitamos prevenir el comportamiento por defecto
+            });
+        }
+        
+        // Cerrar modal al hacer clic fuera
+        if (editUserModal) {
+            editUserModal.addEventListener('click', function(event) {
+                if (event.target === editUserModal) {
+                    cerrarModalEditarUsuario();
+                }
+            });
+        }
+        
+        // Guardar el HTML original del modal body
+        const editModalBodyOriginal = document.querySelector('#editUserModal .modal-body') ? 
+            document.querySelector('#editUserModal .modal-body').innerHTML : null;
+        
+        // Función para editar usuario (cargar datos y abrir modal)
+        window.editarUsuario = function(idUsuario) {
+            // Restaurar el HTML original si fue modificado
+            const modalBody = document.querySelector('#editUserModal .modal-body');
+            if (modalBody && editModalBodyOriginal) {
+                modalBody.innerHTML = editModalBodyOriginal;
+            }
+            
+            // Mostrar overlay de carga
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'editUserLoadingOverlay';
+            loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 10; border-radius: 16px;';
+            loadingOverlay.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x mb-3" style="color: #00a896;"></i><p style="color: #00a896; font-weight: 600;">Cargando datos del usuario...</p></div>';
+            
+            const modalContent = document.querySelector('#editUserModal .modal-content');
+            if (modalContent) {
+                modalContent.style.position = 'relative';
+                modalContent.appendChild(loadingOverlay);
+            }
+            
+            abrirModalEditarUsuario();
+            
+            // Cargar datos del usuario vía AJAX
+            fetch('<%= request.getContextPath() %>/UsuarioServlet?action=obtenerUsuarioJson&id=' + idUsuario, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al cargar los datos del usuario');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Remover overlay de carga
+                const overlay = document.getElementById('editUserLoadingOverlay');
+                if (overlay) {
+                    overlay.remove();
+                }
+                
+                // Llenar el formulario con los datos
+                const idInput = document.getElementById('editIdUsuario');
+                const nombresInput = document.getElementById('editNombres');
+                const apellidosInput = document.getElementById('editApellidos');
+                const emailInput = document.getElementById('editEmail');
+                const rolSelect = document.getElementById('editRol');
+                const codigoProductorInput = document.getElementById('editCodigoProductor');
+                const distritoSelect = document.getElementById('editDistrito');
+                const activoCheckbox = document.getElementById('editActivo');
+                
+                if (idInput) idInput.value = data.idUsuario || '';
+                if (nombresInput) nombresInput.value = data.nombres || '';
+                if (apellidosInput) apellidosInput.value = data.apellidos || '';
+                if (emailInput) emailInput.value = data.email || '';
+                if (rolSelect) rolSelect.value = data.rolId || '';
+                
+                // Código de productor
+                if (codigoProductorInput) {
+                    codigoProductorInput.value = data.codigoProductor || '';
+                }
+                
+                // Distrito
+                if (distritoSelect && data.distritoId) {
+                    distritoSelect.value = data.distritoId;
+                }
+                
+                // Estado activo
+                if (activoCheckbox) {
+                    activoCheckbox.checked = data.activo === true;
+                    // Actualizar icono del toggle
+                    const toggleLabel = activoCheckbox.closest('.form-check');
+                    if (toggleLabel) {
+                        const toggleIcon = toggleLabel.querySelector('i');
+                        if (toggleIcon) {
+                            toggleIcon.className = data.activo ? 'fas fa-toggle-on me-2 text-success' : 'fas fa-toggle-off me-2 text-secondary';
+                        }
+                    }
+                }
+                
+                // Mostrar/ocultar campos según el rol
+                toggleEditCodigoProductor();
+                toggleEditDistrito();
+            })
+            .catch(error => {
+                console.error('Error al cargar usuario:', error);
+                const overlay = document.getElementById('editUserLoadingOverlay');
+                if (overlay) {
+                    overlay.remove();
+                }
+                cerrarModalEditarUsuario();
+                alert('Error al cargar los datos del usuario. Por favor, intenta nuevamente.');
+            });
+        };
     });
 </script>
 
@@ -1401,6 +1783,139 @@
                 <button type="submit">
                     <i class="fas fa-paper-plane"></i>
                     Enviar Reporte
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===================== Modal: Editar Usuario ===================== -->
+<div id="editUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-edit"></i> Editar Usuario</h2>
+            <span class="modal-close">&times;</span>
+        </div>
+        
+        <form method="POST" action="<%= request.getContextPath() %>/UsuarioServlet?action=actualizar" id="formEditarUsuario">
+            <input type="hidden" name="id_usuario" id="editIdUsuario">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="editNombres">
+                                <i class="fas fa-user"></i>
+                                Nombres <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" 
+                                   name="nombres" 
+                                   id="editNombres" 
+                                   placeholder="Ej: Juan" 
+                                   required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="editApellidos">
+                                <i class="fas fa-user"></i>
+                                Apellidos <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" 
+                                   name="apellidos" 
+                                   id="editApellidos" 
+                                   placeholder="Ej: Pérez" 
+                                   required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editEmail">
+                        <i class="fas fa-envelope"></i>
+                        Correo electrónico <span class="text-danger">*</span>
+                    </label>
+                    <input type="email" 
+                           name="email" 
+                           id="editEmail" 
+                           placeholder="Ej: juan.perez@example.com" 
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editRol">
+                        <i class="fas fa-user-tag"></i>
+                        Rol <span class="text-danger">*</span>
+                    </label>
+                    <select name="rol_id" id="editRol" required>
+                        <option value="" disabled>Selecciona un rol</option>
+                        <option value="1">Administrador</option>
+                        <option value="2">Logística</option>
+                        <option value="3">Productor</option>
+                        <option value="4">Almacén</option>
+                        <option value="7">Gerente de Tienda</option>
+                    </select>
+                </div>
+                
+                <!-- Campo de código de productor (solo visible si el rol es Productor) -->
+                <div class="form-group" id="editCodigoProductorContainer" style="display: none;">
+                    <label for="editCodigoProductor">
+                        <i class="fas fa-tag"></i>
+                        Código de Productor
+                    </label>
+                    <input type="text" 
+                           name="codigo_productor" 
+                           id="editCodigoProductor" 
+                           placeholder="Ej: PROD-0001" 
+                           pattern="PROD-[0-9]{4}" 
+                           title="Formato: PROD-0001"
+                           disabled>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Código único para identificar al productor. Formato: PROD-0001, PROD-0002, etc.</span>
+                    </div>
+                </div>
+                
+                <!-- Campo de distrito (solo visible si el rol es Gerente de Tienda) -->
+                <div class="form-group" id="editDistritoContainer" style="display: none;">
+                    <label for="editDistrito">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Distrito <span class="text-danger">*</span>
+                    </label>
+                    <select name="distrito_id" id="editDistrito">
+                        <option value="" disabled selected>Selecciona un distrito</option>
+                        <% for (Distrito distrito : distritos) { %>
+                            <option value="<%= distrito.getIdDistrito() %>"><%= distrito.getNombre() %></option>
+                        <% } %>
+                    </select>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Selecciona el distrito donde trabajará este gerente de tienda.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="form-check form-switch" style="display: flex; align-items: center; gap: 10px; padding: 12px; background: rgba(0,168,150,0.05); border-radius: 8px;">
+                        <input class="form-check-input" type="checkbox" id="editActivo" name="activo" value="true" style="width: 2.5rem; height: 1.25rem; cursor: pointer;">
+                        <label class="form-check-label fw-semibold" for="editActivo" style="cursor: pointer; font-size: 0.95rem; margin: 0;">
+                            <i class="fas fa-toggle-on me-2 text-success"></i>
+                            Usuario Activo
+                        </label>
+                    </div>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Desmarcar esta casilla deshabilita el acceso del usuario al sistema.</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary modal-cancel">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit">
+                    <i class="fas fa-save"></i>
+                    Guardar Cambios
                 </button>
             </div>
         </form>
