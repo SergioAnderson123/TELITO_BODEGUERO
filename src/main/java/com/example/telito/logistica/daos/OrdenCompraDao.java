@@ -19,23 +19,24 @@ public class OrdenCompraDao extends DAOBase {
         ArrayList<OrdenCompraBean> listaOrdenes = new ArrayList<>();
 
         String sql = """
-            SELECT
-                oc.id_orden_compra AS id_orden,
-                CONCAT(productor.nombres, ' ', productor.apellidos) AS nombre_proveedor,
-                pr.nombre AS nombre_producto,
-                oc.cantidad AS cantidad_paquetes,
-                CONCAT(u.nombres, ' ', u.apellidos) AS personal_responsable,
-                CASE 
-                    WHEN oc.estado = 'Pendiente' AND oc.lote_id IS NOT NULL THEN 'Recibido'
-                    WHEN oc.estado IN ('Recibido', 'En Proceso') THEN 'Pendiente'
-                    ELSE oc.estado
-                END AS estado,
-                oc.monto_total
-            FROM ordenes_compra oc
-            INNER JOIN usuarios productor ON oc.productor_id = productor.id_usuario
-            INNER JOIN productos pr ON oc.producto_id = pr.id_producto
-            INNER JOIN usuarios u ON oc.usuario_id = u.id_usuario
-            WHERE 1=1
+            SELECT * FROM (
+                SELECT
+                    oc.id_orden_compra AS id_orden,
+                    CONCAT(productor.nombres, ' ', productor.apellidos) AS nombre_proveedor,
+                    pr.nombre AS nombre_producto,
+                    oc.cantidad AS cantidad_paquetes,
+                    CONCAT(u.nombres, ' ', u.apellidos) AS personal_responsable,
+                    CASE 
+                        WHEN oc.estado = 'Pendiente' AND oc.lote_id IS NOT NULL THEN 'Recibido'
+                        WHEN oc.estado IN ('Recibido', 'En Proceso') THEN 'Pendiente'
+                        ELSE oc.estado
+                    END AS estado,
+                    oc.monto_total
+                FROM ordenes_compra oc
+                INNER JOIN usuarios productor ON oc.productor_id = productor.id_usuario
+                INNER JOIN productos pr ON oc.producto_id = pr.id_producto
+                INNER JOIN usuarios u ON oc.usuario_id = u.id_usuario
+                WHERE 1=1
             """;
 
         List<Object> params = new ArrayList<>();
@@ -56,12 +57,16 @@ public class OrdenCompraDao extends DAOBase {
             sql += " AND productor.id_usuario = ?";
             params.add(Integer.parseInt(proveedorId));
         }
+
+        sql += ") AS ordenes_filtradas WHERE 1=1";
+        
+        // Filtrar por el estado calculado (no el original)
         if (estado != null && !estado.trim().isEmpty()) {
-            sql += " AND oc.estado = ?";
+            sql += " AND estado = ?";
             params.add(estado.trim());
         }
 
-        sql += " ORDER BY oc.id_orden_compra DESC LIMIT ? OFFSET ?";
+        sql += " ORDER BY id_orden DESC LIMIT ? OFFSET ?";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -117,12 +122,19 @@ public class OrdenCompraDao extends DAOBase {
     // === MÉTODO PARA CONTAR TOTAL DE ÓRDENES CON FILTROS ===
     public int contarOrdenes(String busqueda, String proveedorId, String estado) {
         String sql = """
-            SELECT COUNT(*) as total
-            FROM ordenes_compra oc
-            INNER JOIN usuarios productor ON oc.productor_id = productor.id_usuario
-            INNER JOIN productos pr ON oc.producto_id = pr.id_producto
-            INNER JOIN usuarios u ON oc.usuario_id = u.id_usuario
-            WHERE 1=1
+            SELECT COUNT(*) as total FROM (
+                SELECT
+                    oc.id_orden_compra AS id_orden,
+                    CASE 
+                        WHEN oc.estado = 'Pendiente' AND oc.lote_id IS NOT NULL THEN 'Recibido'
+                        WHEN oc.estado IN ('Recibido', 'En Proceso') THEN 'Pendiente'
+                        ELSE oc.estado
+                    END AS estado
+                FROM ordenes_compra oc
+                INNER JOIN usuarios productor ON oc.productor_id = productor.id_usuario
+                INNER JOIN productos pr ON oc.producto_id = pr.id_producto
+                INNER JOIN usuarios u ON oc.usuario_id = u.id_usuario
+                WHERE 1=1
             """;
 
         List<Object> params = new ArrayList<>();
@@ -142,8 +154,12 @@ public class OrdenCompraDao extends DAOBase {
             sql += " AND productor.id_usuario = ?";
             params.add(Integer.parseInt(proveedorId));
         }
+        
+        sql += ") AS ordenes_filtradas WHERE 1=1";
+        
+        // Filtrar por el estado calculado (no el original)
         if (estado != null && !estado.trim().isEmpty()) {
-            sql += " AND oc.estado = ?";
+            sql += " AND estado = ?";
             params.add(estado.trim());
         }
 
@@ -440,6 +456,49 @@ public class OrdenCompraDao extends DAOBase {
         } catch (SQLException e) {
             logger.error("Error al obtener datos básicos de la orden: " + idOrden, e);
             throw new RuntimeException("Error al obtener datos básicos de la orden", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return null;
+    }
+    
+    /**
+     * Obtiene los datos necesarios para revertir el stock cuando se rechaza una orden.
+     * @param idOrden ID de la orden de compra
+     * @return Array con [lote_id, cantidad_paquetes, producto_id, productor_id] o null si no tiene lote asignado
+     */
+    public Object[] obtenerDatosParaRevertirStock(int idOrden) {
+        String sql = """
+            SELECT 
+                oc.lote_id,
+                oc.cantidad,
+                oc.producto_id,
+                oc.productor_id
+            FROM ordenes_compra oc
+            WHERE oc.id_orden_compra = ? AND oc.lote_id IS NOT NULL AND oc.lote_id > 0
+            """;
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, idOrden);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                Object[] datos = new Object[4];
+                datos[0] = rs.getInt("lote_id");
+                datos[1] = rs.getInt("cantidad"); // cantidad en paquetes
+                datos[2] = rs.getInt("producto_id");
+                datos[3] = rs.getInt("productor_id");
+                return datos;
+            }
+        } catch (SQLException e) {
+            logger.error("Error al obtener datos para revertir stock de la orden: " + idOrden, e);
+            throw new RuntimeException("Error al obtener datos para revertir stock", e);
         } finally {
             closeResources(conn, pstmt, rs);
         }

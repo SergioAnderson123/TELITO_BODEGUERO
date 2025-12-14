@@ -462,4 +462,18 @@ public class MovimientoDao extends DAOBase {
         
         return listaMovimientos;
     }
+    
+    /**
+     * Elimina los movimientos de salida relacionados con una orden de compra.
+     * Se usa cuando se rechaza una orden para revertir el descuento de stock.
+     * @param ordenCompraId ID de la orden de compra
+     * @return true si se eliminó al menos un movimiento, false si no se encontró ninguno
+     */
+    public boolean eliminarMovimientoPorOrdenCompra(int ordenCompraId) {
+        String sql = "DELETE FROM movimientos_inventario WHERE orden_compra_id = ? AND tipo = 'Salida'";
+        
+        int filasAfectadas = executeUpdate(sql, ordenCompraId);
+        logger.info("Movimientos de salida eliminados para orden de compra {}: {} filas", ordenCompraId, filasAfectadas);
+        return filasAfectadas > 0;
+    }
 }

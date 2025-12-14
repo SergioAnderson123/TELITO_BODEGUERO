@@ -684,6 +684,84 @@ public class OrdenCompraServlet extends HttpServlet {
                 if (actualizado) {
                     System.out.println("✓ Estado actualizado correctamente");
                     
+                    // ========== REVERTIR STOCK SI SE RECHAZA UNA ORDEN CON LOTE ASIGNADO ==========
+                    if ("Rechazado".equals(nuevoEstado)) {
+                        try {
+                            System.out.println("=== VERIFICANDO SI HAY LOTE ASIGNADO PARA REVERTIR STOCK ===");
+                            
+                            // Obtener datos de la orden para revertir el stock
+                            Object[] datosRevertir = ordenCompraDao2.obtenerDatosParaRevertirStock(idOrden);
+                            
+                            if (datosRevertir != null) {
+                                int loteId = (Integer) datosRevertir[0];
+                                int cantidadPaquetes = (Integer) datosRevertir[1];
+                                int productoId = (Integer) datosRevertir[2];
+                                int productorId = (Integer) datosRevertir[3];
+                                
+                                System.out.println("✓ Orden tiene lote asignado. Revirtiendo stock...");
+                                System.out.println("  - Lote ID: " + loteId);
+                                System.out.println("  - Cantidad en paquetes: " + cantidadPaquetes);
+                                System.out.println("  - Producto ID: " + productoId);
+                                System.out.println("  - Productor ID: " + productorId);
+                                
+                                // Obtener unidades por paquete del producto
+                                com.example.telito.productor.daos.LoteDao loteDao = new com.example.telito.productor.daos.LoteDao();
+                                int unidadesPorPaquete = loteDao.obtenerUnidadesPorPaquete(productoId);
+                                
+                                // Calcular unidades a revertir
+                                int unidadesARevertir = cantidadPaquetes * unidadesPorPaquete;
+                                
+                                System.out.println("  - Unidades por paquete: " + unidadesPorPaquete);
+                                System.out.println("  - Unidades a revertir: " + cantidadPaquetes + " × " + unidadesPorPaquete + " = " + unidadesARevertir);
+                                
+                                // Obtener stock actual del lote
+                                Object[] loteInfo = loteDao.buscarLotePorId(loteId, productorId);
+                                
+                                if (loteInfo != null) {
+                                    int stockActual = (Integer) loteInfo[3]; // stock_actual en unidades
+                                    int nuevoStock = stockActual + unidadesARevertir;
+                                    
+                                    System.out.println("  - Stock actual: " + stockActual + " unidades");
+                                    System.out.println("  - Nuevo stock después de revertir: " + nuevoStock + " unidades");
+                                    
+                                    // Actualizar el stock del lote
+                                    boolean stockRevertido = loteDao.actualizarStock(loteId, nuevoStock, productorId);
+                                    
+                                    if (stockRevertido) {
+                                        System.out.println("✓✓✓ Stock revertido exitosamente. El lote ahora tiene " + nuevoStock + " unidades");
+                                        
+                                        // Eliminar o marcar como cancelado el movimiento de salida relacionado
+                                        try {
+                                            com.example.telito.almacen.daos.MovimientoDao movimientoDao = new com.example.telito.almacen.daos.MovimientoDao();
+                                            // Buscar y eliminar el movimiento de salida relacionado con esta orden
+                                            boolean movimientoEliminado = movimientoDao.eliminarMovimientoPorOrdenCompra(idOrden);
+                                            
+                                            if (movimientoEliminado) {
+                                                System.out.println("✓ Movimiento de salida eliminado correctamente");
+                                            } else {
+                                                System.out.println("⚠ No se encontró movimiento de salida para eliminar (puede que no exista)");
+                                            }
+                                        } catch (Exception e) {
+                                            System.err.println("⚠ ADVERTENCIA: No se pudo eliminar el movimiento de salida: " + e.getMessage());
+                                            // Continuamos aunque falle, el stock ya fue revertido
+                                        }
+                                    } else {
+                                        System.err.println("❌ ERROR: No se pudo revertir el stock del lote");
+                                    }
+                                } else {
+                                    System.err.println("❌ ERROR: No se encontró el lote o no pertenece al productor");
+                                }
+                            } else {
+                                System.out.println("ℹ La orden no tiene lote asignado, no es necesario revertir stock");
+                            }
+                        } catch (Exception e) {
+                            System.err.println("❌ ERROR al revertir stock: " + e.getMessage());
+                            e.printStackTrace();
+                            // Continuamos aunque falle la reversión del stock, el estado ya fue actualizado
+                        }
+                    }
+                    // ========== FIN REVERTIR STOCK ==========
+                    
                     // ========== ENVÍO DE CORREO AL PRODUCTOR ==========
                     try {
                         // Obtener datos de la orden

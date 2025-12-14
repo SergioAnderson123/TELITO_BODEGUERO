@@ -367,7 +367,7 @@ public class ProductoDao extends DAOBase {
         ArrayList<Producto> lista = new ArrayList<>();
         
         String sql = "SELECT p.*, c.id_categoria, c.nombre as categoria_nombre, " +
-                "(SELECT COUNT(*) FROM lotes WHERE producto_id = p.id_producto) as numero_lotes " +
+                "(SELECT COUNT(DISTINCT id_lote) FROM lotes WHERE producto_id = p.id_producto AND stock_actual > 0) as numero_lotes " +
                 "FROM productos p " +
                 "LEFT JOIN categorias c ON p.categoria_id = c.id_categoria " +
                 "WHERE (p.codigo_sku LIKE ? OR p.nombre LIKE ?) " +

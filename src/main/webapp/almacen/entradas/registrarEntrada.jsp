@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <!doctype html>
 <html lang="es">
@@ -82,7 +83,7 @@
                                                 <div class="col-md-6 border-start">
                                                     <p class="mb-2 text-success"><strong><i class="fas fa-check-circle me-1"></i>Lote Asignado por el Productor:</strong></p>
                                                     <p class="mb-2"><strong>Código:</strong> <span class="badge bg-success">${loteAsignado.codigoLote}</span></p>
-                                                    <p class="mb-0"><strong>Fecha Venc.:</strong> <span class="badge bg-warning text-dark">${loteAsignado.fechaVencimiento}</span></p>
+                                                    <p class="mb-0"><strong>Fecha Venc.:</strong> <span class="badge bg-warning text-dark"><fmt:formatDate value="${loteAsignado.fechaVencimiento}" pattern="dd/MM/yyyy"/></span></p>
                                                 </div>
                                             </c:if>
                                         </div>
@@ -124,7 +125,7 @@
                                                     <span class="text-danger">*</span>
                                                 </label>
                                                 <input type="date" class="form-control" id="fecha_vencimiento_verificacion" name="fecha_vencimiento_verificacion" required>
-                                                <small class="text-muted">Debe coincidir con: <strong class="text-warning">${loteAsignado.fechaVencimiento}</strong></small>
+                                                <small class="text-muted">Debe coincidir con: <strong class="text-warning"><fmt:formatDate value="${loteAsignado.fechaVencimiento}" pattern="dd/MM/yyyy"/></strong></small>
                                             </div>
                                         </c:if>
                                         
