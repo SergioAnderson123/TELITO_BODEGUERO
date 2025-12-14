@@ -58,7 +58,9 @@ public class ProveedorDao extends DAOBase {
                 productor.setId(rs.getInt("id_usuario"));
                 productor.setNombre(rs.getString("nombre_completo"));
                 listaProductores.add(productor);
+                logger.debug("Productor encontrado: ID={}, Nombre={}", productor.getId(), productor.getNombre());
             }
+            logger.info("Total de productores encontrados: {}", listaProductores.size());
         } catch (SQLException e) {
             logger.error("Error al listar productores", e);
             throw new RuntimeException("Error al listar productores", e);

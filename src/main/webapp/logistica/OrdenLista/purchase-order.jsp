@@ -465,7 +465,7 @@
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong><%= orden.getMontoTotal() %></strong></td>
                                         <td class="text-center" style="font-size: 0.85rem; padding: 0.5rem;">
                                             <% if ("Recibido".equals(orden.getEstado())) { %>
-                                            <button class="btn btn-sm shadow-sm" onclick="editarOrden('<%= orden.getNumeroOrden() %>')" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; border: 1px solid #6c757d; color: #212529; background-color: #f8f9fa; transition: all 0.2s ease; white-space: nowrap;" onmouseover="this.style.backgroundColor='#e9ecef'; this.style.borderColor='#6c757d';" onmouseout="this.style.backgroundColor='#f8f9fa'; this.style.borderColor='#6c757d';">
+                                            <button class="btn btn-sm shadow-sm" onclick="editarOrden('<%= orden.getNumeroOrden() %>')" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; border: none; color: white; background: linear-gradient(135deg, #00a896 0%, #028f80 100%); transition: all 0.2s ease; white-space: nowrap; font-weight: 600;" onmouseover="this.style.background='linear-gradient(135deg, #028f80 0%, #00a896 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,168,150,0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #00a896 0%, #028f80 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
                                                 <i class="fas fa-eye me-1"></i>Ver
                                             </button>
                                             <% } else { %>

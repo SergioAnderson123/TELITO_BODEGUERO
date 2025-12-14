@@ -5,6 +5,7 @@
 <%@ page import="com.example.telito.logistica.beans.LoteBean" %>
 <%@ page import="com.example.telito.logistica.beans.VehiculoBean" %>
 <%@ page import="com.example.telito.logistica.beans.DistritoBean" %>
+<%@ page import="com.example.telito.logistica.beans.ProveedorBean" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!doctype html>
 <html lang="es">
@@ -923,11 +924,21 @@
             document.body.style.overflow = 'hidden';
         }
         
+        // ===================== Cargar lotes por productor =====================
+        const modalProductor = document.getElementById('modalProductor');
+        const modalLote = document.getElementById('modalLote');
+        
         // Función para cerrar el modal
         function cerrarModalAgregarPlan() {
             agregarPlanModal.classList.remove('show');
             agregarPlanModal.style.display = 'none';
             document.body.style.overflow = '';
+            
+            // Limpiar formulario al cerrar
+            const formAgregarPlan = document.getElementById('formAgregarPlan');
+            if (formAgregarPlan) {
+                formAgregarPlan.reset();
+            }
         }
         
         // Event listener para el botón
@@ -1002,11 +1013,37 @@
                         <option value="" selected disabled>Seleccione un lote...</option>
                         <%
                             ArrayList<LoteBean> lotesModal = (ArrayList<LoteBean>) request.getAttribute("listaLotes");
-                            if (lotesModal != null) {
+                            System.out.println("=== DEBUG JSP: Lotes en request ===");
+                            System.out.println("lotesModal es null? " + (lotesModal == null));
+                            
+                            // FALLBACK: Si el servlet no cargó los lotes, cargarlos directamente aquí
+                            if (lotesModal == null || lotesModal.isEmpty()) {
+                                System.out.println("⚠️ listaLotes es NULL o vacío - Cargando directamente desde DAO");
+                                try {
+                                    com.example.telito.logistica.daos.LoteDao loteDao = new com.example.telito.logistica.daos.LoteDao();
+                                    lotesModal = loteDao.listarLotesDisponibles();
+                                    System.out.println("✓ Lotes cargados directamente: " + (lotesModal != null ? lotesModal.size() : 0));
+                                    if (lotesModal != null) {
+                                        for (LoteBean l : lotesModal) {
+                                            System.out.println("  - Lote: ID=" + l.getId() + ", Producto=" + l.getNombreProducto() + ", Codigo=" + l.getCodigoLote());
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    System.err.println("❌ Error al cargar lotes en JSP: " + e.getMessage());
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                System.out.println("✓ Lotes cargados desde servlet: " + lotesModal.size());
+                            }
+                            
+                            if (lotesModal != null && !lotesModal.isEmpty()) {
+                                System.out.println("Total de lotes a mostrar: " + lotesModal.size());
                                 for (LoteBean lote : lotesModal) { %>
                         <option value="<%= lote.getId() %>"><%= lote.getNombreProducto() %> (<%= lote.getCodigoLote() %>)</option>
                         <%     }
-                        } %>
+                            } else {
+                                System.out.println("⚠️ No hay lotes disponibles para mostrar");
+                            } %>
                     </select>
                     <div class="form-hint">
                         <i class="fas fa-info-circle"></i>

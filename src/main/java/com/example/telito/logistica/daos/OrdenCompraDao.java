@@ -326,7 +326,12 @@ public class OrdenCompraDao extends DAOBase {
                      "l.codigo_lote, " +
                      "l.fecha_vencimiento, " +
                      "l.stock_actual, " +
-                     "ub.nombre AS ubicacion " +
+                     "l.estado AS estado_lote, " +
+                     "CASE " +
+                     "  WHEN l.estado = 'Registrado' THEN ub.nombre " +
+                     "  WHEN l.estado IS NULL OR l.estado = 'No Registrado' THEN 'Pendiente de recepción' " +
+                     "  ELSE 'Sin ubicación asignada' " +
+                     "END AS ubicacion " +
                      "FROM ordenes_compra oc " +
                      "INNER JOIN usuarios productor ON oc.productor_id = productor.id_usuario " +
                      "INNER JOIN productos pr ON oc.producto_id = pr.id_producto " +

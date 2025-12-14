@@ -1191,7 +1191,7 @@
                 '<td><strong>' + codigoLoteVal + '</strong></td>' +
                 '<td><span class="badge bg-secondary">' + skuVal + '</span></td>' +
                 '<td>' + productoVal + '</td>' +
-                '<td><span class="badge bg-primary">' + paquetesVal + ' paquetes</span></td>' +
+                '<td><span class="badge" style="background: linear-gradient(135deg, #00a896 0%, #028f80 100%); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">' + paquetesVal + ' paquetes</span></td>' +
                 '<td>' + fechaVal + '</td>';
             
             console.log('HTML generado:', row.innerHTML);

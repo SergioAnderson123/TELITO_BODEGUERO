@@ -30,6 +30,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 
     <!-- Custom CSS (turquesa/verde agua) -->
     <style>
@@ -350,6 +353,7 @@
             background-color: rgba(0,0,0,0.6); 
             backdrop-filter: blur(4px);
             overflow-y: auto;
+            overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
         }
         #addProductModal.show {
@@ -362,7 +366,7 @@
             background-color: var(--white); 
             width: 100%;
             max-width: 750px; 
-            max-height: 85vh; 
+            max-height: calc(100vh - 40px); 
             border: none; 
             border-radius: 16px; 
             box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
@@ -370,6 +374,8 @@
             position: relative;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            margin: 20px auto;
         }
         @keyframes modalSlideIn { 
             from { 
@@ -389,6 +395,7 @@
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+            flex-shrink: 0;
         }
         #addProductModal .modal-header h2 { 
             margin: 0; 
@@ -428,7 +435,10 @@
         #addProductModal .modal-body {
             padding: 25px;
             overflow-y: auto;
-            max-height: calc(85vh - 160px);
+            overflow-x: hidden;
+            flex: 1 1 auto;
+            min-height: 0;
+            max-height: calc(100vh - 350px);
         }
         #addProductModal .form-section {
             background: #f8f9fa;
@@ -486,12 +496,164 @@
             transition: all 0.3s ease;
             background: white;
         }
+        /* Estilos específicos para el dropdown de categorías */
+        #addProductModal .category-select {
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300a896' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+        }
+        /* Estilos para las opciones del select cuando está abierto */
+        #addProductModal .category-select option {
+            padding: 10px 14px;
+            font-size: 0.95rem;
+        }
+        /* Asegurar que el select no se salga del modal */
+        #addProductModal .form-group {
+            position: relative;
+        }
+        #addProductModal .form-group select {
+            position: relative;
+            z-index: 1;
+        }
+        /* Mejorar el scroll del dropdown */
+        #addProductModal #productCategory::-webkit-scrollbar {
+            width: 8px;
+        }
+        #addProductModal #productCategory::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        #addProductModal #productCategory::-webkit-scrollbar-thumb {
+            background: #00a896;
+            border-radius: 4px;
+        }
+        #addProductModal #productCategory::-webkit-scrollbar-thumb:hover {
+            background: #028f80;
+        }
         #addProductModal .form-group input:focus,
         #addProductModal .form-group select:focus,
         #addProductModal .form-group textarea:focus {
             border-color: #00a896;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        /* Ocultar el select nativo cuando Select2 está activo */
+        #addProductModal .select2-hidden-accessible {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+        
+        /* Estilos específicos para Select2 en el modal */
+        #addProductModal .select2-container {
+            width: 100% !important;
+            z-index: 9999 !important;
+            margin-bottom: 0;
+        }
+        #addProductModal .select2-container--default .select2-selection--single {
+            height: 46px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        #addProductModal .select2-container--default .select2-selection--single:hover {
+            border-color: #d0d7de;
+        }
+        #addProductModal .select2-container--default .select2-selection--single:focus,
+        #addProductModal .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: #e9ecef !important;
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1) !important;
+        }
+        #addProductModal .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 46px;
+            padding-left: 14px;
+            padding-right: 30px;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+        #addProductModal .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 44px;
+            right: 10px;
+            top: 1px;
+        }
+        #addProductModal .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            border-color: #6c757d transparent transparent transparent;
+            border-style: solid;
+            border-width: 5px 4px 0 4px;
+            height: 0;
+            left: 50%;
+            margin-left: -4px;
+            margin-top: -2px;
+            position: absolute;
+            top: 50%;
+            width: 0;
+        }
+        /* Dropdown de Select2 - limitar altura y hacer scrolleable */
+        #addProductModal .select2-dropdown {
+            border: 2px solid #e9ecef !important;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 9999 !important;
+            margin-top: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        #addProductModal .select2-results {
+            padding: 4px 0;
+        }
+        #addProductModal .select2-results__option {
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        #addProductModal .select2-results__option[aria-selected="true"] {
+            background-color: #f8f9fa;
+            color: var(--text-dark);
+        }
+        #addProductModal .select2-results__option--highlighted {
+            background-color: #00a896 !important;
+            color: white !important;
+        }
+        /* Campo de búsqueda dentro del dropdown */
+        #addProductModal .select2-search--dropdown .select2-search__field {
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            margin: 4px;
+            width: calc(100% - 8px);
+        }
+        #addProductModal .select2-search--dropdown .select2-search__field:focus {
+            border-color: #00a896;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        /* Ocultar scrollbar del dropdown - hacerlo invisible pero funcional */
+        #addProductModal .select2-dropdown {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE y Edge */
+        }
+        #addProductModal .select2-dropdown::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
         #addProductModal .form-group input:disabled,
         #addProductModal .form-group input[readonly] {
@@ -523,6 +685,12 @@
             border-top: 2px solid #e9ecef;
             background: #f8f9fa;
             border-radius: 0 0 16px 16px;
+            flex-shrink: 0;
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            min-height: 70px;
+            box-sizing: border-box;
         }
         #addProductModal .modal-footer button {
             padding: 12px 28px;
@@ -1270,7 +1438,7 @@
                                 <i class="fas fa-folder"></i>
                                 Categoría
                             </label>
-                            <select name="productCategory" id="productCategory" required>
+                            <select name="productCategory" id="productCategory" required class="category-select">
                                 <option value="">Seleccionar categoría...</option>
                                 <% if (todasLasCategorias != null) { %>
                                     <% for (Categoria categoria : todasLasCategorias) { %>
@@ -1365,6 +1533,10 @@
     </div>
 </div>
 
+<!-- jQuery (requerido para Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -1407,10 +1579,39 @@
         document.body.style.overflow = 'hidden'; // Prevenir scroll del body
         cargarNuevoSKU();
         limpiarFormulario();
+        // Inicializar Select2 después de un pequeño delay para asegurar que el modal esté visible
+        setTimeout(function() {
+            inicializarSelect2();
+        }, 100);
+    }
+    
+    // Función para inicializar Select2
+    function inicializarSelect2() {
+        // Destruir Select2 si ya existe
+        if ($('#productCategory').hasClass('select2-hidden-accessible')) {
+            $('#productCategory').select2('destroy');
+        }
+        // Inicializar Select2
+        $('#productCategory').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Seleccionar categoría...',
+            allowClear: true,
+            dropdownParent: $('#addProductModal'),
+            width: '100%',
+            language: {
+                noResults: function() {
+                    return "No se encontraron categorías";
+                }
+            }
+        });
     }
 
     // Función para cerrar el modal (sin animación)
     function cerrarModal() {
+        // Cerrar Select2 dropdown si está abierto
+        if ($('#productCategory').hasClass('select2-hidden-accessible')) {
+            $('#productCategory').select2('close');
+        }
         modal.classList.remove('show');
         modal.style.display = 'none';
         document.body.style.overflow = ''; // Restaurar scroll del body
@@ -1419,7 +1620,12 @@
     // Función para limpiar el formulario
     function limpiarFormulario() {
         document.getElementById('productName').value = '';
-        document.getElementById('productCategory').selectedIndex = 0;
+        // Limpiar Select2 si está inicializado
+        if ($('#productCategory').hasClass('select2-hidden-accessible')) {
+            $('#productCategory').val(null).trigger('change');
+        } else {
+            document.getElementById('productCategory').selectedIndex = 0;
+        }
         document.getElementById('productDescription').value = '';
         document.getElementById('productPrice').value = '';
         document.getElementById('productUnits').value = '1';

@@ -14,7 +14,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -396,9 +399,50 @@ public class EntradaServlet extends HttpServlet {
                 throw new Exception("El código de lote verificado no coincide con el lote asignado");
             }
             
-            // ACTUALIZAR el lote existente: cambiar ubicación y estado
+            // Obtener unidades_por_paquete del producto para calcular el stock en unidades
+            int unidadesPorPaquete = 1; // Valor por defecto
+            String sqlUnidades = "SELECT unidades_por_paquete FROM productos WHERE id_producto = ?";
+            Connection connTemp = null;
+            PreparedStatement pstmtTemp = null;
+            ResultSet rsTemp = null;
+            try {
+                connTemp = com.example.telito.util.DatabaseConnection.getConnection();
+                pstmtTemp = connTemp.prepareStatement(sqlUnidades);
+                pstmtTemp.setInt(1, oc.getProductoId());
+                rsTemp = pstmtTemp.executeQuery();
+                if (rsTemp.next()) {
+                    unidadesPorPaquete = rsTemp.getInt("unidades_por_paquete");
+                }
+            } catch (Exception e) {
+                System.err.println("⚠️ Error al obtener unidades_por_paquete: " + e.getMessage());
+            } finally {
+                try {
+                    if (rsTemp != null) rsTemp.close();
+                    if (pstmtTemp != null) pstmtTemp.close();
+                    if (connTemp != null) connTemp.close();
+                } catch (Exception e) {
+                    System.err.println("Error al cerrar recursos: " + e.getMessage());
+                }
+            }
+            
+            // Calcular la cantidad recibida en unidades
+            int cantidadRecibidaUnidades = cantidadRecibida * unidadesPorPaquete;
+            
+            // RESTAURAR el stock del lote: cuando el almacén recibe la mercancía,
+            // el stock debe restaurarse porque ahora está físicamente en el almacén
+            // El stock se había descontado cuando el productor asignó el lote a la orden
+            int stockActual = loteProductor.getStockActual();
+            int nuevoStock = stockActual + cantidadRecibidaUnidades;
+            
+            System.out.println("=== RESTAURACIÓN DE STOCK ===");
+            System.out.println("Cantidad recibida: " + cantidadRecibida + " paquetes = " + cantidadRecibidaUnidades + " unidades");
+            System.out.println("Stock actual del lote: " + stockActual + " unidades");
+            System.out.println("Nuevo stock después de restaurar: " + nuevoStock + " unidades (" + (nuevoStock / unidadesPorPaquete) + " paquetes)");
+            
+            // ACTUALIZAR el lote existente: cambiar ubicación, estado y restaurar stock
             loteDao.actualizarUbicacionYEstado(loteProductorId, idUbicacion, idDistrito, "Registrado");
-            System.out.println("✓ Lote actualizado - Nueva ubicación: " + idUbicacion + " | Estado: Registrado");
+            loteDao.actualizarStock(loteProductorId, nuevoStock);
+            System.out.println("✓ Lote actualizado - Nueva ubicación: " + idUbicacion + " | Estado: Registrado | Stock restaurado: " + nuevoStock + " unidades");
 
             // 7. Registramos el movimiento de entrada (usando el lote existente)
             Movimiento movimiento = new Movimiento();

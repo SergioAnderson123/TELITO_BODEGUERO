@@ -13,6 +13,7 @@ import com.example.telito.logistica.daos.ConductorDao;
 import com.example.telito.logistica.daos.DistritoDao;
 import com.example.telito.logistica.daos.LoteDao;
 import com.example.telito.logistica.daos.PlanTransporteDao;
+import com.example.telito.logistica.daos.ProveedorDao;
 import com.example.telito.logistica.daos.VehiculoDao;
 import com.example.telito.administrador.daos.AlertaDAO;
 import com.example.telito.util.EmailUtil;
@@ -24,8 +25,18 @@ import java.util.ArrayList;
 public class PlanTransporteServlet extends HttpServlet {
 
     @Override
+    public void init() throws ServletException {
+        super.init();
+        System.out.println("=== PlanTransporteServlet INICIALIZADO ===");
+    }
+
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        System.out.println("=== DEBUG PlanTransporteServlet - INICIO doGet ===");
+        System.out.println("URL: " + request.getRequestURL());
+        System.out.println("Query String: " + request.getQueryString());
+        
         // Verificar que el usuario tenga rol de logística
         HttpSession session = request.getSession(false);
         if (!AuthorizationHelper.puedeAccederLogistica(session)) {
@@ -36,10 +47,13 @@ public class PlanTransporteServlet extends HttpServlet {
             return;
         }
 
+        System.out.println("✓ Usuario autorizado, continuando...");
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action") == null ? "listar" : request.getParameter("action");
+        System.out.println("=== DEBUG PlanTransporteServlet ===");
+        System.out.println("Action recibida: " + action);
 
         PlanTransporteDao planTransporteDao = new PlanTransporteDao();
         LoteDao loteDao = new LoteDao();
@@ -50,6 +64,7 @@ public class PlanTransporteServlet extends HttpServlet {
 
         switch (action) {
             case "listar":
+                System.out.println("✓ Entrando en case 'listar'");
                 String busqueda = request.getParameter("busqueda");
                 String conductorId = request.getParameter("conductor");
                 String estado = request.getParameter("estado");
@@ -100,6 +115,34 @@ public class PlanTransporteServlet extends HttpServlet {
                 rd = request.getRequestDispatcher("/logistica/Distribucion/distribucion.jsp");
                 rd.forward(request, response);
                 break;
+
+            case "obtenerLotesPorProductor":
+                // Endpoint AJAX para obtener lotes por productor
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                
+                try {
+                    int productorId = Integer.parseInt(request.getParameter("productorId"));
+                    LoteDao loteDaoAjax = new LoteDao();
+                    ArrayList<com.example.telito.logistica.beans.LoteBean> lotes = loteDaoAjax.listarLotesDisponiblesPorProductor(productorId);
+                    
+                    StringBuilder json = new StringBuilder();
+                    json.append("{\"success\":true,\"lotes\":[");
+                    for (int i = 0; i < lotes.size(); i++) {
+                        com.example.telito.logistica.beans.LoteBean lote = lotes.get(i);
+                        if (i > 0) json.append(",");
+                        json.append("{")
+                            .append("\"id\":").append(lote.getId()).append(",")
+                            .append("\"codigoLote\":\"").append(lote.getCodigoLote().replace("\"", "\\\"")).append("\",")
+                            .append("\"nombreProducto\":\"").append(lote.getNombreProducto().replace("\"", "\\\"")).append("\"")
+                            .append("}");
+                    }
+                    json.append("]}");
+                    response.getWriter().write(json.toString());
+                } catch (Exception e) {
+                    response.getWriter().write("{\"success\":false,\"message\":\"Error al obtener lotes: " + e.getMessage() + "\"}");
+                }
+                return;
 
             case "crear":
                 request.setAttribute("listaLotes", loteDao.listarLotesDisponibles());
