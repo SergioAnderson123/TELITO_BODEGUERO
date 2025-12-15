@@ -15,39 +15,7 @@
     <jsp:include page="/administrador/layouts/header_admin.jsp" />
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
-            <div class="row g-4">
-                <div class="col-lg-4 col-md-6">
-                    <div class="config-card stock-card">
-                        <a href="<%= request.getContextPath() %>/StockMinimoServlet" class="text-decoration-none">
-                            <div class="config-card-header">
-                                <div class="config-icon stock-icon">
-                                    <i class="fas fa-triangle-exclamation"></i>
-                                </div>
-                                <div class="config-badge stock-badge">
-                                    <i class="fas fa-chart-line"></i>
-                                </div>
-                            </div>
-                            <div class="config-card-body">
-                                <h4 class="config-title">Configurar Stock Mínimo</h4>
-                                <p class="config-description">Define umbrales y notificaciones para el control de inventario</p>
-                                <div class="config-stats">
-                                    <div class="stat-item">
-                                        <span class="stat-number">15</span>
-                                        <span class="stat-label">Productos</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <span class="stat-number">3</span>
-                                        <span class="stat-label">Alertas</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="config-card-footer">
-                                <span class="config-action">Configurar <i class="fas fa-arrow-right"></i></span>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-
+            <div class="row g-4 justify-content-center">
                 <div class="col-lg-4 col-md-6">
                     <div class="config-card alert-card">
                         <a href="<%= request.getContextPath() %>/AlertaServlet" class="text-decoration-none">

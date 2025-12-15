@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.example.telito.administrador.beans.Usuario" %>
 <%
     Usuario usuarioHeader = (Usuario) session.getAttribute("usuario");
@@ -122,6 +123,7 @@ if (sessionStorage.getItem('recargarDesdePerfil') === 'true') {
     </div>
 </div>
 
+<script>
 // Control del Sidebar en Móvil
 const sidebarToggle = document.getElementById('sidebarToggle');
 const sidebar = document.querySelector('.nav-left-sidebar');
@@ -167,11 +169,11 @@ if (window.innerWidth <= 992) {
     });
 }
 
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 992) {
-            closeSidebar();
-        }
-    });
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 992) {
+        closeSidebar();
+    }
+});
 </script>
 
 <!-- Estilos para Notificaciones -->
@@ -354,11 +356,6 @@ function cargarNotificacionesRecientes() {
         if (data.exito) {
             const notifs = data.datos.notificaciones || [];
             mostrarNotificaciones(notifs);
-            
-            // Si hay notificaciones no leídas, mostrar modal automáticamente (mejor UX)
-            if (notifs.length > 0) {
-                mostrarModalNotificaciones(notifs);
-            }
         }
     })
     .catch(error => {
@@ -528,6 +525,19 @@ function mostrarModalTodasNotificaciones() {
     });
 }
 
+// Función auxiliar para escapar HTML (protección XSS, preserva UTF-8)
+function escapeHtml(text) {
+    if (!text) return '';
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
 // Pintar todas las notificaciones dentro del modal grande
 function mostrarTodasNotificaciones(notificaciones) {
     const lista = document.getElementById('listaNotificacionesGrande');
@@ -549,6 +559,10 @@ function mostrarTodasNotificaciones(notificaciones) {
         const esLeida = notif.leida || false;
         const claseLeida = esLeida ? '' : 'no-leida';
         
+        // Usar escapeHtml para asegurar que los caracteres UTF-8 se rendericen correctamente
+        const titulo = escapeHtml(notif.titulo || '');
+        const mensaje = escapeHtml(notif.mensaje || '');
+        
         return '<div class="notificacion-item-grande ' + claseLeida + '">' +
                 '<div class="d-flex gap-3 align-items-start">' +
                     '<div class="notificacion-icon-grande ' + nivelPrioridad + '">' +
@@ -556,10 +570,10 @@ function mostrarTodasNotificaciones(notificaciones) {
                     '</div>' +
                     '<div class="notificacion-contenido-grande flex-grow-1">' +
                         '<div class="d-flex justify-content-between align-items-start mb-2">' +
-                            '<div class="notificacion-titulo-grande">' + notif.titulo + '</div>' +
+                            '<div class="notificacion-titulo-grande">' + titulo + '</div>' +
                             (!esLeida ? '<span class="badge bg-primary rounded-pill" style="font-size: 0.7rem;">Nueva</span>' : '') +
                         '</div>' +
-                        '<div class="notificacion-mensaje-grande">' + notif.mensaje + '</div>' +
+                        '<div class="notificacion-mensaje-grande">' + mensaje + '</div>' +
                         '<div class="notificacion-tiempo-grande">' +
                             '<i class="far fa-clock me-1"></i>' + tiempoRelativo +
                         '</div>' +
@@ -569,6 +583,17 @@ function mostrarTodasNotificaciones(notificaciones) {
     });
     
     lista.innerHTML = htmlArray.join('');
+    
+    // Actualizar contador en el modal
+    const contador = notificaciones.filter(n => !(n.leida || false)).length;
+    const contadorEl = document.getElementById('contadorModalNotificaciones');
+    if (contadorEl) {
+        if (contador > 0) {
+            contadorEl.textContent = contador + ' notificación' + (contador !== 1 ? 'es' : '') + ' sin leer';
+        } else {
+            contadorEl.textContent = 'Todas las notificaciones leídas';
+        }
+    }
 }
 
 // Mostrar toast
@@ -605,4 +630,70 @@ function mostrarToast(tipo, mensaje, icono) {
     }, 3000);
 }
 </script>
+
+<!-- Estilos para el modal grande de notificaciones -->
+<style>
+    .notificacion-item-grande {
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        cursor: default;
+        background: white;
+        border-left: 4px solid transparent;
+    }
+    
+    .notificacion-item-grande:hover {
+        background: #f8f9fa;
+    }
+    
+    .notificacion-item-grande.no-leida {
+        background: #e8f4f8;
+        border-left-color: #00a896;
+    }
+    
+    .notificacion-icon-grande {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+    
+    .notificacion-icon-grande.CRITICAL {
+        background: #fee;
+        color: #dc3545;
+    }
+    
+    .notificacion-icon-grande.WARNING {
+        background: #fff3cd;
+        color: #ffc107;
+    }
+    
+    .notificacion-icon-grande.INFO {
+        background: #d1ecf1;
+        color: #0dcaf0;
+    }
+    
+    .notificacion-titulo-grande {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #212529;
+        margin-bottom: 8px;
+    }
+    
+    .notificacion-mensaje-grande {
+        font-size: 0.9rem;
+        color: #495057;
+        line-height: 1.5;
+        margin-bottom: 8px;
+    }
+    
+    .notificacion-tiempo-grande {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
 

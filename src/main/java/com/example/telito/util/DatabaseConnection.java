@@ -10,7 +10,7 @@ public class DatabaseConnection {
     
     // Configuración de la base de datos
     // Nota: allowPublicKeyRetrieval=true es necesario con MySQL 8 cuando se usa el plugin de autenticación por defecto.
-    private static final String URL = "jdbc:mysql://localhost:3306/telito_bodeguero?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    private static final String URL = "jdbc:mysql://localhost:3306/telito_bodeguero?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima";
     private static final String USER = "root";
     private static final String PASSWORD = "root";
     

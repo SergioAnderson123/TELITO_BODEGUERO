@@ -351,8 +351,18 @@ function obtenerIconoTipo(tipo) {
 }
 
 // Obtener tiempo relativo
-function obtenerTiempoRelativo(fechaStr) {
-    const fecha = new Date(fechaStr);
+function obtenerTiempoRelativo(fechaInput) {
+    // Manejar tanto timestamps numéricos como strings de fecha
+    let fecha;
+    if (typeof fechaInput === 'number') {
+        fecha = new Date(fechaInput);
+    } else if (typeof fechaInput === 'string') {
+        // Intentar parsear la fecha string
+        fecha = new Date(fechaInput);
+    } else {
+        fecha = new Date();
+    }
+    
     const ahora = new Date();
     const diffMs = ahora - fecha;
     const diffMins = Math.floor(diffMs / 60000);
@@ -362,6 +372,7 @@ function obtenerTiempoRelativo(fechaStr) {
     if (diffMins < 1) return 'Ahora mismo';
     if (diffMins < 60) return `Hace ${diffMins} min`;
     if (diffHours < 24) return `Hace ${diffHours} h`;
+    if (diffDays === 1) return 'Hace 1 día';
     if (diffDays < 7) return `Hace ${diffDays} días`;
     return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
 }
