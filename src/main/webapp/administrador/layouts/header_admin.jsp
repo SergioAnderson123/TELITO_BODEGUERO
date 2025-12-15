@@ -38,7 +38,7 @@
                         <i class="fas fa-bell" style="font-size: 1.3rem; color: var(--turquoise-dark);"></i>
                         <span class="badge-notificacion" id="badgeNotificaciones" style="display: none;">0</span>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-end notificaciones-dropdown" aria-labelledby="notificacionesDropdown" style="width: 380px;">
+                    <div class="dropdown-menu dropdown-menu-end notificaciones-dropdown" aria-labelledby="notificacionesDropdown" style="width: 380px; max-width: calc(100vw - 40px);">
                         <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; padding: 12px 20px;">
                             <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notificaciones</h6>
                             <button class="btn btn-sm btn-light" onclick="marcarTodasLeidas()" style="font-size: 0.75rem; padding: 2px 8px;">
@@ -257,7 +257,10 @@ function cargarContadorNotificaciones() {
 function cargarNotificacionesRecientes() {
     fetch('${pageContext.request.contextPath}/NotificacionServlet?action=recientes', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Accept': 'application/json; charset=UTF-8'
+        }
     })
     .then(response => response.json())
     .then(data => {
@@ -305,14 +308,18 @@ function mostrarNotificaciones(notificaciones) {
             nivel: nivelPrioridad
         });
         
-        return '<div class="notificacion-item no-leida" onclick="verNotificacion(' + idNotif + ', \'' + (notif.urlAccion || '') + '\')">' +
+        // Usar escapeHtml para asegurar que los caracteres UTF-8 se rendericen correctamente
+        const titulo = escapeHtml(notif.titulo || '');
+        const mensaje = escapeHtml(notif.mensaje || '');
+        
+        return '<div class="notificacion-item no-leida">' +
                 '<div class="d-flex gap-3">' +
                     '<div class="notificacion-icon ' + nivelPrioridad + '">' +
                         '<i class="' + iconoTipo + '"></i>' +
                     '</div>' +
                     '<div class="notificacion-contenido">' +
-                        '<div class="notificacion-titulo">' + notif.titulo + '</div>' +
-                        '<div class="notificacion-mensaje">' + notif.mensaje + '</div>' +
+                        '<div class="notificacion-titulo">' + titulo + '</div>' +
+                        '<div class="notificacion-mensaje">' + mensaje + '</div>' +
                         '<div class="notificacion-tiempo">' +
                             '<i class="far fa-clock me-1"></i>' + tiempoRelativo +
                         '</div>' +
@@ -504,7 +511,10 @@ window.addEventListener('resize', function() {
 function mostrarModalTodasNotificaciones() {
     fetch('${pageContext.request.contextPath}/NotificacionServlet?action=todas', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Accept': 'application/json; charset=UTF-8'
+        }
     })
     .then(response => response.json())
     .then(data => {
@@ -522,6 +532,19 @@ function mostrarModalTodasNotificaciones() {
         console.error('Error al cargar todas las notificaciones:', error);
         mostrarToast('danger', 'Error de conexión con el servidor', 'fas fa-exclamation-triangle');
     });
+}
+
+// Función auxiliar para escapar HTML (protección XSS, preserva UTF-8)
+function escapeHtml(text) {
+    if (!text) return '';
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
 // Mostrar todas las notificaciones en el modal grande
@@ -545,6 +568,10 @@ function mostrarTodasNotificaciones(notificaciones) {
         const esLeida = notif.leida || false;
         const claseLeida = esLeida ? '' : 'no-leida';
         
+        // Usar escapeHtml para asegurar que los caracteres UTF-8 se rendericen correctamente
+        const titulo = escapeHtml(notif.titulo || '');
+        const mensaje = escapeHtml(notif.mensaje || '');
+        
         return '<div class="notificacion-item-grande ' + claseLeida + '">' +
                 '<div class="d-flex gap-3 align-items-start">' +
                     '<div class="notificacion-icon-grande ' + nivelPrioridad + '">' +
@@ -552,10 +579,10 @@ function mostrarTodasNotificaciones(notificaciones) {
                     '</div>' +
                     '<div class="notificacion-contenido-grande flex-grow-1">' +
                         '<div class="d-flex justify-content-between align-items-start mb-2">' +
-                            '<div class="notificacion-titulo-grande">' + notif.titulo + '</div>' +
+                            '<div class="notificacion-titulo-grande">' + titulo + '</div>' +
                             (!esLeida ? '<span class="badge bg-primary rounded-pill" style="font-size: 0.7rem;">Nueva</span>' : '') +
                         '</div>' +
-                        '<div class="notificacion-mensaje-grande">' + notif.mensaje + '</div>' +
+                        '<div class="notificacion-mensaje-grande">' + mensaje + '</div>' +
                         '<div class="notificacion-tiempo-grande">' +
                             '<i class="far fa-clock me-1"></i>' + tiempoRelativo +
                         '</div>' +

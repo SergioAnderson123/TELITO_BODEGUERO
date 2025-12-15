@@ -3,12 +3,13 @@ package com.example.telito.util;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 // Gestión centralizada de conexiones a la base de datos
 public class DatabaseConnection {
     
     // Configuración de la base de datos
-    private static final String URL = "jdbc:mysql://localhost:3306/telito_bodeguero";
+    private static final String URL = "jdbc:mysql://localhost:3306/telito_bodeguero?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC";
     private static final String USER = "root";
     private static final String PASSWORD = "root";
     
@@ -33,6 +34,12 @@ public class DatabaseConnection {
             Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
             // Configuración adicional de la conexión
             conn.setAutoCommit(true);
+            // Asegurar que la conexión use UTF-8
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute("SET NAMES 'utf8mb4'");
+                stmt.execute("SET CHARACTER SET utf8mb4");
+                stmt.execute("SET character_set_connection=utf8mb4");
+            }
             return conn;
         } catch (SQLException e) {
             System.err.println("✗ Error al obtener conexión a la base de datos: " + e.getMessage());

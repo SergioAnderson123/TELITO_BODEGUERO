@@ -93,6 +93,32 @@
             background: linear-gradient(135deg, #00a896 0%, #02796b 100%) !important;
             border: none;
         }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .config-item {
+                padding: 0.75rem !important;
+                margin-bottom: 1rem !important;
+            }
+            .config-label {
+                font-size: 0.9rem !important;
+            }
+            .config-description {
+                font-size: 0.8rem !important;
+            }
+            .nav-tabs {
+                flex-wrap: wrap;
+                padding: 10px 15px 0 !important;
+            }
+            .nav-tabs .nav-link {
+                padding: 0.5rem 1rem !important;
+                font-size: 0.85rem !important;
+                margin-bottom: 0.5rem;
+            }
+            .card-body {
+                padding: 1rem !important;
+            }
+        }
     </style>
 </head>
 <body>

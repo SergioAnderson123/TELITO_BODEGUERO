@@ -65,6 +65,12 @@
         }
         
         /* Estilos para tabs internos en acordeones */
+        .nav-tabs-sm {
+            border-bottom: 2px solid #e9ecef;
+            background: #ffffff !important;
+            padding: 0.5rem 0;
+        }
+        
         .nav-tabs-sm .nav-link {
             font-size: 0.85rem;
             padding: 0.5rem 1rem;
@@ -72,22 +78,38 @@
             border-bottom: 2px solid transparent;
             color: #6c757d;
             transition: all 0.3s ease;
+            background: #ffffff !important;
         }
         
         .nav-tabs-sm .nav-link:hover {
-            color: #00a896;
+            color: #00a896 !important;
             border-bottom-color: rgba(0, 168, 150, 0.3);
+            background: #ffffff !important;
         }
         
         .nav-tabs-sm .nav-link.active {
-            color: #00a896;
-            background: transparent;
-            border-bottom-color: #00a896;
+            color: #00a896 !important;
+            background: #ffffff !important;
+            border-bottom-color: #00a896 !important;
             font-weight: 600;
         }
         
-        .nav-tabs-sm {
-            border-bottom: 2px solid #e9ecef;
+        .nav-tabs-sm .nav-link:not(.active) {
+            color: #6c757d !important;
+            background: #ffffff !important;
+        }
+        
+        /* Asegurar que los tab-pane internos tengan fondo blanco */
+        .accordion-body .tab-pane {
+            background: #ffffff !important;
+        }
+        
+        .accordion-body .tab-content {
+            background: #ffffff !important;
+        }
+        
+        .accordion-body {
+            background: #ffffff !important;
         }
         
         /* Estilos para las tablas igual que gestión de usuarios */
@@ -123,6 +145,94 @@
         
         .tab-pane.active {
             display: block !important;
+        }
+        
+        /* Responsive para Inventario General */
+        @media (max-width: 768px) {
+            .filtros-container {
+                padding: 0.5rem !important;
+            }
+            .filtros-container .row {
+                margin-left: -0.25rem !important;
+                margin-right: -0.25rem !important;
+            }
+            .filtros-container [class*="col-"] {
+                padding-left: 0.25rem !important;
+                padding-right: 0.25rem !important;
+                margin-bottom: 0.5rem;
+            }
+            .filtros-container .form-select,
+            .filtros-container .form-control {
+                font-size: 0.85rem !important;
+                padding: 0.35rem 0.5rem !important;
+            }
+            .filtros-container .btn {
+                width: 100%;
+                font-size: 0.85rem !important;
+                padding: 0.4rem 0.75rem !important;
+            }
+            .accordion-button {
+                flex-direction: column;
+                align-items: flex-start !important;
+                padding: 0.75rem 1rem !important;
+            }
+            .accordion-button .d-flex {
+                flex-direction: column;
+                width: 100%;
+            }
+            .accordion-button .badge {
+                margin-top: 0.5rem;
+                margin-right: 0.5rem;
+                font-size: 0.7rem !important;
+            }
+            .accordion-body {
+                padding: 0.75rem !important;
+            }
+            .nav-tabs-sm {
+                flex-wrap: wrap;
+            }
+            .nav-tabs-sm .nav-link {
+                padding: 0.4rem 0.6rem !important;
+                font-size: 0.75rem !important;
+                margin-bottom: 0.25rem;
+            }
+            .table th, .table td {
+                padding: 0.3rem 0.4rem !important;
+                font-size: 0.75rem !important;
+            }
+            .table th {
+                font-size: 0.7rem !important;
+            }
+            .badge {
+                font-size: 0.65rem !important;
+                padding: 0.2rem 0.4rem !important;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .page-header {
+                padding: 10px !important;
+            }
+            .pageheader-title {
+                font-size: 1.1rem !important;
+            }
+            .pageheader-text {
+                font-size: 0.8rem !important;
+            }
+            .nav-tabs {
+                padding: 0.5rem !important;
+            }
+            .nav-tabs .nav-link {
+                padding: 0.4rem 0.6rem !important;
+                font-size: 0.8rem !important;
+                margin-bottom: 0.25rem;
+            }
+            .accordion-button {
+                font-size: 0.85rem !important;
+            }
+            .accordion-button strong {
+                font-size: 0.9rem !important;
+            }
         }
         
         /* Ocultar la búsqueda de DataTables ya que usamos filtros personalizados */
@@ -183,18 +293,18 @@
                     <div class="card-header" style="padding: 0; border-bottom: none;">
                         <ul class="nav nav-tabs" id="inventarioTabs" role="tablist" style="border-bottom: none;">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="logistica-tab" data-bs-toggle="tab" data-bs-target="#logistica" type="button" role="tab" aria-controls="logistica" aria-selected="true">
+                                <button class="nav-link ${tabActivo == 'logistica' ? 'active' : ''}" id="logistica-tab" data-bs-toggle="tab" data-bs-target="#logistica" type="button" role="tab" aria-controls="logistica" aria-selected="${tabActivo == 'logistica' ? 'true' : 'false'}">
                                     <i class="fas fa-truck-fast me-2"></i>Logística
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="almacen-tab" data-bs-toggle="tab" data-bs-target="#almacen" type="button" role="tab" aria-controls="almacen" aria-selected="false">
+                                <button class="nav-link ${tabActivo == 'almacen' ? 'active' : ''}" id="almacen-tab" data-bs-toggle="tab" data-bs-target="#almacen" type="button" role="tab" aria-controls="almacen" aria-selected="${tabActivo == 'almacen' ? 'true' : 'false'}">
                                     <i class="fas fa-warehouse me-2"></i>Almacén
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="productores-tab" data-bs-toggle="tab" data-bs-target="#productores" type="button" role="tab" aria-controls="productores" aria-selected="false">
-                                    <i class="fas fa-seedling me-2"></i>Productores
+                                <button class="nav-link ${tabActivo == 'productores' ? 'active' : ''}" id="productores-tab" data-bs-toggle="tab" data-bs-target="#productores" type="button" role="tab" aria-controls="productores" aria-selected="${tabActivo == 'productores' ? 'true' : 'false'}">
+                                    <i class="fas fa-user-tie me-2"></i>Productores
                                 </button>
                             </li>
                         </ul>
@@ -202,21 +312,22 @@
                     <div class="card-body" style="padding: 0.75rem;">
                         <div class="tab-content" id="inventarioTabsContent">
                             <!-- Pestaña Logística -->
-                            <div class="tab-pane fade show active" id="logistica" role="tabpanel" aria-labelledby="logistica-tab">
+                            <div class="tab-pane fade ${tabActivo == 'logistica' ? 'show active' : ''}" id="logistica" role="tabpanel" aria-labelledby="logistica-tab">
                                 <!-- Filtros -->
                                 <div class="filtros-container">
-                                    <form id="filtroLogistica" class="row g-2 mb-0" style="margin-bottom: 0 !important;">
+                                    <form id="filtroLogistica" method="get" action="${pageContext.request.contextPath}/administrador/inventario-general" class="row g-2 mb-0" style="margin-bottom: 0 !important;">
+                                        <input type="hidden" name="tab" value="logistica"/>
                                         <div class="col-md-4">
                                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
-                                            <input type="text" class="form-control form-control-sm shadow-sm" id="buscarLogistica" placeholder="SKU, producto..." style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                            <input type="text" class="form-control form-control-sm shadow-sm" id="buscarLogistica" name="busquedaLogistica" value="${busquedaLogistica != null ? busquedaLogistica : ''}" placeholder="SKU, producto..." style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                         </div>
                                         <div class="col-md-2">
                                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-info-circle me-1"></i>Estado</label>
-                                            <select class="form-select form-select-sm shadow-sm" id="estadoLogistica" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                            <select class="form-select form-select-sm shadow-sm" id="estadoLogistica" name="filtroLogistica" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                                 <option value="">Todos</option>
-                                                <option value="En Stock">En Stock</option>
-                                                <option value="Poco Stock">Poco Stock</option>
-                                                <option value="Sin Stock">Sin Stock</option>
+                                                <option value="En Stock" ${filtroLogistica == 'En Stock' ? 'selected' : ''}>En Stock</option>
+                                                <option value="Poco Stock" ${filtroLogistica == 'Poco Stock' ? 'selected' : ''}>Poco Stock</option>
+                                                <option value="Sin Stock" ${filtroLogistica == 'Sin Stock' ? 'selected' : ''}>Sin Stock</option>
                                             </select>
                                         </div>
                                         <div class="col-md-2 d-flex align-items-end">
@@ -268,17 +379,17 @@
                                                         <td style="padding: 0.35rem 0.5rem;">
                                                             <c:choose>
                                                                 <c:when test="${it.estadoStock == 'En Stock'}">
-                                                                    <span class="badge bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                                                    <span class="badge shadow-sm" style="background-color: #c8e6c9; color: #2e7d32; font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                                         <i class="fas fa-check-circle me-1"></i>En stock
                                                                     </span>
                                                                 </c:when>
                                                                 <c:when test="${it.estadoStock == 'Poco Stock'}">
-                                                                    <span class="badge bg-warning text-dark shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                                                    <span class="badge shadow-sm" style="background-color: #fff9c4; color: #f57f17; font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                                         <i class="fas fa-exclamation-triangle me-1"></i>Poco
                                                                     </span>
                                                                 </c:when>
                                                                 <c:otherwise>
-                                                                    <span class="badge bg-secondary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                                                    <span class="badge shadow-sm" style="background-color: #e0e0e0; color: #424242; font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                                         <i class="fas fa-times-circle me-1"></i>Sin stock
                                                                     </span>
                                                                 </c:otherwise>
@@ -294,21 +405,22 @@
                             </div>
 
                             <!-- Pestaña Almacén -->
-                            <div class="tab-pane fade" id="almacen" role="tabpanel" aria-labelledby="almacen-tab">
+                            <div class="tab-pane fade ${tabActivo == 'almacen' ? 'show active' : ''}" id="almacen" role="tabpanel" aria-labelledby="almacen-tab">
                                 <!-- Filtros -->
                                 <div class="filtros-container">
-                                    <form id="filtroAlmacen" class="row g-2 mb-0" style="margin-bottom: 0 !important;">
+                                    <form id="filtroAlmacen" method="get" action="${pageContext.request.contextPath}/administrador/inventario-general" class="row g-2 mb-0" style="margin-bottom: 0 !important;">
+                                        <input type="hidden" name="tab" value="almacen"/>
                                         <div class="col-md-4">
                                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
-                                            <input type="text" class="form-control form-control-sm shadow-sm" id="buscarAlmacen" placeholder="Código lote, producto, ubicación..." style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                            <input type="text" class="form-control form-control-sm shadow-sm" id="buscarAlmacen" name="busquedaAlmacen" value="${busquedaAlmacen != null ? busquedaAlmacen : ''}" placeholder="Código lote, producto, ubicación..." style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                         </div>
                                         <div class="col-md-2">
                                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-info-circle me-1"></i>Estado</label>
-                                            <select class="form-select form-select-sm shadow-sm" id="estadoAlmacen" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                            <select class="form-select form-select-sm shadow-sm" id="estadoAlmacen" name="filtroAlmacen" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                                 <option value="">Todos</option>
-                                                <option value="Activo">Activo</option>
-                                                <option value="Vencido">Vencido</option>
-                                                <option value="Por Vencer">Por Vencer</option>
+                                                <option value="Activo" ${filtroAlmacen == 'Activo' ? 'selected' : ''}>Activo</option>
+                                                <option value="Vencido" ${filtroAlmacen == 'Vencido' ? 'selected' : ''}>Vencido</option>
+                                                <option value="Por Vencer" ${filtroAlmacen == 'Por Vencer' ? 'selected' : ''}>Por Vencer</option>
                                             </select>
                                         </div>
                                         <div class="col-md-2 d-flex align-items-end">
@@ -368,7 +480,7 @@
                             </div>
 
                             <!-- Pestaña Productores -->
-                            <div class="tab-pane fade" id="productores" role="tabpanel" aria-labelledby="productores-tab">
+                            <div class="tab-pane fade ${tabActivo == 'productores' ? 'show active' : ''}" id="productores" role="tabpanel" aria-labelledby="productores-tab">
                                 <!-- Filtros -->
                                 <div class="filtros-container mb-3">
                                     <form id="filtroProductores" method="get" action="${pageContext.request.contextPath}/administrador/inventario-general" class="row g-2 mb-0" style="margin-bottom: 0 !important;">
@@ -378,7 +490,7 @@
                                             <select class="form-select form-select-sm shadow-sm" id="filtroProductorSelect" name="filtroProductor" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                                 <option value="">Todos los productores</option>
                                                 <c:forEach var="prod" items="${listaProductoresUsuarios}">
-                                                    <option value="${prod.id}" ${filtroProductor != null && filtroProductor == prod.id ? 'selected' : ''}>${prod.nombre}</option>
+                                                    <option value="${prod.id}" ${filtroProductor != null && String.valueOf(prod.id).equals(filtroProductor) ? 'selected' : ''}>${prod.nombre}</option>
                                                 </c:forEach>
                                             </select>
                                         </div>
@@ -466,7 +578,7 @@
                                                                         </c:when>
                                                                         <c:otherwise>
                                                                             <div class="table-responsive">
-                                                                                <table class="table table-sm table-hover mb-0" style="font-size: 0.85rem;">
+                                                                                <table id="tablaProductos-${productorId}" class="table table-sm table-hover mb-0 inventario-table" style="font-size: 0.85rem;">
                                                                                     <thead class="table-light">
                                                                                     <tr>
                                                                                         <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-barcode me-1"></i>SKU</th>
@@ -487,7 +599,7 @@
                                                                                                 <span class="badge bg-light text-dark">${p.categoriaNombre != null ? p.categoriaNombre : 'Sin categoría'}</span>
                                                                                             </td>
                                                                                             <td style="padding: 0.4rem 0.5rem;">
-                                                                                                <span class="badge ${p.stock > 0 ? 'bg-success' : 'bg-danger'}">${p.stock}</span>
+                                                                                                <span class="badge" style="${p.stock > 0 ? 'background-color: #c8e6c9; color: #2e7d32;' : 'background-color: #ffcdd2; color: #c62828;'}">${p.stock}</span>
                                                                                             </td>
                                                                                             <td style="padding: 0.4rem 0.5rem;">
                                                                                                 S/. <fmt:formatNumber value="${p.precioActual}" minFractionDigits="2"/>
@@ -513,7 +625,7 @@
                                                                         </c:when>
                                                                         <c:otherwise>
                                                                             <div class="table-responsive">
-                                                                                <table class="table table-sm table-hover mb-0" style="font-size: 0.85rem;">
+                                                                                <table id="tablaOrdenes-${productorId}" class="table table-sm table-hover mb-0 inventario-table" style="font-size: 0.85rem;">
                                                                                     <thead class="table-light">
                                                                                     <tr>
                                                                                         <th style="font-size: 0.8rem; padding: 0.4rem 0.5rem;"><i class="fas fa-hashtag me-1"></i>N° Orden</th>
@@ -540,16 +652,22 @@
                                                                                                 <c:set var="estadoOrden" value="${orden[6]}"/>
                                                                                                 <c:choose>
                                                                                                     <c:when test="${estadoOrden == 'Recibido'}">
-                                                                                                        <span class="badge bg-info">Recibido</span>
+                                                                                                        <span class="badge" style="background-color: #b3e5fc; color: #01579b;">Recibido</span>
                                                                                                     </c:when>
                                                                                                     <c:when test="${estadoOrden == 'En Proceso'}">
-                                                                                                        <span class="badge bg-warning text-dark">En Proceso</span>
+                                                                                                        <span class="badge" style="background-color: #fff9c4; color: #f57f17;">En Proceso</span>
                                                                                                     </c:when>
                                                                                                     <c:when test="${estadoOrden == 'Rechazado'}">
-                                                                                                        <span class="badge bg-danger">Rechazado</span>
+                                                                                                        <span class="badge" style="background-color: #ffcdd2; color: #c62828;">Rechazado</span>
+                                                                                                    </c:when>
+                                                                                                    <c:when test="${estadoOrden == 'Aprobado'}">
+                                                                                                        <span class="badge" style="background-color: #c8e6c9; color: #2e7d32;">Aprobado</span>
+                                                                                                    </c:when>
+                                                                                                    <c:when test="${estadoOrden == 'Pendiente'}">
+                                                                                                        <span class="badge" style="background-color: #e0e0e0; color: #424242;">Pendiente</span>
                                                                                                     </c:when>
                                                                                                     <c:otherwise>
-                                                                                                        <span class="badge bg-secondary">${estadoOrden}</span>
+                                                                                                        <span class="badge" style="background-color: #e0e0e0; color: #424242;">${estadoOrden}</span>
                                                                                                     </c:otherwise>
                                                                                                 </c:choose>
                                                                                             </td>
@@ -607,13 +725,13 @@
                                                                                                                 <c:set var="tipoMov" value="${mov['tipo']}"/>
                                                                                                                 <c:choose>
                                                                                                                     <c:when test="${tipoMov == 'Entrada'}">
-                                                                                                                        <span class="badge bg-success">Entrada</span>
+                                                                                                                        <span class="badge" style="background-color: #c8e6c9; color: #2e7d32;">Entrada</span>
                                                                                                                     </c:when>
                                                                                                                     <c:when test="${tipoMov == 'Salida'}">
-                                                                                                                        <span class="badge bg-danger">Salida</span>
+                                                                                                                        <span class="badge" style="background-color: #ffcdd2; color: #c62828;">Salida</span>
                                                                                                                     </c:when>
                                                                                                                     <c:otherwise>
-                                                                                                                        <span class="badge bg-secondary">${tipoMov}</span>
+                                                                                                                        <span class="badge" style="background-color: #e0e0e0; color: #424242;">${tipoMov}</span>
                                                                                                                     </c:otherwise>
                                                                                                                 </c:choose>
                                                                                                             </td>
@@ -731,12 +849,136 @@
                 }
             }
             
-            // Inicializar la tabla activa al cargar
-            if ($('#logistica').hasClass('active')) {
-                initTablaLogistica();
+            // Inicializar la tabla activa al cargar según el tab activo
+            var tabActivo = '${tabActivo != null ? tabActivo : "logistica"}';
+            
+            // Forzar la activación correcta de la pestaña al cargar
+            setTimeout(function() {
+                // Remover todas las clases active de las pestañas
+                $('#logistica-tab, #almacen-tab, #productores-tab').removeClass('active').attr('aria-selected', 'false');
+                $('#logistica, #almacen, #productores').removeClass('show active');
+                
+                // Activar solo la pestaña correcta
+                if (tabActivo === 'logistica') {
+                    $('#logistica-tab').addClass('active').attr('aria-selected', 'true');
+                    $('#logistica').addClass('show active');
+                    initTablaLogistica();
+                } else if (tabActivo === 'almacen') {
+                    $('#almacen-tab').addClass('active').attr('aria-selected', 'true');
+                    $('#almacen').addClass('show active');
+                    initTablaAlmacen();
+                } else if (tabActivo === 'productores') {
+                    $('#productores-tab').addClass('active').attr('aria-selected', 'true');
+                    $('#productores').addClass('show active');
+                    // NO inicializar tablas internas aquí - se inicializarán cuando se expandan los acordeones
+                }
+            }, 100);
+            
+            // Función para inicializar todas las tablas internas de productores
+            function initTablasProductores() {
+                // Inicializar tablas de productos, órdenes y movimientos para cada productor
+                // Solo inicializar tablas que existan, sean elementos <table>, estén visibles y no estén ya inicializadas
+                $('table[id^="tablaProductos-"]').each(function() {
+                    var $table = $(this);
+                    var tableId = $table.attr('id');
+                    // Verificar que sea una tabla, esté visible y no esté ya inicializada
+                    if ($table.is('table') && $table.is(':visible') && !$table.hasClass('dataTable') && $table.find('tbody tr').length > 0) {
+                        try {
+                            $table.DataTable(tableConfig);
+                        } catch(e) {
+                            console.error('Error al inicializar tabla ' + tableId + ':', e);
+                        }
+                    }
+                });
+                
+                $('table[id^="tablaOrdenes-"]').each(function() {
+                    var $table = $(this);
+                    var tableId = $table.attr('id');
+                    // Verificar que sea una tabla, esté visible y no esté ya inicializada
+                    if ($table.is('table') && $table.is(':visible') && !$table.hasClass('dataTable') && $table.find('tbody tr').length > 0) {
+                        try {
+                            $table.DataTable(tableConfig);
+                        } catch(e) {
+                            console.error('Error al inicializar tabla ' + tableId + ':', e);
+                        }
+                    }
+                });
             }
             
+            // Inicializar tablas internas cuando se expande un acordeón de productor
+            $('.accordion-collapse').on('shown.bs.collapse', function() {
+                var productorId = $(this).attr('id').replace('collapse', '');
+                setTimeout(function() {
+                    // Inicializar tabla de productos solo si existe, es visible y tiene filas
+                    var tablaProductos = $('#tablaProductos-' + productorId);
+                    if (tablaProductos.length > 0 && tablaProductos.is('table') && tablaProductos.is(':visible') && 
+                        !tablaProductos.hasClass('dataTable') && tablaProductos.find('tbody tr').length > 0) {
+                        try {
+                            tablaProductos.DataTable(tableConfig);
+                        } catch(e) {
+                            console.error('Error al inicializar tabla productos:', e);
+                        }
+                    }
+                    
+                    // Inicializar tabla de órdenes solo si existe, es visible y tiene filas
+                    var tablaOrdenes = $('#tablaOrdenes-' + productorId);
+                    if (tablaOrdenes.length > 0 && tablaOrdenes.is('table') && tablaOrdenes.is(':visible') && 
+                        !tablaOrdenes.hasClass('dataTable') && tablaOrdenes.find('tbody tr').length > 0) {
+                        try {
+                            tablaOrdenes.DataTable(tableConfig);
+                        } catch(e) {
+                            console.error('Error al inicializar tabla órdenes:', e);
+                        }
+                    }
+                }, 200);
+            });
+            
+            // Inicializar tablas internas cuando se cambia de pestaña dentro de un productor
+            $(document).on('shown.bs.tab', '[id^="productos-tab-"], [id^="ordenes-tab-"], [id^="movimientos-tab-"]', function(e) {
+                var target = $(e.target).data('bs-target');
+                if (!target) return;
+                
+                var match = target.match(/\d+/);
+                if (!match) return;
+                
+                var productorId = match[0];
+                
+                setTimeout(function() {
+                    if (target.includes('productos-')) {
+                        var tabla = $('#tablaProductos-' + productorId);
+                        if (tabla.length > 0 && tabla.is('table') && tabla.is(':visible') && 
+                            !tabla.hasClass('dataTable') && tabla.find('tbody tr').length > 0) {
+                            try {
+                                tabla.DataTable(tableConfig);
+                            } catch(e) {
+                                console.error('Error al inicializar tabla productos:', e);
+                            }
+                        }
+                    } else if (target.includes('ordenes-')) {
+                        var tabla = $('#tablaOrdenes-' + productorId);
+                        if (tabla.length > 0 && tabla.is('table') && tabla.is(':visible') && 
+                            !tabla.hasClass('dataTable') && tabla.find('tbody tr').length > 0) {
+                            try {
+                                tabla.DataTable(tableConfig);
+                            } catch(e) {
+                                console.error('Error al inicializar tabla órdenes:', e);
+                            }
+                        }
+                    }
+                }, 200);
+            });
+            
             // Filtros para Logística
+            // Asegurar que el formulario preserve el tab al enviar
+            $('#filtroLogistica').on('submit', function(e) {
+                var tabInput = $(this).find('input[name="tab"]');
+                if (tabInput.length === 0) {
+                    $(this).append('<input type="hidden" name="tab" value="logistica"/>');
+                } else {
+                    tabInput.val('logistica');
+                }
+            });
+            
             // Filtro automático en Logística
             $('#estadoLogistica').on('change', function() {
                 $('#filtroLogistica').submit();
@@ -759,32 +1001,46 @@
             });
             
             // Filtros para Almacén
-            $('#btnBuscarAlmacen').on('click', function() {
-                if (!tablaAlmacen) initTablaAlmacen();
-                if (tablaAlmacen) {
-                    var busqueda = $('#buscarAlmacen').val();
-                    var estado = $('#estadoAlmacen').val();
-                    
-                    tablaAlmacen.column(0).search(busqueda, false, false);
-                    tablaAlmacen.column(1).search(busqueda, false, false);
-                    tablaAlmacen.column(2).search(busqueda, false, false);
-                    tablaAlmacen.column(5).search(estado, false, false);
-                    tablaAlmacen.draw();
+            // Asegurar que el formulario preserve el tab al enviar
+            $('#filtroAlmacen').on('submit', function(e) {
+                var tabInput = $(this).find('input[name="tab"]');
+                if (tabInput.length === 0) {
+                    $(this).append('<input type="hidden" name="tab" value="almacen"/>');
+                } else {
+                    tabInput.val('almacen');
                 }
             });
             
+            $('#btnBuscarAlmacen').on('click', function() {
+                $('#filtroAlmacen').submit();
+            });
+            
             $('#btnLimpiarAlmacen').on('click', function() {
-                if (!tablaAlmacen) initTablaAlmacen();
-                if (tablaAlmacen) {
-                    $('#buscarAlmacen').val('');
-                    $('#estadoAlmacen').val('');
-                    tablaAlmacen.search('').columns().search('').draw();
-                }
+                $('#buscarAlmacen').val('');
+                $('#estadoAlmacen').val('');
+                window.location.href = '${pageContext.request.contextPath}/administrador/inventario-general?tab=almacen';
+            });
+            
+            // Búsqueda con debounce para almacén
+            let searchTimeoutAlmacen = null;
+            $('#buscarAlmacen').on('input', function() {
+                clearTimeout(searchTimeoutAlmacen);
+                searchTimeoutAlmacen = setTimeout(function() {
+                    $('#filtroAlmacen').submit();
+                }, 500);
             });
             
             // Filtro automático por productor
             $('#filtroProductorSelect').on('change', function() {
-                $('#filtroProductores').submit();
+                // Asegurar que se preserve el tab=productores
+                var form = $('#filtroProductores');
+                var tabInput = form.find('input[name="tab"]');
+                if (tabInput.length === 0) {
+                    form.append('<input type="hidden" name="tab" value="productores"/>');
+                } else {
+                    tabInput.val('productores');
+                }
+                form.submit();
             });
             
             // Limpiar filtros de productores
@@ -792,6 +1048,16 @@
                 $('#filtroProductorSelect').val('');
                 $('#buscarProductores').val('');
                 window.location.href = '${pageContext.request.contextPath}/administrador/inventario-general?tab=productores';
+            });
+            
+            // Asegurar que el formulario preserve el tab al enviar
+            $('#filtroProductores').on('submit', function(e) {
+                var tabInput = $(this).find('input[name="tab"]');
+                if (tabInput.length === 0) {
+                    $(this).append('<input type="hidden" name="tab" value="productores"/>');
+                } else {
+                    tabInput.val('productores');
+                }
             });
             
             // Búsqueda con debounce para productores
@@ -803,8 +1069,8 @@
                 }, 500);
             });
             
-            // Inicializar DataTables al cambiar de pestaña
-            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            // Inicializar DataTables al cambiar de pestaña principal
+            $('button[data-bs-toggle="tab"][data-bs-target^="#logistica"], button[data-bs-toggle="tab"][data-bs-target^="#almacen"], button[data-bs-toggle="tab"][data-bs-target^="#productores"]').on('shown.bs.tab', function (e) {
                 var target = $(e.target).data('bs-target');
                 
                 if (target === '#logistica') {
@@ -822,12 +1088,8 @@
                         }, 100);
                     }
                 } else if (target === '#productores') {
-                    initTablaProductores();
-                    if (tablaProductores) {
-                        setTimeout(function() {
-                            tablaProductores.columns.adjust().responsive.recalc();
-                        }, 100);
-                    }
+                    // NO inicializar tablas internas aquí - se inicializarán cuando se expandan los acordeones
+                    // Las tablas se inicializarán automáticamente cuando se expandan los acordeones
                 }
             });
         });

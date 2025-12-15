@@ -3,6 +3,52 @@
 <!doctype html>
 <html lang="es">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Reportes Globales - Telito Bodeguero</title>
+    <script>
+        // CRÍTICO: Establecer fondo inmediatamente ANTES de que se cargue cualquier CSS
+        (function() {
+            document.documentElement.style.backgroundColor = '#edf6f9';
+            document.documentElement.style.margin = '0';
+            document.documentElement.style.padding = '0';
+            if (document.body) {
+                document.body.style.backgroundColor = '#edf6f9';
+                document.body.style.margin = '0';
+                document.body.style.padding = '0';
+            } else {
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.body.style.backgroundColor = '#edf6f9';
+                    document.body.style.margin = '0';
+                    document.body.style.padding = '0';
+                });
+            }
+        })();
+    </script>
+    <style>
+        /* CRÍTICO: Prevenir flash de fondo azul - debe estar ANTES de cualquier otro CSS */
+        html, body {
+            background-color: #edf6f9 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        }
+        .dashboard-main-wrapper {
+            background-color: #edf6f9 !important;
+            min-height: 100vh !important;
+        }
+        .dashboard-wrapper {
+            background-color: #edf6f9 !important;
+        }
+        .dashboard-content {
+            background-color: #edf6f9 !important;
+        }
+        .container-fluid {
+            background-color: transparent !important;
+        }
+    </style>
     <jsp:include page="/administrador/layouts/head.jsp">
         <jsp:param name="pageTitle" value="Reportes Globales"/>
     </jsp:include>
@@ -429,5 +475,35 @@
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Asegurar que el fondo se mantenga correcto durante toda la carga
+    (function() {
+        function setBackground() {
+            document.documentElement.style.backgroundColor = '#edf6f9';
+            if (document.body) {
+                document.body.style.backgroundColor = '#edf6f9';
+            }
+            var wrapper = document.querySelector('.dashboard-main-wrapper');
+            if (wrapper) {
+                wrapper.style.backgroundColor = '#edf6f9';
+            }
+            var content = document.querySelector('.dashboard-content');
+            if (content) {
+                content.style.backgroundColor = '#edf6f9';
+            }
+        }
+        
+        // Ejecutar inmediatamente
+        setBackground();
+        
+        // Ejecutar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setBackground);
+        }
+        
+        // Ejecutar cuando la ventana esté completamente cargada
+        window.addEventListener('load', setBackground);
+    })();
+</script>
 </body>
 </html>

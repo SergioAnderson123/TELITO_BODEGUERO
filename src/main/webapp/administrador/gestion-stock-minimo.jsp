@@ -7,6 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <!doctype html>
 <html lang="es">
@@ -14,6 +15,56 @@
     <jsp:include page="/administrador/layouts/head.jsp">
         <jsp:param name="pageTitle" value="Gestión de Stock Mínimo"/>
     </jsp:include>
+    <style>
+        /* Estilos mejorados para el dropdown de acciones */
+        .dropdown-menu {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            border-radius: 8px !important;
+            min-width: 180px !important;
+            font-size: 0.9rem !important;
+            padding: 0.5rem 0 !important;
+            animation: fadeInDown 0.2s ease-out;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dropdown-item {
+            border-radius: 4px;
+            margin: 2px 8px;
+            padding: 0.5rem 0.75rem !important;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .dropdown-item:hover {
+            transform: translateX(3px);
+            background-color: #f8f9fa;
+        }
+        
+        .dropdown-item.text-primary:hover {
+            background-color: #e3f2fd;
+            color: #1976d2 !important;
+        }
+        
+        .dropdown-item.text-danger:hover {
+            background-color: #ffebee;
+            color: #dc3545 !important;
+        }
+    </style>
 </head>
 <body>
 <div class="dashboard-main-wrapper">
@@ -76,71 +127,70 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
+                            <table id="stockMinimoTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%;">
                                 <thead class="table-light">
                                 <tr>
-                                    <th><i class="fas fa-box me-1"></i>Producto</th>
-                                    <th><i class="fas fa-barcode me-1"></i>Código</th>
-                                    <th><i class="fas fa-warehouse me-1"></i>Stock Mín. Lote</th>
-                                    <th><i class="fas fa-exclamation-triangle me-1"></i>Stock Crít. Lote</th>
-                                    <th><i class="fas fa-chart-line me-1"></i>Stock Mín. Total</th>
-                                    <th><i class="fas fa-exclamation-circle me-1"></i>Stock Crít. Total</th>
-                                    <th><i class="fas fa-toggle-on me-1"></i>Estado</th>
-                                    <th><i class="fas fa-calendar me-1"></i>Última Actualización</th>
-                                    <th class="text-end" style="width: 120px;"><i class="fas fa-cog me-1"></i>Acciones</th>
+                                    <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-box me-1"></i>Producto</th>
+                                    <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-barcode me-1"></i>Código</th>
+                                    <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-warehouse me-1"></i>Stock Mín. Lote</th>
+                                    <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-exclamation-triangle me-1"></i>Stock Crít. Lote</th>
+                                    <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-chart-line me-1"></i>Stock Mín. Total</th>
+                                    <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-exclamation-circle me-1"></i>Stock Crít. Total</th>
+                                    <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-toggle-on me-1"></i>Estado</th>
+                                    <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-calendar me-1"></i>Última Actualización</th>
+                                    <th class="text-end" style="width: 120px; font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-cog me-1"></i>Acciones</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <c:forEach var="config" items="${listaStockMinimo}">
                                     <tr>
-                                        <td>${config.producto.nombre}</td>
-                                        <td><span class="badge bg-secondary">${config.producto.codigoSku}</span></td>
-                                        <td>
-                                            <span class="badge bg-info px-3 py-2 shadow-sm">${config.stockMinimoLote}</span>
+                                        <td style="padding: 0.35rem 0.5rem; font-size: 0.85rem;">${config.producto.nombre}</td>
+                                        <td style="padding: 0.35rem 0.5rem;"><span class="badge bg-secondary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">${config.producto.codigoSku}</span></td>
+                                        <td style="padding: 0.35rem 0.5rem;">
+                                            <span class="badge shadow-sm" style="background-color: #b3e5fc; color: #01579b; font-size: 0.8rem; padding: 0.3rem 0.6rem;">${config.stockMinimoLote}</span>
                                         </td>
-                                        <td>
-                                            <span class="badge bg-warning text-dark px-3 py-2 shadow-sm">${config.stockCriticoLote}</span>
+                                        <td style="padding: 0.35rem 0.5rem;">
+                                            <span class="badge shadow-sm" style="background-color: #fff9c4; color: #f57f17; font-size: 0.8rem; padding: 0.3rem 0.6rem;">${config.stockCriticoLote}</span>
                                         </td>
-                                        <td>
-                                            <span class="badge bg-primary px-3 py-2 shadow-sm">${config.stockMinimoProducto}</span>
+                                        <td style="padding: 0.35rem 0.5rem;">
+                                            <span class="badge shadow-sm" style="background-color: #b3e5fc; color: #01579b; font-size: 0.8rem; padding: 0.3rem 0.6rem;">${config.stockMinimoProducto}</span>
                                         </td>
-                                        <td>
-                                            <span class="badge bg-danger px-3 py-2 shadow-sm">${config.stockCriticoProducto}</span>
+                                        <td style="padding: 0.35rem 0.5rem;">
+                                            <span class="badge shadow-sm" style="background-color: #ffcdd2; color: #c62828; font-size: 0.8rem; padding: 0.3rem 0.6rem;">${config.stockCriticoProducto}</span>
                                         </td>
-                                        <td>
+                                        <td style="padding: 0.35rem 0.5rem;">
                                             <c:choose>
                                                 <c:when test="${config.activo}">
-                                                    <span class="badge bg-success px-3 py-2 shadow-sm">
+                                                    <span class="badge shadow-sm" style="background-color: #c8e6c9; color: #2e7d32; font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                         <i class="fas fa-check-circle me-1"></i>Activo
                                                     </span>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <span class="badge bg-secondary px-3 py-2 shadow-sm">
+                                                    <span class="badge shadow-sm" style="background-color: #e0e0e0; color: #424242; font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                         <i class="fas fa-times-circle me-1"></i>Inactivo
                                                     </span>
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
-                                        <td><small class="text-muted">${config.fechaActualizacion}</small></td>
-                                        <td class="text-end">
-                                            <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-sm btn-outline-primary shadow-sm"
-                                                        data-id="${config.idStockMinimo}"
-                                                        data-nombre="${config.producto.nombre}"
-                                                        data-stockminimolote="${config.stockMinimoLote}"
-                                                        data-stockcriticolote="${config.stockCriticoLote}"
-                                                        data-stockminimoproducto="${config.stockMinimoProducto}"
-                                                        data-stockcriticoproducto="${config.stockCriticoProducto}"
-                                                        data-activo="${config.activo}"
-                                                        onclick="editarConfiguracionFromButton(this)"
-                                                        title="Editar">
-                                                    <i class="fas fa-edit"></i>
+                                        <td style="padding: 0.35rem 0.5rem; font-size: 0.85rem;"><small class="text-muted">${config.fechaActualizacion}</small></td>
+                                        <td class="text-end" style="padding: 0.35rem 0.5rem;">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">
+                                                    <i class="fas fa-ellipsis-v"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-outline-danger shadow-sm"
-                                                        onclick="eliminarConfiguracion(${config.idStockMinimo})"
-                                                        title="Eliminar">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li><a class="dropdown-item" href="#" 
+                                                           data-id="${config.idStockMinimo}"
+                                                           data-nombre="${fn:escapeXml(config.producto.nombre)}"
+                                                           data-stockminimolote="${config.stockMinimoLote}"
+                                                           data-stockcriticolote="${config.stockCriticoLote}"
+                                                           data-stockminimoproducto="${config.stockMinimoProducto}"
+                                                           data-stockcriticoproducto="${config.stockCriticoProducto}"
+                                                           data-activo="${config.activo}"
+                                                           onclick="editarDesdeDropdown(this); return false;"><i class="fas fa-edit me-2"></i>Editar</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" href="#" onclick="eliminarConfiguracion(${config.idStockMinimo}); return false;"><i class="fas fa-trash me-2"></i>Eliminar</a></li>
+                                                </ul>
                                             </div>
                                         </td>
                                     </tr>
@@ -194,7 +244,7 @@
                                         <div class="input-group">
                                             <input type="number" class="form-control" id="stockMinimoLote" 
                                                    name="stockMinimoLote" min="0" required placeholder="Ej: 10">
-                                            <span class="input-group-text">📦</span>
+                                            <span class="input-group-text"><i class="fas fa-box"></i></span>
                                         </div>
                                         <div class="form-text">Por cada lote individual</div>
                                     </div>
@@ -203,7 +253,7 @@
                                         <div class="input-group">
                                             <input type="number" class="form-control" id="stockCriticoLote" 
                                                    name="stockCriticoLote" min="0" required placeholder="Ej: 5">
-                                            <span class="input-group-text">📦</span>
+                                            <span class="input-group-text"><i class="fas fa-box"></i></span>
                                         </div>
                                         <div class="form-text">Nivel crítico por lote</div>
                                     </div>
@@ -227,7 +277,7 @@
                                         <div class="input-group">
                                             <input type="number" class="form-control" id="stockMinimoProducto" 
                                                    name="stockMinimoProducto" min="0" required placeholder="Ej: 50">
-                                            <span class="input-group-text">📦</span>
+                                            <span class="input-group-text"><i class="fas fa-box"></i></span>
                                         </div>
                                         <div class="form-text">Suma de todos los lotes</div>
                                     </div>
@@ -236,7 +286,7 @@
                                         <div class="input-group">
                                             <input type="number" class="form-control" id="stockCriticoProducto" 
                                                    name="stockCriticoProducto" min="0" required placeholder="Ej: 20">
-                                            <span class="input-group-text">📦</span>
+                                            <span class="input-group-text"><i class="fas fa-box"></i></span>
                                         </div>
                                         <div class="form-text">Nivel crítico total</div>
                                     </div>
@@ -303,7 +353,7 @@
                                         <div class="input-group">
                                             <input type="number" class="form-control" id="globalStockMinimoLote" 
                                                    name="stockMinimoLote" min="1" required placeholder="Ej: 10" value="10">
-                                            <span class="input-group-text">📦</span>
+                                            <span class="input-group-text"><i class="fas fa-box"></i></span>
                                         </div>
                                         <div class="form-text">Paquetes por lote</div>
                                     </div>
@@ -312,7 +362,7 @@
                                         <div class="input-group">
                                             <input type="number" class="form-control" id="globalStockCriticoLote" 
                                                    name="stockCriticoLote" min="1" required placeholder="Ej: 5" value="5">
-                                            <span class="input-group-text">📦</span>
+                                            <span class="input-group-text"><i class="fas fa-box"></i></span>
                                         </div>
                                         <div class="form-text">Nivel crítico por lote</div>
                                     </div>
@@ -333,7 +383,7 @@
                                         <div class="input-group">
                                             <input type="number" class="form-control" id="globalStockMinimoProducto" 
                                                    name="stockMinimoProducto" min="1" required placeholder="Ej: 50" value="50">
-                                            <span class="input-group-text">📦</span>
+                                            <span class="input-group-text"><i class="fas fa-box"></i></span>
                                         </div>
                                         <div class="form-text">Suma de todos los lotes</div>
                                     </div>
@@ -342,7 +392,7 @@
                                         <div class="input-group">
                                             <input type="number" class="form-control" id="globalStockCriticoProducto" 
                                                    name="stockCriticoProducto" min="1" required placeholder="Ej: 20" value="20">
-                                            <span class="input-group-text">📦</span>
+                                            <span class="input-group-text"><i class="fas fa-box"></i></span>
                                         </div>
                                         <div class="form-text">Nivel crítico total</div>
                                     </div>
@@ -371,6 +421,35 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    // Inicializar DataTables
+    $(document).ready(function() {
+        $('#stockMinimoTable').DataTable({
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
+                search: "Buscar:",
+                lengthMenu: "Mostrar _MENU_ registros",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                infoEmpty: "Mostrando 0 a 0 de 0 registros",
+                infoFiltered: "(filtrado de _MAX_ registros totales)",
+                paginate: {
+                    first: "Primero",
+                    last: "Último",
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
+            },
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+            order: [[0, 'asc']],
+            responsive: true,
+            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>'
+        });
+    });
+</script>
 <script>
     function editarConfiguracion(id, nombre, stockMinimoLote, stockCriticoLote, stockMinimoProducto, stockCriticoProducto, activo) {
         document.getElementById('modalTitle').textContent = 'Editar Configuración de Stock';
@@ -396,6 +475,21 @@
         const stockMinimoProducto = parseInt(btn.dataset.stockminimoproducto);
         const stockCriticoProducto = parseInt(btn.dataset.stockcriticoproducto);
         const activo = String(btn.dataset.activo) === 'true';
+        editarConfiguracion(id, nombre, stockMinimoLote, stockCriticoLote, stockMinimoProducto, stockCriticoProducto, activo);
+    }
+    
+    function editarConfiguracionDirecta(id, nombre, stockMinimoLote, stockCriticoLote, stockMinimoProducto, stockCriticoProducto, activo) {
+        editarConfiguracion(id, nombre, stockMinimoLote, stockCriticoLote, stockMinimoProducto, stockCriticoProducto, activo);
+    }
+    
+    function editarDesdeDropdown(element) {
+        const id = parseInt(element.dataset.id);
+        const nombre = element.dataset.nombre;
+        const stockMinimoLote = parseInt(element.dataset.stockminimolote);
+        const stockCriticoLote = parseInt(element.dataset.stockcriticolote);
+        const stockMinimoProducto = parseInt(element.dataset.stockminimoproducto);
+        const stockCriticoProducto = parseInt(element.dataset.stockcriticoproducto);
+        const activo = element.dataset.activo === 'true';
         editarConfiguracion(id, nombre, stockMinimoLote, stockCriticoLote, stockMinimoProducto, stockCriticoProducto, activo);
     }
 

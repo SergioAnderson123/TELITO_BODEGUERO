@@ -2,20 +2,6 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%-- Mensajes de éxito o error --%>
-<% if (session.getAttribute("successMsg") != null) { %>
-<div class="alert alert-success" role="alert">
-    <%= session.getAttribute("successMsg") %>
-    <% session.removeAttribute("successMsg"); %>
-</div>
-<% } %>
-<% if (session.getAttribute("errorMsg") != null) { %>
-<div class="alert alert-danger" role="alert">
-    <%= session.getAttribute("errorMsg") %>
-    <% session.removeAttribute("errorMsg"); %>
-</div>
-<% } %>
-
 <% ArrayList<AlertaConfig> listaAlertas = (ArrayList<AlertaConfig>) request.getAttribute("listaAlertas"); %>
 
 <!doctype html>
@@ -24,6 +10,56 @@
     <jsp:include page="/administrador/layouts/head.jsp">
         <jsp:param name="pageTitle" value="Gestión de Alertas"/>
     </jsp:include>
+    <style>
+        /* Estilos mejorados para el dropdown de acciones */
+        .dropdown-menu {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            border-radius: 8px !important;
+            min-width: 180px !important;
+            font-size: 0.9rem !important;
+            padding: 0.5rem 0 !important;
+            animation: fadeInDown 0.2s ease-out;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dropdown-item {
+            border-radius: 4px;
+            margin: 2px 8px;
+            padding: 0.5rem 0.75rem !important;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .dropdown-item:hover {
+            transform: translateX(3px);
+            background-color: #f8f9fa;
+        }
+        
+        .dropdown-item.text-primary:hover {
+            background-color: #e3f2fd;
+            color: #1976d2 !important;
+        }
+        
+        .dropdown-item.text-danger:hover {
+            background-color: #ffebee;
+            color: #dc3545 !important;
+        }
+    </style>
 </head>
 <body>
 <div class="dashboard-main-wrapper">
@@ -39,16 +75,6 @@
             <p class="pageheader-text">Crea y administra las reglas de notificación del sistema.</p>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <form method="get" action="<%= request.getContextPath() %>/AlertaServlet" class="d-flex align-items-center">
-                <input type="hidden" name="action" value="listar">
-                <input type="hidden" name="page" value="1">
-                <label class="me-2 text-muted small"><i class="fas fa-list me-1"></i>Mostrar</label>
-                <select name="size" class="form-select form-select-sm shadow-sm" style="width: auto;" onchange="this.form.submit()">
-                    <option value="10" <%= (request.getAttribute("size")!=null && (Integer)request.getAttribute("size")==10) ? "selected" : "" %>>10</option>
-                    <option value="25" <%= (request.getAttribute("size")!=null && (Integer)request.getAttribute("size")==25) ? "selected" : "" %>>25</option>
-                    <option value="50" <%= (request.getAttribute("size")!=null && (Integer)request.getAttribute("size")==50) ? "selected" : "" %>>50</option>
-                </select>
-            </form>
             <a href="<%= request.getContextPath() %>/AlertaReporteServlet?action=exportar" class="btn btn-success shadow-sm">
                 <i class="fas fa-file-excel me-2"></i>Exportar a Excel
             </a>
@@ -60,6 +86,22 @@
             </a>
         </div>
     </div>
+
+    <!-- Mensajes de éxito o error -->
+    <% if (session.getAttribute("successMsg") != null) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i><%= session.getAttribute("successMsg") %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <% session.removeAttribute("successMsg"); %>
+    </div>
+    <% } %>
+    <% if (session.getAttribute("errorMsg") != null) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><%= session.getAttribute("errorMsg") %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <% session.removeAttribute("errorMsg"); %>
+    </div>
+    <% } %>
 
     <div class="row">
         <div class="col-12">
@@ -74,7 +116,7 @@
                 </div>
                 <div class="card-body" style="padding: 0.75rem;">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important;">
+                        <table id="alertaTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%;">
                             <thead class="table-light">
                             <tr>
                                 <th style="font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-tag me-1"></i>Nombre de la Regla</th>
@@ -93,19 +135,19 @@
                                     <td style="padding: 0.35rem 0.5rem;">
                                         <% String tipoAlerta = alerta.getTipoAlerta(); %>
                                         <% if ("STOCK_MINIMO_LOTE".equals(tipoAlerta)) { %>
-                                            <span class="badge bg-warning text-dark shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">📦 Stock Mín. Lote</span>
+                                            <span class="badge shadow-sm" style="background-color: #fff9c4; color: #f57f17; font-size: 0.8rem; padding: 0.3rem 0.6rem;"><i class="fas fa-box me-1"></i>Stock Mín. Lote</span>
                                         <% } else if ("STOCK_CRITICO_LOTE".equals(tipoAlerta)) { %>
-                                            <span class="badge bg-danger shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">📦 Stock Crít. Lote</span>
+                                            <span class="badge shadow-sm" style="background-color: #ffcdd2; color: #c62828; font-size: 0.8rem; padding: 0.3rem 0.6rem;"><i class="fas fa-box me-1"></i>Stock Crít. Lote</span>
                                         <% } else if ("STOCK_MINIMO_TOTAL".equals(tipoAlerta)) { %>
-                                            <span class="badge bg-info text-dark shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">📊 Stock Mín. Total</span>
+                                            <span class="badge shadow-sm" style="background-color: #b3e5fc; color: #01579b; font-size: 0.8rem; padding: 0.3rem 0.6rem;"><i class="fas fa-chart-bar me-1"></i>Stock Mín. Total</span>
                                         <% } else if ("STOCK_CRITICO_TOTAL".equals(tipoAlerta)) { %>
-                                            <span class="badge bg-danger shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">📊 Stock Crít. Total</span>
+                                            <span class="badge shadow-sm" style="background-color: #ffcdd2; color: #c62828; font-size: 0.8rem; padding: 0.3rem 0.6rem;"><i class="fas fa-chart-bar me-1"></i>Stock Crít. Total</span>
                                         <% } else if ("VENCIMIENTO".equals(tipoAlerta)) { %>
-                                            <span class="badge bg-warning text-dark shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">⏰ Vencimiento</span>
+                                            <span class="badge shadow-sm" style="background-color: #fff9c4; color: #f57f17; font-size: 0.8rem; padding: 0.3rem 0.6rem;"><i class="fas fa-clock me-1"></i>Vencimiento</span>
                                         <% } else if ("MOVIMIENTO".equals(tipoAlerta)) { %>
-                                            <span class="badge bg-secondary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">🔄 Movimiento</span>
+                                            <span class="badge shadow-sm" style="background-color: #e0e0e0; color: #424242; font-size: 0.8rem; padding: 0.3rem 0.6rem;"><i class="fas fa-exchange-alt me-1"></i>Movimiento</span>
                                         <% } else { %>
-                                            <span class="badge bg-secondary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;"><%= tipoAlerta %></span>
+                                            <span class="badge shadow-sm" style="background-color: #e0e0e0; color: #424242; font-size: 0.8rem; padding: 0.3rem 0.6rem;"><%= tipoAlerta %></span>
                                         <% } %>
                                     </td>
                                     <td style="padding: 0.35rem 0.5rem; font-size: 0.85rem;">
@@ -117,15 +159,15 @@
                                             --
                                         <% } %>
                                         <% if (alerta.getCategoria() != null) { %>
-                                            <br><small class="text-muted" style="font-size: 0.75rem;">📁 Categoría: <%= alerta.getCategoria().getNombre() %></small>
+                                            <br><small class="text-muted" style="font-size: 0.75rem;"><i class="fas fa-folder me-1"></i>Categoría: <%= alerta.getCategoria().getNombre() %></small>
                                         <% } %>
                                     </td>
                                     <td style="padding: 0.35rem 0.5rem; font-size: 0.85rem;"><%= alerta.getRolANotificar().getNombre() %></td>
                                     <td style="padding: 0.35rem 0.5rem;">
                                         <% if (alerta.isActivo()) { %>
-                                            <span class="badge bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">Activa</span>
+                                            <span class="badge shadow-sm" style="background-color: #c8e6c9; color: #2e7d32; font-size: 0.8rem; padding: 0.3rem 0.6rem;">Activa</span>
                                         <% } else { %>
-                                            <span class="badge bg-secondary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">Inactiva</span>
+                                            <span class="badge shadow-sm" style="background-color: #e0e0e0; color: #424242; font-size: 0.8rem; padding: 0.3rem 0.6rem;">Inactiva</span>
                                         <% } %>
                                     </td>
                                     <td class="text-end" style="padding: 0.35rem 0.5rem;">
@@ -167,44 +209,34 @@
     </div>
 </div>
 
-<%
-    Integer currentPage = (Integer) request.getAttribute("currentPage");
-    Integer totalPages = (Integer) request.getAttribute("totalPages");
-    Integer size = (Integer) request.getAttribute("size");
-    if (currentPage == null) currentPage = 1;
-    if (totalPages == null) totalPages = 1;
-    if (size == null) size = 10;
-    String base = request.getContextPath() + "/AlertaServlet?action=listar";
-%>
-<nav aria-label="Paginación de alertas" class="d-flex justify-content-between align-items-center mt-3 px-4">
-    <div class="text-muted small">Página <%= currentPage %> de <%= totalPages %></div>
-    <ul class="pagination mb-0">
-        <li class="page-item <%= currentPage <= 1 ? "disabled" : "" %>">
-            <a class="page-link" href="<%= base %>&page=<%= currentPage - 1 %>&size=<%= size %>">Anterior</a>
-        </li>
-        <% for (int p = 1; p <= totalPages; p++) { %>
-        <li class="page-item <%= p == currentPage ? "active" : "" %>"><a class="page-link" href="<%= base %>&page=<%= p %>&size=<%= size %>"><%= p %></a></li>
-        <% } %>
-        <li class="page-item <%= currentPage >= totalPages ? "disabled" : "" %>">
-            <a class="page-link" href="<%= base %>&page=<%= currentPage + 1 %>&size=<%= size %>">Siguiente</a>
-        </li>
-    </ul>
-</nav>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const sidebar = document.getElementById('sidebar');
-        const content = document.getElementById('content');
-        const header = document.getElementById('header');
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('hidden');
-                content.classList.toggle('full-width');
-                header.classList.toggle('full-width');
-            });
-        }
+    // Inicializar DataTables
+    $(document).ready(function() {
+        $('#alertaTable').DataTable({
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
+                search: "Buscar:",
+                lengthMenu: "Mostrar _MENU_ registros",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                infoEmpty: "Mostrando 0 a 0 de 0 registros",
+                infoFiltered: "(filtrado de _MAX_ registros totales)",
+                paginate: {
+                    first: "Primero",
+                    last: "Último",
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
+            },
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+            order: [[0, 'asc']],
+            responsive: true,
+            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>'
+        });
     });
 </script>
 </body>

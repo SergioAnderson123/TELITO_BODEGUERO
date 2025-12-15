@@ -42,11 +42,18 @@ public class InventarioGeneralServlet extends HttpServlet {
         }
         
         // Obtener filtros
+        String tab = request.getParameter("tab");
         String filtroProductor = request.getParameter("filtroProductor");
         String filtroLogistica = request.getParameter("filtroLogistica");
         String filtroAlmacen = request.getParameter("filtroAlmacen");
         String busquedaLogistica = request.getParameter("busquedaLogistica");
         String busquedaProductores = request.getParameter("busquedaProductores");
+        
+        // Preservar el tab activo
+        if (tab == null || tab.isEmpty()) {
+            tab = "logistica"; // Por defecto
+        }
+        request.setAttribute("tabActivo", tab);
         
         // Inventario desde perspectiva de Logística (agrupado por producto)
         InventarioDao inventarioDao = new InventarioDao();
@@ -55,9 +62,18 @@ public class InventarioGeneralServlet extends HttpServlet {
         request.setAttribute("busquedaLogistica", busquedaLogistica);
 
         // Inventario desde perspectiva de Almacén (lotes registrados)
-        LoteDao loteDao = new LoteDao();
-        ArrayList<Lote> listaAlmacen = loteDao.listarLotesRegistrados(1);
+        com.example.telito.almacen.daos.LoteDao loteDao = new com.example.telito.almacen.daos.LoteDao();
+        String busquedaAlmacen = request.getParameter("busquedaAlmacen");
+        // El filtro de almacén se aplica por estado (Activo, Vencido, Por Vencer)
+        // pero el método listarLotesRegistrados usa estadoStock (En Stock, Poco Stock, Sin Stock)
+        // Por ahora, solo aplicamos la búsqueda
+        ArrayList<com.example.telito.almacen.beans.Lote> listaAlmacen = loteDao.listarLotesRegistrados(1, busquedaAlmacen, null);
         request.setAttribute("listaAlmacen", listaAlmacen);
+        request.setAttribute("busquedaAlmacen", busquedaAlmacen);
+        request.setAttribute("filtroAlmacen", filtroAlmacen);
+        request.setAttribute("filtroLogistica", filtroLogistica);
+        request.setAttribute("filtroProductor", filtroProductor);
+        request.setAttribute("busquedaProductores", busquedaProductores);
 
         // Inventario desde perspectiva de Productores - AGRUPADO POR PRODUCTOR
         ProductoDAO productoDao = new ProductoDAO();

@@ -356,6 +356,308 @@
             margin-right: 0;
         }
     }
+    
+    /* ===================== ESTILOS RESPONSIVE GLOBALES ===================== */
+    
+    /* Tablas responsive */
+    @media (max-width: 768px) {
+        .table-card .card-body {
+            padding: 15px !important;
+        }
+        .table-card .card-header {
+            padding: 15px 20px !important;
+        }
+        .table th, .table td {
+            padding: 0.5rem 0.4rem !important;
+            font-size: 0.8rem !important;
+        }
+        .table th {
+            font-size: 0.75rem !important;
+        }
+        .badge {
+            font-size: 0.7rem !important;
+            padding: 0.25rem 0.5rem !important;
+        }
+    }
+    
+    /* Modales responsive */
+    @media (max-width: 768px) {
+        .modal-dialog {
+            margin: 10px !important;
+            max-width: calc(100% - 20px) !important;
+        }
+        .modal-content {
+            border-radius: 12px !important;
+        }
+        .modal-header, .modal-body, .modal-footer {
+            padding: 15px !important;
+        }
+        .modal-title {
+            font-size: 1.1rem !important;
+        }
+    }
+    
+    /* Formularios responsive */
+    @media (max-width: 768px) {
+        .form-control, .form-select {
+            font-size: 16px !important; /* Evita zoom en iOS */
+        }
+        .form-label {
+            font-size: 0.9rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        .input-group {
+            flex-wrap: wrap;
+        }
+        .input-group-text {
+            font-size: 0.85rem !important;
+        }
+    }
+    
+    /* Botones responsive */
+    @media (max-width: 768px) {
+        .btn {
+            padding: 0.5rem 1rem !important;
+            font-size: 0.9rem !important;
+        }
+        .btn-sm {
+            padding: 0.35rem 0.75rem !important;
+            font-size: 0.8rem !important;
+        }
+        .btn-group {
+            flex-wrap: wrap;
+        }
+        .d-flex.gap-2, .d-flex.gap-3 {
+            flex-wrap: wrap;
+        }
+    }
+    
+    /* Cards y tarjetas responsive */
+    @media (max-width: 768px) {
+        .card {
+            margin-bottom: 1rem !important;
+        }
+        .card-body {
+            padding: 1rem !important;
+        }
+        .card-header {
+            padding: 1rem !important;
+        }
+        .page-header {
+            margin-bottom: 1.5rem !important;
+        }
+        .pageheader-title {
+            font-size: 1.3rem !important;
+        }
+        .pageheader-text {
+            font-size: 0.9rem !important;
+        }
+    }
+    
+    /* Grids y columnas responsive */
+    @media (max-width: 768px) {
+        .row.g-2, .row.g-3, .row.g-4 {
+            margin-left: -0.5rem !important;
+            margin-right: -0.5rem !important;
+        }
+        .row.g-2 > *, .row.g-3 > *, .row.g-4 > * {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        [class*="col-"] {
+            margin-bottom: 1rem;
+        }
+    }
+    
+    /* Filtros y búsquedas responsive */
+    @media (max-width: 768px) {
+        .filtros-container {
+            margin-bottom: 1rem !important;
+        }
+        .filtros-container .row {
+            margin-left: -0.5rem !important;
+            margin-right: -0.5rem !important;
+        }
+        .filtros-container [class*="col-"] {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+            margin-bottom: 0.75rem;
+        }
+        .filtros-container .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+    
+    /* Tabs responsive */
+    @media (max-width: 768px) {
+        .nav-tabs {
+            flex-wrap: wrap;
+            padding: 0.5rem !important;
+        }
+        .nav-tabs .nav-link {
+            padding: 0.5rem 0.75rem !important;
+            font-size: 0.85rem !important;
+            margin-bottom: 0.25rem;
+        }
+        .nav-tabs-sm .nav-link {
+            padding: 0.4rem 0.6rem !important;
+            font-size: 0.8rem !important;
+        }
+    }
+    
+    /* Accordions responsive */
+    @media (max-width: 768px) {
+        .accordion-button {
+            padding: 0.75rem 1rem !important;
+            font-size: 0.9rem !important;
+        }
+        .accordion-body {
+            padding: 0.75rem !important;
+        }
+        .accordion-item {
+            margin-bottom: 0.75rem !important;
+        }
+    }
+    
+    /* Dropdowns responsive */
+    @media (max-width: 768px) {
+        .dropdown-menu {
+            min-width: 160px !important;
+            font-size: 0.85rem !important;
+        }
+        .dropdown-item {
+            padding: 0.5rem 0.75rem !important;
+        }
+        .notificaciones-dropdown {
+            width: calc(100vw - 40px) !important;
+            max-width: 380px !important;
+            left: auto !important;
+            right: 10px !important;
+        }
+    }
+    
+    /* Paginación responsive */
+    @media (max-width: 768px) {
+        .pagination {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .pagination .page-link {
+            padding: 0.4rem 0.6rem !important;
+            font-size: 0.85rem !important;
+        }
+    }
+    
+    /* Alerts responsive */
+    @media (max-width: 768px) {
+        .alert {
+            padding: 0.75rem 1rem !important;
+            font-size: 0.9rem !important;
+        }
+    }
+    
+    /* Charts responsive */
+    @media (max-width: 768px) {
+        .charts-grid {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+        }
+        .chart-container {
+            height: 250px !important;
+        }
+    }
+    
+    /* Report cards responsive */
+    @media (max-width: 768px) {
+        .report-card {
+            margin-bottom: 1.5rem !important;
+        }
+        .report-card-header {
+            padding: 20px !important;
+        }
+        .report-card-body {
+            padding: 15px 20px !important;
+        }
+        .report-card-footer {
+            padding: 12px 20px !important;
+        }
+        .report-icon {
+            font-size: 2rem !important;
+        }
+        .report-title {
+            font-size: 1.1rem !important;
+        }
+        .report-description {
+            font-size: 0.85rem !important;
+        }
+        .stat-item {
+            padding: 10px !important;
+        }
+        .stat-number {
+            font-size: 1.3rem !important;
+        }
+        .stat-label {
+            font-size: 0.7rem !important;
+        }
+    }
+    
+    /* Configuración avanzada tabs responsive */
+    @media (max-width: 768px) {
+        .config-item {
+            padding: 0.75rem !important;
+            margin-bottom: 1rem !important;
+        }
+        .config-label {
+            font-size: 0.9rem !important;
+        }
+        .config-description {
+            font-size: 0.8rem !important;
+        }
+    }
+    
+    /* Inventario general responsive */
+    @media (max-width: 768px) {
+        .accordion-button {
+            flex-direction: column;
+            align-items: flex-start !important;
+        }
+        .accordion-button .d-flex {
+            flex-direction: column;
+            width: 100%;
+        }
+        .accordion-button .badge {
+            margin-top: 0.5rem;
+            margin-right: 0.5rem;
+        }
+    }
+    
+    /* Muy pequeños (menos de 576px) */
+    @media (max-width: 576px) {
+        .dashboard-content {
+            padding: 15px !important;
+        }
+        .container-fluid {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        .page-header {
+            padding: 15px !important;
+        }
+        .pageheader-title {
+            font-size: 1.2rem !important;
+        }
+        .table-responsive {
+            font-size: 0.8rem;
+        }
+        .btn-group-vertical {
+            width: 100%;
+        }
+        .btn-group-vertical .btn {
+            width: 100%;
+            margin-bottom: 0.25rem;
+        }
+    }
 </style>
 
 <!-- Incluir modales personalizados -->
