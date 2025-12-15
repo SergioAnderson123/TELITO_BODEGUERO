@@ -518,6 +518,184 @@
                 padding: 10px;
             }
         }
+        
+        /* ===================== Estilos para Modal de Editar Vehículo ===================== */
+        #editVehiculoModal.modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1050; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #editVehiculoModal.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #editVehiculoModal .modal-content { 
+            background-color: #ffffff; 
+            width: 100%;
+            max-width: 600px; 
+            max-height: 90vh; 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        #editVehiculoModal .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); 
+            padding: 20px 25px; 
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+        }
+        #editVehiculoModal .modal-header h2 { 
+            margin: 0; 
+            color: white; 
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #editVehiculoModal .modal-header h2 i {
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        #editVehiculoModal .modal-close { 
+            color: white; 
+            font-size: 24px; 
+            font-weight: normal; 
+            cursor: pointer; 
+            opacity: 0.9; 
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        #editVehiculoModal .modal-close:hover { 
+            opacity: 1; 
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        #editVehiculoModal .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(90vh - 160px);
+        }
+        #editVehiculoModal .form-group {
+            margin-bottom: 1rem;
+        }
+        #editVehiculoModal .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2b2d42;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #editVehiculoModal .form-group label i {
+            color: #00a896;
+            font-size: 0.85rem;
+        }
+        #editVehiculoModal .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        #editVehiculoModal .form-group input:focus {
+            border-color: #00a896;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        #editVehiculoModal .form-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-top: 6px;
+            padding: 8px 12px;
+            background: rgba(0,168,150,0.05);
+            border-radius: 6px;
+        }
+        #editVehiculoModal .form-hint i {
+            color: #00a896;
+            flex-shrink: 0;
+        }
+        #editVehiculoModal .modal-footer { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 12px; 
+            padding: 20px 25px; 
+            border-top: 2px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 0 0 16px 16px;
+        }
+        #editVehiculoModal .modal-footer button {
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #editVehiculoModal .modal-footer .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        #editVehiculoModal .modal-footer .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+        }
+        #editVehiculoModal .modal-footer button[type="submit"] {
+            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+        }
+        #editVehiculoModal .modal-footer button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+        }
+        @media (max-width: 768px) {
+            #editVehiculoModal .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: 95vh;
+                margin: 10px;
+            }
+            #editVehiculoModal.show {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -677,7 +855,7 @@
                                                         </button>
                                                         <ul class="dropdown-menu dropdown-menu-end shadow-lg">
                                                             <li>
-                                                                <a class="dropdown-item text-primary" href="${pageContext.request.contextPath}/administrador/VehiculoServlet?action=editar&id=${vehiculo.idVehiculo}">
+                                                                <a class="dropdown-item text-primary" href="#" onclick="event.preventDefault(); editarVehiculo(${vehiculo.idVehiculo});">
                                                                     <i class="fas fa-edit"></i> Editar
                                                                 </a>
                                                             </li>
@@ -706,6 +884,95 @@
             </div>
             <jsp:include page="/administrador/layouts/footer.jsp"/>
         </div>
+    </div>
+</div>
+
+<!-- ===================== Modal: Editar Vehículo ===================== -->
+<div id="editVehiculoModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-truck-loading"></i> Editar Vehículo</h2>
+            <span class="modal-close">&times;</span>
+        </div>
+        
+        <form method="POST" action="${pageContext.request.contextPath}/administrador/VehiculoServlet?action=actualizar" id="formEditarVehiculo">
+            <input type="hidden" name="id" id="editIdVehiculo">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editPlaca">
+                        <i class="fas fa-id-card"></i>
+                        Placa <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" 
+                           name="placa" 
+                           id="editPlaca" 
+                           placeholder="Ej: ABC-123" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa la placa del vehículo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editMarca">
+                        <i class="fas fa-industry"></i>
+                        Marca
+                    </label>
+                    <input type="text" 
+                           name="marca" 
+                           id="editMarca" 
+                           placeholder="Ej: Toyota, Nissan">
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa la marca del vehículo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editModelo">
+                        <i class="fas fa-car"></i>
+                        Modelo
+                    </label>
+                    <input type="text" 
+                           name="modelo" 
+                           id="editModelo" 
+                           placeholder="Ej: Hiace, Urvan">
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el modelo del vehículo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editCapacidadKg">
+                        <i class="fas fa-weight"></i>
+                        Capacidad (Kg) <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" 
+                           name="capacidadKg" 
+                           id="editCapacidadKg" 
+                           placeholder="Ej: 1500" 
+                           min="0" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa la capacidad máxima en kilogramos</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary modal-cancel">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit">
+                    <i class="fas fa-save"></i>
+                    Guardar cambios
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -1038,7 +1305,123 @@
             if (event.key === 'Escape' && sendEmailModal && sendEmailModal.classList.contains('show')) {
                 cerrarModalEnviarCorreo();
             }
+            if (event.key === 'Escape' && editVehiculoModal && editVehiculoModal.classList.contains('show')) {
+                cerrarModalEditarVehiculo();
+            }
         });
+        
+        // ===================== Manejo del Modal de Editar Vehículo =====================
+        const editVehiculoModal = document.getElementById('editVehiculoModal');
+        const closeEditVehiculoModalBtn = document.querySelector('#editVehiculoModal .modal-close');
+        const cancelEditVehiculoModalBtn = document.querySelector('#editVehiculoModal .modal-cancel');
+        
+        // Función para abrir el modal de edición
+        function abrirModalEditarVehiculo() {
+            if (editVehiculoModal) {
+                editVehiculoModal.classList.add('show');
+                editVehiculoModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        // Función para cerrar el modal de edición
+        function cerrarModalEditarVehiculo() {
+            if (editVehiculoModal) {
+                editVehiculoModal.classList.remove('show');
+                editVehiculoModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Función global para editar vehículo
+        window.editarVehiculo = function(idVehiculo) {
+            const editVehiculoModal = document.getElementById('editVehiculoModal');
+            const originalModalBodyContent = editVehiculoModal.querySelector('.modal-body').innerHTML;
+            
+            // Mostrar loading overlay
+            const modalBody = editVehiculoModal.querySelector('.modal-body');
+            if (modalBody) {
+                modalBody.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x mb-3" style="color: #00a896;"></i><p>Cargando datos del vehículo...</p></div>';
+            }
+            
+            abrirModalEditarVehiculo();
+            
+            fetch('${pageContext.request.contextPath}/administrador/VehiculoServlet?action=obtenerVehiculoJson&id=' + idVehiculo, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Error al cargar los datos del vehículo');
+                return response.json();
+            })
+            .then(data => {
+                // Restore original form HTML
+                modalBody.innerHTML = originalModalBodyContent;
+                
+                // Populate form fields
+                document.getElementById('editIdVehiculo').value = data.idVehiculo;
+                document.getElementById('editPlaca').value = data.placa || '';
+                document.getElementById('editMarca').value = data.marca || '';
+                document.getElementById('editModelo').value = data.modelo || '';
+                document.getElementById('editCapacidadKg').value = data.capacidadKg || '';
+            })
+            .catch(error => {
+                console.error('Error al cargar vehículo:', error);
+                cerrarModalEditarVehiculo();
+                alert('Error al cargar los datos del vehículo. Por favor, intenta nuevamente.');
+            });
+        };
+        
+        // Event listeners para cerrar el modal
+        if (closeEditVehiculoModalBtn) {
+            closeEditVehiculoModalBtn.addEventListener('click', cerrarModalEditarVehiculo);
+        }
+        
+        if (cancelEditVehiculoModalBtn) {
+            cancelEditVehiculoModalBtn.addEventListener('click', cerrarModalEditarVehiculo);
+        }
+        
+        // Cerrar modal al hacer clic fuera del contenido
+        if (editVehiculoModal) {
+            editVehiculoModal.addEventListener('click', function(event) {
+                if (event.target === editVehiculoModal) {
+                    cerrarModalEditarVehiculo();
+                }
+            });
+        }
+        
+        // Manejo del formulario de edición con AJAX
+        const formEditarVehiculo = document.getElementById('formEditarVehiculo');
+        if (formEditarVehiculo) {
+            formEditarVehiculo.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const formData = new FormData(formEditarVehiculo);
+                const url = formEditarVehiculo.action;
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exito) {
+                        alert(data.mensaje || 'Vehículo actualizado exitosamente.');
+                        cerrarModalEditarVehiculo();
+                        location.reload();
+                    } else {
+                        alert(data.mensaje || 'Error al actualizar el vehículo.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al enviar formulario de edición:', error);
+                    alert('Error de conexión con el servidor.');
+                });
+            });
+        }
     });
 
     function confirmarEliminacion(id, placa) {

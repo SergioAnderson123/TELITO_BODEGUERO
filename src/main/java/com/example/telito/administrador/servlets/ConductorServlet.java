@@ -3,6 +3,7 @@ package com.example.telito.administrador.servlets;
 import com.example.telito.administrador.beans.Conductor;
 import com.example.telito.administrador.daos.ConductorDAO;
 import com.example.telito.util.AuthorizationHelper;
+import com.google.gson.Gson;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,6 +14,8 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 // Gestión de conductores - CRUD completo
 @WebServlet(name = "ConductorServlet", value = "/administrador/ConductorServlet")
@@ -89,6 +92,10 @@ public class ConductorServlet extends HttpServlet {
                 request.setAttribute("conductor", conductorEditar);
                 RequestDispatcher dispatcherEditar = request.getRequestDispatcher("/administrador/editar-conductor.jsp");
                 dispatcherEditar.forward(request, response);
+                break;
+
+            case "obtenerConductorJson":
+                obtenerConductorJson(request, response);
                 break;
 
             case "eliminar":
@@ -171,14 +178,72 @@ public class ConductorServlet extends HttpServlet {
             conductor.setLicencia(licencia);
 
             boolean actualizado = conductorDAO.actualizarConductor(conductor);
-            if (actualizado) {
-                request.getSession().setAttribute("mensaje", "Conductor actualizado exitosamente.");
-                request.getSession().setAttribute("tipoMensaje", "success");
+            
+            // Verificar si es una petición AJAX
+            String acceptHeader = request.getHeader("Accept");
+            boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
+            
+            if (isAjaxRequest) {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                Gson gson = new Gson();
+                Map<String, Object> resultado = new HashMap<>();
+                if (actualizado) {
+                    resultado.put("exito", true);
+                    resultado.put("mensaje", "Conductor actualizado exitosamente.");
+                } else {
+                    resultado.put("exito", false);
+                    resultado.put("mensaje", "Error al actualizar el conductor.");
+                }
+                response.getWriter().write(gson.toJson(resultado));
             } else {
-                request.getSession().setAttribute("mensaje", "Error al actualizar el conductor.");
-                request.getSession().setAttribute("tipoMensaje", "danger");
+                if (actualizado) {
+                    request.getSession().setAttribute("mensaje", "Conductor actualizado exitosamente.");
+                    request.getSession().setAttribute("tipoMensaje", "success");
+                } else {
+                    request.getSession().setAttribute("mensaje", "Error al actualizar el conductor.");
+                    request.getSession().setAttribute("tipoMensaje", "danger");
+                }
+                response.sendRedirect(request.getContextPath() + "/administrador/ConductorServlet");
             }
-            response.sendRedirect(request.getContextPath() + "/administrador/ConductorServlet");
+        }
+    }
+
+    private void obtenerConductorJson(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson gson = new Gson();
+        try {
+            int idConductor = Integer.parseInt(request.getParameter("id"));
+            Conductor conductor = new ConductorDAO().buscarConductorPorId(idConductor);
+            if (conductor != null) {
+                Map<String, Object> conductorData = new HashMap<>();
+                conductorData.put("idConductor", conductor.getIdConductor());
+                conductorData.put("nombreCompleto", conductor.getNombreCompleto());
+                conductorData.put("licencia", conductor.getLicencia());
+                
+                response.getWriter().write(gson.toJson(conductorData));
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                Map<String, Object> error = new HashMap<>();
+                error.put("exito", false);
+                error.put("mensaje", "Conductor no encontrado");
+                response.getWriter().write(gson.toJson(error));
+            }
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "ID de conductor inválido");
+            response.getWriter().write(gson.toJson(error));
+        } catch (Exception e) {
+            System.err.println("Error al obtener conductor en JSON: " + e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Error interno del servidor");
+            response.getWriter().write(gson.toJson(error));
         }
     }
 }

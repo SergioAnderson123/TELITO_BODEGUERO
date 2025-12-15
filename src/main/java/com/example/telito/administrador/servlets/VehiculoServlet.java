@@ -3,6 +3,7 @@ package com.example.telito.administrador.servlets;
 import com.example.telito.administrador.beans.Vehiculo;
 import com.example.telito.administrador.daos.VehiculoDAO;
 import com.example.telito.util.AuthorizationHelper;
+import com.google.gson.Gson;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,6 +14,8 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 // Gestión de vehículos - CRUD completo
 @WebServlet(name = "VehiculoServlet", value = "/administrador/VehiculoServlet")
@@ -89,6 +92,10 @@ public class VehiculoServlet extends HttpServlet {
                 request.setAttribute("vehiculo", vehiculoEditar);
                 RequestDispatcher dispatcherEditar = request.getRequestDispatcher("/administrador/editar-vehiculo.jsp");
                 dispatcherEditar.forward(request, response);
+                break;
+
+            case "obtenerVehiculoJson":
+                obtenerVehiculoJson(request, response);
                 break;
 
             case "eliminar":
@@ -179,14 +186,74 @@ public class VehiculoServlet extends HttpServlet {
             vehiculo.setCapacidadKg(capacidadKg);
 
             boolean actualizado = vehiculoDAO.actualizarVehiculo(vehiculo);
-            if (actualizado) {
-                request.getSession().setAttribute("mensaje", "Vehículo actualizado exitosamente.");
-                request.getSession().setAttribute("tipoMensaje", "success");
+            
+            // Verificar si es una petición AJAX
+            String acceptHeader = request.getHeader("Accept");
+            boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
+            
+            if (isAjaxRequest) {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                Gson gson = new Gson();
+                Map<String, Object> resultado = new HashMap<>();
+                if (actualizado) {
+                    resultado.put("exito", true);
+                    resultado.put("mensaje", "Vehículo actualizado exitosamente.");
+                } else {
+                    resultado.put("exito", false);
+                    resultado.put("mensaje", "Error al actualizar el vehículo.");
+                }
+                response.getWriter().write(gson.toJson(resultado));
             } else {
-                request.getSession().setAttribute("mensaje", "Error al actualizar el vehículo.");
-                request.getSession().setAttribute("tipoMensaje", "danger");
+                if (actualizado) {
+                    request.getSession().setAttribute("mensaje", "Vehículo actualizado exitosamente.");
+                    request.getSession().setAttribute("tipoMensaje", "success");
+                } else {
+                    request.getSession().setAttribute("mensaje", "Error al actualizar el vehículo.");
+                    request.getSession().setAttribute("tipoMensaje", "danger");
+                }
+                response.sendRedirect(request.getContextPath() + "/administrador/VehiculoServlet");
             }
-            response.sendRedirect(request.getContextPath() + "/administrador/VehiculoServlet");
+        }
+    }
+
+    private void obtenerVehiculoJson(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson gson = new Gson();
+        try {
+            int idVehiculo = Integer.parseInt(request.getParameter("id"));
+            Vehiculo vehiculo = new VehiculoDAO().buscarVehiculoPorId(idVehiculo);
+            if (vehiculo != null) {
+                Map<String, Object> vehiculoData = new HashMap<>();
+                vehiculoData.put("idVehiculo", vehiculo.getIdVehiculo());
+                vehiculoData.put("placa", vehiculo.getPlaca());
+                vehiculoData.put("marca", vehiculo.getMarca());
+                vehiculoData.put("modelo", vehiculo.getModelo());
+                vehiculoData.put("capacidadKg", vehiculo.getCapacidadKg());
+                
+                response.getWriter().write(gson.toJson(vehiculoData));
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                Map<String, Object> error = new HashMap<>();
+                error.put("exito", false);
+                error.put("mensaje", "Vehículo no encontrado");
+                response.getWriter().write(gson.toJson(error));
+            }
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "ID de vehículo inválido");
+            response.getWriter().write(gson.toJson(error));
+        } catch (Exception e) {
+            System.err.println("Error al obtener vehículo en JSON: " + e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Error interno del servidor");
+            response.getWriter().write(gson.toJson(error));
         }
     }
 }

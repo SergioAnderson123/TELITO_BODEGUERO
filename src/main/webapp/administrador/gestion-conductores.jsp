@@ -519,6 +519,184 @@
                 padding: 10px;
             }
         }
+        
+        /* ===================== Estilos para Modal de Editar Conductor ===================== */
+        #editConductorModal.modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1050; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #editConductorModal.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #editConductorModal .modal-content { 
+            background-color: #ffffff; 
+            width: 100%;
+            max-width: 600px; 
+            max-height: 90vh; 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        #editConductorModal .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); 
+            padding: 20px 25px; 
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+        }
+        #editConductorModal .modal-header h2 { 
+            margin: 0; 
+            color: white; 
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #editConductorModal .modal-header h2 i {
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        #editConductorModal .modal-close { 
+            color: white; 
+            font-size: 24px; 
+            font-weight: normal; 
+            cursor: pointer; 
+            opacity: 0.9; 
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        #editConductorModal .modal-close:hover { 
+            opacity: 1; 
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        #editConductorModal .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(90vh - 160px);
+        }
+        #editConductorModal .form-group {
+            margin-bottom: 1rem;
+        }
+        #editConductorModal .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2b2d42;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #editConductorModal .form-group label i {
+            color: #00a896;
+            font-size: 0.85rem;
+        }
+        #editConductorModal .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        #editConductorModal .form-group input:focus {
+            border-color: #00a896;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+        }
+        #editConductorModal .form-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-top: 6px;
+            padding: 8px 12px;
+            background: rgba(0,168,150,0.05);
+            border-radius: 6px;
+        }
+        #editConductorModal .form-hint i {
+            color: #00a896;
+            flex-shrink: 0;
+        }
+        #editConductorModal .modal-footer { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 12px; 
+            padding: 20px 25px; 
+            border-top: 2px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 0 0 16px 16px;
+        }
+        #editConductorModal .modal-footer button {
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #editConductorModal .modal-footer .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        #editConductorModal .modal-footer .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+        }
+        #editConductorModal .modal-footer button[type="submit"] {
+            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+        }
+        #editConductorModal .modal-footer button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+        }
+        @media (max-width: 768px) {
+            #editConductorModal .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: 95vh;
+                margin: 10px;
+            }
+            #editConductorModal.show {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -680,7 +858,7 @@
                                                         </button>
                                                         <ul class="dropdown-menu dropdown-menu-end shadow-lg">
                                                             <li>
-                                                                <a class="dropdown-item text-primary" href="${pageContext.request.contextPath}/administrador/ConductorServlet?action=editar&id=${conductor.idConductor}">
+                                                                <a class="dropdown-item text-primary" href="#" onclick="event.preventDefault(); editarConductor(${conductor.idConductor});">
                                                                     <i class="fas fa-edit"></i> Editar
                                                                 </a>
                                                             </li>
@@ -765,6 +943,64 @@
                 <button type="submit">
                     <i class="fas fa-save"></i>
                     Guardar Conductor
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===================== Modal: Editar Conductor ===================== -->
+<div id="editConductorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-edit"></i> Editar Conductor</h2>
+            <span class="modal-close">&times;</span>
+        </div>
+        
+        <form method="POST" action="${pageContext.request.contextPath}/administrador/ConductorServlet?action=actualizar" id="formEditarConductor">
+            <input type="hidden" name="id" id="editIdConductor">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editNombreCompleto">
+                        <i class="fas fa-user"></i>
+                        Nombre Completo <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" 
+                           name="nombreCompleto" 
+                           id="editNombreCompleto" 
+                           placeholder="Ej: Juan Pérez García" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el nombre completo del conductor</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editLicencia">
+                        <i class="fas fa-id-card"></i>
+                        Número de Licencia <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" 
+                           name="licencia" 
+                           id="editLicencia" 
+                           placeholder="Ej: A001, B002" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el número de licencia del conductor</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary modal-cancel">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="submit">
+                    <i class="fas fa-save"></i>
+                    Guardar cambios
                 </button>
             </div>
         </form>
@@ -1020,7 +1256,121 @@
             if (event.key === 'Escape' && sendEmailModal && sendEmailModal.classList.contains('show')) {
                 cerrarModalEnviarCorreo();
             }
+            if (event.key === 'Escape' && editConductorModal && editConductorModal.classList.contains('show')) {
+                cerrarModalEditarConductor();
+            }
         });
+        
+        // ===================== Manejo del Modal de Editar Conductor =====================
+        const editConductorModal = document.getElementById('editConductorModal');
+        const closeEditConductorModalBtn = document.querySelector('#editConductorModal .modal-close');
+        const cancelEditConductorModalBtn = document.querySelector('#editConductorModal .modal-cancel');
+        
+        // Función para abrir el modal de edición
+        function abrirModalEditarConductor() {
+            if (editConductorModal) {
+                editConductorModal.classList.add('show');
+                editConductorModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        // Función para cerrar el modal de edición
+        function cerrarModalEditarConductor() {
+            if (editConductorModal) {
+                editConductorModal.classList.remove('show');
+                editConductorModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Función global para editar conductor
+        window.editarConductor = function(idConductor) {
+            const editConductorModal = document.getElementById('editConductorModal');
+            const originalModalBodyContent = editConductorModal.querySelector('.modal-body').innerHTML;
+            
+            // Mostrar loading overlay
+            const modalBody = editConductorModal.querySelector('.modal-body');
+            if (modalBody) {
+                modalBody.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x mb-3" style="color: #00a896;"></i><p>Cargando datos del conductor...</p></div>';
+            }
+            
+            abrirModalEditarConductor();
+            
+            fetch('${pageContext.request.contextPath}/administrador/ConductorServlet?action=obtenerConductorJson&id=' + idConductor, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Error al cargar los datos del conductor');
+                return response.json();
+            })
+            .then(data => {
+                // Restore original form HTML
+                modalBody.innerHTML = originalModalBodyContent;
+                
+                // Populate form fields
+                document.getElementById('editIdConductor').value = data.idConductor;
+                document.getElementById('editNombreCompleto').value = data.nombreCompleto || '';
+                document.getElementById('editLicencia').value = data.licencia || '';
+            })
+            .catch(error => {
+                console.error('Error al cargar conductor:', error);
+                cerrarModalEditarConductor();
+                alert('Error al cargar los datos del conductor. Por favor, intenta nuevamente.');
+            });
+        };
+        
+        // Event listeners para cerrar el modal
+        if (closeEditConductorModalBtn) {
+            closeEditConductorModalBtn.addEventListener('click', cerrarModalEditarConductor);
+        }
+        
+        if (cancelEditConductorModalBtn) {
+            cancelEditConductorModalBtn.addEventListener('click', cerrarModalEditarConductor);
+        }
+        
+        // Cerrar modal al hacer clic fuera del contenido
+        if (editConductorModal) {
+            editConductorModal.addEventListener('click', function(event) {
+                if (event.target === editConductorModal) {
+                    cerrarModalEditarConductor();
+                }
+            });
+        }
+        
+        // Manejo del formulario de edición con AJAX
+        const formEditarConductor = document.getElementById('formEditarConductor');
+        if (formEditarConductor) {
+            formEditarConductor.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const formData = new FormData(formEditarConductor);
+                const url = formEditarConductor.action;
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exito) {
+                        alert(data.mensaje || 'Conductor actualizado exitosamente.');
+                        cerrarModalEditarConductor();
+                        location.reload();
+                    } else {
+                        alert(data.mensaje || 'Error al actualizar el conductor.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al enviar formulario de edición:', error);
+                    alert('Error de conexión con el servidor.');
+                });
+            });
+        }
     });
 </script>
 
