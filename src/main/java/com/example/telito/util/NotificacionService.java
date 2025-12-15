@@ -249,7 +249,7 @@ public class NotificacionService {
         String mensaje = String.format("El lote '%s' del producto '%s' vence en 7 días (Fecha: %s). " +
                                        "Revisar inventario.", codigoLote, nombreProducto, 
                                        new java.text.SimpleDateFormat("dd/MM/yyyy").format(fechaVencimiento));
-        String urlAccion = "/TELITO_BODEGUERO/almacen/lotes";
+        String urlAccion = "/almacen/lotes";
         
         List<String> roles = new ArrayList<>();
         roles.add(Rol.ALMACEN);
@@ -268,7 +268,7 @@ public class NotificacionService {
         String mensaje = String.format("⚠️ URGENTE: El lote '%s' del producto '%s' vence en 3 días (Fecha: %s). " +
                                        "Acción inmediata requerida.", codigoLote, nombreProducto,
                                        new java.text.SimpleDateFormat("dd/MM/yyyy").format(fechaVencimiento));
-        String urlAccion = "/TELITO_BODEGUERO/almacen/lotes";
+        String urlAccion = "/almacen/lotes";
         
         List<String> roles = new ArrayList<>();
         roles.add(Rol.ALMACEN);
@@ -288,7 +288,7 @@ public class NotificacionService {
                                        "Revisar y retirar del inventario inmediatamente.", 
                                        codigoLote, nombreProducto,
                                        new java.text.SimpleDateFormat("dd/MM/yyyy").format(fechaVencimiento));
-        String urlAccion = "/TELITO_BODEGUERO/administrador/inventario-general";
+        String urlAccion = "/administrador/inventario-general";
         
         return crearNotificacionPorRol(Rol.ADMINISTRADOR, TipoNotificacion.LOTE_VENCIDO, titulo, mensaje,
                                       Prioridad.CRITICAL, productoId, loteId, null, null, 
@@ -301,7 +301,7 @@ public class NotificacionService {
         String titulo = "Nueva Incidencia Reportada";
         String mensaje = String.format("Se ha reportado una incidencia de tipo '%s': %s", 
                                        tipoIncidencia, descripcion);
-        String urlAccion = "/TELITO_BODEGUERO/almacen/incidencias";
+        String urlAccion = "/almacen/incidencias";
         
         return crearNotificacionPorRol(Rol.ADMINISTRADOR, TipoNotificacion.INCIDENCIA_REPORTADA, 
                                       titulo, mensaje, Prioridad.WARNING, null, loteId, null, null, 
@@ -320,7 +320,7 @@ public class NotificacionService {
         String mensaje = String.format("Se realizó un ajuste de inventario del %.1f%% para el lote '%s' " +
                                        "del producto '%s'. Stock anterior: %d, Stock nuevo: %d.",
                                        porcentajeAjuste, codigoLote, nombreProducto, stockAnterior, stockNuevo);
-        String urlAccion = "/TELITO_BODEGUERO/almacen/movimientos";
+        String urlAccion = "/almacen/movimientos";
         
         return crearNotificacionPorRol(Rol.ADMINISTRADOR, TipoNotificacion.AJUSTE_INVENTARIO, 
                                       titulo, mensaje, Prioridad.INFO, productoId, loteId, null, null, 
@@ -333,7 +333,7 @@ public class NotificacionService {
         String titulo = "Entrada de Productos Registrada";
         String mensaje = String.format("Se ha registrado la entrada de %d unidades del producto '%s' " +
                                        "según la orden de compra %s.", cantidad, nombreProducto, numeroOrden);
-        String urlAccion = "/TELITO_BODEGUERO/logistica/ordenes";
+        String urlAccion = "/logistica/ordenes";
         
         return crearNotificacionPorRol(Rol.LOGISTICA, TipoNotificacion.ENTRADA_REGISTRADA, 
                                       titulo, mensaje, Prioridad.INFO, null, null, null, ordenCompraId, 
@@ -379,7 +379,7 @@ public class NotificacionService {
         String titulo = "Orden de Compra Lista para Recepción";
         String mensaje = String.format("La orden de compra %s del producto '%s' está lista y " +
                                        "pendiente de recepción en el almacén.", numeroOrden, nombreProducto);
-        String urlAccion = "/TELITO_BODEGUERO/almacen/entradas";
+        String urlAccion = "/almacen/entradas";
         
         return crearNotificacionPorRol(Rol.ALMACEN, TipoNotificacion.ORDEN_LISTA, titulo, mensaje,
                                       Prioridad.INFO, null, null, null, ordenCompraId, 
@@ -393,7 +393,7 @@ public class NotificacionService {
         String mensaje = String.format("Se ha creado un nuevo plan de transporte %s para %d paquetes " +
                                        "del producto '%s' con destino a %s. Preparar para despacho.", 
                                        numeroPlan, paquetes, nombreProducto, destino);
-        String urlAccion = "/TELITO_BODEGUERO/almacen/PedidoServlet?action=lista";
+        String urlAccion = "/almacen/PedidoServlet?action=lista";
         
         return crearNotificacionPorRol(Rol.ALMACEN, TipoNotificacion.PLAN_TRANSPORTE_CREADO, 
                                       titulo, mensaje, Prioridad.INFO, null, null, null, null, 
