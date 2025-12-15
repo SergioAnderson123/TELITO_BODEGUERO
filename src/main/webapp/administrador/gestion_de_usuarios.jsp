@@ -41,10 +41,16 @@
 
     // Función auxiliar para mostrar el icono de ordenamiento
     public String getSortIcon(String sortByColumn, String currentSortBy, String currentSortOrder) {
+        // Retornar cadena vacía, los iconos se mostrarán con CSS ::after
+        return "";
+    }
+    
+    // Función auxiliar para obtener la clase CSS de ordenamiento
+    public String getSortClass(String sortByColumn, String currentSortBy, String currentSortOrder) {
         if (sortByColumn.equals(currentSortBy)) {
-            return (currentSortOrder != null && currentSortOrder.equalsIgnoreCase("asc")) ? "<i class=\"fas fa-sort-up ms-1\"></i>" : "<i class=\"fas fa-sort-down ms-1\"></i>";
+            return (currentSortOrder != null && currentSortOrder.equalsIgnoreCase("asc")) ? "sort-asc" : "sort-desc";
         }
-        return "<i class=\"fas fa-sort ms-1\"></i>"; // Icono por defecto para no ordenado
+        return ""; // Sin clase si no está ordenado por esta columna
     }
 %>
 
@@ -722,6 +728,46 @@
         #userTable td:nth-child(3) {
             max-width: 250px;
         }
+        
+        /* Estilos para encabezados de tabla con hover verde y ordenamiento */
+        #userTable thead th {
+            position: relative;
+            user-select: none;
+            color: var(--text-muted) !important;
+            text-transform: uppercase;
+        }
+        
+        /* Solo los th ordenables (que no son "Acciones") tienen hover y cursor pointer */
+        #userTable thead th:not(:last-child) {
+            cursor: pointer;
+        }
+        
+        #userTable thead th:not(:last-child):hover {
+            background-color: var(--seafoam) !important;
+        }
+        
+        #userTable thead th.sort-asc::after {
+            content: ' ▲';
+            font-size: 0.7em;
+            color: var(--turquoise-dark);
+        }
+        
+        #userTable thead th.sort-desc::after {
+            content: ' ▼';
+            font-size: 0.7em;
+            color: var(--turquoise-dark);
+        }
+        
+        /* Asegurar que los enlaces dentro de th no interfieran con el hover */
+        #userTable thead th a {
+            display: block;
+            width: 100%;
+            color: inherit;
+        }
+        
+        #userTable thead th a:hover {
+            color: inherit;
+        }
     </style>
 </head>
 <body>
@@ -868,27 +914,19 @@
                         <table id="userTable" class="table table-hover align-middle mb-0 datatable-server-side" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                             <thead class="table-light">
                             <tr>
-                                <th style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
-                                    <a href="<%= getSortUrl(request, "usuario", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 5)) %>" class="text-decoration-none text-dark fw-semibold">
-                                        <i class="fas fa-user me-1"></i>Usuario<%= getSortIcon("usuario", currentSortBy, currentSortOrder) %>
-                                    </a>
+                                <th class="fw-semibold <%= getSortClass("usuario", currentSortBy, currentSortOrder) %>" onclick="window.location.href='<%= getSortUrl(request, "usuario", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 5)) %>'" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer;">
+                                    <i class="fas fa-user me-1"></i>Usuario
                                 </th>
-                                <th style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
-                                    <a href="<%= getSortUrl(request, "correo", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 5)) %>" class="text-decoration-none text-dark fw-semibold">
-                                        <i class="fas fa-envelope me-1"></i>Correo<%= getSortIcon("correo", currentSortBy, currentSortOrder) %>
-                                    </a>
+                                <th class="fw-semibold <%= getSortClass("correo", currentSortBy, currentSortOrder) %>" onclick="window.location.href='<%= getSortUrl(request, "correo", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 5)) %>'" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer;">
+                                    <i class="fas fa-envelope me-1"></i>Correo
                                 </th>
-                                <th style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
-                                    <a href="<%= getSortUrl(request, "rol", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 5)) %>" class="text-decoration-none text-dark fw-semibold">
-                                        <i class="fas fa-user-tag me-1"></i>Rol<%= getSortIcon("rol", currentSortBy, currentSortOrder) %>
-                                    </a>
+                                <th class="fw-semibold <%= getSortClass("rol", currentSortBy, currentSortOrder) %>" onclick="window.location.href='<%= getSortUrl(request, "rol", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 5)) %>'" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer;">
+                                    <i class="fas fa-user-tag me-1"></i>Rol
                                 </th>
-                                <th style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
-                                    <a href="<%= getSortUrl(request, "estado", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 5)) %>" class="text-decoration-none text-dark fw-semibold">
-                                        <i class="fas fa-toggle-on me-1"></i>Estado<%= getSortIcon("estado", currentSortBy, currentSortOrder) %>
-                                    </a>
+                                <th class="fw-semibold <%= getSortClass("estado", currentSortBy, currentSortOrder) %>" onclick="window.location.href='<%= getSortUrl(request, "estado", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 5)) %>'" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer;">
+                                    <i class="fas fa-toggle-on me-1"></i>Estado
                                 </th>
-                                <th class="text-end fw-semibold text-success" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                                <th class="text-end fw-semibold text-success" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: default;">
                                     <i class="fas fa-cog me-1"></i>Acciones
                                 </th>
                             </tr>

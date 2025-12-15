@@ -1,2 +1,2 @@
-<jsp:forward page="/gerente-tienda/GerenteTiendaServlet?action=dashboard" />
+<jsp:forward page="/gerente-tienda/GerenteTiendaServlet?action=recepciones-pendientes" />
 

@@ -49,15 +49,12 @@ public class GerenteTiendaServlet extends HttpServlet {
         String action = request.getParameter("action");
         
         if (action == null || action.isEmpty()) {
-            action = "dashboard";
+            action = "recepciones-pendientes";
         }
         
         logger.debug("Procesando acción GET: {} para distrito: {}", action, distritoId);
         
         switch (action) {
-            case "dashboard":
-                mostrarDashboard(request, response, distritoId);
-                break;
             case "recepciones-pendientes":
                 listarRecepcionesPendientes(request, response, distritoId);
                 break;
@@ -114,32 +111,47 @@ public class GerenteTiendaServlet extends HttpServlet {
     }
 
     /**
-     * Muestra el dashboard del Gerente de Tienda con métricas.
-     */
-    private void mostrarDashboard(HttpServletRequest request, HttpServletResponse response, int distritoId)
-            throws ServletException, IOException {
-        
-        int recepcionesPendientes = recepcionDAO.contarPlanesPendientes(distritoId);
-        int recepcionesCompletadas = recepcionDAO.contarHistorialRecepciones(distritoId);
-        
-        request.setAttribute("recepcionesPendientes", recepcionesPendientes);
-        request.setAttribute("recepcionesCompletadas", recepcionesCompletadas);
-        
-        RequestDispatcher view = request.getRequestDispatcher("/gerente-tienda/dashboard.jsp");
-        view.forward(request, response);
-    }
-
-    /**
      * Lista las recepciones pendientes para el distrito del gerente.
      */
     private void listarRecepcionesPendientes(HttpServletRequest request, HttpServletResponse response, int distritoId)
             throws ServletException, IOException {
         
+        int page = parseInteger(request.getParameter("page"), 1);
+        int size = parseInteger(request.getParameter("size"), 10);
+        if (page < 1) page = 1;
+        if (size < 1) size = 10;
+        
+        // Obtener filtros
+        String busqueda = request.getParameter("busqueda");
+        String fechaDesde = request.getParameter("fecha_desde");
+        String fechaHasta = request.getParameter("fecha_hasta");
         String estadoFiltro = request.getParameter("estado");
-        var planes = recepcionDAO.listarPlanesPorDistrito(distritoId, estadoFiltro);
+        
+        var planes = recepcionDAO.listarPlanesPorDistrito(distritoId, page, size, busqueda, fechaDesde, fechaHasta, estadoFiltro);
+        int totalRows = recepcionDAO.contarPlanesPendientes(distritoId, busqueda, fechaDesde, fechaHasta, estadoFiltro);
+        int totalPages = (int) Math.ceil(totalRows / (double) size);
+        if (totalPages == 0) totalPages = 1;
+        if (page > totalPages) page = totalPages;
+        
+        // Obtener estadísticas para las cards (sin filtros)
+        int totalPendientes = recepcionDAO.contarPlanesPendientes(distritoId, null, null, null, null);
+        int pendientesHoy = recepcionDAO.contarPlanesPendientesHoy(distritoId);
+        int pendientesUltimos7Dias = recepcionDAO.contarPlanesPendientesUltimos7Dias(distritoId);
         
         request.setAttribute("planes", planes);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("size", size);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRows", totalRows);
+        request.setAttribute("busqueda", busqueda);
+        request.setAttribute("fechaDesde", fechaDesde);
+        request.setAttribute("fechaHasta", fechaHasta);
         request.setAttribute("estadoFiltro", estadoFiltro);
+        request.setAttribute("totalPendientes", totalPendientes);
+        request.setAttribute("pendientesHoy", pendientesHoy);
+        request.setAttribute("pendientesUltimos7Dias", pendientesUltimos7Dias);
+        request.setAttribute("baseUrl", request.getContextPath() + "/gerente-tienda/GerenteTiendaServlet?action=recepciones-pendientes");
+        request.setAttribute("itemName", "recepciones");
         
         RequestDispatcher view = request.getRequestDispatcher("/gerente-tienda/recepciones-pendientes.jsp");
         view.forward(request, response);
@@ -240,17 +252,35 @@ public class GerenteTiendaServlet extends HttpServlet {
         if (page < 1) page = 1;
         if (size < 1) size = 10;
         
-        var planes = recepcionDAO.listarHistorialRecepciones(distritoId, page, size);
-        int totalRows = recepcionDAO.contarHistorialRecepciones(distritoId);
+        // Obtener filtros
+        String busqueda = request.getParameter("busqueda");
+        String fechaDesde = request.getParameter("fecha_desde");
+        String fechaHasta = request.getParameter("fecha_hasta");
+        
+        var planes = recepcionDAO.listarHistorialRecepciones(distritoId, page, size, busqueda, fechaDesde, fechaHasta);
+        int totalRows = recepcionDAO.contarHistorialRecepciones(distritoId, busqueda, fechaDesde, fechaHasta);
         int totalPages = (int) Math.ceil(totalRows / (double) size);
         if (totalPages == 0) totalPages = 1;
         if (page > totalPages) page = totalPages;
+        
+        // Obtener estadísticas para las cards (sin filtros)
+        int totalRecepciones = recepcionDAO.contarHistorialRecepciones(distritoId, null, null, null);
+        int recepcionesHoy = recepcionDAO.contarRecepcionesHoy(distritoId);
+        int recepcionesUltimos7Dias = recepcionDAO.contarRecepcionesUltimos7Dias(distritoId);
         
         request.setAttribute("planes", planes);
         request.setAttribute("currentPage", page);
         request.setAttribute("size", size);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalRows", totalRows);
+        request.setAttribute("busqueda", busqueda);
+        request.setAttribute("fechaDesde", fechaDesde);
+        request.setAttribute("fechaHasta", fechaHasta);
+        request.setAttribute("totalRecepciones", totalRecepciones);
+        request.setAttribute("recepcionesHoy", recepcionesHoy);
+        request.setAttribute("recepcionesUltimos7Dias", recepcionesUltimos7Dias);
+        request.setAttribute("baseUrl", request.getContextPath() + "/gerente-tienda/GerenteTiendaServlet?action=historial");
+        request.setAttribute("itemName", "recepciones");
         
         RequestDispatcher view = request.getRequestDispatcher("/gerente-tienda/historial-recepciones.jsp");
         view.forward(request, response);
