@@ -86,13 +86,7 @@ public class LoteServlet extends HttpServlet {
                 Lote lote = loteDao.buscarLotePorId(idLote);
 
                 if (lote != null) {
-                    // Obtener historial de ajustes para este lote
-                    MovimientoDao movimientoDao = new MovimientoDao();
-                    ArrayList<com.example.telito.almacen.beans.Movimiento> historialAjustes = 
-                        movimientoDao.listarAjustesPorLote(idLote);
-                    
                     request.setAttribute("lote", lote);
-                    request.setAttribute("historialAjustes", historialAjustes);
                     RequestDispatcher dispatcher = request.getRequestDispatcher("/almacen/lotes/ajustarInventario.jsp");
                     dispatcher.forward(request, response);
                 } else {
@@ -161,7 +155,7 @@ public class LoteServlet extends HttpServlet {
             case "guardarAjuste":
                 int idLote = Integer.parseInt(request.getParameter("idLote"));
                 int stockOriginal = Integer.parseInt(request.getParameter("stockActual"));
-                int cantidadContada = Integer.parseInt(request.getParameter("cantidadContada"));
+                int cantidadContadaPaquetes = Integer.parseInt(request.getParameter("cantidadContada"));
                 String motivoAjuste = request.getParameter("motivo");
 
                 // La sesión ya fue obtenida en la verificación de autorización arriba
@@ -169,6 +163,13 @@ public class LoteServlet extends HttpServlet {
                     (com.example.telito.administrador.beans.Usuario) session.getAttribute("usuario");
                 int usuarioId = (usuarioSesion != null) ? usuarioSesion.getIdUsuario() : 1;
 
+                // Obtener el lote para tener las unidades por paquete
+                Lote loteAjuste = loteDao.buscarLotePorId(idLote);
+                int unidadesPorPaquete = (loteAjuste != null && loteAjuste.getUnidadesPorPaquete() > 0) 
+                    ? loteAjuste.getUnidadesPorPaquete() : 1;
+                
+                // Convertir paquetes a unidades
+                int cantidadContada = cantidadContadaPaquetes * unidadesPorPaquete;
                 int diferencia = cantidadContada - stockOriginal;
 
                 if (diferencia != 0) {
@@ -185,6 +186,14 @@ public class LoteServlet extends HttpServlet {
 
                     movimientoDao.registrarMovimiento(movimiento);
                     loteDao.actualizarStock(idLote, cantidadContada);
+                    
+                    // Cerrar incidencias pendientes de este lote cuando se hace el ajuste
+                    try {
+                        com.example.telito.almacen.daos.IncidenciaDAO incidenciaDAO = new com.example.telito.almacen.daos.IncidenciaDAO();
+                        incidenciaDAO.cerrarIncidenciasPendientesPorLote(idLote, usuarioId);
+                    } catch (Exception e) {
+                        System.err.println("⚠ Error al cerrar incidencias pendientes: " + e.getMessage());
+                    }
                     
                     // Notificar ajuste significativo si es >= 10%
                     if (stockOriginal > 0) {

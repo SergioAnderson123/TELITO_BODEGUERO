@@ -297,6 +297,20 @@
     .sidebar-toggle:hover {
         color: var(--seafoam);
     }
+
+    /* Fila con incidencia pendiente (fondo rojo claro) */
+    .table-danger-light {
+        background-color: #ffe6e6 !important;
+    }
+    .table-danger-light td {
+        background-color: #ffe6e6 !important;
+    }
+    .table-danger-light:hover {
+        background-color: #ffcccc !important;
+    }
+    .table-danger-light:hover td {
+        background-color: #ffcccc !important;
+    }
     
     /* Overlay para móvil */
     .sidebar-overlay {

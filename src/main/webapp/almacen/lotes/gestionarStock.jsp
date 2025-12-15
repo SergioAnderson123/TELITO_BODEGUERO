@@ -385,14 +385,16 @@
                                         <c:choose>
                                             <c:when test="${not empty listaLotes}">
                                         <c:forEach var="lote" items="${listaLotes}">
-                                                    <tr class="align-middle" style="padding: 0;">
-                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">${lote.codigoSKU}</td>
-                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">${lote.nombreProducto}</td>
-                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong>${lote.codigoLote}</strong></td>
-                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">${lote.paquetesDisponibles} paquetes</td>
-                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">${lote.nombreUbicacion}</td>
-                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">${lote.fechaVencimiento}</td>
-                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                                    <tr class="align-middle ${lote.tieneIncidenciaPendiente ? 'table-danger-light' : ''}" 
+                                                        style="padding: 0; ${lote.tieneIncidenciaPendiente ? 'background-color: #ffe6e6 !important;' : ''}">
+                                                        <c:set var="incidenciaStyle" value="${lote.tieneIncidenciaPendiente ? 'background-color: #ffe6e6 !important;' : ''}" />
+                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; ${incidenciaStyle}">${lote.codigoSKU}</td>
+                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; ${incidenciaStyle}">${lote.nombreProducto}</td>
+                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; ${incidenciaStyle}"><strong>${lote.codigoLote}</strong></td>
+                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; ${incidenciaStyle}">${lote.paquetesDisponibles} paquetes</td>
+                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; ${incidenciaStyle}">${lote.nombreUbicacion}</td>
+                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; ${incidenciaStyle}">${lote.fechaVencimiento}</td>
+                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; ${incidenciaStyle}">
                                                     <c:choose>
                                                         <c:when test="${lote.estadoStock == 'Sin Stock'}">
                                                                     <span class="badge text-bg-danger shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
@@ -416,15 +418,17 @@
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
-                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;" class="text-center">
+                                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; ${incidenciaStyle}" class="text-center">
                                                     <div class="btn-group" role="group">
+                                                        <c:if test="${lote.tieneIncidenciaPendiente}">
                                                                 <a type="button" class="btn btn-sm btn-info shadow-sm"
                                                            href="LoteServlet?action=ajustar&id=${lote.idLote}" 
                                                                    title="Ajustar inventario" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                             <i class="fas fa-edit"></i> Ajustar
                                                         </a>
+                                                        </c:if>
                                                                 <a type="button" class="btn btn-sm btn-warning shadow-sm"
-                                                           href="IncidenciaServlet?action=formReportar&idLote=${lote.idLote}" 
+                                                           href="<%= request.getContextPath() %>/almacen/IncidenciaServlet?action=formReportar&idLote=${lote.idLote}" 
                                                                    title="Reportar incidencia" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                             <i class="fas fa-exclamation-triangle"></i> Incidencia
                                                         </a>

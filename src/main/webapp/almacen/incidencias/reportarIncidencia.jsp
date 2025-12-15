@@ -45,7 +45,7 @@
                                 <p><strong>Producto:</strong> <%= lote.getNombreProducto() %></p>
                                 <p><strong>Código Lote:</strong> <code><%= lote.getCodigoLote() %></code></p>
                                 <p><strong>Cantidad en Sistema:</strong> 
-                                    <span class="badge bg-primary fs-5"><%= lote.getStockActual() %></span>
+                                    <span class="badge bg-primary fs-5"><%= lote.getPaquetesDisponibles() %> paquetes</span>
                                 </p>
                             </div>
                         </div>
@@ -59,12 +59,13 @@
                             <div class="card-body">
                                 <form method="POST" action="<%= request.getContextPath() %>/almacen/IncidenciaServlet?action=reportar">
                                     <input type="hidden" name="loteId" value="<%= lote.getIdLote() %>">
+                                    <input type="hidden" id="unidadesPorPaquete" value="<%= lote.getUnidadesPorPaquete() > 0 ? lote.getUnidadesPorPaquete() : 1 %>">
                                     
                                     <div class="mb-3">
-                                        <label for="cantidadReportada" class="form-label">Cantidad Real Contada:</label>
+                                        <label for="cantidadReportada" class="form-label">Cantidad Real Contada (paquetes):</label>
                                         <input type="number" class="form-control" id="cantidadReportada" 
-                                               name="cantidadReportada" min="0" required>
-                                        <small class="text-muted">Ingrese la cantidad física contada en el almacén</small>
+                                               name="cantidadReportada" min="0" step="1" required>
+                                        <small class="text-muted">Ingrese la cantidad de paquetes contados físicamente en el almacén</small>
                                     </div>
 
                                     <div class="mb-3">
@@ -126,13 +127,13 @@
         const cantidadReportadaInput = document.getElementById('cantidadReportada');
         const diferenciaInput = document.getElementById('diferencia');
         const tipoIncidenciaSelect = document.getElementById('tipoIncidencia');
-        const stockSistema = <%= lote.getStockActual() %>;
+        const paquetesSistema = <%= lote.getPaquetesDisponibles() %>;
         
         cantidadReportadaInput.addEventListener('input', function() {
             const cantidadReportada = parseInt(this.value, 10);
             if (!isNaN(cantidadReportada)) {
-                const diferencia = cantidadReportada - stockSistema;
-                diferenciaInput.value = diferencia;
+                const diferencia = cantidadReportada - paquetesSistema;
+                diferenciaInput.value = diferencia + ' paquetes';
                 
                 // Actualizar tipo de incidencia automáticamente
                 if (diferencia < 0) {

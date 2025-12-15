@@ -221,7 +221,7 @@ public class IncidenciaServlet extends HttpServlet {
         
         try {
             int loteId = Integer.parseInt(request.getParameter("loteId"));
-            int cantidadReportada = Integer.parseInt(request.getParameter("cantidadReportada"));
+            int cantidadReportadaPaquetes = Integer.parseInt(request.getParameter("cantidadReportada"));
             String tipoIncidencia = request.getParameter("tipoIncidencia");
             String motivo = request.getParameter("motivo");
             String descripcion = request.getParameter("descripcion");
@@ -235,7 +235,19 @@ public class IncidenciaServlet extends HttpServlet {
                 return;
             }
             
-            int cantidadSistema = lote.getStockActual();
+            // Validar que el lote tenga un producto_id válido
+            if (lote.getProductoId() <= 0) {
+                session.setAttribute("errorMsg", "Error: El lote no tiene un producto asociado válido.");
+                response.sendRedirect(request.getContextPath() + "/almacen/IncidenciaServlet?action=formReportar&idLote=" + 
+                                    request.getParameter("loteId"));
+                return;
+            }
+            
+            // Convertir paquetes a unidades
+            int unidadesPorPaquete = lote.getUnidadesPorPaquete() > 0 ? lote.getUnidadesPorPaquete() : 1;
+            int cantidadReportada = cantidadReportadaPaquetes * unidadesPorPaquete;
+            
+            int cantidadSistema = lote.getStockActual(); // En unidades
             int diferencia = cantidadReportada - cantidadSistema;
             
             // Validar que el tipo de incidencia coincida con la diferencia
@@ -259,6 +271,13 @@ public class IncidenciaServlet extends HttpServlet {
             
             int idIncidencia = incidenciaDAO.crearIncidencia(incidencia);
             
+            if (idIncidencia <= 0) {
+                session.setAttribute("errorMsg", "Error: No se pudo crear la incidencia en la base de datos.");
+                response.sendRedirect(request.getContextPath() + "/almacen/IncidenciaServlet?action=formReportar&idLote=" + 
+                                    request.getParameter("loteId"));
+                return;
+            }
+            
             // Registrar en auditoría
             AuditoriaService.registrarAccion(
                 usuario,
@@ -269,35 +288,20 @@ public class IncidenciaServlet extends HttpServlet {
                 request
             );
             
-            // Notificación a Administrador: Incidencia Reportada
-            try {
-                NotificacionService.crearNotificacionPorRol(
-                    "ADMINISTRADOR",
-                    "INCIDENCIA_REPORTADA",
-                    "Nueva Incidencia de Inventario Reportada",
-                    "El almacenero %s ha reportado una incidencia de tipo '%s' para el lote %s. Estado: Pendiente.".formatted(
-                        usuario.getNombres() + " " + usuario.getApellidos(), 
-                        incidencia.getTipoIncidencia(), 
-                        lote.getCodigoLote()),
-                    "WARNING",
-                    lote.getProductoId(),
-                    lote.getIdLote(),
-                    null,
-                    null,
-                    request.getContextPath() + "/administrador/auditoria.jsp?action=listar&modulo=ALMACEN&busqueda=" + idIncidencia,
-                    true // Enviar email
-                );
-            } catch (Exception e) {
-                System.err.println("⚠ Error al crear notificación de incidencia: " + e.getMessage());
-            }
+            // NO notificar al administrador - este es un flujo interno del almacenero
+            // La incidencia se cerrará automáticamente cuando se haga el ajuste
             
-            // También enviar email (mantener funcionalidad existente)
-            enviarNotificacionAdministrador(incidencia, lote);
-            
-            session.setAttribute("successMsg", "Incidencia reportada exitosamente. El administrador será notificado.");
+            session.setAttribute("successMsg", "Incidencia reportada exitosamente. La fila aparecerá en rojo en Gestión de Inventario hasta que realices el ajuste.");
             response.sendRedirect(request.getContextPath() + "/almacen/IncidenciaServlet");
             
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            session.setAttribute("errorMsg", "Error: Datos inválidos. Verifique que los campos numéricos sean correctos.");
+            response.sendRedirect(request.getContextPath() + "/almacen/IncidenciaServlet?action=formReportar&idLote=" + 
+                                request.getParameter("loteId"));
         } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error al reportar incidencia: " + e.getMessage());
             e.printStackTrace();
             session.setAttribute("errorMsg", "Error al reportar la incidencia: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/almacen/IncidenciaServlet?action=formReportar&idLote=" + 

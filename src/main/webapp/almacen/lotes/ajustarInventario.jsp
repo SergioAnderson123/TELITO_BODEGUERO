@@ -37,59 +37,9 @@
                             <div class="card-body">
                                 <p><strong>Producto:</strong> <c:out value="${lote.nombreProducto}"/></p>
                                 <p><strong>Código (Lote):</strong> <code><c:out value="${lote.codigoLote}"/></code></p>
-                                <p><strong>Cantidad actual:</strong> <span id="stockActualSpan" class="badge bg-primary fs-5">${lote.stockActual}</span></p>
+                                <p><strong>Cantidad actual:</strong> <span id="stockActualSpan" class="badge bg-primary fs-5">${lote.paquetesDisponibles} paquetes</span></p>
                             </div>
                         </div>
-                        
-                        <!-- Historial de Ajustes -->
-                        <c:if test="${not empty historialAjustes}">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-info text-white">
-                                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Historial de Ajustes</h5>
-                            </div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                    <table class="table table-sm table-hover mb-0">
-                                        <thead class="table-light sticky-top">
-                                            <tr>
-                                                <th>Fecha</th>
-                                                <th>Tipo</th>
-                                                <th>Cantidad</th>
-                                                <th>Motivo</th>
-                                                <th>Usuario</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <c:forEach var="ajuste" items="${historialAjustes}">
-                                            <tr>
-                                                <td><fmt:formatDate value="${ajuste.fecha}" pattern="dd/MM/yyyy HH:mm"/></td>
-                                                <td>
-                                                    <span class="badge ${ajuste.tipoMovimiento == 'Entrada' ? 'bg-success' : 'bg-danger'}">
-                                                        ${ajuste.tipoMovimiento}
-                                                    </span>
-                                                </td>
-                                                <td>${ajuste.cantidad}</td>
-                                                <td>
-                                                    <small>
-                                                        <c:choose>
-                                                            <c:when test="${ajuste.motivo.startsWith('Ajuste de inventario:')}">
-                                                                ${ajuste.motivo.substring(22)}
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                ${ajuste.motivo}
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </small>
-                                                </td>
-                                                <td><small>${ajuste.nombreUsuario}</small></td>
-                                            </tr>
-                                            </c:forEach>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        </c:if>
                     </div>
 
                     <div class="col-lg-7">
@@ -102,11 +52,13 @@
 
                                     <input type="hidden" name="idLote" value="${lote.idLote}">
                                     <input type="hidden" id="stockActual" name="stockActual" value="${lote.stockActual}">
+                                    <input type="hidden" id="unidadesPorPaquete" value="${lote.unidadesPorPaquete > 0 ? lote.unidadesPorPaquete : 1}">
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="cantidadContada" class="form-label">Cantidad real contada:</label>
-                                            <input type="number" class="form-control" id="cantidadContada" name="cantidadContada" required>
+                                            <label for="cantidadContada" class="form-label">Cantidad real contada (paquetes):</label>
+                                            <input type="number" class="form-control" id="cantidadContada" name="cantidadContada" min="0" step="1" required>
+                                            <small class="text-muted">Ingrese la cantidad de paquetes contados</small>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="diferencia" class="form-label">Diferencia:</label>
@@ -142,17 +94,19 @@
 </div>
 
 <script>
-    // Script para calcular la diferencia en tiempo real
+    // Script para calcular la diferencia en tiempo real (en paquetes)
     document.addEventListener('DOMContentLoaded', function() {
         const cantidadContadaInput = document.getElementById('cantidadContada');
         const diferenciaInput = document.getElementById('diferencia');
-        const stockActual = parseInt(document.getElementById('stockActual').value, 10);
+        const stockActualUnidades = parseInt(document.getElementById('stockActual').value, 10);
+        const unidadesPorPaquete = parseInt(document.getElementById('unidadesPorPaquete').value, 10);
+        const stockActualPaquetes = Math.floor(stockActualUnidades / unidadesPorPaquete);
 
         cantidadContadaInput.addEventListener('input', function() {
             const cantidadContada = parseInt(this.value, 10);
             if (!isNaN(cantidadContada)) {
-                const diferencia = cantidadContada - stockActual;
-                diferenciaInput.value = diferencia;
+                const diferencia = cantidadContada - stockActualPaquetes;
+                diferenciaInput.value = diferencia + ' paquetes';
                 if (diferencia > 0) {
                     diferenciaInput.style.color = 'green';
                 } else if (diferencia < 0) {
