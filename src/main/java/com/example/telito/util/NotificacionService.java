@@ -393,7 +393,7 @@ public class NotificacionService {
         String mensaje = String.format("Se ha creado un nuevo plan de transporte %s para %d paquetes " +
                                        "del producto '%s' con destino a %s. Preparar para despacho.", 
                                        numeroPlan, paquetes, nombreProducto, destino);
-        String urlAccion = "/TELITO_BODEGUERO/almacen/pedidos";
+        String urlAccion = "/TELITO_BODEGUERO/almacen/PedidoServlet?action=lista";
         
         return crearNotificacionPorRol(Rol.ALMACEN, TipoNotificacion.PLAN_TRANSPORTE_CREADO, 
                                       titulo, mensaje, Prioridad.INFO, null, null, null, null, 

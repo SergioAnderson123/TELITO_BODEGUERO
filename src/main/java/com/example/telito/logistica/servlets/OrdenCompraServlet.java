@@ -164,8 +164,12 @@ public class OrdenCompraServlet extends HttpServlet {
                         20
                     );
                     
+                    // Configurar headers para evitar caché
                     response.setContentType("application/json");
                     response.setCharacterEncoding("UTF-8");
+                    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                    response.setHeader("Pragma", "no-cache");
+                    response.setDateHeader("Expires", 0);
                     
                     // Construir JSON manualmente
                     StringBuilder jsonBusqueda = new StringBuilder("[");
@@ -205,8 +209,12 @@ public class OrdenCompraServlet extends HttpServlet {
                         20
                     );
                     
+                    // Configurar headers para evitar caché
                     response.setContentType("application/json");
                     response.setCharacterEncoding("UTF-8");
+                    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                    response.setHeader("Pragma", "no-cache");
+                    response.setDateHeader("Expires", 0);
                     
                     StringBuilder jsonProductores = new StringBuilder("[");
                     for (int i = 0; i < productoresBusqueda.size(); i++) {
