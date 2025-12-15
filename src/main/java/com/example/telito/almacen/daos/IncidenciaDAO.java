@@ -35,15 +35,24 @@ public class IncidenciaDAO extends DAOBase {
             pstmt.setString(9, incidencia.getEstado() != null ? incidencia.getEstado() : "Pendiente");
             pstmt.setInt(10, incidencia.getUsuarioReporteId());
             
-            pstmt.executeUpdate();
+            int rowsAffected = pstmt.executeUpdate();
             
-            rs = pstmt.getGeneratedKeys();
-            if (rs.next()) {
-                generatedId = rs.getInt(1);
+            if (rowsAffected > 0) {
+                rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    generatedId = rs.getInt(1);
+                    logger.info("Incidencia creada exitosamente con ID: " + generatedId);
+                } else {
+                    logger.warn("Incidencia creada pero no se pudo obtener el ID generado");
+                }
+            } else {
+                logger.error("No se insertó ninguna fila al crear la incidencia");
+                throw new RuntimeException("No se pudo crear la incidencia. No se insertó ninguna fila.");
             }
         } catch (SQLException e) {
-            logger.error("Error al crear incidencia", e);
-            throw new RuntimeException("Error al crear incidencia", e);
+            logger.error("Error SQL al crear incidencia: " + e.getMessage(), e);
+            logger.error("SQL State: " + e.getSQLState() + ", Error Code: " + e.getErrorCode());
+            throw new RuntimeException("Error al crear incidencia: " + e.getMessage(), e);
         } finally {
             closeResources(conn, pstmt, rs);
         }
@@ -277,6 +286,23 @@ public class IncidenciaDAO extends DAOBase {
     public int contarIncidenciasPendientes() {
         String sql = "SELECT COUNT(*) FROM incidencias_almacen WHERE estado = 'Pendiente'";
         return count(sql);
+    }
+    
+    /**
+     * Cierra todas las incidencias pendientes de un lote cuando se hace un ajuste.
+     * 
+     * @param loteId ID del lote
+     * @param usuarioId ID del usuario que hace el ajuste
+     */
+    public void cerrarIncidenciasPendientesPorLote(int loteId, int usuarioId) {
+        String sql = "UPDATE incidencias_almacen SET " +
+                "estado = 'Cerrada', " +
+                "usuario_resolucion_id = ?, " +
+                "fecha_resolucion = CURRENT_TIMESTAMP, " +
+                "observaciones_resolucion = 'Cerrada automáticamente al realizar ajuste de inventario' " +
+                "WHERE lote_id = ? AND estado = 'Pendiente'";
+        
+        executeUpdate(sql, usuarioId, loteId);
     }
 }
 

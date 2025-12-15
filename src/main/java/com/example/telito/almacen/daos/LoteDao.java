@@ -30,7 +30,11 @@ public class LoteDao extends DAOBase {
                 "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_critico_lote THEN 'Sin Stock' " +
                 "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_minimo_lote THEN 'Poco Stock' " +
                 "    ELSE 'En Stock' " +
-                "END AS estado_stock " +
+                "END AS estado_stock, " +
+                "CASE " +
+                "    WHEN EXISTS (SELECT 1 FROM incidencias_almacen ia WHERE ia.lote_id = l.id_lote AND ia.estado = 'Pendiente') THEN 1 " +
+                "    ELSE 0 " +
+                "END AS tiene_incidencia_pendiente " +
                 "FROM lotes l " +
                 "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                 "INNER JOIN ubicaciones u ON l.ubicacion_id = u.id_ubicacion " +
@@ -50,7 +54,7 @@ public class LoteDao extends DAOBase {
             params.add(busquedaParam);
         }
 
-        sql += "ORDER BY p.codigo_sku ASC, l.codigo_lote ASC";
+        sql += "ORDER BY p.codigo_sku DESC, l.codigo_lote DESC";
 
         // Si hay filtro de estado, envolver en subconsulta
         if (estadoStock != null && !estadoStock.trim().isEmpty()) {
@@ -117,6 +121,20 @@ public class LoteDao extends DAOBase {
                 lote.setCodigoSKU(rs.getString("codigo_sku"));
                 lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
                 lote.setEstadoStock(rs.getString("estado_stock"));
+                // Verificar si tiene incidencia pendiente
+                try {
+                    // MySQL devuelve 1 o 0 para el CASE WHEN
+                    int tieneIncidenciaInt = rs.getInt("tiene_incidencia_pendiente");
+                    boolean tieneIncidencia = tieneIncidenciaInt == 1;
+                    lote.setTieneIncidenciaPendiente(tieneIncidencia);
+                    if (tieneIncidencia) {
+                        logger.info("Lote ID: " + lote.getIdLote() + " (Código: " + lote.getCodigoLote() + ") - TIENE incidencia pendiente");
+                    }
+                } catch (SQLException e) {
+                    // Si la columna no existe en esta consulta, asumir false
+                    logger.warn("No se pudo obtener tiene_incidencia_pendiente para lote ID: " + lote.getIdLote() + " - " + e.getMessage());
+                    lote.setTieneIncidenciaPendiente(false);
+                }
                 lista.add(lote);
             }
         } catch (SQLException e) {
@@ -281,7 +299,10 @@ public class LoteDao extends DAOBase {
     public Lote buscarLotePorId(int idLote) {
         Lote lote = null;
         String sql = "SELECT l.id_lote, l.codigo_lote, l.stock_actual, l.fecha_vencimiento, l.estado, " +
-                " p.nombre AS nombre_producto, u.nombre AS nombre_ubicacion " +
+                " l.producto_id, l.ubicacion_id, l.distrito_id, " +
+                " p.nombre AS nombre_producto, p.unidades_por_paquete, " +
+                " FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes_disponibles, " +
+                " u.nombre AS nombre_ubicacion " +
                 " FROM lotes l " +
                 " INNER JOIN productos p ON (l.producto_id = p.id_producto) " +
                 " INNER JOIN ubicaciones u ON (l.ubicacion_id = u.id_ubicacion) " +
@@ -304,8 +325,22 @@ public class LoteDao extends DAOBase {
                 lote.setStockActual(rs.getInt("stock_actual"));
                 lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
                 lote.setEstado(rs.getString("estado"));
+                lote.setProductoId(rs.getInt("producto_id"));
+                lote.setUbicacionId(rs.getInt("ubicacion_id"));
+                lote.setDistritoId(rs.getInt("distrito_id"));
                 lote.setNombreProducto(rs.getString("nombre_producto"));
                 lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
+                // Obtener unidades por paquete y calcular paquetes disponibles
+                try {
+                    int unidadesPorPaquete = rs.getInt("unidades_por_paquete");
+                    lote.setUnidadesPorPaquete(unidadesPorPaquete);
+                    int paquetesDisponibles = rs.getInt("paquetes_disponibles");
+                    lote.setPaquetesDisponibles(paquetesDisponibles);
+                } catch (SQLException e) {
+                    // Si no se puede obtener, usar valores por defecto
+                    lote.setUnidadesPorPaquete(1);
+                    lote.setPaquetesDisponibles(0);
+                }
             }
         } catch (SQLException e) {
             logger.error("Error al buscar el lote", e);
@@ -511,6 +546,14 @@ public class LoteDao extends DAOBase {
                 lote.setCodigoSKU(rs.getString("codigo_sku"));
                 lote.setNombreUbicacion(rs.getString("nombre_ubicacion"));
                 lote.setEstadoStock(rs.getString("estado_stock"));
+                // Verificar si tiene incidencia pendiente (puede no estar en todas las consultas)
+                try {
+                    int tieneIncidencia = rs.getInt("tiene_incidencia_pendiente");
+                    lote.setTieneIncidenciaPendiente(tieneIncidencia == 1);
+                } catch (SQLException e) {
+                    // Si la columna no existe en esta consulta, asumir false
+                    lote.setTieneIncidenciaPendiente(false);
+                }
                 lista.add(lote);
             }
         } catch (SQLException e) {

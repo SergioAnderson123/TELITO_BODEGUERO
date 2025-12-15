@@ -18,6 +18,8 @@ public class Lote {
     private int distritoId; // <-- AÑADIR ESTE CAMPO
     private String estado;
     private String estadoStock; // Estado del stock: "En Stock", "Poco Stock", "Sin Stock", "No configurado"
+    private boolean tieneIncidenciaPendiente; // Indica si el lote tiene una incidencia pendiente
+    private int unidadesPorPaquete; // Unidades por paquete del producto
 
     // --- AÑADIR GETTERS Y SETTERS PARA 'estado' ---
     public String getEstado() {
@@ -65,5 +67,21 @@ public class Lote {
     
     public void setEstadoStock(String estadoStock) {
         this.estadoStock = estadoStock;
+    }
+    
+    public boolean isTieneIncidenciaPendiente() {
+        return tieneIncidenciaPendiente;
+    }
+    
+    public void setTieneIncidenciaPendiente(boolean tieneIncidenciaPendiente) {
+        this.tieneIncidenciaPendiente = tieneIncidenciaPendiente;
+    }
+    
+    public int getUnidadesPorPaquete() {
+        return unidadesPorPaquete;
+    }
+    
+    public void setUnidadesPorPaquete(int unidadesPorPaquete) {
+        this.unidadesPorPaquete = unidadesPorPaquete;
     }
 }

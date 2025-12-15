@@ -417,20 +417,90 @@
                                 </tbody>
                             </table>
                             <!-- Paginación para PLANES DE TRANSPORTE -->
-                            <jsp:include page="/WEB-INF/includes/pagination.jsp">
-                                <jsp:param name="currentPage" value="${currentPagePlanes}" />
-                                <jsp:param name="totalPages" value="${totalPagesPlanes}" />
-                                <jsp:param name="totalRows" value="${totalRowsPlanes}" />
-                                <jsp:param name="size" value="${sizePlanes}" />
-                                <jsp:param name="baseUrl" value="${baseUrlPlanes}" />
-                                <jsp:param name="itemName" value="${itemNamePlanes}" />
-                                <jsp:param name="param1Name" value="page" />
-                                <jsp:param name="param1Value" value="${currentPage}" />
-                                <jsp:param name="param2Name" value="busqueda" />
-                                <jsp:param name="param2Value" value="${busqueda}" />
-                                <jsp:param name="param3Name" value="estado" />
-                                <jsp:param name="param3Value" value="${estadoFiltro}" />
-                            </jsp:include>
+                            <%
+                                Integer currentPagePlanes = (Integer) request.getAttribute("currentPagePlanes");
+                                Integer totalPagesPlanes = (Integer) request.getAttribute("totalPagesPlanes");
+                                Integer totalRowsPlanes = (Integer) request.getAttribute("totalRowsPlanes");
+                                Integer sizePlanes = (Integer) request.getAttribute("sizePlanes");
+                                String baseUrlPlanes = (String) request.getAttribute("baseUrlPlanes");
+                                String busqueda = (String) request.getAttribute("busqueda");
+                                String estadoFiltro = (String) request.getAttribute("estadoFiltro");
+                                Integer currentPagePedidos = (Integer) request.getAttribute("currentPage");
+                                
+                                if (currentPagePlanes == null) currentPagePlanes = 1;
+                                if (totalPagesPlanes == null) totalPagesPlanes = 1;
+                                if (totalRowsPlanes == null) totalRowsPlanes = 0;
+                                if (sizePlanes == null) sizePlanes = 5;
+                                if (baseUrlPlanes == null) baseUrlPlanes = request.getContextPath() + "/almacen/PedidoServlet";
+                                if (currentPagePedidos == null) currentPagePedidos = 1;
+                                
+                                // Construir parámetros adicionales
+                                StringBuilder additionalParams = new StringBuilder();
+                                if (busqueda != null && !busqueda.trim().isEmpty()) {
+                                    additionalParams.append("&busqueda=").append(java.net.URLEncoder.encode(busqueda, "UTF-8"));
+                                }
+                                if (estadoFiltro != null && !estadoFiltro.trim().isEmpty()) {
+                                    additionalParams.append("&estado=").append(java.net.URLEncoder.encode(estadoFiltro, "UTF-8"));
+                                }
+                                additionalParams.append("&page=").append(currentPagePedidos);
+                                
+                                int startRow = totalRowsPlanes > 0 ? (currentPagePlanes - 1) * sizePlanes + 1 : 0;
+                                int endRow = Math.min(currentPagePlanes * sizePlanes, totalRowsPlanes);
+                            %>
+                            <c:if test="<%= totalPagesPlanes > 1 || totalRowsPlanes > 0 %>">
+                                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
+                                    <div class="pagination-info mb-2 mb-sm-0">
+                                        <span class="text-muted">
+                                            <% if (totalRowsPlanes > 0) { %>
+                                                Mostrando <%= startRow %>-<%= endRow %> de <%= totalRowsPlanes %> planes
+                                            <% } else { %>
+                                                No hay registros para mostrar
+                                            <% } %>
+                                        </span>
+                                    </div>
+                                    <% if (totalPagesPlanes > 1) { %>
+                                    <nav aria-label="Paginación">
+                                        <ul class="pagination pagination-sm mb-0">
+                                            <li class="page-item <%= (currentPagePlanes <= 1) ? "disabled" : "" %>">
+                                                <a class="page-link" href="<%= baseUrlPlanes %>?pagePlanes=<%= currentPagePlanes - 1 %>&size=<%= sizePlanes %><%= additionalParams %>" tabindex="-1">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </a>
+                                            </li>
+                                            <% if (currentPagePlanes > 3) { %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="<%= baseUrlPlanes %>?pagePlanes=1&size=<%= sizePlanes %><%= additionalParams %>">1</a>
+                                            </li>
+                                            <% if (currentPagePlanes > 4) { %>
+                                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                                            <% } %>
+                                            <% } %>
+                                            <%
+                                                int startPage = Math.max(1, currentPagePlanes - 2);
+                                                int endPage = Math.min(totalPagesPlanes, currentPagePlanes + 2);
+                                                for (int i = startPage; i <= endPage; i++) {
+                                            %>
+                                            <li class="page-item <%= (i == currentPagePlanes) ? "active" : "" %>">
+                                                <a class="page-link" href="<%= baseUrlPlanes %>?pagePlanes=<%= i %>&size=<%= sizePlanes %><%= additionalParams %>"><%= i %></a>
+                                            </li>
+                                            <% } %>
+                                            <% if (currentPagePlanes < totalPagesPlanes - 2) { %>
+                                            <% if (currentPagePlanes < totalPagesPlanes - 3) { %>
+                                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                                            <% } %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="<%= baseUrlPlanes %>?pagePlanes=<%= totalPagesPlanes %>&size=<%= sizePlanes %><%= additionalParams %>"><%= totalPagesPlanes %></a>
+                                            </li>
+                                            <% } %>
+                                            <li class="page-item <%= (currentPagePlanes >= totalPagesPlanes) ? "disabled" : "" %>">
+                                                <a class="page-link" href="<%= baseUrlPlanes %>?pagePlanes=<%= currentPagePlanes + 1 %>&size=<%= sizePlanes %><%= additionalParams %>">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                    <% } %>
+                                </div>
+                            </c:if>
                         </div>
                     </div>
                 </div>

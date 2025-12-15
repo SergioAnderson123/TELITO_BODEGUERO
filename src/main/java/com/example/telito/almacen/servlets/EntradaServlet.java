@@ -73,7 +73,7 @@ public class EntradaServlet extends HttpServlet {
                     
                     // Estadísticas generales (sin filtros)
                     int totalOrdenes = ordenCompraDao.contarTotalOrdenes();
-                    int ordenesPendientes = ordenCompraDao.contarOrdenesPendientes(null, null, null);
+                    int ordenesAprobadas = ordenCompraDao.contarOrdenesAprobadas();
                     int ordenesRegistradas = ordenCompraDao.contarOrdenesRegistradas();
                     
                     int offset = (paginaActual - 1) * registrosPorPagina;
@@ -88,7 +88,7 @@ public class EntradaServlet extends HttpServlet {
                     request.setAttribute("totalPages", totalPaginas);
                     request.setAttribute("totalRows", totalRegistros);
                     request.setAttribute("totalOrdenes", totalOrdenes);
-                    request.setAttribute("ordenesPendientes", ordenesPendientes);
+                    request.setAttribute("ordenesAprobadas", ordenesAprobadas);
                     request.setAttribute("ordenesRegistradas", ordenesRegistradas);
                     request.setAttribute("baseUrl", request.getContextPath() + "/almacen/EntradaServlet");
                     request.setAttribute("itemName", "órdenes");

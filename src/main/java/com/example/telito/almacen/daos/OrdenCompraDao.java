@@ -112,6 +112,32 @@ public class OrdenCompraDao extends DAOBase {
         }
         return 0;
     }
+    
+    /**
+     * Cuenta las órdenes que están en estado 'Aprobado' y que aún NO han sido registradas (no tienen movimiento de entrada)
+     */
+    public int contarOrdenesAprobadas() {
+        String sql = "SELECT COUNT(*) FROM ordenes_compra oc " +
+                     "WHERE oc.estado = 'Aprobado' " +
+                     "AND NOT EXISTS (SELECT 1 FROM movimientos_inventario mi WHERE mi.orden_compra_id = oc.id_orden_compra AND mi.tipo = 'Entrada')";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar órdenes aprobadas", e);
+            throw new RuntimeException("Error al contar órdenes aprobadas", e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
+    }
 
     /**
      * Cuenta las órdenes que ya tienen movimientos de entrada registrados (ya fueron recibidas)

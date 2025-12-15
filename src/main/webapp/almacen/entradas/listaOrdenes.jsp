@@ -262,10 +262,10 @@
                     
                     // Obtener estadísticas del servlet
                     Integer totalOrdenesAttr = (Integer) request.getAttribute("totalOrdenes");
-                    Integer ordenesPendientesAttr = (Integer) request.getAttribute("ordenesPendientes");
+                    Integer ordenesAprobadasAttr = (Integer) request.getAttribute("ordenesAprobadas");
                     Integer ordenesRegistradasAttr = (Integer) request.getAttribute("ordenesRegistradas");
                     int totalOrdenes = (totalOrdenesAttr != null) ? totalOrdenesAttr : 0;
-                    int ordenesPendientes = (ordenesPendientesAttr != null) ? ordenesPendientesAttr : 0;
+                    int ordenesAprobadas = (ordenesAprobadasAttr != null) ? ordenesAprobadasAttr : 0;
                     int ordenesRegistradas = (ordenesRegistradasAttr != null) ? ordenesRegistradasAttr : 0;
                 %>
 
@@ -293,8 +293,8 @@
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Pendientes</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= ordenesPendientes %></p>
+                            <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Aprobadas</h3>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= ordenesAprobadas %></p>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
