@@ -90,6 +90,39 @@ public class EmailTemplates {
             DATE_FORMAT.format(new Date())
         );
     }
+
+    /**
+     * Genera un correo HTML de alerta básica reutilizando el template principal.
+     * Se usa para unificar el estilo de correos simples (alertas del sistema, incidencias, etc.).
+     *
+     * @param titulo       Título principal del correo (se muestra en el header)
+     * @param descripcion  Texto corto descriptivo que se muestra antes del contenido
+     * @param contenidoHtml Contenido HTML principal (tablas, listas, etc.)
+     * @return HTML completo listo para enviar por correo
+     */
+    public static String generarCorreoAlertaBasica(String titulo, String descripcion, String contenidoHtml) {
+        String content = """
+            <h2 style="margin: 0 0 16px 0; color: #2b2d42; font-size: 24px; font-weight: 600;">
+                %s
+            </h2>
+            <p style="margin: 0 0 16px 0; color: #555555; font-size: 15px; line-height: 1.6;">
+                %s
+            </p>
+            %s
+        """.formatted(
+            titulo != null ? titulo : "Alerta del sistema",
+            descripcion != null ? descripcion : "Este es un mensaje automático del sistema TELITO BODEGUERO.",
+            contenidoHtml != null ? contenidoHtml : ""
+        );
+
+        return getBaseTemplate(
+            COLOR_PRIMARY,
+            "⚠️",
+            titulo != null ? titulo : "Alerta del sistema",
+            content,
+            "Notificación automática del sistema TELITO BODEGUERO"
+        );
+    }
     
     /**
      * Genera HTML para una sección de información destacada.

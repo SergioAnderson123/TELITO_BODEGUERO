@@ -148,6 +148,12 @@ public class ConductorServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
         ConductorDAO conductorDAO = new ConductorDAO();
+        
+        // Log para depuración
+        System.out.println("ConductorServlet POST - Action recibido: " + action);
+        System.out.println("ConductorServlet POST - Parámetros recibidos: id=" + request.getParameter("id") + 
+                          ", nombreCompleto=" + request.getParameter("nombreCompleto") + 
+                          ", licencia=" + request.getParameter("licencia"));
 
         if ("guardar".equals(action)) {
             String nombreCompleto = request.getParameter("nombreCompleto");
@@ -168,42 +174,149 @@ public class ConductorServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/administrador/ConductorServlet");
 
         } else if ("actualizar".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("id"));
-            String nombreCompleto = request.getParameter("nombreCompleto");
-            String licencia = request.getParameter("licencia");
+            try {
+                int id = Integer.parseInt(request.getParameter("id"));
+                String nombreCompleto = request.getParameter("nombreCompleto");
+                String licencia = request.getParameter("licencia");
 
-            Conductor conductor = new Conductor();
-            conductor.setIdConductor(id);
-            conductor.setNombreCompleto(nombreCompleto);
-            conductor.setLicencia(licencia);
+                // Validar que los parámetros no estén vacíos
+                if (nombreCompleto == null || nombreCompleto.trim().isEmpty()) {
+                    throw new IllegalArgumentException("El nombre completo es requerido.");
+                }
+                if (licencia == null || licencia.trim().isEmpty()) {
+                    throw new IllegalArgumentException("El número de licencia es requerido.");
+                }
 
-            boolean actualizado = conductorDAO.actualizarConductor(conductor);
-            
-            // Verificar si es una petición AJAX
+                Conductor conductor = new Conductor();
+                conductor.setIdConductor(id);
+                conductor.setNombreCompleto(nombreCompleto.trim());
+                conductor.setLicencia(licencia.trim());
+
+                boolean actualizado = conductorDAO.actualizarConductor(conductor);
+                
+                // Verificar si es una petición AJAX
+                String acceptHeader = request.getHeader("Accept");
+                boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
+                
+                if (isAjaxRequest) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    Gson gson = new Gson();
+                    Map<String, Object> resultado = new HashMap<>();
+                    if (actualizado) {
+                        resultado.put("exito", true);
+                        resultado.put("mensaje", "Conductor actualizado exitosamente.");
+                    } else {
+                        resultado.put("exito", false);
+                        resultado.put("mensaje", "Error al actualizar el conductor. El conductor no existe o no se pudo actualizar.");
+                    }
+                    response.getWriter().write(gson.toJson(resultado));
+                } else {
+                    if (actualizado) {
+                        request.getSession().setAttribute("mensaje", "Conductor actualizado exitosamente.");
+                        request.getSession().setAttribute("tipoMensaje", "success");
+                    } else {
+                        request.getSession().setAttribute("mensaje", "Error al actualizar el conductor. El conductor no existe o no se pudo actualizar.");
+                        request.getSession().setAttribute("tipoMensaje", "danger");
+                    }
+                    response.sendRedirect(request.getContextPath() + "/administrador/ConductorServlet");
+                }
+            } catch (NumberFormatException e) {
+                String acceptHeader = request.getHeader("Accept");
+                boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
+                
+                if (isAjaxRequest) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    Gson gson = new Gson();
+                    Map<String, Object> resultado = new HashMap<>();
+                    resultado.put("exito", false);
+                    resultado.put("mensaje", "ID de conductor inválido.");
+                    response.getWriter().write(gson.toJson(resultado));
+                } else {
+                    request.getSession().setAttribute("mensaje", "ID de conductor inválido.");
+                    request.getSession().setAttribute("tipoMensaje", "danger");
+                    response.sendRedirect(request.getContextPath() + "/administrador/ConductorServlet");
+                }
+            } catch (IllegalArgumentException e) {
+                String acceptHeader = request.getHeader("Accept");
+                boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
+                
+                if (isAjaxRequest) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    Gson gson = new Gson();
+                    Map<String, Object> resultado = new HashMap<>();
+                    resultado.put("exito", false);
+                    resultado.put("mensaje", e.getMessage());
+                    response.getWriter().write(gson.toJson(resultado));
+                } else {
+                    request.getSession().setAttribute("mensaje", e.getMessage());
+                    request.getSession().setAttribute("tipoMensaje", "danger");
+                    response.sendRedirect(request.getContextPath() + "/administrador/ConductorServlet");
+                }
+            } catch (RuntimeException e) {
+                System.err.println("Error al actualizar conductor: " + e.getMessage());
+                e.printStackTrace();
+                
+                String acceptHeader = request.getHeader("Accept");
+                boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
+                
+                if (isAjaxRequest) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    Gson gson = new Gson();
+                    Map<String, Object> resultado = new HashMap<>();
+                    resultado.put("exito", false);
+                    resultado.put("mensaje", "Error al actualizar el conductor: " + e.getMessage());
+                    response.getWriter().write(gson.toJson(resultado));
+                } else {
+                    request.getSession().setAttribute("mensaje", "Error al actualizar el conductor: " + e.getMessage());
+                    request.getSession().setAttribute("tipoMensaje", "danger");
+                    response.sendRedirect(request.getContextPath() + "/administrador/ConductorServlet");
+                }
+            } catch (Exception e) {
+                System.err.println("Error inesperado al actualizar conductor: " + e.getMessage());
+                e.printStackTrace();
+                
+                String acceptHeader = request.getHeader("Accept");
+                boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
+                
+                if (isAjaxRequest) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    Gson gson = new Gson();
+                    Map<String, Object> resultado = new HashMap<>();
+                    resultado.put("exito", false);
+                    resultado.put("mensaje", "Error inesperado al actualizar el conductor.");
+                    response.getWriter().write(gson.toJson(resultado));
+                } else {
+                    request.getSession().setAttribute("mensaje", "Error inesperado al actualizar el conductor.");
+                    request.getSession().setAttribute("tipoMensaje", "danger");
+                    response.sendRedirect(request.getContextPath() + "/administrador/ConductorServlet");
+                }
+            }
+        } else {
+            // Si la acción no es reconocida, devolver error
             String acceptHeader = request.getHeader("Accept");
             boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
             
             if (isAjaxRequest) {
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 Gson gson = new Gson();
                 Map<String, Object> resultado = new HashMap<>();
-                if (actualizado) {
-                    resultado.put("exito", true);
-                    resultado.put("mensaje", "Conductor actualizado exitosamente.");
-                } else {
-                    resultado.put("exito", false);
-                    resultado.put("mensaje", "Error al actualizar el conductor.");
-                }
+                resultado.put("exito", false);
+                resultado.put("mensaje", "Acción no reconocida: " + (action != null ? action : "null"));
                 response.getWriter().write(gson.toJson(resultado));
             } else {
-                if (actualizado) {
-                    request.getSession().setAttribute("mensaje", "Conductor actualizado exitosamente.");
-                    request.getSession().setAttribute("tipoMensaje", "success");
-                } else {
-                    request.getSession().setAttribute("mensaje", "Error al actualizar el conductor.");
-                    request.getSession().setAttribute("tipoMensaje", "danger");
-                }
+                request.getSession().setAttribute("mensaje", "Acción no reconocida.");
+                request.getSession().setAttribute("tipoMensaje", "danger");
                 response.sendRedirect(request.getContextPath() + "/administrador/ConductorServlet");
             }
         }

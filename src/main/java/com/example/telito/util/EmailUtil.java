@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
+import com.example.telito.util.EmailTemplates;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -178,41 +180,21 @@ public class EmailUtil {
         String subject = alertTitle.startsWith("TELITO BODEGUERO") ? alertTitle : "TELITO BODEGUERO - " + alertTitle;
         
         // Si el mensaje ya contiene HTML completo (tiene <html>), enviarlo tal cual
-        // Si no, envolverlo en un template HTML básico
+        // Si no, envolverlo en el template unificado de EmailTemplates
         String htmlMessage;
         if (alertMessage != null && alertMessage.trim().toLowerCase().contains("<html>")) {
             // El mensaje ya es HTML completo, usarlo directamente
             htmlMessage = alertMessage;
             logger.info("📧 Detectado HTML completo en el mensaje, usando directamente");
         } else {
-            // El mensaje es texto plano o HTML parcial, envolverlo en template
-            htmlMessage = "<!DOCTYPE html>" +
-                        "<html>" +
-                        "<head>" +
-                        "<meta charset='UTF-8'>" +
-                        "<style>" +
-                        "body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }" +
-                        ".container { max-width: 600px; margin: 0 auto; padding: 20px; }" +
-                        ".header { background-color: #006d77; color: white; padding: 20px; text-align: center; }" +
-                        ".content { padding: 20px; background-color: #f9f9f9; }" +
-                        ".footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }" +
-                        "</style>" +
-                        "</head>" +
-                        "<body>" +
-                        "<div class='container'>" +
-                        "<div class='header'><h2>TELITO BODEGUERO</h2></div>" +
-                        "<div class='content'>" +
-                        "<h3>" + alertTitle + "</h3>" +
-                        (alertMessage != null ? alertMessage.replace("\n", "<br>") : "") +
-                        "<p><em>Este es un mensaje automático del sistema. Por favor, no responda a este correo.</em></p>" +
-                        "</div>" +
-                        "<div class='footer'>" +
-                        "<p>Sistema TELITO BODEGUERO - Gestión Logística</p>" +
-                        "</div>" +
-                        "</div>" +
-                        "</body>" +
-                        "</html>";
-            logger.info("📧 Mensaje es texto plano, envolviendo en template HTML");
+            // El mensaje es texto plano o HTML parcial, envolverlo en el template unificado
+            String cuerpoHtml = alertMessage != null ? alertMessage.replace("\n", "<br>") : "";
+            htmlMessage = EmailTemplates.generarCorreoAlertaBasica(
+                alertTitle,
+                "Este es un mensaje automático del sistema TELITO BODEGUERO.",
+                cuerpoHtml
+            );
+            logger.info("📧 Mensaje es texto plano/HTML parcial, usando template unificado de EmailTemplates");
         }
         
         logger.info("📧 Enviando correo HTML a: " + toEmail);

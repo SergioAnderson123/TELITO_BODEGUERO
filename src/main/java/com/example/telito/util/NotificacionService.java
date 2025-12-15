@@ -32,6 +32,7 @@ public class NotificacionService {
         public static final String ORDEN_COMPRA_CREADA = "ORDEN_COMPRA_CREADA";
         public static final String ORDEN_LISTA = "ORDEN_LISTA";
         public static final String PLAN_TRANSPORTE_CREADO = "PLAN_TRANSPORTE_CREADO";
+        public static final String PLAN_TRANSPORTE_DESTINADO = "PLAN_TRANSPORTE_DESTINADO";
         public static final String PEDIDO_RECHAZADO = "PEDIDO_RECHAZADO";
         public static final String PEDIDO_COMPLETADO = "PEDIDO_COMPLETADO";
         
@@ -397,6 +398,44 @@ public class NotificacionService {
         return crearNotificacionPorRol(Rol.ALMACEN, TipoNotificacion.PLAN_TRANSPORTE_CREADO, 
                                       titulo, mensaje, Prioridad.INFO, null, null, null, null, 
                                       urlAccion, false);
+    }
+    
+    // Notifica plan de transporte destinado a un distrito (GERENTE DE TIENDA del distrito)
+    public static boolean notificarPlanTransporteDestinado(String numeroPlan, String nombreProducto,
+                                                          String nombreDistrito, String fechaEntrega,
+                                                          int distritoId) {
+        try {
+            // Obtener el ID del gerente de tienda asignado a este distrito
+            Integer gerenteId = notificacionDAO.obtenerGerenteTiendaPorDistrito(distritoId);
+            
+            if (gerenteId == null) {
+                logger.warn("No se encontró gerente de tienda activo para el distrito ID: {}", distritoId);
+                return false;
+            }
+            
+            String titulo = "Plan de Transporte Destinado a tu Tienda";
+            String mensaje = String.format("Se ha creado un plan de transporte %s con destino a %s. " +
+                                           "Producto: '%s'. Fecha de entrega estimada: %s. " +
+                                           "Estar preparado para recibir la mercancía.",
+                                           numeroPlan, nombreDistrito, nombreProducto, fechaEntrega);
+            String urlAccion = "/TELITO_BODEGUERO/gerente-tienda/GerenteTiendaServlet?action=recepciones-pendientes";
+            
+            boolean exito = crearNotificacionUsuario(gerenteId, TipoNotificacion.PLAN_TRANSPORTE_DESTINADO,
+                                                    titulo, mensaje, Prioridad.INFO,
+                                                    null, null, null, null, urlAccion);
+            
+            if (exito) {
+                logger.info("✓ Notificación enviada al gerente de tienda ID: {} para plan de transporte: {}", 
+                           gerenteId, numeroPlan);
+            } else {
+                logger.warn("⚠ No se pudo crear notificación para gerente de tienda ID: {}", gerenteId);
+            }
+            
+            return exito;
+        } catch (Exception e) {
+            logger.error("Error al notificar plan de transporte destinado al distrito ID: " + distritoId, e);
+            return false;
+        }
     }
     
     // Notifica pedido rechazado por stock insuficiente (LOGISTICA)

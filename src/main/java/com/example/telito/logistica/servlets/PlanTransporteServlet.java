@@ -222,15 +222,25 @@ public class PlanTransporteServlet extends HttpServlet {
                     nombreDestino = "Destino " + distritoId;
                 }
                 
-                // Crear notificación web
+                // Crear notificación web para Almacén
                 NotificacionService.notificarPlanTransporteCreado(
                     numeroPlan,
                     nombreProducto,
                     nombreDestino,
                     paquetes
                 );
+                
+                // Crear notificación web para Gerente de Tienda del distrito
+                NotificacionService.notificarPlanTransporteDestinado(
+                    numeroPlan,
+                    nombreProducto,
+                    nombreDestino,
+                    fechaEntrega,
+                    distritoId
+                );
             } catch (Exception e) {
                 System.err.println("⚠ Error al crear notificación web de plan de transporte: " + e.getMessage());
+                e.printStackTrace();
             }
             // ========== FIN NOTIFICACIÓN WEB ==========
 

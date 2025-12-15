@@ -35,10 +35,12 @@ public class UsuarioDAO extends DAOBase {
 
         if (sortBy != null && !sortBy.trim().isEmpty()) {
             switch (sortBy) {
+                case "id": columnaOrden = "u.id_usuario"; break;
                 case "usuario": columnaOrden = "u.nombres"; break;
                 case "correo": columnaOrden = "u.email"; break;
                 case "rol": columnaOrden = "r.nombre"; break;
                 case "estado": columnaOrden = "u.activo"; break;
+                default: columnaOrden = "u.id_usuario"; break; // Por defecto ordenar por ID
             }
         }
         if (sortOrder != null && (sortOrder.equalsIgnoreCase("asc") || sortOrder.equalsIgnoreCase("desc"))) {

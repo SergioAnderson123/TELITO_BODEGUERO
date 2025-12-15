@@ -54,7 +54,11 @@
                             </div>
                         </div>
                         <div class="dropdown-divider m-0"></div>
-                        <a class="dropdown-item text-center text-primary fw-bold py-2" href="${pageContext.request.contextPath}/administrador/notificaciones.jsp">
+                        <!-- Enlace con mismo color que el sidebar y abriendo modal en la misma vista -->
+                        <a class="dropdown-item text-center fw-bold py-2"
+                           href="javascript:void(0);"
+                           onclick="event.preventDefault(); mostrarModalTodasNotificaciones();"
+                           style="color: var(--turquoise-dark) !important;">
                             <i class="fas fa-list me-2"></i>Ver todas las notificaciones
                         </a>
                     </div>
@@ -83,6 +87,40 @@ if (sessionStorage.getItem('recargarDesdePerfil') === 'true') {
     sessionStorage.removeItem('recargarDesdePerfil');
     location.reload();
 }
+
+// ========== Modal grande de notificaciones ==========
+</script>
+
+<!-- Modal grande para ver todas las notificaciones -->
+<div class="modal fade" id="modalTodasNotificaciones" tabindex="-1" aria-labelledby="modalTodasNotificacionesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius: 16px;">
+            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 16px 16px 0 0;">
+                <h5 class="modal-title" id="modalTodasNotificacionesLabel">
+                    <i class="fas fa-bell me-2"></i>Todas las notificaciones
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <span id="contadorModalNotificaciones" class="text-muted" style="font-size: 0.85rem;">Cargando...</span>
+                    <button type="button" class="btn btn-sm btn-outline-success" onclick="marcarTodasLeidas()">
+                        <i class="fas fa-check-double me-1"></i>Marcar todas como leídas
+                    </button>
+                </div>
+                <div id="listaNotificacionesGrande" style="max-height: 60vh; overflow-y: auto; padding: 10px 16px;">
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                        <p class="mb-0">Cargando notificaciones...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 // Control del Sidebar en Móvil
 const sidebarToggle = document.getElementById('sidebarToggle');
@@ -302,17 +340,25 @@ function cargarContadorNotificaciones() {
     .catch(error => console.error('Error al cargar contador:', error));
 }
 
-// Cargar notificaciones recientes
+// Cargar notificaciones recientes (forzando UTF-8)
 function cargarNotificacionesRecientes() {
     fetch('${pageContext.request.contextPath}/NotificacionServlet?action=recientes', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Accept': 'application/json; charset=UTF-8'
+        }
     })
     .then(response => response.json())
     .then(data => {
         if (data.exito) {
             const notifs = data.datos.notificaciones || [];
             mostrarNotificaciones(notifs);
+            
+            // Si hay notificaciones no leídas, mostrar modal automáticamente (mejor UX)
+            if (notifs.length > 0) {
+                mostrarModalNotificaciones(notifs);
+            }
         }
     })
     .catch(error => {
@@ -385,7 +431,8 @@ function obtenerIconoTipo(tipo) {
         'PRODUCTO_NUEVO': 'fas fa-plus-circle',
         'USUARIO_CREADO': 'fas fa-user-plus',
         'ALERTA_CONFIGURADA': 'fas fa-cog',
-        'SISTEMA_ACTUALIZADO': 'fas fa-info-circle'
+        'SISTEMA_ACTUALIZADO': 'fas fa-info-circle',
+        'PLAN_TRANSPORTE_DESTINADO': 'fas fa-truck-loading'
     };
     return iconos[tipo] || 'fas fa-bell';
 }
@@ -406,7 +453,7 @@ function obtenerTiempoRelativo(fechaStr) {
     return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
 }
 
-// Ver notificación (marcar como leída y redirigir)
+// Ver notificación (marcar como leída y redirigir en la MISMA pestaña)
 function verNotificacion(id, url) {
     fetch('${pageContext.request.contextPath}/NotificacionServlet?action=marcarLeida&id=' + id, {
         method: 'POST',
@@ -417,8 +464,11 @@ function verNotificacion(id, url) {
         if (data.exito) {
             cargarContadorNotificaciones();
             if (url && url.trim() !== '') {
-                window.location.href = url;
+                const contextPath = '${pageContext.request.contextPath}';
+                const finalUrl = url.startsWith('/') ? contextPath + url : url;
+                window.location.href = finalUrl;
             } else {
+                // Solo recargar lista en el dropdown, sin abrir nuevas pestañas
                 cargarNotificacionesRecientes();
             }
         }
@@ -452,6 +502,73 @@ function marcarTodasLeidas() {
         console.error('Error al marcar todas como leídas:', error);
         mostrarToast('danger', 'Error de conexión con el servidor', 'fas fa-exclamation-triangle');
     });
+}
+
+// Cargar y mostrar todas las notificaciones en un modal grande
+function mostrarModalTodasNotificaciones() {
+    fetch('${pageContext.request.contextPath}/NotificacionServlet?action=todas', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            const notifs = data.datos.notificaciones || [];
+            mostrarTodasNotificaciones(notifs);
+            
+            const modal = new bootstrap.Modal(document.getElementById('modalTodasNotificaciones'));
+            modal.show();
+        } else {
+            mostrarToast('danger', 'Error al cargar notificaciones', 'fas fa-exclamation-triangle');
+        }
+    })
+    .catch(error => {
+        console.error('Error al cargar todas las notificaciones:', error);
+        mostrarToast('danger', 'Error de conexión con el servidor', 'fas fa-exclamation-triangle');
+    });
+}
+
+// Pintar todas las notificaciones dentro del modal grande
+function mostrarTodasNotificaciones(notificaciones) {
+    const lista = document.getElementById('listaNotificacionesGrande');
+    
+    if (!lista) return;
+    
+    if (notificaciones.length === 0) {
+        lista.innerHTML = '<div class="text-center py-4 text-muted">' +
+            '<i class="fas fa-bell-slash fa-2x mb-2"></i>' +
+            '<p class="mb-0">No tienes notificaciones</p>' +
+        '</div>';
+        return;
+    }
+    
+    const htmlArray = notificaciones.map(notif => {
+        const iconoTipo = obtenerIconoTipo(notif.tipo || notif.tipoNotificacion);
+        const tiempoRelativo = obtenerTiempoRelativo(notif.fechaCreacion);
+        const nivelPrioridad = notif.nivel || notif.nivelPrioridad;
+        const esLeida = notif.leida || false;
+        const claseLeida = esLeida ? '' : 'no-leida';
+        
+        return '<div class="notificacion-item-grande ' + claseLeida + '">' +
+                '<div class="d-flex gap-3 align-items-start">' +
+                    '<div class="notificacion-icon-grande ' + nivelPrioridad + '">' +
+                        '<i class="' + iconoTipo + '"></i>' +
+                    '</div>' +
+                    '<div class="notificacion-contenido-grande flex-grow-1">' +
+                        '<div class="d-flex justify-content-between align-items-start mb-2">' +
+                            '<div class="notificacion-titulo-grande">' + notif.titulo + '</div>' +
+                            (!esLeida ? '<span class="badge bg-primary rounded-pill" style="font-size: 0.7rem;">Nueva</span>' : '') +
+                        '</div>' +
+                        '<div class="notificacion-mensaje-grande">' + notif.mensaje + '</div>' +
+                        '<div class="notificacion-tiempo-grande">' +
+                            '<i class="far fa-clock me-1"></i>' + tiempoRelativo +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+    });
+    
+    lista.innerHTML = htmlArray.join('');
 }
 
 // Mostrar toast

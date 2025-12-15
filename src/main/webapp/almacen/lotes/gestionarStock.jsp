@@ -417,18 +417,11 @@
                                                     </c:choose>
                                                 </td>
                                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;" class="text-center">
-                                                    <div class="btn-group" role="group">
-                                                                <a type="button" class="btn btn-sm btn-info shadow-sm"
-                                                           href="LoteServlet?action=ajustar&id=${lote.idLote}" 
-                                                                   title="Ajustar inventario" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                                            <i class="fas fa-edit"></i> Ajustar
-                                                        </a>
-                                                                <a type="button" class="btn btn-sm btn-warning shadow-sm"
+                                                    <a type="button" class="btn btn-sm btn-warning shadow-sm"
                                                            href="IncidenciaServlet?action=formReportar&idLote=${lote.idLote}" 
                                                                    title="Reportar incidencia" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                                            <i class="fas fa-exclamation-triangle"></i> Incidencia
-                                                        </a>
-                                                    </div>
+                                                        <i class="fas fa-exclamation-triangle"></i> Incidencia
+                                                    </a>
                                                 </td>
                                             </tr>
                                         </c:forEach>

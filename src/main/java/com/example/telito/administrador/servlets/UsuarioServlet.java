@@ -433,9 +433,9 @@ public class UsuarioServlet extends HttpServlet {
             }
             
                         session.setAttribute("successMsg", "Usuario creado con éxito.");
-                        // Redirigir con ordenamiento por ID descendente para que el nuevo usuario aparezca primero
-                        // Si no se especifica sortBy, el DAO usa por defecto u.id_usuario DESC
-                        response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=listar&page=1");
+                        // Redirigir con ordenamiento explícito por ID descendente para que el nuevo usuario aparezca primero
+                        // Limpiar filtros y ordenar por ID descendente para mostrar el usuario recién creado
+                        response.sendRedirect(request.getContextPath() + "/UsuarioServlet?action=listar&page=1&sortBy=id&sortOrder=desc");
                     } else {
             logger.error("Error al crear usuario: {}", resultado.getError());
             errores.add(resultado.getError());

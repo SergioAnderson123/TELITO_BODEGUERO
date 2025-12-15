@@ -148,6 +148,14 @@ public class VehiculoServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
         VehiculoDAO vehiculoDAO = new VehiculoDAO();
+        
+        // Log para depuración
+        System.out.println("VehiculoServlet POST - Action recibido: " + action);
+        System.out.println("VehiculoServlet POST - Parámetros recibidos: id=" + request.getParameter("id") + 
+                          ", placa=" + request.getParameter("placa") + 
+                          ", marca=" + request.getParameter("marca") + 
+                          ", modelo=" + request.getParameter("modelo") + 
+                          ", capacidadKg=" + request.getParameter("capacidadKg"));
 
         if ("guardar".equals(action)) {
             String placa = request.getParameter("placa");
@@ -172,46 +180,163 @@ public class VehiculoServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/administrador/VehiculoServlet");
 
         } else if ("actualizar".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("id"));
-            String placa = request.getParameter("placa");
-            String marca = request.getParameter("marca");
-            String modelo = request.getParameter("modelo");
-            int capacidadKg = Integer.parseInt(request.getParameter("capacidadKg"));
+            try {
+                int id = Integer.parseInt(request.getParameter("id"));
+                String placa = request.getParameter("placa");
+                String marca = request.getParameter("marca");
+                String modelo = request.getParameter("modelo");
+                String capacidadKgStr = request.getParameter("capacidadKg");
 
-            Vehiculo vehiculo = new Vehiculo();
-            vehiculo.setIdVehiculo(id);
-            vehiculo.setPlaca(placa);
-            vehiculo.setMarca(marca);
-            vehiculo.setModelo(modelo);
-            vehiculo.setCapacidadKg(capacidadKg);
+                // Validar que los parámetros requeridos no estén vacíos
+                if (placa == null || placa.trim().isEmpty()) {
+                    throw new IllegalArgumentException("La placa es requerida.");
+                }
+                if (capacidadKgStr == null || capacidadKgStr.trim().isEmpty()) {
+                    throw new IllegalArgumentException("La capacidad es requerida.");
+                }
 
-            boolean actualizado = vehiculoDAO.actualizarVehiculo(vehiculo);
-            
-            // Verificar si es una petición AJAX
+                int capacidadKg;
+                try {
+                    capacidadKg = Integer.parseInt(capacidadKgStr);
+                    if (capacidadKg <= 0) {
+                        throw new IllegalArgumentException("La capacidad debe ser mayor a 0.");
+                    }
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("La capacidad debe ser un número válido.");
+                }
+
+                Vehiculo vehiculo = new Vehiculo();
+                vehiculo.setIdVehiculo(id);
+                vehiculo.setPlaca(placa.trim());
+                vehiculo.setMarca(marca != null ? marca.trim() : null);
+                vehiculo.setModelo(modelo != null ? modelo.trim() : null);
+                vehiculo.setCapacidadKg(capacidadKg);
+
+                boolean actualizado = vehiculoDAO.actualizarVehiculo(vehiculo);
+                
+                // Verificar si es una petición AJAX
+                String acceptHeader = request.getHeader("Accept");
+                boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
+                
+                if (isAjaxRequest) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    Gson gson = new Gson();
+                    Map<String, Object> resultado = new HashMap<>();
+                    if (actualizado) {
+                        resultado.put("exito", true);
+                        resultado.put("mensaje", "Vehículo actualizado exitosamente.");
+                    } else {
+                        resultado.put("exito", false);
+                        resultado.put("mensaje", "Error al actualizar el vehículo. El vehículo no existe o no se pudo actualizar.");
+                    }
+                    response.getWriter().write(gson.toJson(resultado));
+                } else {
+                    if (actualizado) {
+                        request.getSession().setAttribute("mensaje", "Vehículo actualizado exitosamente.");
+                        request.getSession().setAttribute("tipoMensaje", "success");
+                    } else {
+                        request.getSession().setAttribute("mensaje", "Error al actualizar el vehículo. El vehículo no existe o no se pudo actualizar.");
+                        request.getSession().setAttribute("tipoMensaje", "danger");
+                    }
+                    response.sendRedirect(request.getContextPath() + "/administrador/VehiculoServlet");
+                }
+            } catch (NumberFormatException e) {
+                String acceptHeader = request.getHeader("Accept");
+                boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
+                
+                if (isAjaxRequest) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    Gson gson = new Gson();
+                    Map<String, Object> resultado = new HashMap<>();
+                    resultado.put("exito", false);
+                    resultado.put("mensaje", "ID de vehículo inválido.");
+                    response.getWriter().write(gson.toJson(resultado));
+                } else {
+                    request.getSession().setAttribute("mensaje", "ID de vehículo inválido.");
+                    request.getSession().setAttribute("tipoMensaje", "danger");
+                    response.sendRedirect(request.getContextPath() + "/administrador/VehiculoServlet");
+                }
+            } catch (IllegalArgumentException e) {
+                String acceptHeader = request.getHeader("Accept");
+                boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
+                
+                if (isAjaxRequest) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    Gson gson = new Gson();
+                    Map<String, Object> resultado = new HashMap<>();
+                    resultado.put("exito", false);
+                    resultado.put("mensaje", e.getMessage());
+                    response.getWriter().write(gson.toJson(resultado));
+                } else {
+                    request.getSession().setAttribute("mensaje", e.getMessage());
+                    request.getSession().setAttribute("tipoMensaje", "danger");
+                    response.sendRedirect(request.getContextPath() + "/administrador/VehiculoServlet");
+                }
+            } catch (RuntimeException e) {
+                System.err.println("Error al actualizar vehículo: " + e.getMessage());
+                e.printStackTrace();
+                
+                String acceptHeader = request.getHeader("Accept");
+                boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
+                
+                if (isAjaxRequest) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    Gson gson = new Gson();
+                    Map<String, Object> resultado = new HashMap<>();
+                    resultado.put("exito", false);
+                    resultado.put("mensaje", "Error al actualizar el vehículo: " + e.getMessage());
+                    response.getWriter().write(gson.toJson(resultado));
+                } else {
+                    request.getSession().setAttribute("mensaje", "Error al actualizar el vehículo: " + e.getMessage());
+                    request.getSession().setAttribute("tipoMensaje", "danger");
+                    response.sendRedirect(request.getContextPath() + "/administrador/VehiculoServlet");
+                }
+            } catch (Exception e) {
+                System.err.println("Error inesperado al actualizar vehículo: " + e.getMessage());
+                e.printStackTrace();
+                
+                String acceptHeader = request.getHeader("Accept");
+                boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
+                
+                if (isAjaxRequest) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    Gson gson = new Gson();
+                    Map<String, Object> resultado = new HashMap<>();
+                    resultado.put("exito", false);
+                    resultado.put("mensaje", "Error inesperado al actualizar el vehículo.");
+                    response.getWriter().write(gson.toJson(resultado));
+                } else {
+                    request.getSession().setAttribute("mensaje", "Error inesperado al actualizar el vehículo.");
+                    request.getSession().setAttribute("tipoMensaje", "danger");
+                    response.sendRedirect(request.getContextPath() + "/administrador/VehiculoServlet");
+                }
+            }
+        } else {
+            // Si la acción no es reconocida, devolver error
             String acceptHeader = request.getHeader("Accept");
             boolean isAjaxRequest = acceptHeader != null && acceptHeader.contains("application/json");
             
             if (isAjaxRequest) {
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 Gson gson = new Gson();
                 Map<String, Object> resultado = new HashMap<>();
-                if (actualizado) {
-                    resultado.put("exito", true);
-                    resultado.put("mensaje", "Vehículo actualizado exitosamente.");
-                } else {
-                    resultado.put("exito", false);
-                    resultado.put("mensaje", "Error al actualizar el vehículo.");
-                }
+                resultado.put("exito", false);
+                resultado.put("mensaje", "Acción no reconocida: " + (action != null ? action : "null"));
                 response.getWriter().write(gson.toJson(resultado));
             } else {
-                if (actualizado) {
-                    request.getSession().setAttribute("mensaje", "Vehículo actualizado exitosamente.");
-                    request.getSession().setAttribute("tipoMensaje", "success");
-                } else {
-                    request.getSession().setAttribute("mensaje", "Error al actualizar el vehículo.");
-                    request.getSession().setAttribute("tipoMensaje", "danger");
-                }
+                request.getSession().setAttribute("mensaje", "Acción no reconocida.");
+                request.getSession().setAttribute("tipoMensaje", "danger");
                 response.sendRedirect(request.getContextPath() + "/administrador/VehiculoServlet");
             }
         }

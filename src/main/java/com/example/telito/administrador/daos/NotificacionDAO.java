@@ -482,6 +482,39 @@ public class NotificacionDAO extends DAOBase {
 
         return usuariosIds;
     }
+    
+    // Obtiene el ID del gerente de tienda asignado a un distrito específico (activo)
+    public Integer obtenerGerenteTiendaPorDistrito(int distritoId) {
+        Integer gerenteId = null;
+        
+        String sql = "SELECT u.id_usuario FROM usuarios u " +
+                "INNER JOIN roles r ON u.rol_id = r.id_rol " +
+                "WHERE UPPER(r.nombre) = UPPER('Gerente de Tienda') " +
+                "AND u.distrito_id = ? AND u.activo = 1 " +
+                "LIMIT 1";
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, distritoId);
+
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                gerenteId = rs.getInt("id_usuario");
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error al obtener gerente de tienda por distrito ID: " + distritoId, e);
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+
+        return gerenteId;
+    }
 
     // Elimina notificaciones antiguas (más de 30 días y leídas)
     public int limpiarNotificacionesAntiguas() {

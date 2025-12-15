@@ -383,6 +383,7 @@ function obtenerIconoTipo(tipo) {
         'ORDEN_COMPRA_CREADA': 'fas fa-shopping-cart',
         'ORDEN_LISTA': 'fas fa-check-circle',
         'PLAN_TRANSPORTE_CREADO': 'fas fa-truck',
+        'PLAN_TRANSPORTE_DESTINADO': 'fas fa-truck-loading',
         'PEDIDO_RECHAZADO': 'fas fa-times',
         'PEDIDO_COMPLETADO': 'fas fa-check',
         'ORDEN_CONFIRMADA': 'fas fa-check-circle',

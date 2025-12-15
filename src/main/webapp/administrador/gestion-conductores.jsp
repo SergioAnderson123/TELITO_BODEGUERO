@@ -1016,7 +1016,8 @@
             <span class="modal-close">&times;</span>
         </div>
         
-        <form method="POST" action="${pageContext.request.contextPath}/administrador/ConductorServlet?action=actualizar" id="formEditarConductor">
+        <form method="POST" action="${pageContext.request.contextPath}/administrador/ConductorServlet" id="formEditarConductor">
+            <input type="hidden" name="action" value="actualizar">
             <input type="hidden" name="id" id="editIdConductor">
             <div class="modal-body">
                 <div class="form-group">
@@ -1472,37 +1473,111 @@
             });
         }
         
-        // Manejo del formulario de edición con AJAX
-        const formEditarConductor = document.getElementById('formEditarConductor');
-        if (formEditarConductor) {
-            formEditarConductor.addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                const formData = new FormData(formEditarConductor);
-                const url = formEditarConductor.action;
-                
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.exito) {
-                        alert(data.mensaje || 'Conductor actualizado exitosamente.');
-                        cerrarModalEditarConductor();
-                        location.reload();
-                    } else {
-                        alert(data.mensaje || 'Error al actualizar el conductor.');
+        // Usar delegación de eventos en el modal para capturar el submit del formulario
+        if (editConductorModal) {
+            editConductorModal.addEventListener('submit', function(event) {
+                // Verificar que el evento venga del formulario de edición
+                const form = event.target;
+                if (form && form.id === 'formEditarConductor') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    console.log('Formulario de edición detectado - previniendo envío normal');
+                    
+                    // Validar que los campos requeridos estén presentes
+                    const id = document.getElementById('editIdConductor');
+                    const nombreCompleto = document.getElementById('editNombreCompleto');
+                    const licencia = document.getElementById('editLicencia');
+                    
+                    if (!id || !id.value || id.value.trim() === '') {
+                        alert('Error: El ID del conductor no está presente. Por favor, cierra el modal y vuelve a intentar.');
+                        return;
                     }
-                })
-                .catch(error => {
-                    console.error('Error al enviar formulario de edición:', error);
-                    alert('Error de conexión con el servidor.');
-                });
-            });
+                    
+                    if (!nombreCompleto || !nombreCompleto.value || nombreCompleto.value.trim() === '') {
+                        alert('El nombre completo es requerido.');
+                        return;
+                    }
+                    
+                    if (!licencia || !licencia.value || licencia.value.trim() === '') {
+                        alert('El número de licencia es requerido.');
+                        return;
+                    }
+                    
+                    const formData = new FormData(form);
+                    // Asegurar que el parámetro action esté en el FormData
+                    if (!formData.has('action')) {
+                        formData.append('action', 'actualizar');
+                    }
+                    
+                    // Log para depuración
+                    console.log('Enviando datos del formulario:');
+                    for (let [key, value] of formData.entries()) {
+                        console.log(key + ':', value);
+                    }
+                    
+                    const url = form.action;
+                    console.log('URL:', url);
+                    
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        console.log('Respuesta recibida:', response.status, response.statusText);
+                        // Verificar el Content-Type de la respuesta
+                        const contentType = response.headers.get('content-type');
+                        const isJson = contentType && contentType.includes('application/json');
+                        
+                        // Verificar si la respuesta es exitosa
+                        if (!response.ok) {
+                            // Si la respuesta no es exitosa, intentar leer el mensaje de error
+                            if (isJson) {
+                                return response.json().then(data => {
+                                    throw new Error(data.mensaje || 'Error al procesar la solicitud.');
+                                });
+                            } else {
+                                // Si no es JSON, leer como texto
+                                return response.text().then(text => {
+                                    console.error('Respuesta no JSON:', text);
+                                    throw new Error('Error del servidor: ' + response.status + ' ' + response.statusText);
+                                });
+                            }
+                        }
+                        
+                        // Si es exitosa, verificar que sea JSON
+                        if (isJson) {
+                            return response.json();
+                        } else {
+                            throw new Error('El servidor no devolvió una respuesta JSON válida.');
+                        }
+                    })
+                    .then(data => {
+                        console.log('Datos recibidos:', data);
+                        if (data.exito) {
+                            alert(data.mensaje || 'Conductor actualizado exitosamente.');
+                            cerrarModalEditarConductor();
+                            location.reload();
+                        } else {
+                            alert(data.mensaje || 'Error al actualizar el conductor.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al enviar formulario de edición:', error);
+                        console.error('Detalles del error:', {
+                            message: error.message,
+                            stack: error.stack,
+                            name: error.name
+                        });
+                        // Mostrar el mensaje de error específico si está disponible
+                        const mensajeError = error.message || 'Error de conexión con el servidor. Por favor, verifica la consola del navegador para más detalles.';
+                        alert(mensajeError);
+                    });
+                }
+            }, true); // Usar capture phase para asegurar que se capture antes
         }
     });
 </script>

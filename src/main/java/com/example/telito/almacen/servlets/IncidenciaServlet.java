@@ -10,6 +10,7 @@ import com.example.telito.administrador.services.AuditoriaService;
 import com.example.telito.util.AuthorizationHelper;
 import com.example.telito.util.EmailUtil;
 import com.example.telito.util.NotificacionService;
+import com.example.telito.util.EmailTemplates;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -422,25 +423,34 @@ public class IncidenciaServlet extends HttpServlet {
      * Construye el mensaje HTML para la notificación de incidencia.
      */
     private String construirMensajeIncidencia(Incidencia incidencia, Lote lote) {
-        StringBuilder html = new StringBuilder();
-        html.append("<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body>");
-        html.append("<h2>Nueva Incidencia de Inventario</h2>");
-        html.append("<p>Se ha reportado una nueva incidencia en el almacén:</p>");
-        html.append("<table border='1' cellpadding='5' style='border-collapse: collapse;'>");
-        html.append("<tr><td><strong>Tipo:</strong></td><td>").append(incidencia.getTipoIncidencia()).append("</td></tr>");
-        html.append("<tr><td><strong>Producto:</strong></td><td>").append(lote.getNombreProducto()).append("</td></tr>");
-        html.append("<tr><td><strong>Código Lote:</strong></td><td>").append(lote.getCodigoLote()).append("</td></tr>");
-        html.append("<tr><td><strong>Cantidad Sistema:</strong></td><td>").append(incidencia.getCantidadSistema()).append("</td></tr>");
-        html.append("<tr><td><strong>Cantidad Reportada:</strong></td><td>").append(incidencia.getCantidadReportada()).append("</td></tr>");
-        html.append("<tr><td><strong>Diferencia:</strong></td><td>").append(incidencia.getDiferencia()).append("</td></tr>");
-        html.append("<tr><td><strong>Motivo:</strong></td><td>").append(incidencia.getMotivo()).append("</td></tr>");
+        StringBuilder cuerpo = new StringBuilder();
+        cuerpo.append("<table style='width:100%; border-collapse: collapse; margin-top: 10px;'>");
+        cuerpo.append("<tr><td style='padding:8px;border-bottom:1px solid #e9ecef;'><strong>Tipo:</strong></td><td style='padding:8px;border-bottom:1px solid #e9ecef;'>")
+              .append(incidencia.getTipoIncidencia()).append("</td></tr>");
+        cuerpo.append("<tr><td style='padding:8px;border-bottom:1px solid #e9ecef;'><strong>Producto:</strong></td><td style='padding:8px;border-bottom:1px solid #e9ecef;'>")
+              .append(lote.getNombreProducto()).append("</td></tr>");
+        cuerpo.append("<tr><td style='padding:8px;border-bottom:1px solid #e9ecef;'><strong>Código Lote:</strong></td><td style='padding:8px;border-bottom:1px solid #e9ecef;'>")
+              .append(lote.getCodigoLote()).append("</td></tr>");
+        cuerpo.append("<tr><td style='padding:8px;border-bottom:1px solid #e9ecef;'><strong>Cantidad Sistema:</strong></td><td style='padding:8px;border-bottom:1px solid #e9ecef;'>")
+              .append(incidencia.getCantidadSistema()).append("</td></tr>");
+        cuerpo.append("<tr><td style='padding:8px;border-bottom:1px solid #e9ecef;'><strong>Cantidad Reportada:</strong></td><td style='padding:8px;border-bottom:1px solid #e9ecef;'>")
+              .append(incidencia.getCantidadReportada()).append("</td></tr>");
+        cuerpo.append("<tr><td style='padding:8px;border-bottom:1px solid #e9ecef;'><strong>Diferencia:</strong></td><td style='padding:8px;border-bottom:1px solid #e9ecef;'>")
+              .append(incidencia.getDiferencia()).append("</td></tr>");
+        cuerpo.append("<tr><td style='padding:8px;border-bottom:1px solid #e9ecef;'><strong>Motivo:</strong></td><td style='padding:8px;border-bottom:1px solid #e9ecef;'>")
+              .append(incidencia.getMotivo()).append("</td></tr>");
         if (incidencia.getDescripcion() != null && !incidencia.getDescripcion().isEmpty()) {
-            html.append("<tr><td><strong>Descripción:</strong></td><td>").append(incidencia.getDescripcion()).append("</td></tr>");
+            cuerpo.append("<tr><td style='padding:8px;border-bottom:1px solid #e9ecef;'><strong>Descripción:</strong></td><td style='padding:8px;border-bottom:1px solid #e9ecef;'>")
+                  .append(incidencia.getDescripcion()).append("</td></tr>");
         }
-        html.append("</table>");
-        html.append("<p>Por favor, revise y resuelva la incidencia en el sistema.</p>");
-        html.append("</body></html>");
-        return html.toString();
+        cuerpo.append("</table>");
+        cuerpo.append("<p style='margin-top:16px; font-size:14px; color:#555555;'>Por favor, revisa y resuelve la incidencia en el sistema de TELITO BODEGUERO.</p>");
+
+        return EmailTemplates.generarCorreoAlertaBasica(
+            "Nueva Incidencia de Inventario",
+            "Se ha reportado una nueva incidencia en el almacén.",
+            cuerpo.toString()
+        );
     }
 }
 
