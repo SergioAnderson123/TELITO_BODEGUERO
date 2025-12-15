@@ -38,18 +38,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <c:if test='${param.activeMenu == "Configuracion"}'>active</c:if>" href="${pageContext.request.contextPath}/administrador/configuracion.jsp">
-                        <i class="fas fa-cogs"></i>Configuración
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link <c:if test='${param.activeMenu == "Auditoria"}'>active</c:if>" href="${pageContext.request.contextPath}/AuditoriaServlet">
                         <i class="fas fa-clipboard-list"></i>Auditoría
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <c:if test='${param.activeMenu == "ConfiguracionAvanzada"}'>active</c:if>" href="${pageContext.request.contextPath}/ConfiguracionAvanzadaServlet">
-                        <i class="fas fa-sliders-h"></i>Configuración Avanzada
+                    <a class="nav-link <c:if test='${param.activeMenu == "Configuracion"}'>active</c:if>" href="${pageContext.request.contextPath}/administrador/configuracion.jsp">
+                        <i class="fas fa-cogs"></i>Configuración
                     </a>
                 </li>
             </ul>

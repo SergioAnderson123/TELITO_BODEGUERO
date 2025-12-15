@@ -223,17 +223,6 @@
                 </div>
             </a>
         </div>
-        <div class="col-lg-3 col-md-6 mb-2">
-            <a href="<%= request.getContextPath() %>/ConfiguracionAvanzadaServlet" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
-                <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
-                    <div class="mb-1" style="color: #006d77;">
-                        <i class="fas fa-sliders-h" style="font-size: 1.9rem;"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0" style="font-size: 0.95rem; color: #000000;">Configuración avanzada</h6>
-                    <span style="font-size: 0.8rem; color: #4a4a4a;">Sistema y emails</span>
-                </div>
-            </a>
-        </div>
     </div>
     
     <!-- Espacio adicional al final para evitar que se corten los accesos rápidos -->

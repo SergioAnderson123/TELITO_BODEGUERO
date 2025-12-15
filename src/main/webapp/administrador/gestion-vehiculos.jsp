@@ -101,24 +101,76 @@
         }
         
         /* Permitir que el dropdown sea visible en la columna de acciones */
+        #vehiculoTable tbody tr {
+            position: relative;
+            z-index: 1;
+        }
+        
+        #vehiculoTable tbody tr:hover {
+            z-index: 2;
+        }
+        
+        #vehiculoTable tbody tr.dropdown-open {
+            z-index: 1000 !important;
+        }
+        
         #vehiculoTable td:last-child {
             overflow: visible !important;
             position: relative;
+            z-index: 10;
+        }
+        
+        #vehiculoTable td:last-child.dropdown-open {
+            z-index: 1001 !important;
         }
         
         #vehiculoTable td:last-child .dropdown {
-            position: static;
+            position: relative !important;
+            display: inline-block !important;
+            z-index: 1000;
+        }
+        
+        #vehiculoTable td:last-child .dropdown.dropdown-open {
+            z-index: 1002 !important;
+        }
+        
+        #vehiculoTable td:last-child .dropdown-toggle::after {
+            display: none;
         }
         
         #vehiculoTable td:last-child .dropdown-menu {
             position: absolute !important;
             right: 0 !important;
             left: auto !important;
-            z-index: 1050 !important;
+            top: 100% !important;
+            bottom: auto !important;
+            z-index: 99999 !important;
+            margin-top: 0.25rem !important;
+            margin-bottom: 0 !important;
+            min-width: 180px !important;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
             transform: none !important;
         }
         
+        #vehiculoTable td:last-child .dropdown-menu.show {
+            display: block !important;
+            position: absolute !important;
+        }
+        
         /* Eliminar scrollbar vertical no deseado */
+        #vehiculoTable tbody {
+            overflow: visible !important;
+        }
+        
+        #vehiculoTable {
+            overflow: visible !important;
+        }
+        
+        #vehiculoTable tbody tr td {
+            overflow: visible !important;
+        }
+        
         .card-body {
             overflow: visible !important;
         }
@@ -137,12 +189,19 @@
         }
         
         /* Contenedor de la tabla sin scrollbars */
-        div[style*="overflow"] {
+        .table-responsive {
             overflow: visible !important;
         }
         
-        /* Asegurar que el contenedor no corte el dropdown pero sin scrollbars */
-        .table-responsive {
+        .table-card .card-body {
+            overflow: visible !important;
+        }
+        
+        .table-card {
+            overflow: visible !important;
+        }
+        
+        div[style*="overflow"]:not(.modal):not(.modal-content) {
             overflow: visible !important;
         }
         
@@ -1148,8 +1207,82 @@
 </div>
 
 <script>
+    // Función para ajustar el posicionamiento de los dropdowns
+    function ajustarDropdowns() {
+        document.querySelectorAll('#vehiculoTable td:last-child .dropdown').forEach(function(dropdown) {
+            const button = dropdown.querySelector('button[data-bs-toggle="dropdown"]');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            
+            if (button && menu) {
+                // Función para posicionar el dropdown
+                function posicionarDropdown() {
+                    if (menu.classList.contains('show')) {
+                        // Agregar clases para aumentar z-index
+                        const tr = button.closest('tr');
+                        const td = button.closest('td');
+                        if (tr) tr.classList.add('dropdown-open');
+                        if (td) td.classList.add('dropdown-open');
+                        dropdown.classList.add('dropdown-open');
+                        
+                        menu.style.position = 'absolute';
+                        menu.style.right = '0';
+                        menu.style.left = 'auto';
+                        menu.style.top = '100%';
+                        menu.style.bottom = 'auto';
+                        menu.style.transform = 'none';
+                        menu.style.zIndex = '99999';
+                        menu.style.marginTop = '0.25rem';
+                        menu.style.marginBottom = '0';
+                        menu.removeAttribute('data-bs-popper');
+                    } else {
+                        // Remover clases cuando se cierra
+                        const tr = button.closest('tr');
+                        const td = button.closest('td');
+                        if (tr) tr.classList.remove('dropdown-open');
+                        if (td) td.classList.remove('dropdown-open');
+                        dropdown.classList.remove('dropdown-open');
+                    }
+                }
+                
+                // Ajustar cuando el dropdown se muestra
+                button.addEventListener('shown.bs.dropdown', function() {
+                    posicionarDropdown();
+                });
+                
+                // Ajustar cuando el dropdown se oculta
+                button.addEventListener('hidden.bs.dropdown', function() {
+                    posicionarDropdown();
+                });
+                
+                // Ajustar después de un pequeño delay para asegurar que Bootstrap haya aplicado sus estilos
+                button.addEventListener('click', function(e) {
+                    setTimeout(function() {
+                        posicionarDropdown();
+                    }, 10);
+                });
+                
+                // Ajustar posición al hacer scroll o redimensionar
+                let scrollTimeout;
+                function ajustarEnScroll() {
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(function() {
+                        if (menu.classList.contains('show')) {
+                            posicionarDropdown();
+                        }
+                    }, 10);
+                }
+                
+                window.addEventListener('scroll', ajustarEnScroll, true);
+                window.addEventListener('resize', ajustarEnScroll);
+            }
+        });
+    }
+    
     // Aplicar filtros automáticamente al cambiar valores
     document.addEventListener('DOMContentLoaded', function() {
+        // Ajustar dropdowns después de que la página cargue
+        ajustarDropdowns();
+        
         const filterForm = document.getElementById('filterForm');
         const searchInput = document.getElementById('searchInput');
         

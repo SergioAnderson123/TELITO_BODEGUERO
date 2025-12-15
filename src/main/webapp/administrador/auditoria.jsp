@@ -103,7 +103,7 @@
 
             <!-- ===================== Alerta de Limpieza Automática ===================== -->
             <% if (totalRegistrosAuditoria > 100) { %>
-            <div class="alert alert-warning alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+            <div id="auditoriaWarningAlert" class="alert alert-warning alert-dismissible fade show d-flex align-items-center mb-4" role="alert" style="display: none;">
                 <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
                 <div class="flex-grow-1">
                     <strong>⚠️ Alto volumen de registros de auditoría</strong><br>
@@ -115,7 +115,7 @@
                 <button type="button" class="btn btn-sm btn-warning ms-3" onclick="ejecutarLimpiezaAuditoria()">
                     <i class="fas fa-broom me-1"></i>Limpiar Ahora
                 </button>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="marcarAlertaAuditoriaCerrada()"></button>
             </div>
             <% } %>
 
@@ -259,8 +259,37 @@
 <jsp:include page="/WEB-INF/includes/modal-alerts.jsp" />
 
 <script>
+    // Función para marcar que la alerta de auditoría fue cerrada
+    function marcarAlertaAuditoriaCerrada() {
+        sessionStorage.setItem('auditoriaWarningClosed', 'true');
+    }
+    
+    // Función para verificar si la alerta debe mostrarse
+    function verificarMostrarAlertaAuditoria() {
+        const alerta = document.getElementById('auditoriaWarningAlert');
+        if (alerta) {
+            const yaCerrada = sessionStorage.getItem('auditoriaWarningClosed');
+            if (!yaCerrada) {
+                alerta.style.display = 'flex';
+            } else {
+                alerta.style.display = 'none';
+            }
+        }
+    }
+    
     // Aplicar filtros automáticamente al cambiar valores
     document.addEventListener('DOMContentLoaded', function() {
+        // Verificar si debe mostrarse la alerta de auditoría
+        verificarMostrarAlertaAuditoria();
+        
+        // Manejar el cierre de la alerta con Bootstrap
+        const alerta = document.getElementById('auditoriaWarningAlert');
+        if (alerta) {
+            alerta.addEventListener('closed.bs.alert', function() {
+                marcarAlertaAuditoriaCerrada();
+            });
+        }
+        
         const filterForm = document.getElementById('filterForm');
         const moduloFilter = document.getElementById('moduloFilter');
         const estadoFilter = document.getElementById('estadoFilter');
@@ -341,6 +370,9 @@
      * Usa el modal de confirmación del sistema
      */
     function ejecutarLimpiezaAuditoria() {
+        // Marcar que la alerta fue cerrada al hacer clic en "Limpiar Ahora"
+        marcarAlertaAuditoriaCerrada();
+        
         showDeleteConfirm(
             '¿Estás seguro de ejecutar la limpieza automática de auditoría?<br><br>' +
             '<ul class="text-start mt-3" style="font-size: 0.95rem;">' +

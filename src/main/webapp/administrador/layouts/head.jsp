@@ -602,7 +602,6 @@
         }
     }
     
-    /* Configuración avanzada tabs responsive */
     @media (max-width: 768px) {
         .config-item {
             padding: 0.75rem !important;
