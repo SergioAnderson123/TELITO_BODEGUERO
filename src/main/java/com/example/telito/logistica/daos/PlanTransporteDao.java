@@ -154,10 +154,10 @@ public class PlanTransporteDao extends DAOBase {
     }
 
     // === NUEVO MÉTODO PARA GUARDAR UN PLAN ===
-    public void crearPlan(String numeroPlan, int loteId, int conductorId, int vehiculoId, String fechaEntrega, int distritoId) {
+    public void crearPlan(String numeroPlan, int loteId, int conductorId, int vehiculoId, String fechaEntrega, int distritoId, int cantidadUnidades) {
         // Obtenemos el producto_id a partir del lote_id para insertarlo
         String sqlProducto = "SELECT producto_id FROM lotes WHERE id_lote = ?";
-        String sqlInsert = "INSERT INTO planes_transporte (numero_plan, producto_id, lote_id, estado, conductor_id, vehiculo_id, fecha_entrega, distrito_id) VALUES (?, ?, ?, 'Pendiente', ?, ?, ?, ?)";
+        String sqlInsert = "INSERT INTO planes_transporte (numero_plan, producto_id, lote_id, estado, conductor_id, vehiculo_id, fecha_entrega, distrito_id, cantidad_unidades) VALUES (?, ?, ?, 'Pendiente', ?, ?, ?, ?, ?)";
 
         Connection conn = null;
         PreparedStatement pstmtProducto = null;
@@ -188,8 +188,9 @@ public class PlanTransporteDao extends DAOBase {
                 pstmtInsert.setInt(5, vehiculoId);
                 pstmtInsert.setString(6, fechaEntrega);
                 pstmtInsert.setInt(7, distritoId);
+                pstmtInsert.setInt(8, cantidadUnidades);
                 pstmtInsert.executeUpdate();
-                logger.info("Plan de transporte creado: {}", numeroPlan);
+                logger.info("Plan de transporte creado: {} con {} unidades", numeroPlan, cantidadUnidades);
             }
         } catch (SQLException e) {
             logger.error("Error al crear plan de transporte", e);

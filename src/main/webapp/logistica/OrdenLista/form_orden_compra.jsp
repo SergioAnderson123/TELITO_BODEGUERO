@@ -11,6 +11,91 @@
         <jsp:param name="pageTitle" value="Generar Orden de Compra"/>
     </jsp:include>
     <style>
+        /* Estilos específicos del módulo: Sidebar con temática café y beige */
+        .nav-left-sidebar {
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important;
+        }
+        .nav-link {
+            color: #F5DEB3 !important;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #FFF8DC !important;
+            background-color: rgba(245, 222, 179, 0.2) !important;
+        }
+        .nav-divider {
+            color: #F5DEB3 !important;
+            border-top-color: rgba(245, 222, 179, 0.4) !important;
+        }
+        .nav-link::before {
+            background: #F5DEB3 !important;
+        }
+        
+        /* Fondo beige claro para todo el contenido principal (header, centro, footer) */
+        .dashboard-header {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-header .navbar {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-wrapper {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-content {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-main-wrapper {
+            background-color: #FFFEF9 !important;
+        }
+        footer,
+        .footer {
+            background-color: #FFFEF9 !important;
+        }
+        body {
+            background-color: #FFFEF9 !important;
+        }
+        
+        /* Textos en color marrón */
+        .dashboard-header .navbar-brand span {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-brand i {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-nav .nav-link span {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link.dropdown-toggle {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link i.fa-bell,
+        .dashboard-header .nav-link i[class*="fa-bell"] {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link[style*="color: var(--turquoise-dark)"] i,
+        .dashboard-header .nav-link i[style*="color: var(--turquoise-dark)"] {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-brand i.fa-truck,
+        .dashboard-header .navbar-brand i[class*="fa-truck"],
+        .dashboard-header .navbar-brand i[style*="color: var(--seafoam)"] {
+            color: #6F4E37 !important;
+        }
+        .pageheader-title {
+            color: #6F4E37 !important;
+        }
+        .pageheader-text {
+            color: #6F4E37 !important;
+        }
+        .page-header h2 {
+            color: #6F4E37 !important;
+        }
+        .page-header p {
+            color: #6F4E37 !important;
+        }
+        .page-header h2 i {
+            color: #6F4E37 !important;
+        }
+        
         /* Estilos para el autocompletado */
         .autocomplete-container {
             position: relative;
@@ -45,7 +130,7 @@
         
         .autocomplete-item:hover,
         .autocomplete-item.selected {
-            background-color: #edf6f9;
+            background-color: rgba(111, 78, 55, 0.1);
         }
         
         .autocomplete-item:last-child {
@@ -64,40 +149,40 @@
         }
         
         .autocomplete-item-price {
-            color: #006d77;
+            color: #6F4E37;
             font-weight: 600;
         }
         
         /* Secciones del formulario */
         .form-section {
-            background: white;
+            background: #FFFEF9;
             border-radius: 12px;
             padding: 25px;
             margin-bottom: 25px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e9ecef;
+            border: 2px solid #6F4E37;
         }
         
         .form-section-title {
-            color: #006d77;
+            color: #6F4E37;
             font-weight: 700;
             font-size: 1.1rem;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #edf6f9;
+            border-bottom: 2px solid rgba(111, 78, 55, 0.2);
             display: flex;
             align-items: center;
         }
         
         .form-section-title i {
             margin-right: 10px;
-            color: #83c5be;
+            color: #6F4E37;
         }
         
         /* Resumen mejorado */
         .resumen-card {
-            background: linear-gradient(135deg, #edf6f9 0%, #ffffff 100%);
-            border: 2px solid #83c5be;
+            background: linear-gradient(165deg, rgba(111, 78, 55, 0.05) 0%, #FFFEF9 100%);
+            border: 2px solid #6F4E37;
             border-radius: 12px;
             padding: 25px;
             position: sticky;
@@ -129,7 +214,7 @@
         }
         
         .resumen-total {
-            background: linear-gradient(160deg, #006d77 0%, #83c5be 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             color: white;
             padding: 20px;
             border-radius: 10px;
@@ -158,8 +243,8 @@
         }
         
         .form-control-autocomplete:focus {
-            border-color: #83c5be;
-            box-shadow: 0 0 0 0.2rem rgba(131, 197, 190, 0.25);
+            border-color: #6F4E37;
+            box-shadow: 0 0 0 0.2rem rgba(111, 78, 55, 0.25);
         }
         
         .input-icon {
@@ -172,8 +257,8 @@
         }
         
         .selected-display {
-            background: #edf6f9;
-            border: 2px solid #83c5be;
+            background: rgba(111, 78, 55, 0.05);
+            border: 2px solid #6F4E37;
             border-radius: 8px;
             padding: 15px;
             margin-top: 10px;
@@ -186,7 +271,7 @@
         
         .selected-name {
             font-weight: 700;
-            color: #006d77;
+            color: #6F4E37;
             font-size: 1.1rem;
             margin-bottom: 5px;
         }
@@ -390,7 +475,7 @@
                     <!-- Columna Derecha - Resumen -->
                     <div class="col-lg-4">
                         <div class="resumen-card">
-                            <h5 class="text-center mb-4" style="color: #006d77;">
+                            <h5 class="text-center mb-4" style="color: #6F4E37;">
                                 <i class="fas fa-calculator me-2"></i>Resumen de Orden
                             </h5>
                             
@@ -411,7 +496,7 @@
 
                             <div class="resumen-item">
                                 <div class="resumen-label">Unidades Totales</div>
-                                <div class="resumen-value text-success" id="resumenUnidadesTotales">0 unidades</div>
+                                <div class="resumen-value" id="resumenUnidadesTotales" style="color: #6F4E37;">0 unidades</div>
                                 <small class="text-muted" style="font-size: 0.75rem;">
                                     <i class="fas fa-info-circle"></i> Paquetes × Unidades por paquete
                                 </small>
@@ -434,10 +519,10 @@
                 <hr class="my-4">
 
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="${pageContext.request.contextPath}/orden-compra" class="btn btn-secondary">
+                    <a href="${pageContext.request.contextPath}/orden-compra" class="btn btn-secondary" style="background-color: #6c757d; border-color: #6c757d;">
                         <i class="fas fa-times me-2"></i>Cancelar
                     </a>
-                    <button type="submit" class="btn btn-primary" id="btnGuardar" disabled>
+                    <button type="submit" class="btn" id="btnGuardar" disabled style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; color: white; font-weight: 600;">
                         <i class="fas fa-save me-2"></i>Guardar Orden de Compra
                     </button>
                 </div>

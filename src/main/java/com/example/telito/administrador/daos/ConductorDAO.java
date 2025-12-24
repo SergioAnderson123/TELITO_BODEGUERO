@@ -21,11 +21,24 @@ public class ConductorDAO extends DAOBase {
     
     // Listar con filtros y paginación
     public ArrayList<Conductor> listarConductores(String busqueda, int page, int size) {
+        return listarConductores(busqueda, null, null, page, size);
+    }
+    
+    // Listar con todos los filtros
+    public ArrayList<Conductor> listarConductores(String busqueda, String dni, String fechaVencimiento, int page, int size) {
         ArrayList<Conductor> lista = new ArrayList<>();
-        String sql = "SELECT id_conductor, nombre_completo, licencia FROM conductores WHERE 1=1";
+        String sql = "SELECT id_conductor, nombre_completo, licencia, telefono, email, dni, tipo_licencia, fecha_vencimiento_licencia FROM conductores WHERE 1=1";
         
         if (busqueda != null && !busqueda.trim().isEmpty()) {
-            sql += " AND (nombre_completo LIKE ? OR licencia LIKE ?)";
+            sql += " AND (nombre_completo LIKE ? OR licencia LIKE ? OR dni LIKE ? OR email LIKE ? OR telefono LIKE ?)";
+        }
+        
+        if (dni != null && !dni.trim().isEmpty()) {
+            sql += " AND dni LIKE ?";
+        }
+        
+        if (fechaVencimiento != null && !fechaVencimiento.trim().isEmpty()) {
+            sql += " AND fecha_vencimiento_licencia <= ?";
         }
         
         sql += " ORDER BY nombre_completo ASC LIMIT ? OFFSET ?";
@@ -43,6 +56,17 @@ public class ConductorDAO extends DAOBase {
                 String busquedaConWildcards = "%" + busqueda + "%";
                 pstmt.setString(paramIndex++, busquedaConWildcards);
                 pstmt.setString(paramIndex++, busquedaConWildcards);
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+            }
+            
+            if (dni != null && !dni.trim().isEmpty()) {
+                pstmt.setString(paramIndex++, "%" + dni + "%");
+            }
+            
+            if (fechaVencimiento != null && !fechaVencimiento.trim().isEmpty()) {
+                pstmt.setString(paramIndex++, fechaVencimiento);
             }
 
             int limit = Math.max(1, size);
@@ -56,6 +80,12 @@ public class ConductorDAO extends DAOBase {
                 conductor.setIdConductor(rs.getInt("id_conductor"));
                 conductor.setNombreCompleto(rs.getString("nombre_completo"));
                 conductor.setLicencia(rs.getString("licencia"));
+                conductor.setTelefono(rs.getString("telefono"));
+                conductor.setEmail(rs.getString("email"));
+                conductor.setDni(rs.getString("dni"));
+                conductor.setTipoLicencia(rs.getString("tipo_licencia"));
+                Date fechaVenc = rs.getDate("fecha_vencimiento_licencia");
+                conductor.setFechaVencimientoLicencia(fechaVenc != null ? fechaVenc : null);
                 lista.add(conductor);
             }
         } catch (SQLException e) {
@@ -74,10 +104,23 @@ public class ConductorDAO extends DAOBase {
     
     // Contar con filtros
     public int contarConductores(String busqueda) {
+        return contarConductores(busqueda, null, null);
+    }
+    
+    // Contar con todos los filtros
+    public int contarConductores(String busqueda, String dni, String fechaVencimiento) {
         String sql = "SELECT COUNT(*) FROM conductores WHERE 1=1";
         
         if (busqueda != null && !busqueda.trim().isEmpty()) {
-            sql += " AND (nombre_completo LIKE ? OR licencia LIKE ?)";
+            sql += " AND (nombre_completo LIKE ? OR licencia LIKE ? OR dni LIKE ? OR email LIKE ? OR telefono LIKE ?)";
+        }
+        
+        if (dni != null && !dni.trim().isEmpty()) {
+            sql += " AND dni LIKE ?";
+        }
+        
+        if (fechaVencimiento != null && !fechaVencimiento.trim().isEmpty()) {
+            sql += " AND fecha_vencimiento_licencia <= ?";
         }
         
         Connection conn = null;
@@ -88,10 +131,22 @@ public class ConductorDAO extends DAOBase {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
             
+            int paramIndex = 1;
             if (busqueda != null && !busqueda.trim().isEmpty()) {
                 String busquedaConWildcards = "%" + busqueda + "%";
-                pstmt.setString(1, busquedaConWildcards);
-                pstmt.setString(2, busquedaConWildcards);
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+                pstmt.setString(paramIndex++, busquedaConWildcards);
+            }
+            
+            if (dni != null && !dni.trim().isEmpty()) {
+                pstmt.setString(paramIndex++, "%" + dni + "%");
+            }
+            
+            if (fechaVencimiento != null && !fechaVencimiento.trim().isEmpty()) {
+                pstmt.setString(paramIndex++, fechaVencimiento);
             }
             
             rs = pstmt.executeQuery();
@@ -110,7 +165,7 @@ public class ConductorDAO extends DAOBase {
     // Buscar conductor por ID
     public Conductor buscarConductorPorId(int id) {
         Conductor conductor = null;
-        String sql = "SELECT id_conductor, nombre_completo, licencia FROM conductores WHERE id_conductor = ?";
+        String sql = "SELECT id_conductor, nombre_completo, licencia, telefono, email, dni, tipo_licencia, fecha_vencimiento_licencia FROM conductores WHERE id_conductor = ?";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -127,6 +182,12 @@ public class ConductorDAO extends DAOBase {
                 conductor.setIdConductor(rs.getInt("id_conductor"));
                 conductor.setNombreCompleto(rs.getString("nombre_completo"));
                 conductor.setLicencia(rs.getString("licencia"));
+                conductor.setTelefono(rs.getString("telefono"));
+                conductor.setEmail(rs.getString("email"));
+                conductor.setDni(rs.getString("dni"));
+                conductor.setTipoLicencia(rs.getString("tipo_licencia"));
+                Date fechaVenc = rs.getDate("fecha_vencimiento_licencia");
+                conductor.setFechaVencimientoLicencia(fechaVenc != null ? fechaVenc : null);
             }
         } catch (SQLException e) {
             logger.error("Error al buscar conductor por ID: " + id, e);
@@ -139,21 +200,70 @@ public class ConductorDAO extends DAOBase {
 
     // Crear nuevo conductor
     public boolean crearConductor(Conductor conductor) {
-        String sql = "INSERT INTO conductores (nombre_completo, licencia) VALUES (?, ?)";
-        int filasAfectadas = executeUpdate(sql, conductor.getNombreCompleto(), conductor.getLicencia());
-        return filasAfectadas > 0;
+        String sql = "INSERT INTO conductores (nombre_completo, licencia, telefono, email, dni, tipo_licencia, fecha_vencimiento_licencia) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, conductor.getNombreCompleto());
+            pstmt.setString(2, conductor.getLicencia());
+            pstmt.setString(3, conductor.getTelefono());
+            pstmt.setString(4, conductor.getEmail());
+            pstmt.setString(5, conductor.getDni());
+            pstmt.setString(6, conductor.getTipoLicencia());
+            if (conductor.getFechaVencimientoLicencia() != null) {
+                pstmt.setDate(7, conductor.getFechaVencimientoLicencia());
+            } else {
+                pstmt.setDate(7, null);
+            }
+            
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
+        } catch (SQLException e) {
+            logger.error("Error al crear conductor", e);
+            throw new RuntimeException("Error al crear conductor", e);
+        } finally {
+            closeResources(conn, pstmt, null);
+        }
     }
 
     // Actualizar conductor
     public boolean actualizarConductor(Conductor conductor) {
-        String sql = "UPDATE conductores SET nombre_completo = ?, licencia = ? WHERE id_conductor = ?";
-        int filasAfectadas = executeUpdate(sql, conductor.getNombreCompleto(), conductor.getLicencia(), conductor.getIdConductor());
-        return filasAfectadas > 0;
+        String sql = "UPDATE conductores SET nombre_completo = ?, licencia = ?, telefono = ?, email = ?, dni = ?, tipo_licencia = ?, fecha_vencimiento_licencia = ? WHERE id_conductor = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, conductor.getNombreCompleto());
+            pstmt.setString(2, conductor.getLicencia());
+            pstmt.setString(3, conductor.getTelefono());
+            pstmt.setString(4, conductor.getEmail());
+            pstmt.setString(5, conductor.getDni());
+            pstmt.setString(6, conductor.getTipoLicencia());
+            if (conductor.getFechaVencimientoLicencia() != null) {
+                pstmt.setDate(7, conductor.getFechaVencimientoLicencia());
+            } else {
+                pstmt.setDate(7, null);
+            }
+            pstmt.setInt(8, conductor.getIdConductor());
+            
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
+        } catch (SQLException e) {
+            logger.error("Error al actualizar conductor", e);
+            throw new RuntimeException("Error al actualizar conductor", e);
+        } finally {
+            closeResources(conn, pstmt, null);
+        }
     }
 
-    // Verificar si el conductor tiene planes de transporte asociados
+    // Verificar si el conductor tiene planes de transporte asociados (solo cuenta los que NO están entregados ni cancelados)
     public boolean tienePlanesTransporteAsociados(int id) {
-        String sql = "SELECT COUNT(*) FROM planes_transporte WHERE conductor_id = ?";
+        String sql = "SELECT COUNT(*) FROM planes_transporte WHERE conductor_id = ? AND estado NOT IN ('Entregado', 'Cancelado')";
         int count = count(sql, id);
         return count > 0;
     }
@@ -288,7 +398,7 @@ public class ConductorDAO extends DAOBase {
      */
     public ArrayList<Conductor> listarTodosConductores() {
         ArrayList<Conductor> lista = new ArrayList<>();
-        String sql = "SELECT id_conductor, nombre_completo, licencia FROM conductores ORDER BY nombre_completo ASC";
+        String sql = "SELECT id_conductor, nombre_completo, licencia, telefono, email, dni, tipo_licencia, fecha_vencimiento_licencia FROM conductores ORDER BY nombre_completo ASC";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -304,6 +414,12 @@ public class ConductorDAO extends DAOBase {
                 conductor.setIdConductor(rs.getInt("id_conductor"));
                 conductor.setNombreCompleto(rs.getString("nombre_completo"));
                 conductor.setLicencia(rs.getString("licencia"));
+                conductor.setTelefono(rs.getString("telefono"));
+                conductor.setEmail(rs.getString("email"));
+                conductor.setDni(rs.getString("dni"));
+                conductor.setTipoLicencia(rs.getString("tipo_licencia"));
+                Date fechaVenc = rs.getDate("fecha_vencimiento_licencia");
+                conductor.setFechaVencimientoLicencia(fechaVenc != null ? fechaVenc : null);
                 lista.add(conductor);
             }
         } catch (SQLException e) {

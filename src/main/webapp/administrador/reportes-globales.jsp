@@ -9,16 +9,16 @@
     <script>
         // CRÍTICO: Establecer fondo inmediatamente ANTES de que se cargue cualquier CSS
         (function() {
-            document.documentElement.style.backgroundColor = '#edf6f9';
+            document.documentElement.style.backgroundColor = '#FFFEF9';
             document.documentElement.style.margin = '0';
             document.documentElement.style.padding = '0';
             if (document.body) {
-                document.body.style.backgroundColor = '#edf6f9';
+                document.body.style.backgroundColor = '#FFFEF9';
                 document.body.style.margin = '0';
                 document.body.style.padding = '0';
             } else {
                 document.addEventListener('DOMContentLoaded', function() {
-                    document.body.style.backgroundColor = '#edf6f9';
+                    document.body.style.backgroundColor = '#FFFEF9';
                     document.body.style.margin = '0';
                     document.body.style.padding = '0';
                 });
@@ -28,7 +28,7 @@
     <style>
         /* CRÍTICO: Prevenir flash de fondo azul - debe estar ANTES de cualquier otro CSS */
         html, body {
-            background-color: #edf6f9 !important;
+            background-color: #FFFEF9 !important;
             margin: 0 !important;
             padding: 0 !important;
         }
@@ -36,14 +36,14 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
         }
         .dashboard-main-wrapper {
-            background-color: #edf6f9 !important;
+            background-color: #FFFEF9 !important;
             min-height: 100vh !important;
         }
         .dashboard-wrapper {
-            background-color: #edf6f9 !important;
+            background-color: #FFFEF9 !important;
         }
         .dashboard-content {
-            background-color: #edf6f9 !important;
+            background-color: #FFFEF9 !important;
         }
         .container-fluid {
             background-color: transparent !important;
@@ -182,11 +182,11 @@
         padding: 20px;
         border-radius: 12px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        border-left: 4px solid #00a896;
+        border-left: 4px solid #6F4E37;
     }
     
     .page-header .pageheader-title {
-        color: #00a896;
+        color: #6F4E37;
         font-weight: 700;
         font-size: 1.5rem;
     }
@@ -210,7 +210,7 @@
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, #00a896 0%, #83c5be 100%);
+        background: linear-gradient(90deg, #6F4E37 0%, #8B6F47 100%);
         transform: scaleX(0);
         transition: transform 0.4s ease;
     }
@@ -479,17 +479,17 @@
     // Asegurar que el fondo se mantenga correcto durante toda la carga
     (function() {
         function setBackground() {
-            document.documentElement.style.backgroundColor = '#edf6f9';
+            document.documentElement.style.backgroundColor = '#FFFEF9';
             if (document.body) {
-                document.body.style.backgroundColor = '#edf6f9';
+                document.body.style.backgroundColor = '#FFFEF9';
             }
             var wrapper = document.querySelector('.dashboard-main-wrapper');
             if (wrapper) {
-                wrapper.style.backgroundColor = '#edf6f9';
+                wrapper.style.backgroundColor = '#FFFEF9';
             }
             var content = document.querySelector('.dashboard-content');
             if (content) {
-                content.style.backgroundColor = '#edf6f9';
+                content.style.backgroundColor = '#FFFEF9';
             }
         }
         

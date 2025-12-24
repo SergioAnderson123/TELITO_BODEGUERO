@@ -41,7 +41,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
         .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: #6c757d; font-weight: 600; }
-        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #00a896; }
+        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #6F4E37; }
         @media (max-width: 768px) {
             .stats-container { grid-template-columns: 1fr; }
         }
@@ -115,19 +115,19 @@
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Incidencias</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalIncidencias %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalIncidencias %></p>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Pendientes</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= incidenciasPendientes %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= incidenciasPendientes %></p>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Resueltas</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= incidenciasResueltas %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= incidenciasResueltas %></p>
                         </div>
                     </div>
                 </div>
@@ -515,7 +515,7 @@
         transition: background-color 0.2s ease;
     }
     #incidenciasTable thead th:hover {
-        background-color: #83c5be !important;
+        background-color: #8B6F47 !important;
     }
     #incidenciasTable thead th.sort-asc::after {
         content: ' ▲';

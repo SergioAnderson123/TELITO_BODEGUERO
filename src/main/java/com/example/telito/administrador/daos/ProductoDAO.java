@@ -9,14 +9,17 @@ import java.util.ArrayList;
 public class ProductoDAO extends DAOBase {
 
     // Lista todos los productos activos con stock total calculado desde lotes
+    // Solo muestra productos de productores activos
     public ArrayList<Producto> listarProductos() {
         ArrayList<Producto> listaProductos = new ArrayList<>();
         String sql = "SELECT p.*, c.nombre as categoria_nombre, " +
                 "COALESCE(SUM(l.stock_actual), 0) as stock_total " +
                 "FROM productos p " +
+                "INNER JOIN usuarios u ON p.productor_id = u.id_usuario " +
+                "INNER JOIN roles r ON u.rol_id = r.id_rol " +
                 "LEFT JOIN categorias c ON p.categoria_id = c.id_categoria " +
                 "LEFT JOIN lotes l ON p.id_producto = l.producto_id " +
-                "WHERE p.activo = 1 " +
+                "WHERE p.activo = 1 AND u.activo = 1 AND r.nombre = 'Productor' " +
                 "GROUP BY p.id_producto " +
                 "ORDER BY p.nombre";
 
@@ -250,5 +253,65 @@ public class ProductoDAO extends DAOBase {
         }
         
         return lista;
+    }
+    
+    // Contar total de productos activos (de productores activos)
+    public int contarProductosActivos() {
+        String sql = "SELECT COUNT(*) as total " +
+                    "FROM productos p " +
+                    "INNER JOIN usuarios u ON p.productor_id = u.id_usuario " +
+                    "INNER JOIN roles r ON u.rol_id = r.id_rol " +
+                    "WHERE p.activo = 1 AND u.activo = 1 AND r.nombre = 'Productor'";
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar productos activos", e);
+            throw new RuntimeException("Error al contar productos activos", e);
+        } finally {
+            closeResources(conn, stmt, rs);
+        }
+        return 0;
+    }
+    
+    // Contar productos activos sin configuración de stock mínimo
+    public int contarProductosSinConfiguracion() {
+        String sql = "SELECT COUNT(*) as total " +
+                    "FROM productos p " +
+                    "INNER JOIN usuarios u ON p.productor_id = u.id_usuario " +
+                    "INNER JOIN roles r ON u.rol_id = r.id_rol " +
+                    "LEFT JOIN stock_minimo_config smc ON p.id_producto = smc.producto_id AND smc.activo = 1 " +
+                    "WHERE p.activo = 1 AND u.activo = 1 AND r.nombre = 'Productor' " +
+                    "AND smc.id_stock_minimo IS NULL";
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar productos sin configuración", e);
+            throw new RuntimeException("Error al contar productos sin configuración", e);
+        } finally {
+            closeResources(conn, stmt, rs);
+        }
+        return 0;
     }
 }

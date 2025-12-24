@@ -27,9 +27,9 @@
     <!-- Custom CSS -->
     <style>
         :root {
-            --turquoise-dark: #00a896; /* oscuro */
-            --seafoam: #83c5be;        /* verde agua */
-            --seafoam-light: #edf6f9;  /* fondo claro */
+            --turquoise-dark: #6F4E37; /* café */
+            --seafoam: #8B6F47;        /* café dorado */
+            --seafoam-light: #FFFEF9;  /* beige claro */
             --text-dark: #2b2d42;
             --text-muted: #6c757d;
             --border: #e9ecef;
@@ -41,7 +41,7 @@
         .dashboard-main-wrapper { display: flex; min-height: 100vh; }
         .nav-left-sidebar {
             width: 250px;
-            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             min-height: 100vh;
             position: fixed;
             left: 0;
@@ -51,14 +51,14 @@
         }
         .dashboard-wrapper { margin-left: 250px; width: calc(100% - 250px); min-height: 100vh; }
         .dashboard-header {
-            background-color: #fff;
+            background-color: #FFFEF9;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: fixed; top: 0; right: 0; left: 250px; z-index: 999;
             height: 70px; border-bottom: 1px solid var(--border);
         }
         .dashboard-content { margin-top: 70px; padding: 20px; }
         .nav-link {
-            color: rgba(255,255,255,.95) !important;
+            color: #F5DEB3 !important;
             padding: 13px 20px;
             border-radius: 10px;
             margin: 6px 15px;
@@ -76,14 +76,14 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background: #fff;
+            background: #F5DEB3;
             transform: scaleY(0);
             transition: transform .3s ease;
             border-radius: 0 4px 4px 0;
         }
         .nav-link:hover, .nav-link.active {
-            background-color: rgba(255,255,255,.25);
-            color: #fff !important;
+            background-color: rgba(245, 222, 179, 0.15);
+            color: #FFF8DC !important;
             transform: translateX(8px);
             box-shadow: 0 4px 12px rgba(0,0,0,.15);
         }
@@ -92,14 +92,14 @@
         }
         .nav-link i { margin-right: 12px; width: 22px; font-size: 1.1rem; }
         .nav-divider {
-            color: rgba(255,255,255,.95);
+            color: #F5DEB3;
             font-weight: 700;
             padding: 18px 20px 8px;
             margin-top: 25px;
             font-size: .8rem;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            border-top: 1px solid rgba(255,255,255,.15);
+            border-top: 1px solid rgba(245, 222, 179, 0.3);
         }
         .user-avatar-md { width: 40px; height: 40px; }
         .navbar-brand { font-weight: 700; color: var(--turquoise-dark); }
@@ -119,7 +119,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
-            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: white;
             border-radius: 12px 12px 0 0;
             padding: 20px 30px;
@@ -129,7 +129,7 @@
         .card-header h2, .card-header h5 { margin: 0; color: white; font-weight: 700; }
         .card-body { padding: 0; }
         button, .btn {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: var(--white);
             border: none;
             padding: 12px 24px;
@@ -141,7 +141,7 @@
         }
         .btn-secondary { background: #8d99ae; border: none; }
         .btn-primary {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             border: none;
             color: #fff;
             font-weight: 600;
@@ -181,7 +181,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #00a896 !important;
+            color: #6F4E37 !important;
         }
         .pageheader-title i {
             color: var(--seafoam);
@@ -294,7 +294,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -352,7 +352,7 @@
             gap: 6px;
         }
         #sendLotesModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #sendLotesModal .form-group input,
@@ -367,7 +367,7 @@
         }
         #sendLotesModal .form-group input:focus,
         #sendLotesModal .form-group textarea:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -380,7 +380,7 @@
             gap: 6px;
         }
         #sendLotesModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             margin-top: 2px;
         }
         #sendLotesModal .modal-footer { 
@@ -414,13 +414,15 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #sendLotesModal .modal-footer button[type="submit"] {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.3);
+            border: none;
+            font-weight: 600;
         }
         #sendLotesModal .modal-footer button[type="submit"]:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+            box-shadow: 0 6px 20px rgba(111, 78, 55, 0.4);
         }
         @media (max-width: 768px) {
             #sendLotesModal .modal-content {
@@ -463,7 +465,7 @@
                                 <span class="badge-notificacion" id="badgeNotificaciones" style="display: none;">0</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end notificaciones-dropdown" aria-labelledby="notificacionesDropdown" style="width: 380px;">
-                                <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; padding: 12px 20px;">
+                                <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; padding: 12px 20px;">
                                     <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notificaciones</h6>
                                     <button class="btn btn-sm btn-light" onclick="marcarTodasLeidas()" style="font-size: 0.75rem; padding: 2px 8px;">
                                         <i class="fas fa-check-double me-1"></i>Marcar todas
@@ -476,7 +478,7 @@
                                     </div>
                                 </div>
                                 <div class="dropdown-divider m-0"></div>
-                                <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #00a896 !important;">
+                                <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #6F4E37 !important;">
                                     <i class="fas fa-list me-2"></i>Ver todas las notificaciones
                                 </a>
                             </div>
@@ -569,10 +571,10 @@
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=exportar" class="btn btn-sm btn-success text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=exportar" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; font-weight: 600;">
                                 <i class="fas fa-file-excel me-1"></i>Exportar Lotes
                             </a>
-                            <button type="button" id="openSendLotesModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <button type="button" id="openSendLotesModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; font-weight: 600;">
                                 <i class="fas fa-envelope me-1"></i>Enviar Lotes
                             </button>
                         </div>
@@ -1170,7 +1172,7 @@
     
     .notificacion-item.no-leida {
         background: #e8f4f8;
-        border-left: 4px solid #00a896;
+        border-left: 4px solid #6F4E37;
     }
     
     .notificacion-item.no-leida:hover {
@@ -1277,12 +1279,12 @@
     
     .notificacion-item-grande:hover {
         background: #f8f9fa;
-        border-left-color: #00a896;
+        border-left-color: #6F4E37;
     }
     
     .notificacion-item-grande.no-leida {
         background: #e8f4f8;
-        border-left-color: #00a896;
+        border-left-color: #6F4E37;
     }
     
     .notificacion-icon-grande {
@@ -1730,7 +1732,7 @@ function marcarTodasLeidasDesdeModal() {
 <div class="modal fade" id="modalNotificacion" tabindex="-1" aria-labelledby="modalNotificacionLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+            <div class="modal-header" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
                 <h5 class="modal-title" id="modalNotificacionLabel" style="font-weight: 600;">
                     <i class="fas fa-bell me-2"></i>Nueva Notificación
                 </h5>
@@ -1754,7 +1756,7 @@ function marcarTodasLeidasDesdeModal() {
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 8px 20px;">
                     <i class="fas fa-times me-2"></i>Cerrar
                 </button>
-                <button type="button" class="btn btn-primary" onclick="irANotificacion()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); border: none; border-radius: 8px; padding: 8px 20px;">
+                <button type="button" class="btn btn-primary" onclick="irANotificacion()" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; border-radius: 8px; padding: 8px 20px;">
                     <i class="fas fa-arrow-right me-2"></i>Ver Detalles
                 </button>
             </div>
@@ -1766,7 +1768,7 @@ function marcarTodasLeidasDesdeModal() {
 <div class="modal fade" id="modalTodasNotificaciones" tabindex="-1" aria-labelledby="modalTodasNotificacionesLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+            <div class="modal-header" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
                 <h5 class="modal-title" id="modalTodasNotificacionesLabel" style="font-weight: 600;">
                     <i class="fas fa-bell me-2"></i>Todas las Notificaciones
                 </h5>
@@ -1774,7 +1776,7 @@ function marcarTodasLeidasDesdeModal() {
             </div>
             <div class="modal-body" style="padding: 0;">
                 <div class="d-flex justify-content-between align-items-center p-3 border-bottom" style="background: #f8f9fa;">
-                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
+                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
                         <i class="fas fa-check-double me-1"></i>Marcar todas como leídas
                     </button>
                     <span class="text-muted" id="contadorModalNotificaciones"></span>

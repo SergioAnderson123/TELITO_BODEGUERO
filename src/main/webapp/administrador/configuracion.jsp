@@ -1,4 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.example.telito.administrador.daos.ProductoDAO" %>
+<%@ page import="com.example.telito.administrador.daos.StockMinimoDAO" %>
+
+<%
+    // Calcular estadísticas para la card de Gestión de Stock Mínimo
+    ProductoDAO productoDAO = new ProductoDAO();
+    StockMinimoDAO stockMinimoDAO = new StockMinimoDAO();
+    
+    // Productos activos sin configuración (disponibles para configurar)
+    int productosSinConfiguracion = productoDAO.contarProductosSinConfiguracion();
+    int productosConfigurados = stockMinimoDAO.contarTotalConfiguraciones();
+%>
 
 <!doctype html>
 <html lang="es">
@@ -43,6 +55,38 @@
                             </div>
                             <div class="config-card-footer">
                                 <span class="config-action">Gestionar <i class="fas fa-arrow-right"></i></span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="config-card stock-card">
+                        <a href="<%= request.getContextPath() %>/StockMinimoServlet?action=listar" class="text-decoration-none">
+                            <div class="config-card-header">
+                                <div class="config-icon stock-icon">
+                                    <i class="fas fa-triangle-exclamation"></i>
+                                </div>
+                                <div class="config-badge stock-badge">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                            </div>
+                            <div class="config-card-body">
+                                <h4 class="config-title">Gestión de Stock Mínimo</h4>
+                                <p class="config-description">Configura los umbrales de stock mínimo para cada producto</p>
+                                <div class="config-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-number"><%= productosSinConfiguracion %></span>
+                                        <span class="stat-label">Productos a Configurar</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-number"><%= productosConfigurados %></span>
+                                        <span class="stat-label">Configurados</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="config-card-footer">
+                                <span class="config-action">Configurar <i class="fas fa-arrow-right"></i></span>
                             </div>
                         </a>
                     </div>

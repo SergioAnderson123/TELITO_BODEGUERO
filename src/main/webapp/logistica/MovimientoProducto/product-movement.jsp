@@ -9,9 +9,94 @@
         <jsp:param name="pageTitle" value="Movimiento de Producto"/>
     </jsp:include>
     <style>
-        /* Estilo para el encabezado de la tabla igual que en productor */
+        /* Estilos específicos del módulo: Sidebar con temática café y beige */
+        .nav-left-sidebar {
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important;
+        }
+        .nav-link {
+            color: #F5DEB3 !important;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #FFF8DC !important;
+            background-color: rgba(245, 222, 179, 0.2) !important;
+        }
+        .nav-divider {
+            color: #F5DEB3 !important;
+            border-top-color: rgba(245, 222, 179, 0.4) !important;
+        }
+        .nav-link::before {
+            background: #F5DEB3 !important;
+        }
+        
+        /* Fondo beige claro para todo el contenido principal (header, centro, footer) */
+        .dashboard-header {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-header .navbar {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-wrapper {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-content {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-main-wrapper {
+            background-color: #FFFEF9 !important;
+        }
+        footer,
+        .footer {
+            background-color: #FFFEF9 !important;
+        }
+        body {
+            background-color: #FFFEF9 !important;
+        }
+        
+        /* Textos en color marrón */
+        .dashboard-header .navbar-brand span {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-brand i {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-nav .nav-link span {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link.dropdown-toggle {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link i.fa-bell,
+        .dashboard-header .nav-link i[class*="fa-bell"] {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link[style*="color: var(--turquoise-dark)"] i,
+        .dashboard-header .nav-link i[style*="color: var(--turquoise-dark)"] {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-brand i.fa-truck,
+        .dashboard-header .navbar-brand i[class*="fa-truck"],
+        .dashboard-header .navbar-brand i[style*="color: var(--seafoam)"] {
+            color: #6F4E37 !important;
+        }
+        .pageheader-title {
+            color: #6F4E37 !important;
+        }
+        .pageheader-text {
+            color: #6F4E37 !important;
+        }
+        .page-header h2 {
+            color: #6F4E37 !important;
+        }
+        .page-header p {
+            color: #6F4E37 !important;
+        }
+        .page-header h2 i {
+            color: #6F4E37 !important;
+        }
+        
+        /* Estilo para el encabezado de la tabla con temática café */
         .table-card .card-header {
-            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important;
             color: #fff;
             border-radius: 12px 12px 0 0;
             padding: 20px 30px;
@@ -20,6 +105,22 @@
         .table-card .card-header h5,
         .table-card .card-header small {
             color: white !important;
+        }
+        
+        /* Cards con fondo beige claro y bordes café */
+        .card {
+            background-color: #FFFEF9 !important;
+            border: 2px solid #6F4E37 !important;
+        }
+        .stat-card {
+            background-color: #FFFEF9 !important;
+            border: 2px solid #6F4E37 !important;
+        }
+        .stat-card h3 {
+            color: #6F4E37 !important;
+        }
+        .stat-card p {
+            color: #6F4E37 !important;
         }
         /* Estilo para el botón Limpiar igual que en productor - sobrescribir estilos globales */
         .btn-outline-secondary {
@@ -89,10 +190,10 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important; 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
-            box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.2);
         }
         #sendMovimientosModal .modal-header h2 { 
             margin: 0; 
@@ -147,7 +248,7 @@
             gap: 6px;
         }
         #sendMovimientosModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #sendMovimientosModal .form-group input,
@@ -162,9 +263,9 @@
         }
         #sendMovimientosModal .form-group input:focus,
         #sendMovimientosModal .form-group textarea:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+            box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1);
         }
         #sendMovimientosModal .form-hint {
             margin-top: 6px;
@@ -175,7 +276,7 @@
             gap: 6px;
         }
         #sendMovimientosModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             margin-top: 2px;
         }
         #sendMovimientosModal .modal-footer { 
@@ -209,13 +310,13 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #sendMovimientosModal .modal-footer button[type="submit"] {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.3);
         }
         #sendMovimientosModal .modal-footer button[type="submit"]:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+            box-shadow: 0 6px 20px rgba(111, 78, 55, 0.4);
         }
         @media (max-width: 768px) {
             #sendMovimientosModal .modal-content {
@@ -276,10 +377,10 @@
                             String urlBase = request.getContextPath() + "/logistica/MovimientoInventarioReporteServlet?action=exportar" + urlParams.toString();
                             String urlEnviar = request.getContextPath() + "/logistica/MovimientoInventarioReporteServlet?action=formEnviar" + urlParams.toString();
                         %>
-                        <a href="<%= urlBase %>" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <a href="<%= urlBase %>" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #D4A574 0%, #C9A87A 100%); color: white; border: none;">
                             <i class="fas fa-file-excel me-1"></i>Exportar a Excel
                         </a>
-                        <button type="button" id="openSendMovimientosModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <button type="button" id="openSendMovimientosModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #E8B86D 0%, #D4A574 100%); border: none;">
                             <i class="fas fa-envelope me-1"></i>Enviar por Correo
                         </button>
                     </div>
@@ -301,27 +402,27 @@
             <!-- ===================== Tarjetas de estadísticas ===================== -->
             <div class="row g-2 mb-3">
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Movimientos</h3>
-                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalMovimientos %></p>
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Total de Movimientos</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalMovimientos %></p>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Entradas</h3>
-                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalEntradas %></p>
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Entradas</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalEntradas %></p>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Salidas</h3>
-                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalSalidas %></p>
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Salidas</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalSalidas %></p>
                     </div>
                 </div>
             </div>
 
             <!-- ===================== Card: Búsqueda y filtros ===================== -->
-            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; background-color: #FFFEF9 !important; border: 2px solid #6F4E37 !important;">
                 <form action="<%= request.getContextPath() %>/MovimientoProductoServlet" method="GET">
                     <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                     <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
@@ -329,7 +430,7 @@
                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                             <div class="input-group">
                                 <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" id="searchInput" placeholder="Producto o lote..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                <button class="btn btn-sm btn-primary shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <button class="btn btn-sm shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem; background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); color: white; border: none;">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
@@ -377,13 +478,16 @@
                                 <table id="movementTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                     <thead class="table-light">
                                     <tr>
-                                        <th onclick="sortTable(0)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th style="width: 8%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold">
+                                            <i class="fas fa-hashtag me-1"></i>N° DE MOV
+                                        </th>
+                                        <th onclick="sortTable(0)" style="width: 8%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-calendar-alt me-1"></i>Fecha
                                         </th>
                                         <th onclick="sortTable(1)" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-box me-1"></i>Producto
                                         </th>
-                                        <th onclick="sortTable(2)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(2)" style="width: 8%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
                                             <i class="fas fa-exchange-alt me-1"></i>Tipo
                                         </th>
                                         <th onclick="sortTable(3)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
@@ -409,6 +513,11 @@
                                             for (MovimientoInventarioBean movimiento : listaMovimientos) {
                                     %>
                                     <tr class="align-middle" style="padding: 0;">
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;">
+                                            <strong style="font-size: 0.9rem; font-weight: 600; color: #2b2d42;">
+                                                MOV<%= String.format("%03d", movimiento.getIdMovimiento()) %>
+                                            </strong>
+                                        </td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getFechaFormateada() %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getNombreProducto() %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
@@ -428,9 +537,7 @@
                                         </td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getDestino() %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                            <span class="badge text-bg-secondary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                 <%= movimiento.getCodigoLote() %>
-                                            </span>
                                         </td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getResponsable() %></td>
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getObservaciones() %></td>
@@ -676,17 +783,17 @@
         user-select: none;
     }
     thead th:hover {
-        background-color: var(--seafoam) !important;
+        background-color: rgba(111, 78, 55, 0.1) !important;
     }
     thead th.sort-asc::after {
         content: ' ▲';
         font-size: 0.7em;
-        color: var(--turquoise-dark);
+        color: #6F4E37;
     }
     thead th.sort-desc::after {
         content: ' ▼';
         font-size: 0.7em;
-        color: var(--turquoise-dark);
+        color: #6F4E37;
     }
 </style>
 

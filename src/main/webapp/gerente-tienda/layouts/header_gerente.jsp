@@ -3,7 +3,7 @@
 <%
     Usuario usuarioHeader = (Usuario) session.getAttribute("usuario");
     String nombreCompleto = usuarioHeader != null ? usuarioHeader.getNombres() + " " + usuarioHeader.getApellidos() : "Usuario";
-    String fotoUrl = "https://ui-avatars.com/api/?name=User&background=006d77&color=fff&size=200";
+    String fotoUrl = "https://ui-avatars.com/api/?name=User&background=6F4E37&color=fff&size=200";
     if (usuarioHeader != null) {
         String foto = usuarioHeader.getFotoPerfil();
         if (foto != null && !foto.trim().isEmpty()) {
@@ -29,8 +29,8 @@
             </button>
             <!-- Brand -->
             <a class="navbar-brand d-flex align-items-center" href="${pageContext.request.contextPath}/gerente-tienda/GerenteTiendaServlet?action=dashboard">
-                <i class="fas fa-store me-2" style="color: var(--turquoise-dark);"></i>
-                <span style="font-weight: 700; color: var(--turquoise-dark);">Telito Bodeguero</span>
+                <i class="fas fa-store me-2" style="color: #6F4E37;"></i>
+                <span style="font-weight: 700; color: #6F4E37;">Telito Bodeguero</span>
             </a>
 
             <!-- Right actions -->
@@ -38,11 +38,11 @@
                 <!-- Notificaciones -->
                 <li class="nav-item dropdown me-3">
                     <a class="nav-link position-relative" href="#" role="button" id="notificacionesDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 8px 12px;">
-                        <i class="fas fa-bell" style="font-size: 1.3rem; color: var(--turquoise-dark);"></i>
+                        <i class="fas fa-bell" style="font-size: 1.3rem; color: #6F4E37;"></i>
                         <span class="badge-notificacion" id="badgeNotificaciones" style="display: none;">0</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end notificaciones-dropdown" aria-labelledby="notificacionesDropdown" style="width: 380px;">
-                        <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, var(--turquoise-dark), var(--seafoam)); color: white; padding: 12px 20px;">
+                        <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #6F4E37, #8B6F47); color: white; padding: 12px 20px;">
                             <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notificaciones</h6>
                             <button class="btn btn-sm btn-light" onclick="marcarTodasLeidas()" style="font-size: 0.75rem; padding: 2px 8px;">
                                 <i class="fas fa-check-double me-1"></i>Marcar todas
@@ -59,7 +59,7 @@
                         <a class="dropdown-item text-center fw-bold py-2"
                            href="javascript:void(0);"
                            onclick="event.preventDefault(); mostrarModalTodasNotificaciones();"
-                           style="color: var(--turquoise-dark) !important;">
+                           style="color: #6F4E37 !important;">
                             <i class="fas fa-list me-2"></i>Ver todas las notificaciones
                         </a>
                     </div>
@@ -69,7 +69,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                         <img src="<%= fotoUrl %>" alt="User" class="rounded-circle me-2" width="32" height="32">
-                        <span style="color:#006d77;"><%= nombreCompleto %></span>
+                        <span style="color:#6F4E37;"><%= nombreCompleto %></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/perfil"><i class="fas fa-user me-2"></i>Perfil</a></li>
@@ -96,7 +96,7 @@ if (sessionStorage.getItem('recargarDesdePerfil') === 'true') {
 <div class="modal fade" id="modalTodasNotificaciones" tabindex="-1" aria-labelledby="modalTodasNotificacionesLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content" style="border-radius: 16px;">
-            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 16px 16px 0 0;">
+            <div class="modal-header" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border-radius: 16px 16px 0 0;">
                 <h5 class="modal-title" id="modalTodasNotificacionesLabel">
                     <i class="fas fa-bell me-2"></i>Todas las notificaciones
                 </h5>
@@ -214,7 +214,7 @@ window.addEventListener('resize', function() {
     
     #listaNotificaciones {
         scrollbar-width: thin;
-        scrollbar-color: rgba(0, 168, 150, 0.3) transparent;
+        scrollbar-color: rgba(111, 78, 55, 0.3) transparent;
     }
     
     #listaNotificaciones::-webkit-scrollbar {
@@ -226,12 +226,12 @@ window.addEventListener('resize', function() {
     }
     
     #listaNotificaciones::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 168, 150, 0.3);
+        background-color: rgba(111, 78, 55, 0.3);
         border-radius: 10px;
     }
     
     #listaNotificaciones::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(0, 168, 150, 0.5);
+        background-color: rgba(111, 78, 55, 0.5);
     }
     
     .notificacion-item {
@@ -248,7 +248,7 @@ window.addEventListener('resize', function() {
     
     .notificacion-item.no-leida {
         background: #e8f4f8;
-        border-left: 4px solid var(--turquoise-dark);
+        border-left: 4px solid #6F4E37;
     }
     
     .notificacion-item.no-leida:hover {
@@ -648,7 +648,7 @@ function mostrarToast(tipo, mensaje, icono) {
     
     .notificacion-item-grande.no-leida {
         background: #e8f4f8;
-        border-left-color: #00a896;
+        border-left-color: #6F4E37;
     }
     
     .notificacion-icon-grande {

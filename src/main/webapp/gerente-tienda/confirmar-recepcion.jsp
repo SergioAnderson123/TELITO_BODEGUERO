@@ -19,19 +19,19 @@
     </jsp:include>
     <style>
         .info-card {
-            background: linear-gradient(135deg, #edf6f9 0%, #ffffff 100%);
-            border-left: 4px solid #00a896;
+            background: linear-gradient(135deg, #FFFEF9 0%, #ffffff 100%);
+            border-left: 4px solid #6F4E37;
             border-radius: 8px;
         }
         .btn-confirmar {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             border: none;
             padding: 12px 30px;
             font-weight: 600;
             color: white;
         }
         .btn-confirmar:hover {
-            background: linear-gradient(135deg, #028f80 0%, #02796b 100%);
+            background: linear-gradient(135deg, #8B6F47 0%, #A0826D 100%);
             color: white;
         }
     </style>

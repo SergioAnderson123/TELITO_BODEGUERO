@@ -338,8 +338,9 @@ public class UsuarioServlet extends HttpServlet {
                     // Obtener datos del usuario antes de deshabilitarlo para auditoría
                     Usuario usuarioDeshabilitar = usuarioDAO.obtenerUsuarioPorId(idADeshabilitar);
                     
+                    // Desactivar usuario (borrado lógico)
                     usuarioDAO.deshabilitarUsuario(idADeshabilitar);
-            logger.info("Usuario ID {} deshabilitado exitosamente", idADeshabilitar);
+                    logger.info("Usuario ID {} deshabilitado exitosamente", idADeshabilitar);
                     
                     // Registrar en auditoría
                     Usuario usuarioActual = (Usuario) session.getAttribute("usuario");

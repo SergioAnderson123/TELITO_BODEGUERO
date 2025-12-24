@@ -2,9 +2,9 @@
 /* ===== RESET Y GLOBALES ===== */
 :root {
 
-    --turquoise-dark: #006d77;
-    --seafoam: #83c5be;
-    --seafoam-light: #edf6f9;
+    --turquoise-dark: #6F4E37;
+    --seafoam: #8B6F47;
+    --seafoam-light: #FFFEF9;
     --sidebar-width: 260px;
     --header-height: 70px;
     --topbar-height: 70px;
@@ -41,7 +41,7 @@ h1, h2, h3, h4, h5, h6, button, strong, b { font-weight: 400 !important; }
 #sidebar-toggle { font-size: 1.25rem; color: var(--color-dark-gray); cursor: pointer; }
 .sidebar {
     width: var(--sidebar-width);
-    background: linear-gradient(160deg, var(--turquoise-dark) 0%, #055e68 100%);
+    background: linear-gradient(160deg, var(--turquoise-dark) 0%, #8B6F47 100%);
     color: var(--color-white);
     position: fixed;
     top: var(--topbar-height);

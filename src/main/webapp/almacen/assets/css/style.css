@@ -1,9 +1,9 @@
 
 :root {
-    --turquoise-dark: #006d77;
-    --seafoam: #83c5be;
-    --seafoam-light: #edf6f9;
-    --white: #ffffff;
+    --turquoise-dark: #6F4E37;
+    --seafoam: #8B6F47;
+    --seafoam-light: #FFFEF9;
+    --white: #FFFEF9;
     --text-dark: #2b2d42;
     --text-muted: #6c757d;
     --border-color: #e9ecef;
@@ -11,7 +11,7 @@
 
 .nav-left-sidebar {
     width: 250px;
-    background: linear-gradient(160deg, var(--turquoise-dark) 0%, #055e68 100%);
+    background: linear-gradient(160deg, var(--turquoise-dark) 0%, #8B6F47 100%);
     min-height: 100vh;
     position: fixed;
     left: 0;
@@ -21,7 +21,7 @@
 }
 
 .nav-divider {
-    color: var(--seafoam);
+    color: #F5DEB3;
     font-weight: 600;
     padding: 15px 20px 5px;
     margin-top: 20px;

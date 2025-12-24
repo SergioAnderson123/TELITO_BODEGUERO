@@ -21,8 +21,8 @@
 
     <style>
         :root {
-            --primary-color: #20c997; /* verde más claro (accent green) */
-            --secondary-color: #83c5be; /* seafoam como en módulos */
+            --primary-color: #D4A574; /* Terracota suave - combina con café */
+            --secondary-color: #E8B86D; /* Dorado suave - combina con café */
             --success-color: #28a745;
             --warning-color: #ffc107;
             --danger-color: #dc3545;
@@ -160,8 +160,8 @@
         
 
         .form-floating .form-control:focus {
-            border-color: rgba(32, 201, 151, 0.8);
-            box-shadow: 0 0 0 0.2rem rgba(32, 201, 151, 0.25);
+            border-color: rgba(212, 165, 116, 0.8);
+            box-shadow: 0 0 0 0.2rem rgba(212, 165, 116, 0.25);
             background: rgba(255, 255, 255, 0.95);
         }
 
@@ -250,7 +250,7 @@
 
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+            box-shadow: 0 10px 25px rgba(212, 165, 116, 0.4);
             color: white;
 
             /* --- MODIFICACIÓN AQUÍ --- */
@@ -276,9 +276,9 @@
 
         .btn-home:hover {
             background-color: var(--secondary-color);
-            color: var(--primary-color);
+            color: white;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(131, 197, 190, 0.3);
+            box-shadow: 0 5px 15px rgba(232, 184, 109, 0.4);
         }
 
         .alert {
@@ -333,8 +333,8 @@
         }
 
         a:hover {
-            color: #20c997;
-            text-shadow: 0 2px 8px rgba(32, 201, 151, 0.4);
+            color: #D4A574;
+            text-shadow: 0 2px 8px rgba(212, 165, 116, 0.4);
         }
 
         /* Animaciones */
@@ -509,7 +509,7 @@
             
             <div class="text-end mb-3">
                 <a href="<%= request.getContextPath() %>/acceso/recuperar?action=solicitar" 
-                   style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem;">
+                   style="color: #E8B86D !important; text-decoration: none; font-size: 0.95rem; font-weight: 600; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);">
                     <i class="fas fa-key me-1"></i>¿Olvidaste tu contraseña?
                 </a>
             </div>
@@ -602,12 +602,12 @@
         tsParticles.load("tsparticles", {
             particles: {
                 number: { value: 80, density: { enable: true, value_area: 800 } },
-                color: { value: "#83c5be" },
+                color: { value: "#E8B86D" },
                 shape: { type: "circle" },
                 opacity: { value: 0.5, random: true },
                 size: { value: 3, random: { enable: true, minimumValue: 1 } },
                 links: {
-                    color: "#83c5be", // Tu --secondary-color
+                    color: "#E8B86D", // Tu --secondary-color
                     distance: 150,
                     enable: true,
                     opacity: 0.4,

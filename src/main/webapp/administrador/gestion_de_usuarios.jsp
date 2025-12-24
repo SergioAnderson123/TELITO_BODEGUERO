@@ -165,7 +165,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -223,7 +223,7 @@
             gap: 6px;
         }
         #addUserModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #addUserModal .form-group input,
@@ -238,7 +238,7 @@
         }
         #addUserModal .form-group input:focus,
         #addUserModal .form-group select:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -254,7 +254,7 @@
             border-radius: 6px;
         }
         #addUserModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             flex-shrink: 0;
         }
         #addUserModal .modal-footer { 
@@ -345,7 +345,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -403,7 +403,7 @@
             gap: 6px;
         }
         #sendEmailModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #sendEmailModal .form-group input,
@@ -418,7 +418,7 @@
         }
         #sendEmailModal .form-group input:focus,
         #sendEmailModal .form-group textarea:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -434,12 +434,12 @@
             border-radius: 6px;
         }
         #sendEmailModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             flex-shrink: 0;
         }
         #sendEmailModal .alert-info {
             background: rgba(0,168,150,0.1);
-            border-left: 4px solid #00a896;
+            border-left: 4px solid #6F4E37;
             border-radius: 8px;
             padding: 12px 16px;
             margin-bottom: 20px;
@@ -482,7 +482,7 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #sendEmailModal .modal-footer button[type="submit"] {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: white;
             box-shadow: 0 4px 12px rgba(0,168,150,0.3);
         }
@@ -539,7 +539,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); 
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -597,7 +597,7 @@
             gap: 6px;
         }
         #editUserModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #editUserModal .form-group input,
@@ -612,7 +612,7 @@
         }
         #editUserModal .form-group input:focus,
         #editUserModal .form-group select:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -628,7 +628,7 @@
             border-radius: 6px;
         }
         #editUserModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             flex-shrink: 0;
         }
         #editUserModal .modal-footer { 
@@ -662,7 +662,7 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #editUserModal .modal-footer button[type="submit"] {
-            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             color: white;
             box-shadow: 0 4px 12px rgba(0,168,150,0.3);
         }
@@ -693,6 +693,20 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+        
+        /* Prevenir movimiento durante la carga - fijar dimensiones de imágenes */
+        #userTable img {
+            width: 38px !important;
+            height: 38px !important;
+            min-width: 38px;
+            min-height: 38px;
+            flex-shrink: 0;
+        }
+        
+        /* Prevenir reflow al cargar */
+        #userTable tbody tr {
+            min-height: 50px;
         }
         
         /* Permitir que el dropdown sea visible en la columna de acciones */
@@ -809,16 +823,19 @@
             background-color: var(--seafoam) !important;
         }
         
-        #userTable thead th.sort-asc::after {
-            content: ' ▲';
-            font-size: 0.7em;
-            color: var(--turquoise-dark);
+        /* Eliminar cualquier flecha de ordenamiento de TODOS los encabezados */
+        #userTable thead th::after,
+        #userTable thead th::before {
+            content: none !important;
+            display: none !important;
         }
         
-        #userTable thead th.sort-desc::after {
-            content: ' ▼';
-            font-size: 0.7em;
-            color: var(--turquoise-dark);
+        #userTable thead th.sort-asc::after,
+        #userTable thead th.sort-desc::after,
+        #userTable thead th.sort-asc::before,
+        #userTable thead th.sort-desc::before {
+            content: none !important;
+            display: none !important;
         }
         
         /* Asegurar que los enlaces dentro de th no interfieran con el hover */
@@ -899,19 +916,19 @@
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
             <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                 <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Usuarios</h3>
-                <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalUsuarios %></p>
+                <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalUsuarios %></p>
             </div>
         </div>
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
             <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                 <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Activos</h3>
-                <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= usuariosActivos %></p>
+                <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= usuariosActivos %></p>
             </div>
         </div>
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
             <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                 <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Inactivos</h3>
-                <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= usuariosInactivos %></p>
+                <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= usuariosInactivos %></p>
             </div>
         </div>
     </div>
@@ -967,7 +984,7 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div>
                             <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-users me-2"></i>Tabla de Usuarios</h5>
-                            <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todos los usuarios del sistema</small>
+                            <small class="text-white" style="font-size: 0.75rem; line-height: 1.2; opacity: 1;">Gestiona todos los usuarios del sistema</small>
                         </div>
                     </div>
                 </div>
@@ -977,16 +994,19 @@
                         <table id="userTable" class="table table-hover align-middle mb-0 datatable-server-side" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                             <thead class="table-light">
                             <tr>
-                                <th class="fw-semibold <%= getSortClass("usuario", currentSortBy, currentSortOrder) %>" onclick="window.location.href='<%= getSortUrl(request, "usuario", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 5)) %>'" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer;">
+                                <th class="fw-semibold" onclick="sortUserTable(0)" style="width: 5%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer; text-align: center;">
+                                    <i class="fas fa-hashtag me-1"></i>ID
+                                </th>
+                                <th class="fw-semibold" onclick="sortUserTable(1)" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer;">
                                     <i class="fas fa-user me-1"></i>Usuario
                                 </th>
-                                <th class="fw-semibold <%= getSortClass("correo", currentSortBy, currentSortOrder) %>" onclick="window.location.href='<%= getSortUrl(request, "correo", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 5)) %>'" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer;">
+                                <th class="fw-semibold" onclick="sortUserTable(2)" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer; text-align: center;">
                                     <i class="fas fa-envelope me-1"></i>Correo
                                 </th>
-                                <th class="fw-semibold <%= getSortClass("rol", currentSortBy, currentSortOrder) %>" onclick="window.location.href='<%= getSortUrl(request, "rol", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 5)) %>'" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer;">
+                                <th class="fw-semibold" onclick="sortUserTable(3)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer; text-align: center;">
                                     <i class="fas fa-user-tag me-1"></i>Rol
                                 </th>
-                                <th class="fw-semibold <%= getSortClass("estado", currentSortBy, currentSortOrder) %>" onclick="window.location.href='<%= getSortUrl(request, "estado", currentSortBy, currentSortOrder, busqueda, rolFiltro, estadoFiltro, (Integer) (request.getAttribute("size") != null ? request.getAttribute("size") : 5)) %>'" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer;">
+                                <th class="fw-semibold" onclick="sortUserTable(4)" style="width: 8%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer; text-align: center;">
                                     <i class="fas fa-toggle-on me-1"></i>Estado
                                 </th>
                                 <th class="text-end fw-semibold text-success" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: default;">
@@ -1015,6 +1035,11 @@
                                 }
                             %>
                             <tr class="align-middle" style="padding: 0;">
+                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                    <span style="font-size: 0.9rem; font-weight: 600; color: #2b2d42;">
+                                        USR<%= String.format("%03d", usuario.getIdUsuario()) %>
+                                    </span>
+                                </td>
                                 <td style="padding: 0.35rem 0.5rem;">
                                     <div class="d-flex align-items-center">
                                         <div class="avatar-wrapper me-2">
@@ -1040,18 +1065,17 @@
                                                  class="rounded-circle shadow-sm" 
                                                  width="38" 
                                                  height="38"
-                                                 style="object-fit: cover; border: 2px solid #e9ecef;"
+                                                 style="object-fit: cover; border: 2px solid #e9ecef; display: block;"
+                                                 loading="lazy"
                                                  onerror="this.src='<%= usuario.getFotoPerfilUrl() %>'">
                                         </div>
                                         <div>
                                             <h6 class="mb-0 fw-semibold text-dark" style="font-size: 0.9rem; line-height: 1.2;"><%= usuario.getNombres() %> <%= usuario.getApellidos() %></h6>
-                                            <small class="text-muted" style="font-size: 0.75rem; line-height: 1.2;">ID: <%= usuario.getIdUsuario() %></small>
                                         </div>
                                     </div>
                                 </td>
-                                <td style="padding: 0.35rem 0.5rem;">
+                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
                                     <div style="font-size: 0.85rem; line-height: 1.3;">
-                                        <i class="fas fa-envelope text-muted me-1"></i>
                                         <span class="text-dark"><%= usuario.getEmail() %></span>
                                     </div>
                                     <% if (usuario.getCodigoProductor() != null && !usuario.getCodigoProductor().isEmpty()) { %>
@@ -1062,12 +1086,12 @@
                                         </div>
                                     <% } %>
                                 </td>
-                                <td style="padding: 0.35rem 0.5rem;">
+                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
                                     <span class="badge <%= badgeClass %> shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                         <i class="fas fa-user-tag me-1"></i><%= roleName %>
                                     </span>
                                 </td>
-                                <td style="padding: 0.35rem 0.5rem;">
+                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
                                     <% if (usuario.isActivo()) { %>
                                         <span class="badge text-bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                             <i class="fas fa-check-circle me-1"></i>Activo
@@ -1104,7 +1128,7 @@
                             <% } %>
                             <% } else { %>
                             <tr>
-                                <td colspan="6" class="text-center py-5">
+                                <td colspan="7" class="text-center py-5">
                                     <div class="text-muted">
                                         <i class="fas fa-users-slash fa-3x mb-3 d-block" style="opacity: 0.3;"></i>
                                         <p class="mb-0">No se encontraron usuarios con los filtros aplicados.</p>
@@ -1201,10 +1225,86 @@
         });
     }
     
+    // Función para ordenar la tabla de usuarios sin recargar la página
+    let sortDirection = {}; // Almacena la dirección de ordenamiento para cada columna
+    
+    function sortUserTable(columnIndex) {
+        const table = document.getElementById('userTable');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // Determinar dirección de ordenamiento
+        if (!sortDirection[columnIndex]) {
+            sortDirection[columnIndex] = 'asc';
+        } else {
+            sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+        }
+        
+        // Ordenar las filas según el tipo de columna
+        rows.sort((a, b) => {
+            let aText, bText;
+            
+            switch(columnIndex) {
+                case 0: // ID (USR001)
+                    aText = a.cells[0].textContent.trim();
+                    bText = b.cells[0].textContent.trim();
+                    // Extraer número de "USR001" -> 1
+                    const aIdNum = parseInt(aText.replace('USR', '')) || 0;
+                    const bIdNum = parseInt(bText.replace('USR', '')) || 0;
+                    return sortDirection[columnIndex] === 'asc' ? aIdNum - bIdNum : bIdNum - aIdNum;
+                    
+                case 1: // Usuario (Nombre completo)
+                    aText = a.cells[1].querySelector('h6') ? a.cells[1].querySelector('h6').textContent.trim() : a.cells[1].textContent.trim();
+                    bText = b.cells[1].querySelector('h6') ? b.cells[1].querySelector('h6').textContent.trim() : b.cells[1].textContent.trim();
+                    break;
+                    
+                case 2: // Correo
+                    aText = a.cells[2].querySelector('span.text-dark') ? a.cells[2].querySelector('span.text-dark').textContent.trim() : a.cells[2].textContent.trim();
+                    bText = b.cells[2].querySelector('span.text-dark') ? b.cells[2].querySelector('span.text-dark').textContent.trim() : b.cells[2].textContent.trim();
+                    break;
+                    
+                case 3: // Rol (badge)
+                    aText = a.cells[3].querySelector('span.badge') ? a.cells[3].querySelector('span.badge').textContent.trim() : a.cells[3].textContent.trim();
+                    bText = b.cells[3].querySelector('span.badge') ? b.cells[3].querySelector('span.badge').textContent.trim() : b.cells[3].textContent.trim();
+                    break;
+                    
+                case 4: // Estado (badge)
+                    aText = a.cells[4].querySelector('span.badge') ? a.cells[4].querySelector('span.badge').textContent.trim() : a.cells[4].textContent.trim();
+                    bText = b.cells[4].querySelector('span.badge') ? b.cells[4].querySelector('span.badge').textContent.trim() : b.cells[4].textContent.trim();
+                    break;
+                    
+                default:
+                    aText = a.cells[columnIndex].textContent.trim();
+                    bText = b.cells[columnIndex].textContent.trim();
+            }
+            
+            // Comparar como texto
+            const comparison = aText.localeCompare(bText, 'es', { numeric: true, sensitivity: 'base' });
+            return sortDirection[columnIndex] === 'asc' ? comparison : -comparison;
+        });
+        
+        // Reordenar las filas en el DOM
+        rows.forEach(row => tbody.appendChild(row));
+        
+        // Actualizar indicadores visuales en los encabezados
+        const headers = table.querySelectorAll('thead th');
+        headers.forEach((header, index) => {
+            header.classList.remove('sort-asc', 'sort-desc');
+            if (index === columnIndex && index !== 6) { // No aplicar a la columna de Acciones
+                header.classList.add(sortDirection[columnIndex] === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+        });
+    }
+    
     // Aplicar filtros automáticamente al cambiar valores
     document.addEventListener('DOMContentLoaded', function() {
-        // Ajustar dropdowns después de que la página cargue
-        ajustarDropdowns();
+        // Ajustar dropdowns después de que la página cargue completamente para evitar movimiento
+        // Usar requestAnimationFrame para asegurar que el renderizado esté completo
+        requestAnimationFrame(function() {
+            setTimeout(function() {
+                ajustarDropdowns();
+            }, 0);
+        });
         const filterForm = document.getElementById('filterForm');
         const searchInput = document.getElementById('searchInput');
         const rolFilter = document.getElementById('rolFilter');
@@ -1254,14 +1354,14 @@
         }
     });
 
-    // Función para confirmar eliminación con modal personalizado
+    // Función para confirmar eliminación (desactivación) con modal personalizado
     function confirmarEliminar(url) {
         showConfirm(
-            '¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.',
+            '¿Estás seguro de que deseas desactivar este usuario? El usuario no podrá acceder al sistema, pero sus datos se mantendrán. Puedes reactivarlo desde el botón Editar.',
             function() {
                 window.location.href = url;
             },
-            'Confirmar eliminación'
+            'Confirmar desactivación'
         );
     }
     
@@ -1585,18 +1685,91 @@
             });
         }
         
-        // Actualizar icono del toggle cuando cambie el checkbox
-        const editActivoCheckbox = document.getElementById('editActivo');
-        if (editActivoCheckbox) {
-            editActivoCheckbox.addEventListener('change', function() {
-                const toggleLabel = this.closest('.form-check');
-                if (toggleLabel) {
-                    const toggleIcon = toggleLabel.querySelector('i');
-                    if (toggleIcon) {
-                        toggleIcon.className = this.checked ? 'fas fa-toggle-on me-2 text-success' : 'fas fa-toggle-off me-2 text-secondary';
+        // Función para actualizar el toggle switch visualmente
+        function actualizarToggleSwitch() {
+            const editActivoCheckbox = document.getElementById('editActivo');
+            const estadoLabelInactivo = document.getElementById('estadoLabelInactivo');
+            const estadoLabelActivo = document.getElementById('estadoLabelActivo');
+            
+            if (editActivoCheckbox) {
+                const toggleSlider = editActivoCheckbox.nextElementSibling;
+                const toggleKnob = toggleSlider ? toggleSlider.querySelector('.toggle-knob') : null;
+                
+                if (editActivoCheckbox.checked) {
+                    // Activo: mover a la derecha, fondo verde
+                    if (toggleSlider) {
+                        toggleSlider.style.backgroundColor = '#28a745';
                     }
+                    if (toggleKnob) {
+                        toggleKnob.style.transform = 'translateX(35px)';
+                    }
+                    if (estadoLabelInactivo) estadoLabelInactivo.style.opacity = '0.4';
+                    if (estadoLabelActivo) estadoLabelActivo.style.opacity = '1';
+                } else {
+                    // Inactivo: mover a la izquierda, fondo rojo
+                    if (toggleSlider) {
+                        toggleSlider.style.backgroundColor = '#dc3545';
+                    }
+                    if (toggleKnob) {
+                        toggleKnob.style.transform = 'translateX(0)';
+                    }
+                    if (estadoLabelInactivo) estadoLabelInactivo.style.opacity = '1';
+                    if (estadoLabelActivo) estadoLabelActivo.style.opacity = '0.4';
                 }
+            }
+        }
+        
+        // Configurar el toggle switch - debe llamarse después de cargar el modal
+        function configurarToggleSwitch() {
+            const editActivoCheckbox = document.getElementById('editActivo');
+            if (!editActivoCheckbox) {
+                console.log('Checkbox no encontrado');
+                return;
+            }
+            
+            const toggleSlider = editActivoCheckbox.nextElementSibling;
+            if (!toggleSlider) {
+                console.log('Toggle slider no encontrado');
+                return;
+            }
+            
+            // Event listener para el cambio del checkbox
+            editActivoCheckbox.addEventListener('change', function() {
+                actualizarToggleSwitch();
             });
+            
+            // Hacer que el toggle-slider sea clickeable
+            toggleSlider.style.pointerEvents = 'auto';
+            toggleSlider.style.cursor = 'pointer';
+            toggleSlider.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Toggle clicked, estado actual:', editActivoCheckbox.checked);
+                editActivoCheckbox.checked = !editActivoCheckbox.checked;
+                console.log('Nuevo estado:', editActivoCheckbox.checked);
+                editActivoCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+            };
+            
+            // También hacer clickeable el label completo
+            const toggleLabel = editActivoCheckbox.closest('.toggle-switch');
+            if (toggleLabel) {
+                toggleLabel.style.cursor = 'pointer';
+                toggleLabel.onclick = function(e) {
+                    // Si el click fue en el slider, no hacer nada (ya se maneja arriba)
+                    if (e.target === toggleSlider || toggleSlider.contains(e.target)) {
+                        return;
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                    editActivoCheckbox.checked = !editActivoCheckbox.checked;
+                    editActivoCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+                };
+            }
+            
+            // Inicializar el estado visual
+            setTimeout(function() {
+                actualizarToggleSwitch();
+            }, 50);
         }
         
         // Manejar envío del formulario de edición
@@ -1633,7 +1806,7 @@
             const loadingOverlay = document.createElement('div');
             loadingOverlay.id = 'editUserLoadingOverlay';
             loadingOverlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 10; border-radius: 16px;';
-            loadingOverlay.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x mb-3" style="color: #00a896;"></i><p style="color: #00a896; font-weight: 600;">Cargando datos del usuario...</p></div>';
+            loadingOverlay.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x mb-3" style="color: #6F4E37;"></i><p style="color: #6F4E37; font-weight: 600;">Cargando datos del usuario...</p></div>';
             
             const modalContent = document.querySelector('#editUserModal .modal-content');
             if (modalContent) {
@@ -1692,15 +1865,12 @@
                 // Estado activo
                 if (activoCheckbox) {
                     activoCheckbox.checked = data.activo === true;
-                    // Actualizar icono del toggle
-                    const toggleLabel = activoCheckbox.closest('.form-check');
-                    if (toggleLabel) {
-                        const toggleIcon = toggleLabel.querySelector('i');
-                        if (toggleIcon) {
-                            toggleIcon.className = data.activo ? 'fas fa-toggle-on me-2 text-success' : 'fas fa-toggle-off me-2 text-secondary';
-                        }
-                    }
                 }
+                
+                // Configurar el toggle switch después de cargar los datos
+                setTimeout(function() {
+                    configurarToggleSwitch();
+                }, 150);
                 
                 // Mostrar/ocultar campos según el rol
                 toggleEditCodigoProductor();
@@ -2061,16 +2231,22 @@
                 </div>
                 
                 <div class="form-group">
-                    <div class="form-check form-switch" style="display: flex; align-items: center; gap: 10px; padding: 12px; background: rgba(0,168,150,0.05); border-radius: 8px;">
-                        <input class="form-check-input" type="checkbox" id="editActivo" name="activo" value="true" style="width: 2.5rem; height: 1.25rem; cursor: pointer;">
-                        <label class="form-check-label fw-semibold" for="editActivo" style="cursor: pointer; font-size: 0.95rem; margin: 0;">
-                            <i class="fas fa-toggle-on me-2 text-success"></i>
-                            Usuario Activo
+                    <label class="fw-semibold mb-2" style="font-size: 0.95rem; display: block;">
+                        <i class="fas fa-user-check me-2"></i>Estado del Usuario
+                    </label>
+                    <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(0,168,150,0.05); border-radius: 10px; border: 2px solid rgba(0,168,150,0.2);">
+                        <span id="estadoLabelInactivo" style="font-weight: 600; color: #dc3545; font-size: 0.9rem;">Inactivo</span>
+                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 70px; height: 35px; margin: 0; cursor: pointer; user-select: none;">
+                            <input type="checkbox" id="editActivo" name="activo" value="true" style="opacity: 0; width: 0; height: 0; position: absolute; pointer-events: none;">
+                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #dc3545; transition: 0.4s; border-radius: 35px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 1; pointer-events: auto;">
+                                <span class="toggle-knob" style="position: absolute; content: ''; height: 28px; width: 28px; left: 4px; bottom: 3.5px; background-color: white; transition: 0.4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); pointer-events: none;"></span>
+                            </span>
                         </label>
+                        <span id="estadoLabelActivo" style="font-weight: 600; color: #28a745; font-size: 0.9rem;">Activo</span>
                     </div>
-                    <div class="form-hint">
+                    <div class="form-hint mt-2">
                         <i class="fas fa-info-circle"></i>
-                        <span>Desmarcar esta casilla deshabilita el acceso del usuario al sistema.</span>
+                        <span>Desliza el botón para cambiar el estado del usuario. Si es productor, sus productos también cambiarán de estado.</span>
                     </div>
                 </div>
             </div>

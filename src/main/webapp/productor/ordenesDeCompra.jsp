@@ -53,10 +53,10 @@
            Paleta y tokens
         ====================== */
         :root {
-            --turquoise-dark: #00a896;
-            --seafoam: #83c5be;
-            --seafoam-light: #edf6f9;
-            --white: #ffffff;
+            --turquoise-dark: #6F4E37;
+            --seafoam: #8B6F47;
+            --seafoam-light: #FFFEF9;
+            --white: #FFFEF9;
             --text-dark: #2b2d42;
             --text-muted: #6c757d;
             --border-color: #e9ecef;
@@ -77,7 +77,7 @@
         ====================== */
         .dashboard-main-wrapper { display: flex; min-height: 100vh; }
         .dashboard-header {
-            background-color: #fff;
+            background-color: #FFFEF9;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: fixed; top: 0; right: 0; left: 250px; z-index: 999;
             height: 70px; border-bottom: 1px solid var(--border-color);
@@ -85,16 +85,16 @@
         .dashboard-wrapper { margin-left: 250px; width: calc(100% - 250px); min-height: 100vh; }
         .dashboard-content { margin-top: 70px; padding: 20px; }
         .page-header { margin-bottom: 0.5rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 0; font-size: 1.4rem; line-height: 1.2; }
+        .page-header h2 { color: #6F4E37; font-weight: 700; margin-bottom: 0; font-size: 1.4rem; line-height: 1.2; }
         .page-header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem; margin-bottom: 0; }
         .pageheader-title {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #00a896 !important;
+            color: #6F4E37 !important;
         }
         .pageheader-title i {
-            color: var(--seafoam);
+            color: #6F4E37;
         }
 
         /* =====================
@@ -102,7 +102,7 @@
         ====================== */
         .nav-left-sidebar {
             width: 250px;
-            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             min-height: 100vh;
             position: fixed;
             left: 0;
@@ -112,7 +112,7 @@
         }
         .navbar-brand { font-weight: 700; color: var(--turquoise-dark); }
         .nav-link {
-            color: rgba(255,255,255,.95) !important;
+            color: #F5DEB3 !important;
             padding: 13px 20px;
             border-radius: 10px;
             margin: 6px 15px;
@@ -130,14 +130,14 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background: #fff;
+            background: #F5DEB3;
             transform: scaleY(0);
             transition: transform .3s ease;
             border-radius: 0 4px 4px 0;
         }
         .nav-link:hover, .nav-link.active {
-            background-color: rgba(255,255,255,.25);
-            color: #fff !important;
+            background-color: rgba(245, 222, 179, 0.15);
+            color: #FFF8DC !important;
             transform: translateX(8px);
             box-shadow: 0 4px 12px rgba(0,0,0,.15);
         }
@@ -146,14 +146,14 @@
         }
         .nav-link i { margin-right: 12px; width: 22px; font-size: 1.1rem; }
         .nav-divider {
-            color: rgba(255,255,255,.95);
+            color: #F5DEB3;
             font-weight: 700;
             padding: 18px 20px 8px;
             margin-top: 25px;
             font-size: .8rem;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            border-top: 1px solid rgba(255,255,255,.15);
+            border-top: 1px solid rgba(245, 222, 179, 0.3);
         }
 
         /* =====================
@@ -185,7 +185,7 @@
             justify-content: space-between; 
             align-items: center; 
             margin-bottom: 25px; 
-            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: white;
             border-radius: 12px 12px 0 0;
             padding: 20px 30px;
@@ -201,7 +201,7 @@
             width: 100%; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-size: 1rem;
         }
         button, .btn {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: var(--white);
             border: none;
             padding: 12px 24px;
@@ -213,7 +213,7 @@
         }
         .btn-secondary { background: #8d99ae; }
         .btn-primary {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             border: none;
             color: #fff;
             font-weight: 600;
@@ -253,7 +253,7 @@
             overflow: hidden;
         }
         .table-card .card-header {
-            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: #fff;
             border-radius: 12px 12px 0 0;
             padding: 20px 30px;
@@ -509,7 +509,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -567,7 +567,7 @@
             gap: 6px;
         }
         #sendOrdenesModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #sendOrdenesModal .form-group input,
@@ -582,7 +582,7 @@
         }
         #sendOrdenesModal .form-group input:focus,
         #sendOrdenesModal .form-group textarea:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -595,7 +595,7 @@
             gap: 6px;
         }
         #sendOrdenesModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             margin-top: 2px;
         }
         #sendOrdenesModal .modal-footer { 
@@ -629,13 +629,15 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #sendOrdenesModal .modal-footer button[type="submit"] {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.3);
+            border: none;
+            font-weight: 600;
         }
         #sendOrdenesModal .modal-footer button[type="submit"]:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+            box-shadow: 0 6px 20px rgba(111, 78, 55, 0.4);
         }
         @media (max-width: 768px) {
             #sendOrdenesModal .modal-content {
@@ -679,7 +681,7 @@
                             <span class="badge-notificacion" id="badgeNotificaciones" style="display: none;">0</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end notificaciones-dropdown" aria-labelledby="notificacionesDropdown" style="width: 380px;">
-                            <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; padding: 12px 20px;">
+                            <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; padding: 12px 20px;">
                                 <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notificaciones</h6>
                                 <button class="btn btn-sm btn-light" onclick="marcarTodasLeidas()" style="font-size: 0.75rem; padding: 2px 8px;">
                                     <i class="fas fa-check-double me-1"></i>Marcar todas
@@ -692,7 +694,7 @@
                                 </div>
                             </div>
                             <div class="dropdown-divider m-0"></div>
-                            <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #00a896 !important;">
+                            <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #6F4E37 !important;">
                                 <i class="fas fa-list me-2"></i>Ver todas las notificaciones
                             </a>
                         </div>
@@ -785,10 +787,10 @@
                         <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Gestiona y monitorea las órdenes de compra de tus productos.</p>
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
-                        <a href="<%= request.getContextPath() %>/productor/OrdenCompraReporteServlet?action=exportar" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <a href="<%= request.getContextPath() %>/productor/OrdenCompraReporteServlet?action=exportar" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; color: white; font-weight: 600;">
                             <i class="fas fa-file-excel me-1"></i>Exportar a Excel
                         </a>
-                        <button type="button" id="openSendOrdenesModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <button type="button" id="openSendOrdenesModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; font-weight: 600;">
                             <i class="fas fa-envelope me-1"></i>Enviar por Correo
                         </button>
                     </div>
@@ -958,7 +960,7 @@
 <div class="modal fade" id="asignarLoteModal" tabindex="-1" aria-labelledby="asignarLoteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-            <div class="modal-header text-white" style="background: linear-gradient(135deg, #00a896 0%, #028f80 100%); border-radius: 16px 16px 0 0; padding: 20px 25px; border-bottom: none;">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); border-radius: 16px 16px 0 0; padding: 20px 25px; border-bottom: none;">
                 <h5 class="modal-title d-flex align-items-center" id="asignarLoteModalLabel" style="font-weight: 600; font-size: 1.2rem;">
                     <span class="d-flex align-items-center justify-content-center me-3" style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 10px; width: 45px; height: 45px;">
                         <i class="fas fa-boxes" style="font-size: 1.2rem;"></i>
@@ -971,38 +973,38 @@
             </div>
             <div class="modal-body" style="padding: 25px; background: #f8f9fa;">
                 <div id="loadingLotes" class="text-center py-5">
-                    <div class="spinner-border" style="color: #00a896; width: 3rem; height: 3rem;" role="status">
+                    <div class="spinner-border" style="color: #6F4E37; width: 3rem; height: 3rem;" role="status">
                         <span class="visually-hidden">Cargando...</span>
                     </div>
                     <p class="mt-3 text-muted" style="font-size: 0.95rem;">Cargando lotes disponibles...</p>
                 </div>
                 <div id="tableLotesContainer" style="display: none;">
-                    <div class="alert" style="background: linear-gradient(135deg, rgba(0,168,150,0.1) 0%, rgba(2,143,128,0.1) 100%); border: 2px solid #00a896; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px;">
-                        <i class="fas fa-info-circle me-2" style="color: #00a896; font-size: 1.1rem;"></i>
-                        <strong style="color: #00a896;">Orden:</strong> <span id="modalOrdenNumero" style="color: #495057; font-weight: 600;"></span> | 
-                        <strong style="color: #00a896;">Producto:</strong> <span id="modalProductoNombre" style="color: #495057; font-weight: 600;"></span>
+                    <div class="alert" style="background: linear-gradient(135deg, rgba(0,168,150,0.1) 0%, rgba(2,143,128,0.1) 100%); border: 2px solid #6F4E37; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px;">
+                        <i class="fas fa-info-circle me-2" style="color: #6F4E37; font-size: 1.1rem;"></i>
+                        <strong style="color: #6F4E37;">Orden:</strong> <span id="modalOrdenNumero" style="color: #495057; font-weight: 600;"></span> | 
+                        <strong style="color: #6F4E37;">Producto:</strong> <span id="modalProductoNombre" style="color: #495057; font-weight: 600;"></span>
                     </div>
                     <div class="table-responsive" style="background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                         <table class="table table-hover mb-0" style="font-size: 0.9rem;">
                             <thead style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
                                 <tr>
                                     <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; width: 80px; text-align: center;">
-                                        <i class="fas fa-check-circle me-1" style="color: #00a896;"></i>Seleccionar
+                                        <i class="fas fa-check-circle me-1" style="color: #6F4E37;"></i>Seleccionar
                                     </th>
                                     <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
-                                        <i class="fas fa-barcode me-1" style="color: #00a896;"></i>Código Lote
+                                        <i class="fas fa-barcode me-1" style="color: #6F4E37;"></i>Código Lote
                                     </th>
                                     <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
-                                        <i class="fas fa-tag me-1" style="color: #00a896;"></i>SKU
+                                        <i class="fas fa-tag me-1" style="color: #6F4E37;"></i>SKU
                                     </th>
                                     <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
-                                        <i class="fas fa-box me-1" style="color: #00a896;"></i>Producto
+                                        <i class="fas fa-box me-1" style="color: #6F4E37;"></i>Producto
                                     </th>
                                     <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; text-align: center;">
-                                        <i class="fas fa-cubes me-1" style="color: #00a896;"></i>Paquetes
+                                        <i class="fas fa-cubes me-1" style="color: #6F4E37;"></i>Paquetes
                                     </th>
                                     <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
-                                        <i class="fas fa-calendar-alt me-1" style="color: #00a896;"></i>Fecha de Vencimiento
+                                        <i class="fas fa-calendar-alt me-1" style="color: #6F4E37;"></i>Fecha de Vencimiento
                                     </th>
                                 </tr>
                             </thead>
@@ -1021,7 +1023,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="padding: 10px 20px; border-radius: 8px; font-weight: 600;">
                     <i class="fas fa-arrow-left me-2"></i>Volver
                 </button>
-                <button type="button" class="btn btn-primary" id="btnEnviarLote" onclick="asignarLoteAOrden()" style="padding: 10px 20px; border-radius: 8px; font-weight: 600; background: linear-gradient(135deg, #00a896 0%, #028f80 100%); border: none;">
+                <button type="button" class="btn btn-primary" id="btnEnviarLote" onclick="asignarLoteAOrden()" style="padding: 10px 20px; border-radius: 8px; font-weight: 600; background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); border: none;">
                     <i class="fas fa-paper-plane me-2"></i>Enviar
                 </button>
             </div>
@@ -1210,7 +1212,7 @@
                 '<td><strong>' + codigoLoteVal + '</strong></td>' +
                 '<td><span class="badge bg-secondary">' + skuVal + '</span></td>' +
                 '<td>' + productoVal + '</td>' +
-                '<td><span class="badge" style="background: linear-gradient(135deg, #00a896 0%, #028f80 100%); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">' + paquetesVal + ' paquetes</span></td>' +
+                '<td><span class="badge" style="background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">' + paquetesVal + ' paquetes</span></td>' +
                 '<td>' + fechaVal + '</td>';
             
             console.log('HTML generado:', row.innerHTML);
@@ -2446,7 +2448,7 @@ function marcarTodasLeidasDesdeModal() {
 <div class="modal fade" id="modalNotificacion" tabindex="-1" aria-labelledby="modalNotificacionLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+            <div class="modal-header" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
                 <h5 class="modal-title" id="modalNotificacionLabel" style="font-weight: 600;">
                     <i class="fas fa-bell me-2"></i>Nueva Notificación
                 </h5>
@@ -2470,7 +2472,7 @@ function marcarTodasLeidasDesdeModal() {
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 8px 20px;">
                     <i class="fas fa-times me-2"></i>Cerrar
                 </button>
-                <button type="button" class="btn btn-primary" onclick="irANotificacion()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); border: none; border-radius: 8px; padding: 8px 20px;">
+                <button type="button" class="btn btn-primary" onclick="irANotificacion()" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; border-radius: 8px; padding: 8px 20px;">
                     <i class="fas fa-arrow-right me-2"></i>Ver Detalles
                 </button>
             </div>
@@ -2482,7 +2484,7 @@ function marcarTodasLeidasDesdeModal() {
 <div class="modal fade" id="modalTodasNotificaciones" tabindex="-1" aria-labelledby="modalTodasNotificacionesLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+            <div class="modal-header" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
                 <h5 class="modal-title" id="modalTodasNotificacionesLabel" style="font-weight: 600;">
                     <i class="fas fa-bell me-2"></i>Todas las Notificaciones
                 </h5>
@@ -2490,7 +2492,7 @@ function marcarTodasLeidasDesdeModal() {
             </div>
             <div class="modal-body" style="padding: 0;">
                 <div class="d-flex justify-content-between align-items-center p-3 border-bottom" style="background: #f8f9fa;">
-                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
+                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
                         <i class="fas fa-check-double me-1"></i>Marcar todas como leídas
                     </button>
                     <span class="text-muted" id="contadorModalNotificaciones"></span>
@@ -2564,12 +2566,12 @@ function marcarTodasLeidasDesdeModal() {
     
     .notificacion-item-grande:hover {
         background: #f8f9fa;
-        border-left-color: #00a896;
+        border-left-color: #6F4E37;
     }
     
     .notificacion-item-grande.no-leida {
         background: #e8f4f8;
-        border-left-color: #00a896;
+        border-left-color: #6F4E37;
     }
     
     .notificacion-icon-grande {

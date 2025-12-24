@@ -13,7 +13,7 @@ public class StockMinimoDAO extends DAOBase {
     // Lista todas las configuraciones activas
     public ArrayList<StockMinimoConfig> listarConfiguraciones() {
         ArrayList<StockMinimoConfig> lista = new ArrayList<>();
-        String sql = "SELECT smc.*, p.nombre as producto_nombre, p.codigo_sku as producto_codigo " +
+        String sql = "SELECT smc.*, p.nombre as producto_nombre, p.codigo_sku as producto_codigo, p.activo as producto_activo " +
                 "FROM stock_minimo_config smc " +
                 "JOIN productos p ON smc.producto_id = p.id_producto " +
                 "WHERE smc.activo = 1 " +
@@ -44,6 +44,7 @@ public class StockMinimoDAO extends DAOBase {
                 producto.setIdProducto(rs.getInt("producto_id"));
                 producto.setNombre(rs.getString("producto_nombre"));
                 producto.setCodigoSku(rs.getString("producto_codigo"));
+                producto.setActivo(rs.getBoolean("producto_activo"));
                 config.setProducto(producto);
 
                 lista.add(config);
@@ -129,6 +130,32 @@ public class StockMinimoDAO extends DAOBase {
         return filasAfectadas > 0;
     }
 
+    // Lista productos que no tienen configuración de stock mínimo
+    public ArrayList<Integer> obtenerProductosConConfiguracion() {
+        ArrayList<Integer> lista = new ArrayList<>();
+        String sql = "SELECT DISTINCT producto_id FROM stock_minimo_config WHERE activo = 1";
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            while (rs.next()) {
+                lista.add(rs.getInt("producto_id"));
+            }
+        } catch (SQLException e) {
+            logger.error("Error al obtener productos con configuración", e);
+            throw new RuntimeException("Error al obtener productos con configuración", e);
+        } finally {
+            closeResources(conn, stmt, rs);
+        }
+        return lista;
+    }
+
     // Obtener stock mínimo global por defecto
     public int obtenerStockMinimoGlobal() {
         String sql = "SELECT valor FROM parametros_sistema WHERE clave = 'STOCK_MINIMO_GLOBAL' AND activo = 1";
@@ -183,7 +210,7 @@ public class StockMinimoDAO extends DAOBase {
      */
     public ArrayList<StockMinimoConfig> listarTodasConfiguraciones() {
         ArrayList<StockMinimoConfig> lista = new ArrayList<>();
-        String sql = "SELECT smc.*, p.nombre as producto_nombre, p.codigo_sku as producto_codigo " +
+        String sql = "SELECT smc.*, p.nombre as producto_nombre, p.codigo_sku as producto_codigo, p.activo as producto_activo " +
                 "FROM stock_minimo_config smc " +
                 "JOIN productos p ON smc.producto_id = p.id_producto " +
                 "ORDER BY p.nombre";
@@ -213,6 +240,7 @@ public class StockMinimoDAO extends DAOBase {
                 producto.setIdProducto(rs.getInt("producto_id"));
                 producto.setNombre(rs.getString("producto_nombre"));
                 producto.setCodigoSku(rs.getString("producto_codigo"));
+                producto.setActivo(rs.getBoolean("producto_activo"));
                 config.setProducto(producto);
 
                 lista.add(config);
@@ -224,5 +252,81 @@ public class StockMinimoDAO extends DAOBase {
             closeResources(conn, stmt, rs);
         }
         return lista;
+    }
+
+    // Contar total de configuraciones activas
+    public int contarTotalConfiguraciones() {
+        String sql = "SELECT COUNT(*) as total FROM stock_minimo_config WHERE activo = 1";
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar total de configuraciones", e);
+            throw new RuntimeException("Error al contar configuraciones", e);
+        } finally {
+            closeResources(conn, stmt, rs);
+        }
+        return 0;
+    }
+
+    // Contar configuraciones con productos activos
+    public int contarConfiguracionesProductosActivos() {
+        String sql = "SELECT COUNT(*) as total FROM stock_minimo_config smc " +
+                    "JOIN productos p ON smc.producto_id = p.id_producto " +
+                    "WHERE smc.activo = 1 AND p.activo = 1";
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar configuraciones con productos activos", e);
+            throw new RuntimeException("Error al contar configuraciones", e);
+        } finally {
+            closeResources(conn, stmt, rs);
+        }
+        return 0;
+    }
+
+    // Contar configuraciones con productos inactivos
+    public int contarConfiguracionesProductosInactivos() {
+        String sql = "SELECT COUNT(*) as total FROM stock_minimo_config smc " +
+                    "JOIN productos p ON smc.producto_id = p.id_producto " +
+                    "WHERE smc.activo = 1 AND p.activo = 0";
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            logger.error("Error al contar configuraciones con productos inactivos", e);
+            throw new RuntimeException("Error al contar configuraciones", e);
+        } finally {
+            closeResources(conn, stmt, rs);
+        }
+        return 0;
     }
 }

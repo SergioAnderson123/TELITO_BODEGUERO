@@ -28,18 +28,18 @@
                 <i class="fas fa-bars"></i>
             </button>
             <a class="navbar-brand d-flex align-items-center" href="${pageContext.request.contextPath}/inicio">
-                <i class="fas fa-user-shield me-2" style="color: var(--seafoam);"></i>
-                <span>Telito Bodeguero</span>
+                <i class="fas fa-user-shield me-2" style="color: #6F4E37;"></i>
+                <span style="color: #6F4E37;">Telito Bodeguero</span>
             </a>
             <ul class="navbar-nav ms-auto">
                 <!-- Notificaciones -->
                 <li class="nav-item dropdown me-3">
                     <a class="nav-link position-relative" href="#" role="button" id="notificacionesDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 8px 12px;">
-                        <i class="fas fa-bell" style="font-size: 1.3rem; color: var(--turquoise-dark);"></i>
+                        <i class="fas fa-bell" style="font-size: 1.3rem; color: #6F4E37;"></i>
                         <span class="badge-notificacion" id="badgeNotificaciones" style="display: none;">0</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end notificaciones-dropdown" aria-labelledby="notificacionesDropdown" style="width: 380px; max-width: calc(100vw - 40px);">
-                        <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; padding: 12px 20px;">
+                        <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; padding: 12px 20px;">
                             <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notificaciones</h6>
                             <button class="btn btn-sm btn-light" onclick="marcarTodasLeidas()" style="font-size: 0.75rem; padding: 2px 8px;">
                                 <i class="fas fa-check-double me-1"></i>Marcar todas
@@ -52,7 +52,7 @@
                             </div>
                         </div>
                         <div class="dropdown-divider m-0"></div>
-                        <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #00a896 !important;">
+                        <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #6F4E37 !important;">
                             <i class="fas fa-list me-2"></i>Ver todas las notificaciones
                         </a>
                     </div>
@@ -62,7 +62,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                         <img src="<%= fotoUrl %>" alt="User" class="rounded-circle me-2" width="32" height="32">
-                        <span style="color:#006d77;"><%= nombreCompleto %></span>
+                        <span style="color:#6F4E37;"><%= nombreCompleto %></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/perfil"><i class="fas fa-user me-2"></i>Perfil</a></li>
@@ -148,7 +148,7 @@
     
     .notificacion-item.no-leida {
         background: #e8f4f8;
-        border-left: 4px solid var(--turquoise-dark);
+        border-left: 4px solid #6F4E37;
     }
     
     .notificacion-item.no-leida:hover {
@@ -639,7 +639,7 @@ function marcarTodasLeidasDesdeModal() {
 <div class="modal fade" id="modalTodasNotificaciones" tabindex="-1" aria-labelledby="modalTodasNotificacionesLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+            <div class="modal-header" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
                 <h5 class="modal-title" id="modalTodasNotificacionesLabel" style="font-weight: 600;">
                     <i class="fas fa-bell me-2"></i>Todas las Notificaciones
                 </h5>
@@ -648,7 +648,7 @@ function marcarTodasLeidasDesdeModal() {
             <div class="modal-body" style="padding: 0;">
                 <div style="padding: 15px 20px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center;">
                     <span id="contadorModalNotificaciones" style="color: #6c757d; font-size: 0.9rem;">Cargando...</span>
-                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
+                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
                         <i class="fas fa-check-double me-1"></i>Marcar todas como leídas
                     </button>
                 </div>
@@ -684,7 +684,7 @@ function marcarTodasLeidasDesdeModal() {
     
     .notificacion-item-grande.no-leida {
         background: #e8f4f8;
-        border-left-color: #00a896;
+        border-left-color: #6F4E37;
     }
     
     .notificacion-icon-grande {

@@ -25,10 +25,9 @@ public class LoteDao extends DAOBase {
                 "FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes_disponibles, " +
                 "u.nombre AS nombre_ubicacion, " +
                 "CASE " +
-                "    WHEN smc.id_stock_minimo IS NULL THEN 'No configurado' " +
                 "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) = 0 THEN 'Sin Stock' " +
-                "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_critico_lote THEN 'Sin Stock' " +
-                "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_minimo_lote THEN 'Poco Stock' " +
+                "    WHEN smc.id_stock_minimo IS NULL THEN 'No configurado' " +
+                "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) > 0 AND FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_minimo_lote THEN 'Poco Stock' " +
                 "    ELSE 'En Stock' " +
                 "END AS estado_stock, " +
                 "CASE " +
@@ -165,8 +164,7 @@ public class LoteDao extends DAOBase {
                 CASE 
                     WHEN smc.id_stock_minimo IS NULL THEN 'No configurado' 
                     WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) = 0 THEN 'Sin Stock' 
-                    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_critico_lote THEN 'Sin Stock' 
-                    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_minimo_lote THEN 'Poco Stock' 
+                    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) > 0 AND FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_minimo_lote THEN 'Poco Stock' 
                     ELSE 'En Stock' 
                 END AS estado_stock
                 FROM lotes l 
@@ -512,8 +510,7 @@ public class LoteDao extends DAOBase {
                 "CASE " +
                 "    WHEN smc.id_stock_minimo IS NULL THEN 'No configurado' " +
                 "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) = 0 THEN 'Sin Stock' " +
-                "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_critico_lote THEN 'Sin Stock' " +
-                "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_minimo_lote THEN 'Poco Stock' " +
+                "    WHEN FLOOR(l.stock_actual / p.unidades_por_paquete) > 0 AND FLOOR(l.stock_actual / p.unidades_por_paquete) <= smc.stock_minimo_lote THEN 'Poco Stock' " +
                 "    ELSE 'En Stock' " +
                 "END AS estado_stock " +
                 "FROM lotes l " +

@@ -35,7 +35,7 @@
         }
         
         .nav-tabs .nav-link.active {
-            color: #00a896 !important;
+            color: #6F4E37 !important;
             background-color: #ffffff;
             border-bottom-color: #ffffff;
             font-weight: 700;
@@ -82,15 +82,15 @@
         }
         
         .nav-tabs-sm .nav-link:hover {
-            color: #00a896 !important;
+            color: #6F4E37 !important;
             border-bottom-color: rgba(0, 168, 150, 0.3);
             background: #ffffff !important;
         }
         
         .nav-tabs-sm .nav-link.active {
-            color: #00a896 !important;
+            color: #6F4E37 !important;
             background: #ffffff !important;
-            border-bottom-color: #00a896 !important;
+            border-bottom-color: #6F4E37 !important;
             font-weight: 600;
         }
         
@@ -370,7 +370,7 @@
                                                 <c:forEach var="it" items="${listaLogistica}">
                                                     <tr class="align-middle">
                                                         <td style="padding: 0.35rem 0.5rem;">
-                                                            <span class="badge bg-secondary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">${it.codigoSKU}</span>
+                                                            <strong style="font-size: 0.85rem;">${it.codigoSKU}</strong>
                                                         </td>
                                                         <td style="padding: 0.35rem 0.5rem; font-size: 0.85rem;">${it.nombreProducto}</td>
                                                         <td style="padding: 0.35rem 0.5rem; font-size: 0.85rem;">${it.paquetesDisponibles}</td>
@@ -531,7 +531,7 @@
                                                         <button class="accordion-button ${status.index == 0 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${productorId}" aria-expanded="${status.index == 0 ? 'true' : 'false'}" aria-controls="collapse${productorId}" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
                                                             <div class="d-flex justify-content-between align-items-center w-100 me-3">
                                                                 <div class="d-flex align-items-center">
-                                                                    <i class="fas fa-user-tie me-2" style="color: #00a896;"></i>
+                                                                    <i class="fas fa-user-tie me-2" style="color: #6F4E37;"></i>
                                                                     <strong style="font-size: 0.95rem;">${datosProductor.nombre}</strong>
                                                                 </div>
                                                                 <div class="d-flex gap-3 align-items-center">
@@ -592,7 +592,7 @@
                                                                                     <c:forEach var="p" items="${productos}">
                                                                                         <tr>
                                                                                             <td style="padding: 0.4rem 0.5rem;">
-                                                                                                <span class="badge bg-secondary" style="font-size: 0.75rem;">${p.codigoSku}</span>
+                                                                                                <strong style="font-size: 0.85rem;">${p.codigoSku}</strong>
                                                                                             </td>
                                                                                             <td style="padding: 0.4rem 0.5rem;">${p.nombre}</td>
                                                                                             <td style="padding: 0.4rem 0.5rem;">
@@ -640,7 +640,7 @@
                                                                                     <c:forEach var="orden" items="${ordenesCompra}">
                                                                                         <tr>
                                                                                             <td style="padding: 0.4rem 0.5rem;">
-                                                                                                <span class="badge" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; font-size: 0.75rem;">${orden[1]}</span>
+                                                                                                <span class="badge" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; font-size: 0.75rem;">${orden[1]}</span>
                                                                                             </td>
                                                                                             <td style="padding: 0.4rem 0.5rem;">${orden[2]}</td>
                                                                                             <td style="padding: 0.4rem 0.5rem;">${orden[3]} paquetes</td>
@@ -820,7 +820,34 @@
             function initTablaLogistica() {
                 if (!tablaLogistica && $('#tablaLogistica').length > 0) {
                     try {
-                        tablaLogistica = $('#tablaLogistica').DataTable(tableConfig);
+                        var $table = $('#tablaLogistica');
+                        var theadCols = $table.find('thead tr').first().find('th').length;
+                        var tbodyRows = $table.find('tbody tr');
+                        
+                        // Verificar si la tabla tiene datos reales (no solo el mensaje de "sin datos")
+                        var hasRealData = false;
+                        if (tbodyRows.length > 0) {
+                            var firstRow = tbodyRows.first();
+                            var firstRowCols = firstRow.find('td').length;
+                            
+                            // Si tiene colspan, significa que es el mensaje de "sin datos"
+                            if (firstRow.find('td[colspan]').length > 0) {
+                                hasRealData = false;
+                            } else if (theadCols === firstRowCols) {
+                                hasRealData = true;
+                            } else {
+                                console.error('Error: Número de columnas no coincide. thead:', theadCols, 'tbody:', firstRowCols);
+                                return;
+                            }
+                        }
+                        
+                        // Solo inicializar DataTables si hay datos reales
+                        if (hasRealData && theadCols > 0) {
+                            tablaLogistica = $table.DataTable(tableConfig);
+                        } else {
+                            // Si no hay datos, simplemente no inicializar DataTables
+                            console.log('Tabla Logística vacía - DataTables no inicializado');
+                        }
                     } catch(e) {
                         console.error('Error al inicializar tabla Logística:', e);
                     }
@@ -831,7 +858,34 @@
             function initTablaAlmacen() {
                 if (!tablaAlmacen && $('#tablaAlmacen').length > 0) {
                     try {
-                        tablaAlmacen = $('#tablaAlmacen').DataTable(tableConfig);
+                        var $table = $('#tablaAlmacen');
+                        var theadCols = $table.find('thead tr').first().find('th').length;
+                        var tbodyRows = $table.find('tbody tr');
+                        
+                        // Verificar si la tabla tiene datos reales (no solo el mensaje de "sin datos")
+                        var hasRealData = false;
+                        if (tbodyRows.length > 0) {
+                            var firstRow = tbodyRows.first();
+                            var firstRowCols = firstRow.find('td').length;
+                            
+                            // Si tiene colspan, significa que es el mensaje de "sin datos"
+                            if (firstRow.find('td[colspan]').length > 0) {
+                                hasRealData = false;
+                            } else if (theadCols === firstRowCols) {
+                                hasRealData = true;
+                            } else {
+                                console.error('Error: Número de columnas no coincide. thead:', theadCols, 'tbody:', firstRowCols);
+                                return;
+                            }
+                        }
+                        
+                        // Solo inicializar DataTables si hay datos reales
+                        if (hasRealData && theadCols > 0) {
+                            tablaAlmacen = $table.DataTable(tableConfig);
+                        } else {
+                            // Si no hay datos, simplemente no inicializar DataTables
+                            console.log('Tabla Almacén vacía - DataTables no inicializado');
+                        }
                     } catch(e) {
                         console.error('Error al inicializar tabla Almacén:', e);
                     }

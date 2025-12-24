@@ -289,6 +289,12 @@ public class UsuarioDAO extends DAOBase {
     public void actualizarUsuario(Usuario usuario) {
         int rolId = usuario.getRol().getIdRol();
         
+        // Obtener el estado anterior del usuario para verificar si se está desactivando o reactivando
+        Usuario usuarioAnterior = obtenerUsuarioPorId(usuario.getIdUsuario());
+        boolean estabaActivo = usuarioAnterior != null && usuarioAnterior.isActivo();
+        boolean seEstaDesactivando = estabaActivo && !usuario.isActivo();
+        boolean seEstaReactivando = !estabaActivo && usuario.isActivo();
+        
         // Si es productor, actualizar también el código de productor
         if (rolId == 3 && usuario.getCodigoProductor() != null) {
             String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, codigo_productor = ?, rol_id = ?, activo = ?, distrito_id = NULL WHERE id_usuario = ?";
@@ -300,6 +306,15 @@ public class UsuarioDAO extends DAOBase {
                 rolId,
                 usuario.isActivo(),
                 usuario.getIdUsuario());
+            
+            // Si se está desactivando un productor, desactivar también sus productos
+            if (seEstaDesactivando) {
+                desactivarProductosDeProductor(usuario.getIdUsuario());
+            }
+            // Si se está reactivando un productor, reactivar también sus productos
+            else if (seEstaReactivando) {
+                reactivarProductosDeProductor(usuario.getIdUsuario());
+            }
         } else if (rolId == 7 && usuario.getDistritoId() != null) {
             // Si es Gerente de Tienda, actualizar distrito_id y limpiar codigo_productor
             String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, codigo_productor = NULL, rol_id = ?, activo = ?, distrito_id = ? WHERE id_usuario = ?";
@@ -321,13 +336,52 @@ public class UsuarioDAO extends DAOBase {
                 rolId,
                 usuario.isActivo(),
                 usuario.getIdUsuario());
+            
+            // Si el usuario anterior era productor (rol_id = 3)
+            if (usuarioAnterior != null && usuarioAnterior.getRol().getIdRol() == 3) {
+                // Si se está desactivando, desactivar sus productos
+                if (seEstaDesactivando) {
+                    desactivarProductosDeProductor(usuario.getIdUsuario());
+                }
+                // Si se está reactivando, reactivar sus productos
+                else if (seEstaReactivando) {
+                    reactivarProductosDeProductor(usuario.getIdUsuario());
+                }
+            }
         }
+    }
+    
+    /**
+     * Desactiva todos los productos de un productor.
+     * @param productorId ID del productor
+     */
+    private void desactivarProductosDeProductor(int productorId) {
+        String sql = "UPDATE productos SET activo = 0 WHERE productor_id = ? AND activo = 1";
+        executeUpdate(sql, productorId);
+        logger.info("Productos del productor {} desactivados automáticamente", productorId);
+    }
+    
+    /**
+     * Reactiva todos los productos de un productor.
+     * @param productorId ID del productor
+     */
+    private void reactivarProductosDeProductor(int productorId) {
+        String sql = "UPDATE productos SET activo = 1 WHERE productor_id = ? AND activo = 0";
+        executeUpdate(sql, productorId);
+        logger.info("Productos del productor {} reactivados automáticamente", productorId);
     }
     
     /**
      * Actualiza un usuario incluyendo la contraseña (útil para reactivar usuarios).
      */
     public boolean actualizarUsuarioConPassword(Usuario usuario) {
+        // Obtener el estado anterior del usuario para verificar si se está desactivando o reactivando
+        Usuario usuarioAnterior = obtenerUsuarioPorId(usuario.getIdUsuario());
+        boolean estabaActivo = usuarioAnterior != null && usuarioAnterior.isActivo();
+        boolean seEstaDesactivando = estabaActivo && !usuario.isActivo();
+        boolean seEstaReactivando = !estabaActivo && usuario.isActivo();
+        boolean esProductor = usuario.getRol().getIdRol() == 3;
+        
         String sql = "UPDATE usuarios SET nombres = ?, apellidos = ?, email = ?, password = SHA2(?, 256), rol_id = ?, activo = ? WHERE id_usuario = ?";
         int filasAfectadas = executeUpdate(sql,
             usuario.getNombres(),
@@ -337,13 +391,59 @@ public class UsuarioDAO extends DAOBase {
             usuario.getRol().getIdRol(),
             usuario.isActivo(),
             usuario.getIdUsuario());
+        
+        // Si es productor
+        if (esProductor) {
+            // Si se está desactivando, desactivar también sus productos
+            if (seEstaDesactivando) {
+                desactivarProductosDeProductor(usuario.getIdUsuario());
+            }
+            // Si se está reactivando, reactivar también sus productos
+            else if (seEstaReactivando) {
+                reactivarProductosDeProductor(usuario.getIdUsuario());
+            }
+        }
+        
         return filasAfectadas > 0;
     }
 
     // Borrado lógico, para 'banear' al usuario sin borrarlo de la BD.
     public void deshabilitarUsuario(int id) {
+        // Verificar si el usuario es un productor antes de desactivarlo
+        Usuario usuario = obtenerUsuarioPorId(id);
+        boolean esProductor = usuario != null && usuario.getRol().getIdRol() == 3;
+        
         String sql = "UPDATE usuarios SET activo = 0 WHERE id_usuario = ?";
         executeUpdate(sql, id);
+        
+        // Si es productor, desactivar también sus productos
+        if (esProductor) {
+            desactivarProductosDeProductor(id);
+        }
+    }
+    
+    /**
+     * Elimina físicamente un usuario de la base de datos (DELETE).
+     * IMPORTANTE: Esto eliminará permanentemente el usuario y puede fallar si hay foreign keys.
+     * @param id ID del usuario a eliminar
+     * @return true si se eliminó correctamente, false si hubo error o restricciones
+     */
+    public boolean eliminarUsuarioFisicamente(int id) {
+        try {
+            // Primero verificar si es productor y desactivar sus productos
+            Usuario usuario = obtenerUsuarioPorId(id);
+            if (usuario != null && usuario.getRol().getIdRol() == 3) {
+                desactivarProductosDeProductor(id);
+            }
+            
+            // Eliminar físicamente el usuario
+            String sql = "DELETE FROM usuarios WHERE id_usuario = ?";
+            int filasAfectadas = executeUpdate(sql, id);
+            return filasAfectadas > 0;
+        } catch (Exception e) {
+            logger.error("Error al eliminar usuario físicamente ID {}: {}", id, e.getMessage(), e);
+            return false;
+        }
     }
     
     /**

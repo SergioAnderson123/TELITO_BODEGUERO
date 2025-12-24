@@ -17,9 +17,94 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     <style>
-        /* Estilo para el encabezado de la tabla igual que en productor */
+        /* Estilos específicos del módulo: Sidebar con temática café y beige */
+        .nav-left-sidebar {
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important;
+        }
+        .nav-link {
+            color: #F5DEB3 !important;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #FFF8DC !important;
+            background-color: rgba(245, 222, 179, 0.2) !important;
+        }
+        .nav-divider {
+            color: #F5DEB3 !important;
+            border-top-color: rgba(245, 222, 179, 0.4) !important;
+        }
+        .nav-link::before {
+            background: #F5DEB3 !important;
+        }
+        
+        /* Fondo beige claro para todo el contenido principal (header, centro, footer) */
+        .dashboard-header {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-header .navbar {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-wrapper {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-content {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-main-wrapper {
+            background-color: #FFFEF9 !important;
+        }
+        footer,
+        .footer {
+            background-color: #FFFEF9 !important;
+        }
+        body {
+            background-color: #FFFEF9 !important;
+        }
+        
+        /* Textos en color marrón */
+        .dashboard-header .navbar-brand span {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-brand i {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-nav .nav-link span {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link.dropdown-toggle {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link i.fa-bell,
+        .dashboard-header .nav-link i[class*="fa-bell"] {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link[style*="color: var(--turquoise-dark)"] i,
+        .dashboard-header .nav-link i[style*="color: var(--turquoise-dark)"] {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-brand i.fa-truck,
+        .dashboard-header .navbar-brand i[class*="fa-truck"],
+        .dashboard-header .navbar-brand i[style*="color: var(--seafoam)"] {
+            color: #6F4E37 !important;
+        }
+        .pageheader-title {
+            color: #6F4E37 !important;
+        }
+        .pageheader-text {
+            color: #6F4E37 !important;
+        }
+        .page-header h2 {
+            color: #6F4E37 !important;
+        }
+        .page-header p {
+            color: #6F4E37 !important;
+        }
+        .page-header h2 i {
+            color: #6F4E37 !important;
+        }
+        
+        /* Estilo para el encabezado de la tabla con temática café */
         .table-card .card-header {
-            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important;
             color: #fff;
             border-radius: 12px 12px 0 0;
             padding: 20px 30px;
@@ -28,6 +113,22 @@
         .table-card .card-header h5,
         .table-card .card-header small {
             color: white !important;
+        }
+        
+        /* Cards con fondo beige claro y bordes café */
+        .card {
+            background-color: #FFFEF9 !important;
+            border: 2px solid #6F4E37 !important;
+        }
+        .stat-card {
+            background-color: #FFFEF9 !important;
+            border: 2px solid #6F4E37 !important;
+        }
+        .stat-card h3 {
+            color: #6F4E37 !important;
+        }
+        .stat-card p {
+            color: #6F4E37 !important;
         }
         /* Estilo para el botón Limpiar igual que en productor - sobrescribir estilos globales */
         .btn-outline-secondary {
@@ -96,10 +197,10 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important; 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
-            box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.2);
         }
         #sendDistribucionModal .modal-header h2 { 
             margin: 0; 
@@ -154,7 +255,7 @@
             gap: 6px;
         }
         #sendDistribucionModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #sendDistribucionModal .form-group input,
@@ -169,9 +270,9 @@
         }
         #sendDistribucionModal .form-group input:focus,
         #sendDistribucionModal .form-group textarea:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+            box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1);
         }
         #sendDistribucionModal .form-hint {
             margin-top: 6px;
@@ -182,7 +283,7 @@
             gap: 6px;
         }
         #sendDistribucionModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             margin-top: 2px;
         }
         #sendDistribucionModal .modal-footer { 
@@ -216,13 +317,13 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #sendDistribucionModal .modal-footer button[type="submit"] {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.3);
         }
         #sendDistribucionModal .modal-footer button[type="submit"]:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+            box-shadow: 0 6px 20px rgba(111, 78, 55, 0.4);
         }
         @media (max-width: 768px) {
             #sendDistribucionModal .modal-content {
@@ -273,10 +374,10 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%); 
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important; 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
-            box-shadow: 0 4px 12px rgba(40,167,69,0.2);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.2);
         }
         #agregarPlanModal .modal-header h2 { 
             margin: 0; 
@@ -331,7 +432,7 @@
             gap: 6px;
         }
         #agregarPlanModal .form-group label i {
-            color: #28a745;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #agregarPlanModal .form-group input,
@@ -348,9 +449,9 @@
         #agregarPlanModal .form-group input:focus,
         #agregarPlanModal .form-group select:focus,
         #agregarPlanModal .form-group textarea:focus {
-            border-color: #28a745;
+            border-color: #6F4E37;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(40,167,69,0.1);
+            box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1);
         }
         
         /* ===================== Estilos para Select2 en el modal ===================== */
@@ -368,8 +469,8 @@
         }
         #agregarPlanModal .select2-selection--single:focus,
         #agregarPlanModal .select2-container--open .select2-selection--single {
-            border-color: #28a745 !important;
-            box-shadow: 0 0 0 3px rgba(40,167,69,0.1) !important;
+            border-color: #6F4E37 !important;
+            box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1) !important;
         }
         #agregarPlanModal .select2-selection__rendered {
             padding: 0 !important;
@@ -409,8 +510,8 @@
             transition: all 0.3s ease !important;
         }
         #agregarPlanModal .select2-search--dropdown .select2-search__field:focus {
-            border-color: #28a745 !important;
-            box-shadow: 0 0 0 3px rgba(40,167,69,0.1) !important;
+            border-color: #6F4E37 !important;
+            box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1) !important;
             outline: none !important;
         }
         #agregarPlanModal .select2-results {
@@ -424,20 +525,20 @@
             transition: all 0.2s ease !important;
         }
         #agregarPlanModal .select2-results__option--highlighted {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important;
             color: #ffffff !important;
         }
         #agregarPlanModal .select2-results__option--highlighted * {
             color: #ffffff !important;
         }
         #agregarPlanModal .select2-results__option[aria-selected="true"] {
-            background-color: #e8f5e9 !important;
-            color: #28a745 !important;
+            background-color: rgba(111, 78, 55, 0.1) !important;
+            color: #6F4E37 !important;
             font-weight: 600 !important;
         }
         /* Asegurar que el texto sea visible en todos los estados */
         #agregarPlanModal .select2-results__option:hover {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important;
             color: #ffffff !important;
         }
         #agregarPlanModal .select2-results__option:hover * {
@@ -452,11 +553,11 @@
             border-radius: 4px;
         }
         #agregarPlanModal .select2-results::-webkit-scrollbar-thumb {
-            background: #28a745;
+            background: #6F4E37;
             border-radius: 4px;
         }
         #agregarPlanModal .select2-results::-webkit-scrollbar-thumb:hover {
-            background: #20c997;
+            background: #8B6F47;
         }
         /* Ocultar campo de búsqueda en el dropdown de distrito */
         #agregarPlanModal .distrito-select + .select2-container .select2-search--dropdown {
@@ -471,7 +572,7 @@
             gap: 6px;
         }
         #agregarPlanModal .form-hint i {
-            color: #28a745;
+            color: #6F4E37;
             margin-top: 2px;
         }
         #agregarPlanModal .modal-footer { 
@@ -505,13 +606,13 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #agregarPlanModal .modal-footer button[type="submit"] {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.3);
         }
         #agregarPlanModal .modal-footer button[type="submit"]:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40,167,69,0.4);
+            box-shadow: 0 6px 20px rgba(111, 78, 55, 0.4);
         }
         @media (max-width: 768px) {
             #agregarPlanModal .modal-content {
@@ -577,13 +678,13 @@
                             String urlBase = request.getContextPath() + "/logistica/DistribucionTransporteReporteServlet?action=exportar" + urlParams.toString();
                             String urlEnviar = request.getContextPath() + "/logistica/DistribucionTransporteReporteServlet?action=formEnviar" + urlParams.toString();
                         %>
-                        <a href="<%= urlBase %>" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <a href="<%= urlBase %>" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #D4A574 0%, #C9A87A 100%); color: white; border: none;">
                             <i class="fas fa-file-excel me-1"></i>Exportar a Excel
                         </a>
-                        <button type="button" id="openSendDistribucionModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <button type="button" id="openSendDistribucionModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #E8B86D 0%, #D4A574 100%); border: none;">
                             <i class="fas fa-envelope me-1"></i>Enviar por Correo
                         </button>
-                        <button type="button" id="openAgregarPlanModalBtn" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
+                        <button type="button" id="openAgregarPlanModalBtn" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; color: white; font-weight: 600;">
                             <i class="fas fa-plus me-1"></i>Agregar Plan
                         </button>
                     </div>
@@ -595,35 +696,59 @@
                 Integer totalPlanesAttr = (Integer) request.getAttribute("totalPlanes");
                 Integer planesEnRutaAttr = (Integer) request.getAttribute("planesEnRuta");
                 Integer planesEntregadosAttr = (Integer) request.getAttribute("planesEntregados");
+                Integer planesCanceladosAttr = (Integer) request.getAttribute("planesCancelados");
+                Integer planesSalidaAttr = (Integer) request.getAttribute("planesSalida");
+                Integer planesPendientesAttr = (Integer) request.getAttribute("planesPendientes");
                 int totalPlanes = (totalPlanesAttr != null) ? totalPlanesAttr : 0;
                 int planesEnRuta = (planesEnRutaAttr != null) ? planesEnRutaAttr : 0;
                 int planesEntregados = (planesEntregadosAttr != null) ? planesEntregadosAttr : 0;
+                int planesCancelados = (planesCanceladosAttr != null) ? planesCanceladosAttr : 0;
+                int planesSalida = (planesSalidaAttr != null) ? planesSalidaAttr : 0;
+                int planesPendientes = (planesPendientesAttr != null) ? planesPendientesAttr : 0;
             %>
 
             <!-- ===================== Tarjetas de estadísticas ===================== -->
-            <div class="row g-2 mb-3">
-                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Planes</h3>
-                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalPlanes %></p>
+            <div class="row g-2 mb-3" style="display: flex; flex-wrap: nowrap;">
+                <div class="col" style="flex: 1 1 0%; min-width: 0;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Total de Planes</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalPlanes %></p>
                     </div>
                 </div>
-                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">En Ruta</h3>
-                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= planesEnRuta %></p>
+                <div class="col" style="flex: 1 1 0%; min-width: 0;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Pendiente</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= planesPendientes %></p>
                     </div>
                 </div>
-                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Entregados</h3>
-                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= planesEntregados %></p>
+                <div class="col" style="flex: 1 1 0%; min-width: 0;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Salida</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= planesSalida %></p>
+                    </div>
+                </div>
+                <div class="col" style="flex: 1 1 0%; min-width: 0;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">En Ruta</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= planesEnRuta %></p>
+                    </div>
+                </div>
+                <div class="col" style="flex: 1 1 0%; min-width: 0;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Entregados</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= planesEntregados %></p>
+                    </div>
+                </div>
+                <div class="col" style="flex: 1 1 0%; min-width: 0;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Cancelado</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= planesCancelados %></p>
                     </div>
                 </div>
             </div>
 
             <!-- ===================== Card: Búsqueda y filtros ===================== -->
-            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; background-color: #FFFEF9 !important; border: 2px solid #6F4E37 !important;">
                 <form action="${pageContext.request.contextPath}/planes-transporte" method="GET" id="filterForm">
                     <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                     <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
@@ -631,7 +756,7 @@
                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                             <div class="input-group">
                                 <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" id="searchInput" placeholder="N° Viaje, Placa, Lote..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                <button class="btn btn-sm btn-primary shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <button class="btn btn-sm shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem; background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); color: white; border: none;">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
@@ -1059,6 +1184,42 @@
                         }
                     }
                 });
+                
+                // Evento para actualizar cantidad máxima cuando se selecciona un lote
+                selectLote.on('select2:select', function(e) {
+                    actualizarInfoLoteModal();
+                });
+                
+                // Evento para limpiar cuando se deselecciona
+                selectLote.on('select2:clear', function(e) {
+                    actualizarInfoLoteModal();
+                });
+            }
+        }
+        
+        // Función para actualizar información del lote seleccionado en el modal
+        function actualizarInfoLoteModal() {
+            const select = document.getElementById('modalLote');
+            const option = select.options[select.selectedIndex];
+            const cantidadInput = document.getElementById('modalCantidadPaquetes');
+            const maxPaquetesSpan = document.getElementById('maxPaquetesModal');
+            const infoLote = document.getElementById('infoLoteModal');
+            
+            if (option && option.value) {
+                const paquetesDisponibles = parseInt(option.getAttribute('data-paquetes')) || 0;
+                const stockActual = parseInt(option.getAttribute('data-stock')) || 0;
+                const unidadesPorPaquete = parseInt(option.getAttribute('data-unidades-paquete')) || 1;
+                
+                cantidadInput.max = paquetesDisponibles;
+                maxPaquetesSpan.textContent = paquetesDisponibles;
+                cantidadInput.placeholder = 'Máximo ' + paquetesDisponibles + ' paquetes';
+                infoLote.innerHTML = '<i class="fas fa-info-circle"></i> Stock disponible: ' + stockActual + ' unidades (' + paquetesDisponibles + ' paquetes)';
+            } else {
+                cantidadInput.max = '';
+                cantidadInput.value = '';
+                maxPaquetesSpan.textContent = '-';
+                cantidadInput.placeholder = 'Ingrese la cantidad de paquetes';
+                infoLote.innerHTML = '<i class="fas fa-info-circle"></i> Selecciona el producto y lote que será transportado';
             }
         }
         
@@ -1150,17 +1311,17 @@
         user-select: none;
     }
     thead th:hover {
-        background-color: var(--seafoam) !important;
+        background-color: rgba(111, 78, 55, 0.1) !important;
     }
     thead th.sort-asc::after {
         content: ' ▲';
         font-size: 0.7em;
-        color: var(--turquoise-dark);
+        color: #6F4E37;
     }
     thead th.sort-desc::after {
         content: ' ▼';
         font-size: 0.7em;
-        color: var(--turquoise-dark);
+        color: #6F4E37;
     }
 </style>
 
@@ -1211,15 +1372,33 @@
                             if (lotesModal != null && !lotesModal.isEmpty()) {
                                 System.out.println("Total de lotes a mostrar: " + lotesModal.size());
                                 for (LoteBean lote : lotesModal) { %>
-                        <option value="<%= lote.getId() %>"><%= lote.getNombreProducto() %> (<%= lote.getCodigoLote() %>)</option>
+                        <option value="<%= lote.getId() %>" 
+                                data-stock="<%= lote.getStockActual() %>"
+                                data-unidades-paquete="<%= lote.getUnidadesPorPaquete() %>"
+                                data-paquetes="<%= lote.getPaquetesDisponibles() %>">
+                            <%= lote.getNombreProducto() %> (<%= lote.getCodigoLote() %>) - <%= lote.getPaquetesDisponibles() %> paquetes disponibles
+                        </option>
                         <%     }
                             } else {
                                 System.out.println("⚠️ No hay lotes disponibles para mostrar");
                             } %>
                     </select>
-                    <div class="form-hint">
+                    <div class="form-hint" id="infoLoteModal">
                         <i class="fas fa-info-circle"></i>
                         <span>Selecciona el producto y lote que será transportado</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalCantidadPaquetes">
+                        <i class="fas fa-boxes"></i>
+                        Cantidad de Paquetes a Transportar <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" class="form-control" id="modalCantidadPaquetes" name="cantidad_paquetes" 
+                           min="1" max="" required placeholder="Ingrese la cantidad de paquetes">
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingrese la cantidad de paquetes a transportar (máximo: <span id="maxPaquetesModal">-</span> paquetes)</span>
                     </div>
                 </div>
                 

@@ -552,7 +552,7 @@
                             bodyFont: { size: 14 },
                             padding: 15,
                             cornerRadius: 8,
-                            borderColor: '#00a896',
+                            borderColor: '#6F4E37',
                             borderWidth: 2,
                             callbacks: {
                                 label: function(context) {

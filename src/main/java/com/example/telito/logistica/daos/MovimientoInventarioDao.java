@@ -19,6 +19,7 @@ public class MovimientoInventarioDao extends DAOBase {
 
         String sql = """
             SELECT 
+                mi.id_movimiento,
                 DATE_FORMAT(mi.fecha, '%d/%m/%Y') as fechaFormateada,
                 p.nombre AS nombreProducto,
                 mi.tipo,
@@ -98,6 +99,7 @@ public class MovimientoInventarioDao extends DAOBase {
                         rs.getString("responsable"),
                         rs.getString("observaciones")
                 );
+                movimiento.setIdMovimiento(rs.getInt("id_movimiento"));
                 listaMovimientos.add(movimiento);
             }
         } catch (SQLException e) {

@@ -162,12 +162,51 @@ public class VehiculoServlet extends HttpServlet {
             String marca = request.getParameter("marca");
             String modelo = request.getParameter("modelo");
             int capacidadKg = Integer.parseInt(request.getParameter("capacidadKg"));
+            String añoStr = request.getParameter("año");
+            String tipoCombustible = request.getParameter("tipoCombustible");
+            String numeroSerieVin = request.getParameter("numeroSerieVin");
+            String fechaUltimaRevisionStr = request.getParameter("fechaUltimaRevision");
+            String fechaVencimientoSoatStr = request.getParameter("fechaVencimientoSoat");
 
             Vehiculo vehiculo = new Vehiculo();
             vehiculo.setPlaca(placa);
             vehiculo.setMarca(marca);
             vehiculo.setModelo(modelo);
             vehiculo.setCapacidadKg(capacidadKg);
+            
+            // Nuevos campos
+            if (añoStr != null && !añoStr.trim().isEmpty()) {
+                try {
+                    vehiculo.setAño(Integer.parseInt(añoStr));
+                } catch (NumberFormatException e) {
+                    vehiculo.setAño(null);
+                }
+            } else {
+                vehiculo.setAño(null);
+            }
+            vehiculo.setTipoCombustible(tipoCombustible != null && !tipoCombustible.trim().isEmpty() ? tipoCombustible : null);
+            vehiculo.setNumeroSerieVin(numeroSerieVin != null && !numeroSerieVin.trim().isEmpty() ? numeroSerieVin : null);
+            
+            // Convertir fechas de String a Date
+            if (fechaUltimaRevisionStr != null && !fechaUltimaRevisionStr.trim().isEmpty()) {
+                try {
+                    vehiculo.setFechaUltimaRevision(java.sql.Date.valueOf(fechaUltimaRevisionStr));
+                } catch (IllegalArgumentException e) {
+                    vehiculo.setFechaUltimaRevision(null);
+                }
+            } else {
+                vehiculo.setFechaUltimaRevision(null);
+            }
+            
+            if (fechaVencimientoSoatStr != null && !fechaVencimientoSoatStr.trim().isEmpty()) {
+                try {
+                    vehiculo.setFechaVencimientoSoat(java.sql.Date.valueOf(fechaVencimientoSoatStr));
+                } catch (IllegalArgumentException e) {
+                    vehiculo.setFechaVencimientoSoat(null);
+                }
+            } else {
+                vehiculo.setFechaVencimientoSoat(null);
+            }
 
             boolean creado = vehiculoDAO.crearVehiculo(vehiculo);
             if (creado) {
@@ -211,6 +250,46 @@ public class VehiculoServlet extends HttpServlet {
                 vehiculo.setMarca(marca != null ? marca.trim() : null);
                 vehiculo.setModelo(modelo != null ? modelo.trim() : null);
                 vehiculo.setCapacidadKg(capacidadKg);
+                
+                // Nuevos campos
+                String añoStr = request.getParameter("año");
+                String tipoCombustible = request.getParameter("tipoCombustible");
+                String numeroSerieVin = request.getParameter("numeroSerieVin");
+                String fechaUltimaRevisionStr = request.getParameter("fechaUltimaRevision");
+                String fechaVencimientoSoatStr = request.getParameter("fechaVencimientoSoat");
+                
+                if (añoStr != null && !añoStr.trim().isEmpty()) {
+                    try {
+                        vehiculo.setAño(Integer.parseInt(añoStr));
+                    } catch (NumberFormatException e) {
+                        vehiculo.setAño(null);
+                    }
+                } else {
+                    vehiculo.setAño(null);
+                }
+                vehiculo.setTipoCombustible(tipoCombustible != null && !tipoCombustible.trim().isEmpty() ? tipoCombustible.trim() : null);
+                vehiculo.setNumeroSerieVin(numeroSerieVin != null && !numeroSerieVin.trim().isEmpty() ? numeroSerieVin.trim() : null);
+                
+                // Convertir fechas de String a Date
+                if (fechaUltimaRevisionStr != null && !fechaUltimaRevisionStr.trim().isEmpty()) {
+                    try {
+                        vehiculo.setFechaUltimaRevision(java.sql.Date.valueOf(fechaUltimaRevisionStr));
+                    } catch (IllegalArgumentException e) {
+                        vehiculo.setFechaUltimaRevision(null);
+                    }
+                } else {
+                    vehiculo.setFechaUltimaRevision(null);
+                }
+                
+                if (fechaVencimientoSoatStr != null && !fechaVencimientoSoatStr.trim().isEmpty()) {
+                    try {
+                        vehiculo.setFechaVencimientoSoat(java.sql.Date.valueOf(fechaVencimientoSoatStr));
+                    } catch (IllegalArgumentException e) {
+                        vehiculo.setFechaVencimientoSoat(null);
+                    }
+                } else {
+                    vehiculo.setFechaVencimientoSoat(null);
+                }
 
                 boolean actualizado = vehiculoDAO.actualizarVehiculo(vehiculo);
                 
@@ -352,10 +431,25 @@ public class VehiculoServlet extends HttpServlet {
             if (vehiculo != null) {
                 Map<String, Object> vehiculoData = new HashMap<>();
                 vehiculoData.put("idVehiculo", vehiculo.getIdVehiculo());
-                vehiculoData.put("placa", vehiculo.getPlaca());
-                vehiculoData.put("marca", vehiculo.getMarca());
-                vehiculoData.put("modelo", vehiculo.getModelo());
+                vehiculoData.put("placa", vehiculo.getPlaca() != null ? vehiculo.getPlaca() : "");
+                vehiculoData.put("marca", vehiculo.getMarca() != null ? vehiculo.getMarca() : "");
+                vehiculoData.put("modelo", vehiculo.getModelo() != null ? vehiculo.getModelo() : "");
                 vehiculoData.put("capacidadKg", vehiculo.getCapacidadKg());
+                vehiculoData.put("año", vehiculo.getAño());
+                vehiculoData.put("tipoCombustible", vehiculo.getTipoCombustible() != null ? vehiculo.getTipoCombustible() : "");
+                vehiculoData.put("numeroSerieVin", vehiculo.getNumeroSerieVin() != null ? vehiculo.getNumeroSerieVin() : "");
+                
+                // Formatear fechas como string para evitar problemas de serialización
+                if (vehiculo.getFechaUltimaRevision() != null) {
+                    vehiculoData.put("fechaUltimaRevision", vehiculo.getFechaUltimaRevision().toString());
+                } else {
+                    vehiculoData.put("fechaUltimaRevision", null);
+                }
+                if (vehiculo.getFechaVencimientoSoat() != null) {
+                    vehiculoData.put("fechaVencimientoSoat", vehiculo.getFechaVencimientoSoat().toString());
+                } else {
+                    vehiculoData.put("fechaVencimientoSoat", null);
+                }
                 
                 response.getWriter().write(gson.toJson(vehiculoData));
             } else {

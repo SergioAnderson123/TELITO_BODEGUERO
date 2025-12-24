@@ -47,12 +47,14 @@ public class ConductorServlet extends HttpServlet {
                 int page = 1;
                 int size = 5;
                 String busqueda = request.getParameter("busqueda");
+                String dni = request.getParameter("dni");
+                String fechaVencimiento = request.getParameter("fechaVencimiento");
                 try { page = Integer.parseInt(request.getParameter("page")); } catch (Exception ignored) {}
                 try { size = Integer.parseInt(request.getParameter("size")); } catch (Exception ignored) {}
                 if (page < 1) page = 1;
                 if (size < 1) size = 5;
 
-                int totalRows = conductorDAO.contarConductores(busqueda);
+                int totalRows = conductorDAO.contarConductores(busqueda, dni, fechaVencimiento);
                 int totalPages = (int) Math.ceil(totalRows / (double) size);
                 if (totalPages == 0) totalPages = 1;
                 if (page > totalPages) page = totalPages;
@@ -62,13 +64,15 @@ public class ConductorServlet extends HttpServlet {
                 int conductoresConPlanes = conductorDAO.contarConductoresConPlanes();
                 int conductoresSinPlanes = conductorDAO.contarConductoresSinPlanes();
 
-                ArrayList<Conductor> listaConductores = conductorDAO.listarConductores(busqueda, page, size);
+                ArrayList<Conductor> listaConductores = conductorDAO.listarConductores(busqueda, dni, fechaVencimiento, page, size);
                 request.setAttribute("listaConductores", listaConductores);
                 request.setAttribute("currentPage", page);
                 request.setAttribute("size", size);
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("totalRows", totalRows);
                 request.setAttribute("busqueda", busqueda);
+                request.setAttribute("dni", dni);
+                request.setAttribute("fechaVencimiento", fechaVencimiento);
                 request.setAttribute("totalConductores", totalConductores);
                 request.setAttribute("conductoresConPlanes", conductoresConPlanes);
                 request.setAttribute("conductoresSinPlanes", conductoresSinPlanes);
@@ -158,10 +162,30 @@ public class ConductorServlet extends HttpServlet {
         if ("guardar".equals(action)) {
             String nombreCompleto = request.getParameter("nombreCompleto");
             String licencia = request.getParameter("licencia");
+            String telefono = request.getParameter("telefono");
+            String email = request.getParameter("email");
+            String dni = request.getParameter("dni");
+            String tipoLicencia = request.getParameter("tipoLicencia");
+            String fechaVencimientoLicenciaStr = request.getParameter("fechaVencimientoLicencia");
 
             Conductor conductor = new Conductor();
             conductor.setNombreCompleto(nombreCompleto);
             conductor.setLicencia(licencia);
+            conductor.setTelefono(telefono != null && !telefono.trim().isEmpty() ? telefono : null);
+            conductor.setEmail(email != null && !email.trim().isEmpty() ? email : null);
+            conductor.setDni(dni != null && !dni.trim().isEmpty() ? dni : null);
+            conductor.setTipoLicencia(tipoLicencia != null && !tipoLicencia.trim().isEmpty() ? tipoLicencia : null);
+            
+            // Convertir fecha de String a Date
+            if (fechaVencimientoLicenciaStr != null && !fechaVencimientoLicenciaStr.trim().isEmpty()) {
+                try {
+                    conductor.setFechaVencimientoLicencia(java.sql.Date.valueOf(fechaVencimientoLicenciaStr));
+                } catch (IllegalArgumentException e) {
+                    conductor.setFechaVencimientoLicencia(null);
+                }
+            } else {
+                conductor.setFechaVencimientoLicencia(null);
+            }
 
             boolean creado = conductorDAO.crearConductor(conductor);
             if (creado) {
@@ -178,6 +202,11 @@ public class ConductorServlet extends HttpServlet {
                 int id = Integer.parseInt(request.getParameter("id"));
                 String nombreCompleto = request.getParameter("nombreCompleto");
                 String licencia = request.getParameter("licencia");
+                String telefono = request.getParameter("telefono");
+                String email = request.getParameter("email");
+                String dni = request.getParameter("dni");
+                String tipoLicencia = request.getParameter("tipoLicencia");
+                String fechaVencimientoLicenciaStr = request.getParameter("fechaVencimientoLicencia");
 
                 // Validar que los parámetros no estén vacíos
                 if (nombreCompleto == null || nombreCompleto.trim().isEmpty()) {
@@ -191,6 +220,21 @@ public class ConductorServlet extends HttpServlet {
                 conductor.setIdConductor(id);
                 conductor.setNombreCompleto(nombreCompleto.trim());
                 conductor.setLicencia(licencia.trim());
+                conductor.setTelefono(telefono != null && !telefono.trim().isEmpty() ? telefono.trim() : null);
+                conductor.setEmail(email != null && !email.trim().isEmpty() ? email.trim() : null);
+                conductor.setDni(dni != null && !dni.trim().isEmpty() ? dni.trim() : null);
+                conductor.setTipoLicencia(tipoLicencia != null && !tipoLicencia.trim().isEmpty() ? tipoLicencia.trim() : null);
+                
+                // Convertir fecha de String a Date
+                if (fechaVencimientoLicenciaStr != null && !fechaVencimientoLicenciaStr.trim().isEmpty()) {
+                    try {
+                        conductor.setFechaVencimientoLicencia(java.sql.Date.valueOf(fechaVencimientoLicenciaStr));
+                    } catch (IllegalArgumentException e) {
+                        conductor.setFechaVencimientoLicencia(null);
+                    }
+                } else {
+                    conductor.setFechaVencimientoLicencia(null);
+                }
 
                 boolean actualizado = conductorDAO.actualizarConductor(conductor);
                 
@@ -332,8 +376,19 @@ public class ConductorServlet extends HttpServlet {
             if (conductor != null) {
                 Map<String, Object> conductorData = new HashMap<>();
                 conductorData.put("idConductor", conductor.getIdConductor());
-                conductorData.put("nombreCompleto", conductor.getNombreCompleto());
-                conductorData.put("licencia", conductor.getLicencia());
+                conductorData.put("nombreCompleto", conductor.getNombreCompleto() != null ? conductor.getNombreCompleto() : "");
+                conductorData.put("licencia", conductor.getLicencia() != null ? conductor.getLicencia() : "");
+                conductorData.put("telefono", conductor.getTelefono() != null ? conductor.getTelefono() : "");
+                conductorData.put("email", conductor.getEmail() != null ? conductor.getEmail() : "");
+                conductorData.put("dni", conductor.getDni() != null ? conductor.getDni() : "");
+                conductorData.put("tipoLicencia", conductor.getTipoLicencia() != null ? conductor.getTipoLicencia() : "");
+                
+                // Formatear la fecha como string para evitar problemas de serialización
+                if (conductor.getFechaVencimientoLicencia() != null) {
+                    conductorData.put("fechaVencimientoLicencia", conductor.getFechaVencimientoLicencia().toString());
+                } else {
+                    conductorData.put("fechaVencimientoLicencia", null);
+                }
                 
                 response.getWriter().write(gson.toJson(conductorData));
             } else {
@@ -355,7 +410,7 @@ public class ConductorServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             Map<String, Object> error = new HashMap<>();
             error.put("exito", false);
-            error.put("mensaje", "Error interno del servidor");
+            error.put("mensaje", "Error interno del servidor: " + e.getMessage());
             response.getWriter().write(gson.toJson(error));
         }
     }

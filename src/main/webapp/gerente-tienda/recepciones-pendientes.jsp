@@ -136,19 +136,19 @@
                         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                             <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                                 <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Pendientes</h3>
-                                <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalPendientes %></p>
+                                <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalPendientes %></p>
                             </div>
                         </div>
                         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                             <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                                 <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Pendientes Hoy</h3>
-                                <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= pendientesHoy %></p>
+                                <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= pendientesHoy %></p>
                             </div>
                         </div>
                         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                             <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                                 <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Últimos 7 Días</h3>
-                                <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= pendientesUltimos7Dias %></p>
+                                <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= pendientesUltimos7Dias %></p>
                             </div>
                         </div>
                     </div>
@@ -163,7 +163,7 @@
                                     <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                                     <div class="input-group">
                                         <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" id="searchInput" placeholder="N° Plan, producto o lote..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                        <button class="btn btn-sm shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem; background-color: #00a896; border-color: #00a896; color: white;">
+                                        <button class="btn btn-sm shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem; background-color: #6F4E37; border-color: #6F4E37; color: white;">
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </div>

@@ -1,5 +1,7 @@
 package com.example.telito.administrador.beans;
 
+import java.sql.Date;
+
 // Bean para representar un vehículo
 public class Vehiculo {
     private int idVehiculo;
@@ -7,6 +9,11 @@ public class Vehiculo {
     private String marca;
     private String modelo;
     private int capacidadKg;
+    private Integer año;
+    private String tipoCombustible;
+    private String numeroSerieVin;
+    private Date fechaUltimaRevision;
+    private Date fechaVencimientoSoat;
 
     public Vehiculo() {
     }
@@ -57,6 +64,46 @@ public class Vehiculo {
 
     public void setCapacidadKg(int capacidadKg) {
         this.capacidadKg = capacidadKg;
+    }
+
+    public Integer getAño() {
+        return año;
+    }
+
+    public void setAño(Integer año) {
+        this.año = año;
+    }
+
+    public String getTipoCombustible() {
+        return tipoCombustible;
+    }
+
+    public void setTipoCombustible(String tipoCombustible) {
+        this.tipoCombustible = tipoCombustible;
+    }
+
+    public String getNumeroSerieVin() {
+        return numeroSerieVin;
+    }
+
+    public void setNumeroSerieVin(String numeroSerieVin) {
+        this.numeroSerieVin = numeroSerieVin;
+    }
+
+    public Date getFechaUltimaRevision() {
+        return fechaUltimaRevision;
+    }
+
+    public void setFechaUltimaRevision(Date fechaUltimaRevision) {
+        this.fechaUltimaRevision = fechaUltimaRevision;
+    }
+
+    public Date getFechaVencimientoSoat() {
+        return fechaVencimientoSoat;
+    }
+
+    public void setFechaVencimientoSoat(Date fechaVencimientoSoat) {
+        this.fechaVencimientoSoat = fechaVencimientoSoat;
     }
 }
 

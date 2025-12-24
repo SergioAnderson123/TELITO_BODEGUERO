@@ -1,7 +1,8 @@
 package com.example.telito.logistica.beans;
 
 public class MovimientoInventarioBean {
-    // Los 8 campos que necesita product-movement.html
+    // Los 9 campos que necesita product-movement.html
+    private int idMovimiento;           // ID del movimiento
     private String fechaFormateada;     // Fecha
     private String nombreProducto;      // Producto
     private String tipo;                // Tipo (Entrada/Salida/Ajuste)
@@ -104,5 +105,13 @@ public class MovimientoInventarioBean {
 
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
+    }
+
+    public int getIdMovimiento() {
+        return idMovimiento;
+    }
+
+    public void setIdMovimiento(int idMovimiento) {
+        this.idMovimiento = idMovimiento;
     }
 }

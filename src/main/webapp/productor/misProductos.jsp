@@ -40,10 +40,10 @@
            Paleta y tokens
         ====================== */
         :root {
-            --turquoise-dark: #00a896;
-            --seafoam: #83c5be;
-            --seafoam-light: #edf6f9;
-            --white: #ffffff;
+            --turquoise-dark: #6F4E37;
+            --seafoam: #8B6F47;
+            --seafoam-light: #FFFEF9;
+            --white: #FFFEF9;
             --text-dark: #2b2d42;
             --text-muted: #6c757d;
             --border-color: #e9ecef;
@@ -64,7 +64,7 @@
         ====================== */
         .dashboard-main-wrapper { display: flex; min-height: 100vh; }
         .dashboard-header {
-            background-color: #fff;
+            background-color: #FFFEF9;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: fixed; top: 0; right: 0; left: 250px; z-index: 999;
             height: 70px; border-bottom: 1px solid var(--border-color);
@@ -72,16 +72,16 @@
         .dashboard-wrapper { margin-left: 250px; width: calc(100% - 250px); min-height: 100vh; }
         .dashboard-content { margin-top: 70px; padding: 20px; }
         .page-header { margin-bottom: 0.5rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .page-header h2 { color: var(--turquoise-dark); font-weight: 700; margin-bottom: 0; font-size: 1.4rem; line-height: 1.2; }
+        .page-header h2 { color: #6F4E37; font-weight: 700; margin-bottom: 0; font-size: 1.4rem; line-height: 1.2; }
         .page-header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem; margin-bottom: 0; }
         .pageheader-title {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #00a896 !important;
+            color: #6F4E37 !important;
         }
         .pageheader-title i {
-            color: var(--seafoam);
+            color: #6F4E37;
         }
 
         /* =====================
@@ -89,7 +89,7 @@
         ====================== */
         .nav-left-sidebar {
             width: 250px;
-            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             min-height: 100vh;
             position: fixed;
             left: 0;
@@ -97,9 +97,9 @@
             z-index: 1000;
             box-shadow: 3px 0 15px rgba(0,0,0,.12);
         }
-        .navbar-brand { font-weight: 700; color: var(--turquoise-dark); }
+        .navbar-brand { font-weight: 700; color: #6F4E37; }
         .nav-link {
-            color: rgba(255,255,255,.95) !important;
+            color: #F5DEB3 !important;
             padding: 13px 20px;
             border-radius: 10px;
             margin: 6px 15px;
@@ -117,14 +117,14 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background: #fff;
+            background: #F5DEB3;
             transform: scaleY(0);
             transition: transform .3s ease;
             border-radius: 0 4px 4px 0;
         }
         .nav-link:hover, .nav-link.active {
-            background-color: rgba(255,255,255,.25);
-            color: #fff !important;
+            background-color: rgba(245, 222, 179, 0.15);
+            color: #FFF8DC !important;
             transform: translateX(8px);
             box-shadow: 0 4px 12px rgba(0,0,0,.15);
         }
@@ -133,14 +133,14 @@
         }
         .nav-link i { margin-right: 12px; width: 22px; font-size: 1.1rem; }
         .nav-divider {
-            color: rgba(255,255,255,.95);
+            color: #F5DEB3;
             font-weight: 700;
             padding: 18px 20px 8px;
             margin-top: 25px;
             font-size: .8rem;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            border-top: 1px solid rgba(255,255,255,.15);
+            border-top: 1px solid rgba(245, 222, 179, 0.3);
         }
 
         /* =====================
@@ -148,22 +148,23 @@
         ====================== */
         .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
         .stat-card {
-            background-color: var(--white);
+            background-color: #FFFEF9;
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            border: 2px solid #6F4E37;
         }
         .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: var(--text-muted); font-weight: 600; }
-        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: var(--turquoise-dark); }
+        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #6F4E37; }
 
         /* Card principal */
         .card {
-            background-color: var(--white);
+            background-color: #FFFEF9;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
             margin-bottom: 40px;
-            border: none;
+            border: 2px solid #6F4E37;
             transition: box-shadow .3s ease;
         }
         .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); }
@@ -172,16 +173,16 @@
             justify-content: space-between; 
             align-items: center; 
             margin-bottom: 25px; 
-            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: white;
             border-radius: 12px 12px 0 0;
             padding: 20px 30px;
             margin: -30px -30px 25px -30px;
-            box-shadow: 0 4px 12px rgba(0,168,150,.25);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.25);
         }
         .card-header h2, .card-header h5 { margin: 0; color: white; font-weight: 700; }
         .card-body { padding: 0; }
-        #openModalBtn { background: linear-gradient(135deg, #00a896 0%, #028f80 100%); border: none; }
+        #openModalBtn { background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); border: none; }
         
         /* Table card - igual a logística y almacenero */
         .table-card {
@@ -193,7 +194,7 @@
             overflow: hidden;
         }
         .table-card .card-header {
-            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: #fff;
             border-radius: 12px 12px 0 0;
             padding: 20px 30px;
@@ -219,7 +220,7 @@
             width: 100%; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-size: 1rem;
         }
         button, .btn {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: var(--white);
             border: none;
             padding: 12px 24px;
@@ -231,7 +232,7 @@
         }
         .btn-secondary { background: #8d99ae; }
         .btn-primary {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             border: none;
             color: #fff;
             font-weight: 600;
@@ -391,7 +392,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -445,7 +446,7 @@
             padding: 20px;
             border-radius: 12px;
             margin-bottom: 20px;
-            border-left: 4px solid #00a896;
+            border-left: 4px solid #6F4E37;
         }
         #addProductModal .form-section-title {
             font-size: 0.95rem;
@@ -457,7 +458,7 @@
             gap: 8px;
         }
         #addProductModal .form-section-title i {
-            color: #00a896;
+            color: #6F4E37;
         }
         #addProductModal .form-row {
             display: grid;
@@ -531,16 +532,16 @@
             border-radius: 4px;
         }
         #addProductModal #productCategory::-webkit-scrollbar-thumb {
-            background: #00a896;
+            background: #6F4E37;
             border-radius: 4px;
         }
         #addProductModal #productCategory::-webkit-scrollbar-thumb:hover {
-            background: #028f80;
+            background: #8B6F47;
         }
         #addProductModal .form-group input:focus,
         #addProductModal .form-group select:focus,
         #addProductModal .form-group textarea:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -630,7 +631,7 @@
             color: var(--text-dark);
         }
         #addProductModal .select2-results__option--highlighted {
-            background-color: #00a896 !important;
+            background-color: #6F4E37 !important;
             color: white !important;
         }
         /* Campo de búsqueda dentro del dropdown */
@@ -643,7 +644,7 @@
             width: calc(100% - 8px);
         }
         #addProductModal .select2-search--dropdown .select2-search__field:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -674,7 +675,7 @@
             border-radius: 6px;
         }
         #addProductModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             flex-shrink: 0;
         }
         #addProductModal .modal-footer { 
@@ -714,13 +715,15 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #addProductModal .modal-footer button[type="submit"] {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.3);
+            border: none;
+            font-weight: 600;
         }
         #addProductModal .modal-footer button[type="submit"]:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40,167,69,0.4);
+            box-shadow: 0 6px 20px rgba(111, 78, 55, 0.4);
         }
         
         /* Asegurar que los modales Bootstrap tengan z-index correcto */
@@ -875,7 +878,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -933,7 +936,7 @@
             gap: 6px;
         }
         #sendProductosModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #sendProductosModal .form-group input,
@@ -948,7 +951,7 @@
         }
         #sendProductosModal .form-group input:focus,
         #sendProductosModal .form-group textarea:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -961,7 +964,7 @@
             gap: 6px;
         }
         #sendProductosModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             margin-top: 2px;
         }
         #sendProductosModal .modal-footer { 
@@ -995,13 +998,15 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #sendProductosModal .modal-footer button[type="submit"] {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.3);
+            border: none;
+            font-weight: 600;
         }
         #sendProductosModal .modal-footer button[type="submit"]:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+            box-shadow: 0 6px 20px rgba(111, 78, 55, 0.4);
         }
         @media (max-width: 768px) {
             #sendProductosModal .modal-content {
@@ -1152,7 +1157,7 @@
                             <span class="badge-notificacion" id="badgeNotificaciones" style="display: none;">0</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end notificaciones-dropdown" aria-labelledby="notificacionesDropdown" style="width: 380px;">
-                            <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; padding: 12px 20px;">
+                            <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; padding: 12px 20px;">
                                 <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notificaciones</h6>
                                 <button class="btn btn-sm btn-light" onclick="marcarTodasLeidas()" style="font-size: 0.75rem; padding: 2px 8px;">
                                     <i class="fas fa-check-double me-1"></i>Marcar todas
@@ -1165,7 +1170,7 @@
                                 </div>
                             </div>
                             <div class="dropdown-divider m-0"></div>
-                            <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #00a896 !important;">
+                            <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #6F4E37 !important;">
                                 <i class="fas fa-list me-2"></i>Ver todas las notificaciones
                             </a>
                         </div>
@@ -1261,10 +1266,10 @@
                         <button id="openModalBtn" class="btn btn-sm shadow-sm btn-agregar-producto" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
                             <i class="fas fa-plus me-1"></i>Agregar Producto
                         </button>
-                        <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=exportar" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=exportar" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; color: white; font-weight: 600;">
                             <i class="fas fa-file-excel me-1"></i>Exportar Productos
                         </a>
-                        <button type="button" id="openSendProductosModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <button type="button" id="openSendProductosModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; font-weight: 600;">
                             <i class="fas fa-envelope me-1"></i>Enviar Productos
                         </button>
                     </div>
@@ -1947,9 +1952,9 @@
                         row.innerHTML = 
                             '<td style="padding: 12px 16px; vertical-align: middle;"><strong style="color: #495057; font-size: 0.95rem;">' + lote.codigoLote + '</strong></td>' +
                             '<td style="padding: 12px 16px; vertical-align: middle; text-align: center;"><span style="color: #495057; font-weight: 500;">' + paquetesInicial + '</span> <span style="color: #6c757d; font-size: 0.85rem;">paquetes</span><br><small style="color: #adb5bd; font-size: 0.8rem;">(' + stockInicial.toLocaleString() + ' unidades)</small></td>' +
-                            '<td style="padding: 12px 16px; vertical-align: middle; text-align: center;"><span style="color: #00a896; font-weight: 600; font-size: 1.05rem;">' + paquetesRestante + '</span> <span style="color: #6c757d; font-size: 0.85rem;">paquetes</span><br><small style="color: #adb5bd; font-size: 0.8rem;">(' + stockRestante.toLocaleString() + ' unidades)</small></td>' +
+                            '<td style="padding: 12px 16px; vertical-align: middle; text-align: center;"><span style="color: #6F4E37; font-weight: 600; font-size: 1.05rem;">' + paquetesRestante + '</span> <span style="color: #6c757d; font-size: 0.85rem;">paquetes</span><br><small style="color: #adb5bd; font-size: 0.8rem;">(' + stockRestante.toLocaleString() + ' unidades)</small></td>' +
                             '<td style="padding: 12px 16px; vertical-align: middle; text-align: center;"><span style="' + badgeStyle + '">' + badgeIcon + porcentajeUsado + '%</span></td>' +
-                            '<td style="padding: 12px 16px; vertical-align: middle; text-align: center;"><span style="color: #495057; font-weight: 500;"><i class="far fa-calendar-alt me-1" style="color: #00a896;"></i>' + fechaVencimiento + '</span></td>';
+                            '<td style="padding: 12px 16px; vertical-align: middle; text-align: center;"><span style="color: #495057; font-weight: 500;"><i class="far fa-calendar-alt me-1" style="color: #6F4E37;"></i>' + fechaVencimiento + '</span></td>';
                         
                         // Agregar efecto hover
                         row.addEventListener('mouseenter', function() {
@@ -2037,7 +2042,7 @@
 <div class="modal fade" id="resumenLotesProductoModal" tabindex="-1" aria-labelledby="resumenLotesProductoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-            <div class="modal-header text-white" style="background: linear-gradient(135deg, #00a896 0%, #028f80 100%); border-radius: 16px 16px 0 0; padding: 20px 25px; border-bottom: none;">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); border-radius: 16px 16px 0 0; padding: 20px 25px; border-bottom: none;">
                 <h5 class="modal-title d-flex align-items-center" id="resumenLotesProductoModalLabel" style="font-weight: 600; font-size: 1.3rem;">
                     <span class="d-flex align-items-center justify-content-center me-3" style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 10px; width: 45px; height: 45px;">
                         <i class="fas fa-boxes" style="font-size: 1.3rem;"></i>
@@ -2050,9 +2055,9 @@
             </div>
             <div class="modal-body" style="padding: 25px; background: #f8f9fa;">
                 <!-- Nombre del producto con estilo destacado -->
-                <div class="mb-4" style="background: white; padding: 15px 20px; border-radius: 12px; border-left: 4px solid #00a896;">
+                <div class="mb-4" style="background: white; padding: 15px 20px; border-radius: 12px; border-left: 4px solid #6F4E37;">
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-box text-muted me-3" style="font-size: 1.3rem; color: #00a896 !important;"></i>
+                        <i class="fas fa-box text-muted me-3" style="font-size: 1.3rem; color: #6F4E37 !important;"></i>
                         <div>
                             <small class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Producto</small>
                             <h6 class="mb-0" id="modalProductoNombreResumen" style="font-size: 1.15rem; font-weight: 600; color: var(--turquoise-dark);"></h6>
@@ -2062,7 +2067,7 @@
 
                 <!-- Loading spinner mejorado -->
                 <div id="loadingResumenProducto" class="text-center py-5">
-                    <div class="spinner-border" role="status" style="color: #00a896; width: 3rem; height: 3rem; border-width: 0.3rem;">
+                    <div class="spinner-border" role="status" style="color: #6F4E37; width: 3rem; height: 3rem; border-width: 0.3rem;">
                         <span class="visually-hidden">Cargando...</span>
                     </div>
                     <p class="mt-3 text-muted" style="font-size: 0.9rem;">Cargando información de lotes...</p>
@@ -2075,19 +2080,19 @@
                             <thead style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
                                 <tr>
                                     <th style="padding: 14px 16px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: #495057; border: none;">
-                                        <i class="fas fa-barcode me-2" style="color: #00a896;"></i>Código Lote
+                                        <i class="fas fa-barcode me-2" style="color: #6F4E37;"></i>Código Lote
                                     </th>
                                     <th style="padding: 14px 16px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: #495057; border: none; text-align: center;">
-                                        <i class="fas fa-boxes me-2" style="color: #00a896;"></i>Inicial
+                                        <i class="fas fa-boxes me-2" style="color: #6F4E37;"></i>Inicial
                                     </th>
                                     <th style="padding: 14px 16px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: #495057; border: none; text-align: center;">
-                                        <i class="fas fa-box-open me-2" style="color: #00a896;"></i>Restante
+                                        <i class="fas fa-box-open me-2" style="color: #6F4E37;"></i>Restante
                                     </th>
                                     <th style="padding: 14px 16px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: #495057; border: none; text-align: center;">
-                                        <i class="fas fa-chart-pie me-2" style="color: #00a896;"></i>% Usado
+                                        <i class="fas fa-chart-pie me-2" style="color: #6F4E37;"></i>% Usado
                                     </th>
                                     <th style="padding: 14px 16px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: #495057; border: none; text-align: center;">
-                                        <i class="fas fa-calendar-alt me-2" style="color: #00a896;"></i>Vencimiento
+                                        <i class="fas fa-calendar-alt me-2" style="color: #6F4E37;"></i>Vencimiento
                                     </th>
                                 </tr>
                             </thead>
@@ -3083,7 +3088,7 @@ function marcarTodasLeidasDesdeModal() {
 <div class="modal fade" id="modalNotificacion" tabindex="-1" aria-labelledby="modalNotificacionLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+            <div class="modal-header" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
                 <h5 class="modal-title" id="modalNotificacionLabel" style="font-weight: 600;">
                     <i class="fas fa-bell me-2"></i>Nueva Notificación
                 </h5>
@@ -3107,7 +3112,7 @@ function marcarTodasLeidasDesdeModal() {
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 8px 20px;">
                     <i class="fas fa-times me-2"></i>Cerrar
                 </button>
-                <button type="button" class="btn btn-primary" onclick="irANotificacion()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); border: none; border-radius: 8px; padding: 8px 20px;">
+                <button type="button" class="btn btn-primary" onclick="irANotificacion()" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; border-radius: 8px; padding: 8px 20px;">
                     <i class="fas fa-arrow-right me-2"></i>Ver Detalles
                 </button>
             </div>
@@ -3119,7 +3124,7 @@ function marcarTodasLeidasDesdeModal() {
 <div class="modal fade" id="modalTodasNotificaciones" tabindex="-1" aria-labelledby="modalTodasNotificacionesLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+            <div class="modal-header" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
                 <h5 class="modal-title" id="modalTodasNotificacionesLabel" style="font-weight: 600;">
                     <i class="fas fa-bell me-2"></i>Todas las Notificaciones
                 </h5>
@@ -3127,7 +3132,7 @@ function marcarTodasLeidasDesdeModal() {
             </div>
             <div class="modal-body" style="padding: 0;">
                 <div class="d-flex justify-content-between align-items-center p-3 border-bottom" style="background: #f8f9fa;">
-                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
+                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
                         <i class="fas fa-check-double me-1"></i>Marcar todas como leídas
                     </button>
                     <span class="text-muted" id="contadorModalNotificaciones"></span>
@@ -3201,12 +3206,12 @@ function marcarTodasLeidasDesdeModal() {
     
     .notificacion-item-grande:hover {
         background: #f8f9fa;
-        border-left-color: #00a896;
+        border-left-color: #6F4E37;
     }
     
     .notificacion-item-grande.no-leida {
         background: #e8f4f8;
-        border-left-color: #00a896;
+        border-left-color: #6F4E37;
     }
     
     .notificacion-icon-grande {

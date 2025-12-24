@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <!doctype html>
 <html lang="es">
@@ -99,6 +100,23 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+        
+        /* Estilos para encabezados de tabla con hover verde y ordenamiento - similar a usuarios */
+        #conductorTable thead th {
+            position: relative;
+            user-select: none;
+            color: var(--text-muted) !important;
+            text-transform: uppercase;
+        }
+        
+        /* Efecto hover verde en los encabezados (excepto Acciones) */
+        #conductorTable thead th:not(:last-child) {
+            cursor: pointer;
+        }
+        
+        #conductorTable thead th:not(:last-child):hover {
+            background-color: var(--seafoam) !important;
         }
         
         /* Permitir que el dropdown sea visible en la columna de acciones */
@@ -243,7 +261,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -301,7 +319,7 @@
             gap: 6px;
         }
         #sendEmailModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #sendEmailModal .form-group input,
@@ -317,7 +335,7 @@
         }
         #sendEmailModal .form-group input:focus,
         #sendEmailModal .form-group textarea:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -330,7 +348,7 @@
             gap: 6px;
         }
         #sendEmailModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             margin-top: 2px;
         }
         #sendEmailModal .modal-footer {
@@ -355,11 +373,11 @@
             gap: 8px;
         }
         #sendEmailModal .modal-footer button[type="submit"] {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: white;
         }
         #sendEmailModal .modal-footer button[type="submit"]:hover {
-            background: linear-gradient(135deg, #028f80 0%, #02796b 100%);
+            background: linear-gradient(135deg, #8B6F47 0%, #A0826D 100%);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,168,150,0.3);
         }
@@ -374,12 +392,12 @@
             margin-top: 1rem;
             padding: 12px 16px;
             border-radius: 8px;
-            border-left: 4px solid #00a896;
+            border-left: 4px solid #6F4E37;
             background: #e8f5f4;
-            color: #006d77;
+            color: #6F4E37;
         }
         #sendEmailModal .alert i {
-            color: #00a896;
+            color: #6F4E37;
         }
         @keyframes modalSlideIn {
             from {
@@ -440,7 +458,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -498,7 +516,7 @@
             gap: 6px;
         }
         #addConductorModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #addConductorModal .form-group input {
@@ -512,7 +530,7 @@
             box-sizing: border-box;
         }
         #addConductorModal .form-group input:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -525,7 +543,7 @@
             gap: 6px;
         }
         #addConductorModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             margin-top: 2px;
         }
         #addConductorModal .modal-footer { 
@@ -616,7 +634,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); 
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -674,7 +692,7 @@
             gap: 6px;
         }
         #editConductorModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #editConductorModal .form-group input {
@@ -687,7 +705,7 @@
             background: white;
         }
         #editConductorModal .form-group input:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -703,7 +721,7 @@
             border-radius: 6px;
         }
         #editConductorModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             flex-shrink: 0;
         }
         #editConductorModal .modal-footer { 
@@ -737,7 +755,7 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #editConductorModal .modal-footer button[type="submit"] {
-            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             color: white;
             box-shadow: 0 4px 12px rgba(0,168,150,0.3);
         }
@@ -809,19 +827,19 @@
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Conductores</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalConductores %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalConductores %></p>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Con Planes Asignados</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= conductoresConPlanes %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= conductoresConPlanes %></p>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Sin Planes Asignados</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= conductoresSinPlanes %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= conductoresSinPlanes %></p>
                         </div>
                     </div>
                 </div>
@@ -832,7 +850,7 @@
                         <input type="hidden" name="action" value="listar">
                         <input type="hidden" name="size" value="${size != null ? size : 5}">
                         <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
-                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
+                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                                 <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" id="searchInput" placeholder="Nombre o licencia..." value="${busqueda != null ? busqueda : ''}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
@@ -841,7 +859,15 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 d-flex align-items-end">
+                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+                                <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-id-badge me-1"></i>DNI</label>
+                                <input type="text" class="form-control form-control-sm shadow-sm" name="dni" id="dniInput" placeholder="Buscar por DNI..." value="${param.dni != null ? param.dni : ''}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                            </div>
+                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+                                <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-calendar-alt me-1"></i>Vencimiento</label>
+                                <input type="date" class="form-control form-control-sm shadow-sm" name="fechaVencimiento" id="fechaVencimientoInput" value="${param.fechaVencimiento != null ? param.fechaVencimiento : ''}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12 d-flex align-items-end">
                                 <a href="${pageContext.request.contextPath}/administrador/ConductorServlet" class="btn btn-sm btn-outline-secondary w-100 shadow-sm" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
                                     <i class="fas fa-sync-alt me-1"></i>Limpiar
                                 </a>
@@ -877,27 +903,28 @@
                                     <table id="conductorTable" class="table table-hover align-middle mb-0 datatable-server-side" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                         <thead class="table-light">
                                         <tr>
-                                            <th style="width: 5%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">#</th>
-                                            <th style="width: 50%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-user me-1"></i>Nombre Completo</th>
-                                            <th style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-id-card me-1"></i>Licencia</th>
-                                            <th class="text-end fw-semibold text-success" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-cog me-1"></i>Acciones</th>
+                                            <th style="width: 5%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-hashtag me-1"></i>ID</th>
+                                            <th style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-user me-1"></i>Nombre Completo</th>
+                                            <th style="width: 8%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-id-badge me-1"></i>DNI</th>
+                                            <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-phone me-1"></i>Teléfono</th>
+                                            <th style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-envelope me-1"></i>Email</th>
+                                            <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-id-card me-1"></i>Licencia</th>
+                                            <th style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-calendar-alt me-1"></i>Vencimiento</th>
+                                            <th class="text-end fw-semibold text-success" style="width: 6%; font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-cog me-1"></i>Acciones</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <%
-                                            Integer currentPage = (Integer) request.getAttribute("currentPage");
-                                            Integer size = (Integer) request.getAttribute("size");
-                                            int currentPageInt = (currentPage != null) ? currentPage : 1;
-                                            int sizeInt = (size != null) ? size : 5;
-                                            int contador = (currentPageInt - 1) * sizeInt + 1;
-                                        %>
                                         <c:forEach var="conductor" items="${listaConductores}">
                                             <tr class="align-middle" style="padding: 0;">
-                                                <td class="text-muted" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= contador++ %></td>
+                                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                                    <span style="font-size: 0.9rem; font-weight: 600; color: #2b2d42;">
+                                                        CON<fmt:formatNumber value="${conductor.idConductor}" pattern="000"/>
+                                                    </span>
+                                                </td>
                                                 <td style="padding: 0.35rem 0.5rem;">
                                                     <div class="d-flex align-items-center">
                                                         <div class="avatar-wrapper me-2">
-                                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-sm" 
+                                                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center shadow-sm" 
                                                                  style="width: 38px; height: 38px; font-weight: 600; font-size: 0.9rem; border: 2px solid #e9ecef;">
                                                                 ${fn:substring(conductor.nombreCompleto, 0, 1)}
                                                             </div>
@@ -906,9 +933,70 @@
                                                     </div>
                                                 </td>
                                                 <td style="padding: 0.35rem 0.5rem;">
-                                                    <span class="badge bg-info shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                                        <i class="fas fa-id-card me-1"></i>${conductor.licencia}
+                                                    <c:choose>
+                                                        <c:when test="${not empty conductor.dni}">
+                                                            <span class="text-dark" style="font-size: 0.85rem;">${conductor.dni}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted" style="font-size: 0.85rem;">-</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td style="padding: 0.35rem 0.5rem;">
+                                                    <c:choose>
+                                                        <c:when test="${not empty conductor.telefono}">
+                                                            <span class="text-dark" style="font-size: 0.85rem;">${conductor.telefono}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted" style="font-size: 0.85rem;">-</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td style="padding: 0.35rem 0.5rem;">
+                                                    <c:choose>
+                                                        <c:when test="${not empty conductor.email}">
+                                                            <span class="text-dark" style="font-size: 0.85rem;">${conductor.email}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted" style="font-size: 0.85rem;">-</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td style="padding: 0.35rem 0.5rem;">
+                                                    <span class="text-dark" style="font-size: 0.85rem;">
+                                                        ${conductor.licencia}
                                                     </span>
+                                                </td>
+                                                <td style="padding: 0.35rem 0.5rem;">
+                                                    <c:choose>
+                                                        <c:when test="${not empty conductor.fechaVencimientoLicencia}">
+                                                            <%
+                                                                // Obtener la fecha del conductor
+                                                                com.example.telito.administrador.beans.Conductor cond = (com.example.telito.administrador.beans.Conductor) pageContext.getAttribute("conductor");
+                                                                if (cond != null && cond.getFechaVencimientoLicencia() != null) {
+                                                                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                                                                    String fechaFormateada = sdf.format(cond.getFechaVencimientoLicencia());
+                                                                    // Verificar si está próxima a vencer (30 días)
+                                                                    java.util.Date hoy = new java.util.Date();
+                                                                    long diffInMillies = cond.getFechaVencimientoLicencia().getTime() - hoy.getTime();
+                                                                    long diffInDays = diffInMillies / (1000 * 60 * 60 * 24);
+                                                                    
+                                                                    if (diffInDays < 0) {
+                                                                        // Ya venció
+                                                                        out.print("<span class='badge bg-danger shadow-sm' style='font-size: 0.8rem; padding: 0.3rem 0.6rem;'><i class='fas fa-exclamation-triangle me-1'></i>" + fechaFormateada + "</span>");
+                                                                    } else {
+                                                                        // Válida o próxima a vencer - mostrar solo texto
+                                                                        out.print("<span class='text-dark' style='font-size: 0.85rem;'>" + fechaFormateada + "</span>");
+                                                                    }
+                                                                } else {
+                                                                    out.print("<span class='text-muted' style='font-size: 0.85rem;'>-</span>");
+                                                                }
+                                                            %>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted" style="font-size: 0.85rem;">-</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </td>
                                                 <td class="text-end" style="padding: 0.35rem 0.5rem;">
                                                     <div class="dropdown">
@@ -992,6 +1080,92 @@
                         <span>Ingresa el número de licencia del conductor</span>
                     </div>
                 </div>
+                
+                <div class="form-group">
+                    <label for="modalTipoLicencia">
+                        <i class="fas fa-certificate"></i>
+                        Tipo de Licencia <span class="text-danger">*</span>
+                    </label>
+                    <select name="tipoLicencia" 
+                            id="modalTipoLicencia" 
+                            required>
+                        <option value="">Seleccione un tipo</option>
+                        <option value="A">A - Motocicletas</option>
+                        <option value="B">B - Vehículos particulares</option>
+                        <option value="C">C - Vehículos de carga</option>
+                        <option value="D">D - Transporte público</option>
+                        <option value="E">E - Transporte de carga pesada</option>
+                    </select>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Selecciona el tipo de licencia del conductor</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalFechaVencimientoLicencia">
+                        <i class="fas fa-calendar-alt"></i>
+                        Fecha de Vencimiento de Licencia <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" 
+                           name="fechaVencimientoLicencia" 
+                           id="modalFechaVencimientoLicencia" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa la fecha de vencimiento de la licencia</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalDni">
+                        <i class="fas fa-id-badge"></i>
+                        DNI <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" 
+                           name="dni" 
+                           id="modalDni" 
+                           placeholder="Ej: 12345678" 
+                           maxlength="20"
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el DNI del conductor</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalTelefono">
+                        <i class="fas fa-phone"></i>
+                        Teléfono <span class="text-danger">*</span>
+                    </label>
+                    <input type="tel" 
+                           name="telefono" 
+                           id="modalTelefono" 
+                           placeholder="Ej: 987654321" 
+                           maxlength="20"
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el número de teléfono del conductor</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalEmail">
+                        <i class="fas fa-envelope"></i>
+                        Email <span class="text-danger">*</span>
+                    </label>
+                    <input type="email" 
+                           name="email" 
+                           id="modalEmail" 
+                           placeholder="Ej: conductor@ejemplo.com"
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el correo electrónico del conductor</span>
+                    </div>
+                </div>
             </div>
             
             <div class="modal-footer">
@@ -1049,6 +1223,91 @@
                     <div class="form-hint">
                         <i class="fas fa-info-circle"></i>
                         <span>Ingresa el número de licencia del conductor</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editTipoLicencia">
+                        <i class="fas fa-certificate"></i>
+                        Tipo de Licencia <span class="text-danger">*</span>
+                    </label>
+                    <select name="tipoLicencia" 
+                            id="editTipoLicencia" 
+                            required>
+                        <option value="">Seleccione un tipo</option>
+                        <option value="A">A - Motocicletas</option>
+                        <option value="B">B - Vehículos particulares</option>
+                        <option value="C">C - Vehículos de carga</option>
+                        <option value="D">D - Transporte público</option>
+                        <option value="E">E - Transporte de carga pesada</option>
+                    </select>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Selecciona el tipo de licencia del conductor</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editFechaVencimientoLicencia">
+                        <i class="fas fa-calendar-alt"></i>
+                        Fecha de Vencimiento de Licencia <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" 
+                           name="fechaVencimientoLicencia" 
+                           id="editFechaVencimientoLicencia" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa la fecha de vencimiento de la licencia</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editDni">
+                        <i class="fas fa-id-badge"></i>
+                        DNI <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" 
+                           name="dni" 
+                           id="editDni" 
+                           placeholder="Ej: 12345678" 
+                           maxlength="20"
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el DNI del conductor</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editTelefono">
+                        <i class="fas fa-phone"></i>
+                        Teléfono <span class="text-danger">*</span>
+                    </label>
+                    <input type="tel" 
+                           name="telefono" 
+                           id="editTelefono" 
+                           placeholder="Ej: 987654321" 
+                           maxlength="20"
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el número de teléfono del conductor</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editEmail">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </label>
+                    <input type="email" 
+                           name="email" 
+                           id="editEmail" 
+                           placeholder="Ej: conductor@ejemplo.com">
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el correo electrónico del conductor (opcional)</span>
                     </div>
                 </div>
             </div>
@@ -1227,6 +1486,8 @@
         
         const filterForm = document.getElementById('filterForm');
         const searchInput = document.getElementById('searchInput');
+        const dniInput = document.getElementById('dniInput');
+        const fechaVencimientoInput = document.getElementById('fechaVencimientoInput');
         
         // Aplicar filtros al presionar Enter en el campo de búsqueda
         if (searchInput && filterForm) {
@@ -1235,6 +1496,23 @@
                     e.preventDefault();
                     filterForm.submit();
                 }
+            });
+        }
+        
+        // Aplicar filtros al presionar Enter en el campo de DNI
+        if (dniInput && filterForm) {
+            dniInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    filterForm.submit();
+                }
+            });
+        }
+        
+        // Aplicar filtros al cambiar la fecha de vencimiento
+        if (fechaVencimientoInput && filterForm) {
+            fechaVencimientoInput.addEventListener('change', function() {
+                filterForm.submit();
             });
         }
     });
@@ -1262,6 +1540,11 @@
                 // Limpiar formulario
                 document.getElementById('modalNombreCompleto').value = '';
                 document.getElementById('modalLicencia').value = '';
+                document.getElementById('modalTipoLicencia').value = '';
+                document.getElementById('modalFechaVencimientoLicencia').value = '';
+                document.getElementById('modalDni').value = '';
+                document.getElementById('modalTelefono').value = '';
+                document.getElementById('modalEmail').value = '';
                 
                 addConductorModal.classList.add('show');
                 addConductorModal.style.display = 'flex';
@@ -1426,7 +1709,7 @@
             // Mostrar loading overlay
             const modalBody = editConductorModal.querySelector('.modal-body');
             if (modalBody) {
-                modalBody.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x mb-3" style="color: #00a896;"></i><p>Cargando datos del conductor...</p></div>';
+                modalBody.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x mb-3" style="color: #6F4E37;"></i><p>Cargando datos del conductor...</p></div>';
             }
             
             abrirModalEditarConductor();
@@ -1436,22 +1719,60 @@
                 headers: { 'Content-Type': 'application/json' }
             })
             .then(response => {
-                if (!response.ok) throw new Error('Error al cargar los datos del conductor');
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.mensaje || 'Error al cargar los datos del conductor');
+                    });
+                }
                 return response.json();
             })
             .then(data => {
+                // Verificar si hay un error en la respuesta
+                if (data.exito === false) {
+                    throw new Error(data.mensaje || 'Error al cargar los datos del conductor');
+                }
+                
                 // Restore original form HTML
                 modalBody.innerHTML = originalModalBodyContent;
                 
                 // Populate form fields
-                document.getElementById('editIdConductor').value = data.idConductor;
+                document.getElementById('editIdConductor').value = data.idConductor || '';
                 document.getElementById('editNombreCompleto').value = data.nombreCompleto || '';
                 document.getElementById('editLicencia').value = data.licencia || '';
+                document.getElementById('editTipoLicencia').value = data.tipoLicencia || '';
+                
+                // Formatear fecha para el input date (YYYY-MM-DD)
+                if (data.fechaVencimientoLicencia) {
+                    try {
+                        // Si viene como string en formato YYYY-MM-DD, usarlo directamente
+                        if (typeof data.fechaVencimientoLicencia === 'string' && data.fechaVencimientoLicencia.match(/^\d{4}-\d{2}-\d{2}/)) {
+                            document.getElementById('editFechaVencimientoLicencia').value = data.fechaVencimientoLicencia.substring(0, 10);
+                        } else {
+                            // Si viene como objeto Date o timestamp
+                            const fecha = new Date(data.fechaVencimientoLicencia);
+                            if (!isNaN(fecha.getTime())) {
+                                const fechaFormateada = fecha.toISOString().split('T')[0];
+                                document.getElementById('editFechaVencimientoLicencia').value = fechaFormateada;
+                            } else {
+                                document.getElementById('editFechaVencimientoLicencia').value = '';
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Error al formatear fecha:', e);
+                        document.getElementById('editFechaVencimientoLicencia').value = '';
+                    }
+                } else {
+                    document.getElementById('editFechaVencimientoLicencia').value = '';
+                }
+                
+                document.getElementById('editDni').value = data.dni || '';
+                document.getElementById('editTelefono').value = data.telefono || '';
+                document.getElementById('editEmail').value = data.email || '';
             })
             .catch(error => {
                 console.error('Error al cargar conductor:', error);
                 cerrarModalEditarConductor();
-                alert('Error al cargar los datos del conductor. Por favor, intenta nuevamente.');
+                alert('Error al cargar los datos del conductor: ' + (error.message || 'Por favor, intenta nuevamente.'));
             });
         };
         

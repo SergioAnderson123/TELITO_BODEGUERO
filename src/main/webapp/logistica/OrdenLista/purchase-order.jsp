@@ -12,9 +12,94 @@
     <!-- Incluir modales personalizados -->
     <jsp:include page="/WEB-INF/includes/modal-alerts.jsp" />
     <style>
-        /* Estilo para el encabezado de la tabla igual que en productor */
+        /* Estilos específicos del módulo: Sidebar con temática café y beige */
+        .nav-left-sidebar {
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important;
+        }
+        .nav-link {
+            color: #F5DEB3 !important;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #FFF8DC !important;
+            background-color: rgba(245, 222, 179, 0.2) !important;
+        }
+        .nav-divider {
+            color: #F5DEB3 !important;
+            border-top-color: rgba(245, 222, 179, 0.4) !important;
+        }
+        .nav-link::before {
+            background: #F5DEB3 !important;
+        }
+        
+        /* Fondo beige claro para todo el contenido principal (header, centro, footer) */
+        .dashboard-header {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-header .navbar {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-wrapper {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-content {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-main-wrapper {
+            background-color: #FFFEF9 !important;
+        }
+        footer,
+        .footer {
+            background-color: #FFFEF9 !important;
+        }
+        body {
+            background-color: #FFFEF9 !important;
+        }
+        
+        /* Textos en color marrón */
+        .dashboard-header .navbar-brand span {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-brand i {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-nav .nav-link span {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link.dropdown-toggle {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link i.fa-bell,
+        .dashboard-header .nav-link i[class*="fa-bell"] {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link[style*="color: var(--turquoise-dark)"] i,
+        .dashboard-header .nav-link i[style*="color: var(--turquoise-dark)"] {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-brand i.fa-truck,
+        .dashboard-header .navbar-brand i[class*="fa-truck"],
+        .dashboard-header .navbar-brand i[style*="color: var(--seafoam)"] {
+            color: #6F4E37 !important;
+        }
+        .pageheader-title {
+            color: #6F4E37 !important;
+        }
+        .pageheader-text {
+            color: #6F4E37 !important;
+        }
+        .page-header h2 {
+            color: #6F4E37 !important;
+        }
+        .page-header p {
+            color: #6F4E37 !important;
+        }
+        .page-header h2 i {
+            color: #6F4E37 !important;
+        }
+        
+        /* Estilo para el encabezado de la tabla con temática café */
         .table-card .card-header {
-            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important;
             color: #fff;
             border-radius: 12px 12px 0 0;
             padding: 20px 30px;
@@ -23,6 +108,22 @@
         .table-card .card-header h5,
         .table-card .card-header small {
             color: white !important;
+        }
+        
+        /* Cards con fondo beige claro y bordes café */
+        .card {
+            background-color: #FFFEF9 !important;
+            border: 2px solid #6F4E37 !important;
+        }
+        .stat-card {
+            background-color: #FFFEF9 !important;
+            border: 2px solid #6F4E37 !important;
+        }
+        .stat-card h3 {
+            color: #6F4E37 !important;
+        }
+        .stat-card p {
+            color: #6F4E37 !important;
         }
         /* Estilo para el botón Limpiar igual que en productor - sobrescribir estilos globales */
         .btn-outline-secondary {
@@ -91,10 +192,10 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important; 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
-            box-shadow: 0 4px 12px rgba(0,168,150,0.2);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.2);
         }
         #sendOrdenesCompraModal .modal-header h2 { 
             margin: 0; 
@@ -149,7 +250,7 @@
             gap: 6px;
         }
         #sendOrdenesCompraModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #sendOrdenesCompraModal .form-group input,
@@ -164,9 +265,9 @@
         }
         #sendOrdenesCompraModal .form-group input:focus,
         #sendOrdenesCompraModal .form-group textarea:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+            box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1);
         }
         #sendOrdenesCompraModal .form-hint {
             margin-top: 6px;
@@ -177,7 +278,7 @@
             gap: 6px;
         }
         #sendOrdenesCompraModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             margin-top: 2px;
         }
         #sendOrdenesCompraModal .modal-footer { 
@@ -211,13 +312,13 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #sendOrdenesCompraModal .modal-footer button[type="submit"] {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(0,168,150,0.3);
+            box-shadow: 0 4px 12px rgba(111, 78, 55, 0.3);
         }
         #sendOrdenesCompraModal .modal-footer button[type="submit"]:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,168,150,0.4);
+            box-shadow: 0 6px 20px rgba(111, 78, 55, 0.4);
         }
         @media (max-width: 768px) {
             #sendOrdenesCompraModal .modal-content {
@@ -274,13 +375,13 @@
                             String urlBase = request.getContextPath() + "/logistica/OrdenCompraReporteServlet?action=exportar" + urlParams.toString();
                             String urlEnviar = request.getContextPath() + "/logistica/OrdenCompraReporteServlet?action=formEnviar" + urlParams.toString();
                         %>
-                        <a href="<%= urlBase %>" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <a href="<%= urlBase %>" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #D4A574 0%, #C9A87A 100%); color: white; border: none;">
                             <i class="fas fa-file-excel me-1"></i>Exportar a Excel
                         </a>
-                        <button type="button" id="openSendOrdenesCompraModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                        <button type="button" id="openSendOrdenesCompraModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #E8B86D 0%, #D4A574 100%); border: none;">
                             <i class="fas fa-envelope me-1"></i>Enviar por Correo
                         </button>
-                        <a href="${pageContext.request.contextPath}/orden-compra?action=crear" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
+                        <a href="${pageContext.request.contextPath}/orden-compra?action=crear" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; color: white; font-weight: 600;">
                             <i class="fas fa-plus me-1"></i>Agregar Orden
                         </a>
                     </div>
@@ -292,35 +393,51 @@
                 Integer totalOrdenesAttr = (Integer) request.getAttribute("totalOrdenes");
                 Integer ordenesPendientesAttr = (Integer) request.getAttribute("ordenesPendientes");
                 Integer ordenesAprobadasAttr = (Integer) request.getAttribute("ordenesAprobadas");
+                Integer ordenesRechazadasAttr = (Integer) request.getAttribute("ordenesRechazadas");
+                Integer ordenesRecibidasAttr = (Integer) request.getAttribute("ordenesRecibidas");
                 int totalOrdenes = (totalOrdenesAttr != null) ? totalOrdenesAttr : 0;
                 int ordenesPendientes = (ordenesPendientesAttr != null) ? ordenesPendientesAttr : 0;
                 int ordenesAprobadas = (ordenesAprobadasAttr != null) ? ordenesAprobadasAttr : 0;
+                int ordenesRechazadas = (ordenesRechazadasAttr != null) ? ordenesRechazadasAttr : 0;
+                int ordenesRecibidas = (ordenesRecibidasAttr != null) ? ordenesRecibidasAttr : 0;
             %>
 
             <!-- ===================== Tarjetas de estadísticas ===================== -->
-            <div class="row g-2 mb-3">
-                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Órdenes</h3>
-                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalOrdenes %></p>
+            <div class="row g-2 mb-3" style="display: flex; flex-wrap: nowrap;">
+                <div class="col" style="flex: 1 1 0%; min-width: 0;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Total de Órdenes</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalOrdenes %></p>
                     </div>
                 </div>
-                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Pendientes</h3>
-                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= ordenesPendientes %></p>
+                <div class="col" style="flex: 1 1 0%; min-width: 0;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Pendientes</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= ordenesPendientes %></p>
                     </div>
                 </div>
-                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Aprobadas</h3>
-                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= ordenesAprobadas %></p>
+                <div class="col" style="flex: 1 1 0%; min-width: 0;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Aprobadas</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= ordenesAprobadas %></p>
+                    </div>
+                </div>
+                <div class="col" style="flex: 1 1 0%; min-width: 0;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Rechazadas</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= ordenesRechazadas %></p>
+                    </div>
+                </div>
+                <div class="col" style="flex: 1 1 0%; min-width: 0;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Recibidas</h3>
+                        <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= ordenesRecibidas %></p>
                     </div>
                 </div>
             </div>
 
             <!-- ===================== Card: Búsqueda y filtros ===================== -->
-            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; background-color: #FFFEF9 !important; border: 2px solid #6F4E37 !important;">
                 <form action="${pageContext.request.contextPath}/orden-compra" method="GET" id="filterForm">
                     <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                     <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
@@ -328,7 +445,7 @@
                             <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
                             <div class="input-group">
                                 <input type="text" class="form-control form-control-sm shadow-sm" name="busqueda" id="searchInput" placeholder="N° Orden o producto..." value="${param.busqueda}" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                <button class="btn btn-sm btn-primary shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                <button class="btn btn-sm shadow-sm" type="button" style="font-size: 0.85rem; padding: 0.35rem 0.5rem; background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); color: white; border: none;">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
@@ -458,7 +575,7 @@
                                         <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong><%= orden.getMontoTotal() %></strong></td>
                                         <td class="text-center" style="font-size: 0.85rem; padding: 0.5rem;">
                                             <% if ("Recibido".equals(orden.getEstado())) { %>
-                                            <button class="btn btn-sm shadow-sm" onclick="editarOrden('<%= orden.getNumeroOrden() %>')" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; border: none; color: white; background: linear-gradient(135deg, #00a896 0%, #028f80 100%); transition: all 0.2s ease; white-space: nowrap; font-weight: 600;" onmouseover="this.style.background='linear-gradient(135deg, #028f80 0%, #00a896 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,168,150,0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #00a896 0%, #028f80 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                                            <button class="btn btn-sm shadow-sm" onclick="editarOrden('<%= orden.getNumeroOrden() %>')" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; border: none; color: white; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); transition: all 0.2s ease; white-space: nowrap; font-weight: 600;" onmouseover="this.style.background='linear-gradient(165deg, #8B6F47 0%, #6F4E37 50%, #A0826D 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(111,78,55,0.3)';" onmouseout="this.style.background='linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
                                                 <i class="fas fa-eye me-1"></i>Ver
                                             </button>
                                             <% } else { %>
@@ -509,7 +626,7 @@
 <div class="modal fade" id="detalleOrdenModal" tabindex="-1" aria-labelledby="detalleOrdenModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-            <div class="modal-header text-white" style="background: linear-gradient(135deg, #00a896 0%, #028f80 100%); border-radius: 16px 16px 0 0; padding: 20px 25px; border-bottom: none;">
+            <div class="modal-header text-white" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important; border-radius: 16px 16px 0 0; padding: 20px 25px; border-bottom: none;">
                 <h5 class="modal-title d-flex align-items-center" id="detalleOrdenModalLabel" style="font-weight: 600; font-size: 1.2rem;">
                     <span class="d-flex align-items-center justify-content-center me-3" style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 10px; width: 45px; height: 45px;">
                         <i class="fas fa-box-open" style="font-size: 1.2rem;"></i>
@@ -522,22 +639,22 @@
             </div>
             <div class="modal-body" style="padding: 25px; background: #f8f9fa;">
                 <div id="loadingDetalle" class="text-center py-5">
-                    <div class="spinner-border" style="color: #00a896; width: 3rem; height: 3rem;" role="status">
+                    <div class="spinner-border" style="color: #6F4E37; width: 3rem; height: 3rem;" role="status">
                         <span class="visually-hidden">Cargando...</span>
                     </div>
                     <p class="mt-3 text-muted" style="font-size: 0.95rem;">Cargando detalles de la orden...</p>
                 </div>
                 <div id="detalleOrdenContainer" style="display: none;">
-                    <div class="alert" style="background: linear-gradient(135deg, rgba(0,168,150,0.1) 0%, rgba(2,143,128,0.1) 100%); border: 2px solid #00a896; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px;">
-                        <i class="fas fa-info-circle me-2" style="color: #00a896; font-size: 1.1rem;"></i>
-                        <strong style="color: #00a896;">Orden:</strong> <span id="detalleNumeroOrden" style="color: #495057; font-weight: 600;"></span>
+                    <div class="alert" style="background: linear-gradient(165deg, rgba(111,78,55,0.1) 0%, rgba(139,111,71,0.1) 100%); border: 2px solid #6F4E37; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px;">
+                        <i class="fas fa-info-circle me-2" style="color: #6F4E37; font-size: 1.1rem;"></i>
+                        <strong style="color: #6F4E37;">Orden:</strong> <span id="detalleNumeroOrden" style="color: #495057; font-weight: 600;"></span>
                     </div>
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                                 <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
-                                    <i class="fas fa-user me-2" style="color: #00a896;"></i>Productor
+                                    <i class="fas fa-user me-2" style="color: #6F4E37;"></i>Productor
                                 </label>
                                 <p id="detalleProductor" class="mb-0" style="font-size: 1rem; font-weight: 500; color: #495057;">-</p>
                             </div>
@@ -545,7 +662,7 @@
                         <div class="col-md-6">
                             <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                                 <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
-                                    <i class="fas fa-user-tie me-2" style="color: #00a896;"></i>Personal Responsable
+                                    <i class="fas fa-user-tie me-2" style="color: #6F4E37;"></i>Personal Responsable
                                 </label>
                                 <p id="detallePersonalResponsable" class="mb-0" style="font-size: 1rem; font-weight: 500; color: #495057;">-</p>
                             </div>
@@ -556,7 +673,7 @@
                         <div class="col-md-6">
                             <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                                 <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
-                                    <i class="fas fa-box me-2" style="color: #00a896;"></i>Producto
+                                    <i class="fas fa-box me-2" style="color: #6F4E37;"></i>Producto
                                 </label>
                                 <p id="detalleProducto" class="mb-0" style="font-size: 1rem; font-weight: 500; color: #495057;">-</p>
                             </div>
@@ -564,9 +681,9 @@
                         <div class="col-md-6">
                             <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                                 <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
-                                    <i class="fas fa-barcode me-2" style="color: #00a896;"></i>SKU
+                                    <i class="fas fa-barcode me-2" style="color: #6F4E37;"></i>SKU
                                 </label>
-                                <p id="detalleSKU" class="mb-0"><span class="badge" style="background: linear-gradient(135deg, #00a896 0%, #028f80 100%); font-size: 0.9rem; padding: 6px 12px;">-</span></p>
+                                <p id="detalleSKU" class="mb-0"><span class="badge" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); font-size: 0.9rem; padding: 6px 12px;">-</span></p>
                             </div>
                         </div>
                     </div>
@@ -575,23 +692,23 @@
                         <div class="col-md-4">
                             <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;">
                                 <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
-                                    <i class="fas fa-cubes me-2" style="color: #00a896;"></i>Cantidad
+                                    <i class="fas fa-cubes me-2" style="color: #6F4E37;"></i>Cantidad
                                 </label>
-                                <p id="detalleCantidad" class="mb-0" style="font-size: 1.3rem; font-weight: 600; color: #00a896;">-</p>
+                                <p id="detalleCantidad" class="mb-0" style="font-size: 1.3rem; font-weight: 600; color: #6F4E37;">-</p>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;">
                                 <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
-                                    <i class="fas fa-dollar-sign me-2" style="color: #00a896;"></i>Monto Total
+                                    <i class="fas fa-dollar-sign me-2" style="color: #6F4E37;"></i>Monto Total
                                 </label>
-                                <p id="detalleMontoTotal" class="mb-0" style="font-size: 1.3rem; font-weight: 600; color: #00a896;">-</p>
+                                <p id="detalleMontoTotal" class="mb-0" style="font-size: 1.3rem; font-weight: 600; color: #6F4E37;">-</p>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;">
                                 <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
-                                    <i class="fas fa-clipboard-check me-2" style="color: #00a896;"></i>Estado
+                                    <i class="fas fa-clipboard-check me-2" style="color: #6F4E37;"></i>Estado
                                 </label>
                                 <p id="detalleEstado" class="mb-0"><span class="badge" style="font-size: 0.9rem; padding: 6px 12px;">-</span></p>
                             </div>
@@ -600,7 +717,7 @@
                     
                     <hr style="border-top: 2px solid #e9ecef; margin: 25px 0;">
                     
-                    <h6 class="mb-3" style="color: #00a896; font-weight: 600; font-size: 1rem;">
+                    <h6 class="mb-3" style="color: #6F4E37; font-weight: 600; font-size: 1rem;">
                         <i class="fas fa-boxes me-2"></i>Lote Asignado por el Productor
                     </h6>
                     
@@ -608,7 +725,7 @@
                         <div class="col-md-6">
                             <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                                 <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
-                                    <i class="fas fa-tag me-2" style="color: #00a896;"></i>Código de Lote
+                                    <i class="fas fa-tag me-2" style="color: #6F4E37;"></i>Código de Lote
                                 </label>
                                 <p id="detalleCodigoLote" class="mb-0" style="font-size: 1.1rem; font-weight: 600; color: #495057;">-</p>
                             </div>
@@ -616,7 +733,7 @@
                         <div class="col-md-6">
                             <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                                 <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
-                                    <i class="fas fa-calendar-alt me-2" style="color: #00a896;"></i>Fecha de Vencimiento
+                                    <i class="fas fa-calendar-alt me-2" style="color: #6F4E37;"></i>Fecha de Vencimiento
                                 </label>
                                 <p id="detalleFechaVencimiento" class="mb-0" style="font-size: 1rem; font-weight: 500; color: #495057;">-</p>
                             </div>
@@ -627,15 +744,15 @@
                         <div class="col-md-6">
                             <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                                 <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
-                                    <i class="fas fa-boxes me-2" style="color: #00a896;"></i>Stock Disponible
+                                    <i class="fas fa-boxes me-2" style="color: #6F4E37;"></i>Stock Disponible
                                 </label>
-                                <p id="detalleStockDisponible" class="mb-0" style="font-size: 1.1rem; font-weight: 600; color: #00a896;">-</p>
+                                <p id="detalleStockDisponible" class="mb-0" style="font-size: 1.1rem; font-weight: 600; color: #6F4E37;">-</p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                                 <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 8px;">
-                                    <i class="fas fa-map-marker-alt me-2" style="color: #00a896;"></i>Ubicación
+                                    <i class="fas fa-map-marker-alt me-2" style="color: #6F4E37;"></i>Ubicación
                                 </label>
                                 <p id="detalleUbicacion" class="mb-0" style="font-size: 1rem; font-weight: 500; color: #495057;">-</p>
                             </div>
@@ -655,7 +772,7 @@
                     <button type="button" class="btn btn-danger me-2" id="btnRechazar" onclick="cambiarEstadoOrden('Rechazado')" style="padding: 10px 20px; border-radius: 8px; font-weight: 600;">
                         <i class="fas fa-times-circle me-2"></i>Rechazar
                     </button>
-                    <button type="button" class="btn btn-success" id="btnAprobar" onclick="cambiarEstadoOrden('Aprobado')" style="padding: 10px 20px; border-radius: 8px; font-weight: 600; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none;">
+                    <button type="button" class="btn btn-success" id="btnAprobar" onclick="cambiarEstadoOrden('Aprobado')" style="padding: 10px 20px; border-radius: 8px; font-weight: 600; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none;">
                         <i class="fas fa-check-circle me-2"></i>Aprobar
                     </button>
                 </div>
@@ -1006,17 +1123,17 @@
         user-select: none;
     }
     thead th:hover {
-        background-color: var(--seafoam) !important;
+        background-color: rgba(111, 78, 55, 0.1) !important;
     }
     thead th.sort-asc::after {
         content: ' ▲';
         font-size: 0.7em;
-        color: var(--turquoise-dark);
+        color: #6F4E37;
     }
     thead th.sort-desc::after {
         content: ' ▼';
         font-size: 0.7em;
-        color: var(--turquoise-dark);
+        color: #6F4E37;
     }
 </style>
 

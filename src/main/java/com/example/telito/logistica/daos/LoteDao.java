@@ -14,7 +14,8 @@ public class LoteDao extends DAOBase {
         ArrayList<LoteBean> lista = new ArrayList<>();
         // Solo lotes del almacén, no del productor
         String sql = """
-            SELECT l.id_lote, l.codigo_lote, p.nombre AS nombre_producto, l.stock_actual, l.estado, l.ubicacion_id
+            SELECT l.id_lote, l.codigo_lote, p.nombre AS nombre_producto, l.stock_actual, l.estado, l.ubicacion_id,
+                   p.unidades_por_paquete, FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes_disponibles
             FROM lotes l
             INNER JOIN productos p ON l.producto_id = p.id_producto
             WHERE l.stock_actual > 0 
@@ -40,11 +41,14 @@ public class LoteDao extends DAOBase {
                 lote.setId(rs.getInt("id_lote"));
                 lote.setCodigoLote(rs.getString("codigo_lote"));
                 lote.setNombreProducto(rs.getString("nombre_producto"));
+                lote.setStockActual(rs.getInt("stock_actual"));
+                lote.setUnidadesPorPaquete(rs.getInt("unidades_por_paquete"));
+                lote.setPaquetesDisponibles(rs.getInt("paquetes_disponibles"));
                 lista.add(lote);
                 count++;
-                logger.debug("Lote encontrado: ID={}, Codigo={}, Producto={}, Stock={}, Estado={}, Ubicacion={}", 
+                logger.debug("Lote encontrado: ID={}, Codigo={}, Producto={}, Stock={}, Estado={}, Ubicacion={}, Paquetes={}", 
                     lote.getId(), lote.getCodigoLote(), lote.getNombreProducto(),
-                    rs.getInt("stock_actual"), rs.getString("estado"), rs.getInt("ubicacion_id"));
+                    rs.getInt("stock_actual"), rs.getString("estado"), rs.getInt("ubicacion_id"), lote.getPaquetesDisponibles());
             }
             logger.info("Total de lotes disponibles encontrados: {}", count);
             

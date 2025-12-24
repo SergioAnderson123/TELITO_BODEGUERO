@@ -34,15 +34,32 @@
 
                                 <div class="mb-3">
                                     <label for="lote" class="form-label">Producto y Lote a Transportar</label>
-                                    <select class="form-select" id="lote" name="lote_id" required>
+                                    <select class="form-select" id="lote" name="lote_id" required onchange="actualizarInfoLote()">
                                         <option value="" selected disabled>Seleccione un lote...</option>
                                         <% ArrayList<LoteBean> listaLotes = (ArrayList<LoteBean>) request.getAttribute("listaLotes");
                                             if (listaLotes != null) {
                                                 for (LoteBean lote : listaLotes) { %>
-                                        <option value="<%= lote.getId() %>"><%= lote.getNombreProducto() %> (<%= lote.getCodigoLote() %>)</option>
+                                        <option value="<%= lote.getId() %>" 
+                                                data-stock="<%= lote.getStockActual() %>"
+                                                data-unidades-paquete="<%= lote.getUnidadesPorPaquete() %>"
+                                                data-paquetes="<%= lote.getPaquetesDisponibles() %>">
+                                            <%= lote.getNombreProducto() %> (<%= lote.getCodigoLote() %>) - <%= lote.getPaquetesDisponibles() %> paquetes disponibles
+                                        </option>
                                         <%     }
                                         } %>
                                     </select>
+                                    <small class="form-text text-muted" id="infoLote">
+                                        <i class="fas fa-info-circle"></i> Selecciona un lote para ver la información disponible
+                                    </small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="cantidad_paquetes" class="form-label">Cantidad de Paquetes a Transportar</label>
+                                    <input type="number" class="form-control" id="cantidad_paquetes" name="cantidad_paquetes" 
+                                           min="1" max="" required placeholder="Ingrese la cantidad de paquetes">
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle"></i> Ingrese la cantidad de paquetes a transportar (máximo: <span id="maxPaquetes">-</span> paquetes)
+                                    </small>
                                 </div>
 
                                 <div class="row">
@@ -109,5 +126,30 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function actualizarInfoLote() {
+        const select = document.getElementById('lote');
+        const option = select.options[select.selectedIndex];
+        const cantidadInput = document.getElementById('cantidad_paquetes');
+        const maxPaquetesSpan = document.getElementById('maxPaquetes');
+        const infoLote = document.getElementById('infoLote');
+        
+        if (option.value) {
+            const paquetesDisponibles = parseInt(option.getAttribute('data-paquetes')) || 0;
+            const stockActual = parseInt(option.getAttribute('data-stock')) || 0;
+            const unidadesPorPaquete = parseInt(option.getAttribute('data-unidades-paquete')) || 1;
+            
+            cantidadInput.max = paquetesDisponibles;
+            maxPaquetesSpan.textContent = paquetesDisponibles;
+            cantidadInput.placeholder = 'Máximo ' + paquetesDisponibles + ' paquetes';
+            infoLote.innerHTML = '<i class="fas fa-info-circle"></i> Stock disponible: ' + stockActual + ' unidades (' + paquetesDisponibles + ' paquetes)';
+        } else {
+            cantidadInput.max = '';
+            maxPaquetesSpan.textContent = '-';
+            cantidadInput.placeholder = 'Ingrese la cantidad de paquetes';
+            infoLote.innerHTML = '<i class="fas fa-info-circle"></i> Selecciona un lote para ver la información disponible';
+        }
+    }
+</script>
 </body>
 </html>

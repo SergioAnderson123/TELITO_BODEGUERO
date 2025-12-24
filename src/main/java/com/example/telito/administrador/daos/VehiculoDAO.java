@@ -22,10 +22,10 @@ public class VehiculoDAO extends DAOBase {
     // Listar con filtros y paginación
     public ArrayList<Vehiculo> listarVehiculos(String busqueda, int page, int size) {
         ArrayList<Vehiculo> lista = new ArrayList<>();
-        String sql = "SELECT id_vehiculo, placa, marca, modelo, capacidad_kg FROM vehiculos WHERE 1=1";
+        String sql = "SELECT id_vehiculo, placa, marca, modelo, capacidad_kg, año, tipo_combustible, numero_serie_vin, fecha_ultima_revision, fecha_vencimiento_soat FROM vehiculos WHERE 1=1";
         
         if (busqueda != null && !busqueda.trim().isEmpty()) {
-            sql += " AND (placa LIKE ? OR marca LIKE ? OR modelo LIKE ?)";
+            sql += " AND (placa LIKE ? OR marca LIKE ? OR modelo LIKE ? OR numero_serie_vin LIKE ?)";
         }
         
         sql += " ORDER BY placa ASC LIMIT ? OFFSET ?";
@@ -44,6 +44,7 @@ public class VehiculoDAO extends DAOBase {
                 pstmt.setString(paramIndex++, busquedaConWildcards);
                 pstmt.setString(paramIndex++, busquedaConWildcards);
                 pstmt.setString(paramIndex++, busquedaConWildcards);
+                pstmt.setString(paramIndex++, busquedaConWildcards);
             }
 
             int limit = Math.max(1, size);
@@ -59,6 +60,17 @@ public class VehiculoDAO extends DAOBase {
                 vehiculo.setMarca(rs.getString("marca"));
                 vehiculo.setModelo(rs.getString("modelo"));
                 vehiculo.setCapacidadKg(rs.getInt("capacidad_kg"));
+                
+                // Nuevos campos
+                int añoValue = rs.getInt("año");
+                vehiculo.setAño(rs.wasNull() ? null : añoValue);
+                vehiculo.setTipoCombustible(rs.getString("tipo_combustible"));
+                vehiculo.setNumeroSerieVin(rs.getString("numero_serie_vin"));
+                Date fechaUltimaRev = rs.getDate("fecha_ultima_revision");
+                vehiculo.setFechaUltimaRevision(fechaUltimaRev != null ? fechaUltimaRev : null);
+                Date fechaVencSoat = rs.getDate("fecha_vencimiento_soat");
+                vehiculo.setFechaVencimientoSoat(fechaVencSoat != null ? fechaVencSoat : null);
+                
                 lista.add(vehiculo);
             }
         } catch (SQLException e) {
@@ -80,7 +92,7 @@ public class VehiculoDAO extends DAOBase {
         String sql = "SELECT COUNT(*) FROM vehiculos WHERE 1=1";
         
         if (busqueda != null && !busqueda.trim().isEmpty()) {
-            sql += " AND (placa LIKE ? OR marca LIKE ? OR modelo LIKE ?)";
+            sql += " AND (placa LIKE ? OR marca LIKE ? OR modelo LIKE ? OR numero_serie_vin LIKE ?)";
         }
         
         Connection conn = null;
@@ -96,6 +108,7 @@ public class VehiculoDAO extends DAOBase {
                 pstmt.setString(1, busquedaConWildcards);
                 pstmt.setString(2, busquedaConWildcards);
                 pstmt.setString(3, busquedaConWildcards);
+                pstmt.setString(4, busquedaConWildcards);
             }
             
             rs = pstmt.executeQuery();
@@ -114,7 +127,7 @@ public class VehiculoDAO extends DAOBase {
     // Buscar vehículo por ID
     public Vehiculo buscarVehiculoPorId(int id) {
         Vehiculo vehiculo = null;
-        String sql = "SELECT id_vehiculo, placa, marca, modelo, capacidad_kg FROM vehiculos WHERE id_vehiculo = ?";
+        String sql = "SELECT id_vehiculo, placa, marca, modelo, capacidad_kg, año, tipo_combustible, numero_serie_vin, fecha_ultima_revision, fecha_vencimiento_soat FROM vehiculos WHERE id_vehiculo = ?";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -133,6 +146,16 @@ public class VehiculoDAO extends DAOBase {
                 vehiculo.setMarca(rs.getString("marca"));
                 vehiculo.setModelo(rs.getString("modelo"));
                 vehiculo.setCapacidadKg(rs.getInt("capacidad_kg"));
+                
+                // Nuevos campos
+                int añoValue = rs.getInt("año");
+                vehiculo.setAño(rs.wasNull() ? null : añoValue);
+                vehiculo.setTipoCombustible(rs.getString("tipo_combustible"));
+                vehiculo.setNumeroSerieVin(rs.getString("numero_serie_vin"));
+                Date fechaUltimaRev = rs.getDate("fecha_ultima_revision");
+                vehiculo.setFechaUltimaRevision(fechaUltimaRev != null ? fechaUltimaRev : null);
+                Date fechaVencSoat = rs.getDate("fecha_vencimiento_soat");
+                vehiculo.setFechaVencimientoSoat(fechaVencSoat != null ? fechaVencSoat : null);
             }
         } catch (SQLException e) {
             logger.error("Error al buscar vehículo por ID: " + id, e);
@@ -145,16 +168,89 @@ public class VehiculoDAO extends DAOBase {
 
     // Crear nuevo vehículo
     public boolean crearVehiculo(Vehiculo vehiculo) {
-        String sql = "INSERT INTO vehiculos (placa, marca, modelo, capacidad_kg) VALUES (?, ?, ?, ?)";
-        int filasAfectadas = executeUpdate(sql, vehiculo.getPlaca(), vehiculo.getMarca(), vehiculo.getModelo(), vehiculo.getCapacidadKg());
-        return filasAfectadas > 0;
+        String sql = "INSERT INTO vehiculos (placa, marca, modelo, capacidad_kg, año, tipo_combustible, numero_serie_vin, fecha_ultima_revision, fecha_vencimiento_soat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, vehiculo.getPlaca());
+            pstmt.setString(2, vehiculo.getMarca());
+            pstmt.setString(3, vehiculo.getModelo());
+            pstmt.setInt(4, vehiculo.getCapacidadKg());
+            
+            // Nuevos campos
+            if (vehiculo.getAño() != null) {
+                pstmt.setInt(5, vehiculo.getAño());
+            } else {
+                pstmt.setNull(5, Types.INTEGER);
+            }
+            pstmt.setString(6, vehiculo.getTipoCombustible());
+            pstmt.setString(7, vehiculo.getNumeroSerieVin());
+            if (vehiculo.getFechaUltimaRevision() != null) {
+                pstmt.setDate(8, vehiculo.getFechaUltimaRevision());
+            } else {
+                pstmt.setDate(8, null);
+            }
+            if (vehiculo.getFechaVencimientoSoat() != null) {
+                pstmt.setDate(9, vehiculo.getFechaVencimientoSoat());
+            } else {
+                pstmt.setDate(9, null);
+            }
+            
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
+        } catch (SQLException e) {
+            logger.error("Error al crear vehículo", e);
+            throw new RuntimeException("Error al crear vehículo", e);
+        } finally {
+            closeResources(conn, pstmt, null);
+        }
     }
 
     // Actualizar vehículo
     public boolean actualizarVehiculo(Vehiculo vehiculo) {
-        String sql = "UPDATE vehiculos SET placa = ?, marca = ?, modelo = ?, capacidad_kg = ? WHERE id_vehiculo = ?";
-        int filasAfectadas = executeUpdate(sql, vehiculo.getPlaca(), vehiculo.getMarca(), vehiculo.getModelo(), vehiculo.getCapacidadKg(), vehiculo.getIdVehiculo());
-        return filasAfectadas > 0;
+        String sql = "UPDATE vehiculos SET placa = ?, marca = ?, modelo = ?, capacidad_kg = ?, año = ?, tipo_combustible = ?, numero_serie_vin = ?, fecha_ultima_revision = ?, fecha_vencimiento_soat = ? WHERE id_vehiculo = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, vehiculo.getPlaca());
+            pstmt.setString(2, vehiculo.getMarca());
+            pstmt.setString(3, vehiculo.getModelo());
+            pstmt.setInt(4, vehiculo.getCapacidadKg());
+            
+            // Nuevos campos
+            if (vehiculo.getAño() != null) {
+                pstmt.setInt(5, vehiculo.getAño());
+            } else {
+                pstmt.setNull(5, Types.INTEGER);
+            }
+            pstmt.setString(6, vehiculo.getTipoCombustible());
+            pstmt.setString(7, vehiculo.getNumeroSerieVin());
+            if (vehiculo.getFechaUltimaRevision() != null) {
+                pstmt.setDate(8, vehiculo.getFechaUltimaRevision());
+            } else {
+                pstmt.setDate(8, null);
+            }
+            if (vehiculo.getFechaVencimientoSoat() != null) {
+                pstmt.setDate(9, vehiculo.getFechaVencimientoSoat());
+            } else {
+                pstmt.setDate(9, null);
+            }
+            pstmt.setInt(10, vehiculo.getIdVehiculo());
+            
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
+        } catch (SQLException e) {
+            logger.error("Error al actualizar vehículo", e);
+            throw new RuntimeException("Error al actualizar vehículo", e);
+        } finally {
+            closeResources(conn, pstmt, null);
+        }
     }
 
     // Verificar si el vehículo tiene planes de transporte asociados

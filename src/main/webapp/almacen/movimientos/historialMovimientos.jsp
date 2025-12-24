@@ -18,7 +18,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
         .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: #6c757d; font-weight: 600; }
-        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #00a896; }
+        .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #6F4E37; }
         @media (max-width: 1200px) {
             .stats-container { grid-template-columns: repeat(2, 1fr); }
         }
@@ -86,7 +86,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -144,7 +144,7 @@
             gap: 6px;
         }
         #sendEmailModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #sendEmailModal .form-group input,
@@ -159,7 +159,7 @@
         }
         #sendEmailModal .form-group input:focus,
         #sendEmailModal .form-group textarea:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -175,12 +175,12 @@
             border-radius: 6px;
         }
         #sendEmailModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             flex-shrink: 0;
         }
         #sendEmailModal .alert-info {
             background: rgba(0,168,150,0.1);
-            border-left: 4px solid #00a896;
+            border-left: 4px solid #6F4E37;
             border-radius: 8px;
             padding: 12px 16px;
             margin-bottom: 20px;
@@ -216,7 +216,7 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #sendEmailModal .modal-footer button[type="submit"] {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: white;
             box-shadow: 0 4px 12px rgba(0,168,150,0.3);
         }
@@ -292,25 +292,25 @@
                     <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Movimientos</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalMovimientos %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalMovimientos %></p>
                         </div>
                     </div>
                     <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Entradas</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= movimientosEntrada %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= movimientosEntrada %></p>
                         </div>
                     </div>
                     <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Salidas</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= movimientosSalida %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= movimientosSalida %></p>
                         </div>
                     </div>
                     <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Ajustes</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= movimientosAjuste %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= movimientosAjuste %></p>
                         </div>
                     </div>
                 </div>
@@ -601,7 +601,7 @@
         transition: background-color 0.2s ease;
     }
     #movementTable thead th:hover {
-        background-color: #83c5be !important;
+        background-color: #8B6F47 !important;
     }
     #movementTable thead th.sort-asc::after {
         content: ' ▲';

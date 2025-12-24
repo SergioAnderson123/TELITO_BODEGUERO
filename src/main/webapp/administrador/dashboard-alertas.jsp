@@ -73,7 +73,7 @@
         }
         
         .metric-card-info {
-            background: linear-gradient(160deg, #83c5be 0%, #006d77 100%);
+            background: linear-gradient(160deg, #8B6F47 0%, #6F4E37 100%);
             color: white;
         }
         
@@ -88,13 +88,13 @@
         }
         
         .metric-card-total {
-            background: linear-gradient(160deg, #006d77 0%, #83c5be 100%);
+            background: linear-gradient(160deg, #6F4E37 0%, #8B6F47 100%);
             color: white;
         }
         
         .metric-card-rules {
-            background: linear-gradient(160deg, #edf6f9 0%, #83c5be 100%);
-            color: #006d77;
+            background: linear-gradient(160deg, #FFFEF9 0%, #8B6F47 100%);
+            color: #6F4E37;
         }
         
         .metric-icon {
@@ -139,7 +139,7 @@
         }
         
         .alert-item.info {
-            border-left-color: #83c5be;
+            border-left-color: #8B6F47;
             background: linear-gradient(90deg, rgba(131, 197, 190, 0.1) 0%, white 10%);
         }
         
@@ -164,7 +164,7 @@
         }
         
         .badge-info {
-            background: linear-gradient(160deg, #83c5be 0%, #006d77 100%);
+            background: linear-gradient(160deg, #8B6F47 0%, #6F4E37 100%);
             color: white;
         }
         
@@ -232,7 +232,7 @@
         }
         
         .alerts-section::-webkit-scrollbar-thumb {
-            background: linear-gradient(160deg, #006d77 0%, #83c5be 100%);
+            background: linear-gradient(160deg, #6F4E37 0%, #8B6F47 100%);
             border-radius: 10px;
         }
         
@@ -262,7 +262,7 @@
             <div class="page-header mb-3">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
-                        <h2><i class="fas fa-bell me-2" style="color: #006d77;"></i>Dashboard de Alertas</h2>
+                        <h2><i class="fas fa-bell me-2" style="color: #6F4E37;"></i>Dashboard de Alertas</h2>
                         <p>Vista general de todas las alertas del sistema en tiempo real</p>
                     </div>
                     <div>
@@ -319,7 +319,7 @@
                 <div class="col-lg-5">
                     <div class="chart-container">
                         <h5 class="mb-3" style="color: #2d3748; font-weight: 700;">
-                            <i class="fas fa-chart-pie me-2" style="color: #006d77;"></i>Distribución por Nivel
+                            <i class="fas fa-chart-pie me-2" style="color: #6F4E37;"></i>Distribución por Nivel
                         </h5>
                         <canvas id="nivelChart"></canvas>
                     </div>
@@ -329,7 +329,7 @@
                 <div class="col-lg-7">
                     <div class="chart-container">
                         <h5 class="mb-3" style="color: #2d3748; font-weight: 700;">
-                            <i class="fas fa-chart-bar me-2" style="color: #006d77;"></i>Distribución por Tipo
+                            <i class="fas fa-chart-bar me-2" style="color: #6F4E37;"></i>Distribución por Tipo
                         </h5>
                         <canvas id="tipoChart"></canvas>
                     </div>
@@ -340,7 +340,7 @@
             <div class="row mt-3">
                 <div class="col-12">
                     <div class="card shadow-sm" style="border-radius: 12px; border: none;">
-                        <div class="card-header" style="background: linear-gradient(160deg, #006d77 0%, #83c5be 100%); color: white; border-radius: 12px 12px 0 0; padding: 15px 20px;">
+                        <div class="card-header" style="background: linear-gradient(160deg, #6F4E37 0%, #8B6F47 100%); color: white; border-radius: 12px 12px 0 0; padding: 15px 20px;">
                             <h5 class="mb-0" style="font-weight: 700;">
                                 <i class="fas fa-list me-2"></i>Alertas Activas Recientes
                                 <span class="badge bg-light text-dark ms-2"><%= alertasActivas.size() %></span>

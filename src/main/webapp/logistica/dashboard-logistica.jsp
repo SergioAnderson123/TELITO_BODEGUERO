@@ -17,6 +17,160 @@
         <jsp:param name="pageTitle" value="Dashboard Logístico"/>
     </jsp:include>
     <style>
+        /* Estilos específicos del dashboard: Sidebar con temática café y beige */
+        .nav-left-sidebar {
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%) !important;
+        }
+        .nav-link {
+            color: #F5DEB3 !important;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #FFF8DC !important;
+            background-color: rgba(245, 222, 179, 0.2) !important;
+        }
+        .nav-divider {
+            color: #F5DEB3 !important;
+            border-top-color: rgba(245, 222, 179, 0.4) !important;
+        }
+        .nav-link::before {
+            background: #F5DEB3 !important;
+        }
+        
+        /* Fondo beige claro para todo el contenido principal (header, centro, footer) */
+        .dashboard-header {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-header .navbar {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-wrapper {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-content {
+            background-color: #FFFEF9 !important;
+        }
+        .dashboard-main-wrapper {
+            background-color: #FFFEF9 !important;
+        }
+        footer,
+        .footer {
+            background-color: #FFFEF9 !important;
+        }
+        body {
+            background-color: #FFFEF9 !important;
+        }
+        
+        /* Textos en color marrón */
+        .dashboard-header .navbar-brand span {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-brand i {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-nav .nav-link span {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link.dropdown-toggle {
+            color: #6F4E37 !important;
+        }
+        /* Campana de notificaciones y logo en color marrón */
+        .dashboard-header .nav-link i.fa-bell,
+        .dashboard-header .nav-link i[class*="fa-bell"] {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .nav-link[style*="color: var(--turquoise-dark)"] i,
+        .dashboard-header .nav-link i[style*="color: var(--turquoise-dark)"] {
+            color: #6F4E37 !important;
+        }
+        .dashboard-header .navbar-brand i.fa-truck,
+        .dashboard-header .navbar-brand i[class*="fa-truck"],
+        .dashboard-header .navbar-brand i[style*="color: var(--seafoam)"] {
+            color: #6F4E37 !important;
+        }
+        .pageheader-title {
+            color: #6F4E37 !important;
+        }
+        .pageheader-text {
+            color: #6F4E37 !important;
+        }
+        .page-header h2 {
+            color: #6F4E37 !important;
+        }
+        .page-header p {
+            color: #6F4E37 !important;
+        }
+        .page-header h2 i {
+            color: #6F4E37 !important;
+        }
+        
+        /* Textos e iconos de las cards en color marrón */
+        .dashboard-content .stat-card h6,
+        .dashboard-content .stat-card h6[style*="color: #4a4a4a"],
+        .dashboard-content .stat-card h2,
+        .dashboard-content .stat-card h2[style*="color: #000000"],
+        .dashboard-content .stat-card small,
+        .dashboard-content .stat-card small[style*="color: #4a4a4a"],
+        .dashboard-content .stat-card p {
+            color: #6F4E37 !important;
+        }
+        .dashboard-content .stat-card .stat-icon,
+        .dashboard-content .stat-card .stat-icon.text-warning,
+        .dashboard-content .stat-card .stat-icon.text-info,
+        .dashboard-content .stat-card .stat-icon.text-success,
+        .dashboard-content .stat-card .stat-icon.text-danger {
+            color: #6F4E37 !important;
+        }
+        .dashboard-content .stat-card .stat-icon i {
+            color: #6F4E37 !important;
+        }
+        .dashboard-content .quick-link-card h6,
+        .dashboard-content .quick-link-card h6[style*="color: #000000"],
+        .dashboard-content .quick-link-card span,
+        .dashboard-content .quick-link-card span[style*="color: #4a4a4a"] {
+            color: #6F4E37 !important;
+        }
+        .dashboard-content .quick-link-card .mb-1,
+        .dashboard-content .quick-link-card .mb-1[style*="color: #006d77"] {
+            color: #6F4E37 !important;
+        }
+        .dashboard-content .quick-link-card i {
+            color: #6F4E37 !important;
+        }
+        .dashboard-content .pageheader-title .fa-bolt,
+        .dashboard-content .pageheader-title i.fa-bolt,
+        .dashboard-content h5 i.fa-bolt,
+        .dashboard-content h5 .fa-bolt,
+        .dashboard-content .text-primary.fa-bolt,
+        .dashboard-content i.fa-bolt.text-primary {
+            color: #6F4E37 !important;
+        }
+        .dashboard-content .text-primary {
+            color: #6F4E37 !important;
+        }
+        
+        /* Bordes izquierdos de las cards en colores cálidos que combinan con café */
+        .dashboard-content .stat-card.border-warning,
+        .dashboard-content .stat-card.border-start.border-warning {
+            border-left-color: #D4A574 !important; /* Terracota suave */
+            border-left-width: 4px !important;
+        }
+        .dashboard-content .stat-card.border-info,
+        .dashboard-content .stat-card.border-start.border-info {
+            border-left-color: #E8B86D !important; /* Dorado suave */
+            border-left-width: 4px !important;
+        }
+        .dashboard-content .stat-card.border-success,
+        .dashboard-content .stat-card.border-start.border-success {
+            border-left-color: #C9A87A !important; /* Beige dorado */
+            border-left-width: 4px !important;
+        }
+        .dashboard-content .stat-card.border-danger,
+        .dashboard-content .stat-card.border-start.border-danger,
+        .dashboard-content .stat-card.border.border-danger {
+            border-left-color: #B8865B !important; /* Café tostado */
+            border-left-width: 4px !important;
+        }
+        
         /* CRÍTICO: Eliminar TODAS las restricciones y forzar el mismo tamaño que Productor */
         .dashboard-wrapper {
             width: calc(100% - 250px) !important;

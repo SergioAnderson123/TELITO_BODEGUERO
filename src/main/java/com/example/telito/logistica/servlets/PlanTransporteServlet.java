@@ -82,6 +82,9 @@ public class PlanTransporteServlet extends HttpServlet {
                 int totalPlanes = planTransporteDao.contarPlanes(null, null, null, null, null);
                 int planesEnRuta = planTransporteDao.contarPlanes(null, null, "En Ruta", null, null);
                 int planesEntregados = planTransporteDao.contarPlanes(null, null, "Entregado", null, null);
+                int planesCancelados = planTransporteDao.contarPlanes(null, null, "Cancelado", null, null);
+                int planesSalida = planTransporteDao.contarPlanes(null, null, "Salida", null, null);
+                int planesPendientes = planTransporteDao.contarPlanes(null, null, "Pendiente", null, null);
 
                 ArrayList<PlanTransporteBean> listaPlanes = planTransporteDao.listarPlanesDeTransporte(busqueda, conductorId, estado, fechaDesde, fechaHasta, page, size);
 
@@ -103,6 +106,9 @@ public class PlanTransporteServlet extends HttpServlet {
                 request.setAttribute("totalPlanes", totalPlanes);
                 request.setAttribute("planesEnRuta", planesEnRuta);
                 request.setAttribute("planesEntregados", planesEntregados);
+                request.setAttribute("planesCancelados", planesCancelados);
+                request.setAttribute("planesSalida", planesSalida);
+                request.setAttribute("planesPendientes", planesPendientes);
                 request.setAttribute("baseUrl", request.getContextPath() + "/planes-transporte");
                 request.setAttribute("itemName", "planes de transporte");
 
@@ -176,6 +182,51 @@ public class PlanTransporteServlet extends HttpServlet {
             int vehiculoId = Integer.parseInt(request.getParameter("vehiculo_id"));
             String fechaEntrega = request.getParameter("fecha_entrega");
             int distritoId = Integer.parseInt(request.getParameter("distrito_id"));
+            
+            // 1.1. Leer cantidad de paquetes y convertir a unidades
+            int cantidadPaquetes = Integer.parseInt(request.getParameter("cantidad_paquetes"));
+            
+            // Validar cantidad de paquetes
+            if (cantidadPaquetes <= 0) {
+                request.setAttribute("error", "La cantidad de paquetes debe ser mayor a 0");
+                request.getRequestDispatcher("/logistica/Distribucion/form_plan_transporte.jsp").forward(request, response);
+                return;
+            }
+            
+            // Obtener información del lote para validar stock
+            LoteDao loteDao = new LoteDao();
+            String sqlLote = "SELECT l.stock_actual, p.unidades_por_paquete FROM lotes l " +
+                            "INNER JOIN productos p ON l.producto_id = p.id_producto " +
+                            "WHERE l.id_lote = ?";
+            
+            int stockActual = 0;
+            int unidadesPorPaquete = 1;
+            
+            try (java.sql.Connection conn = com.example.telito.util.DatabaseConnection.getConnection();
+                 java.sql.PreparedStatement pstmt = conn.prepareStatement(sqlLote)) {
+                pstmt.setInt(1, loteId);
+                try (java.sql.ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next()) {
+                        stockActual = rs.getInt("stock_actual");
+                        unidadesPorPaquete = rs.getInt("unidades_por_paquete");
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("Error al obtener información del lote", e);
+                request.setAttribute("error", "Error al obtener información del lote");
+                request.getRequestDispatcher("/logistica/Distribucion/form_plan_transporte.jsp").forward(request, response);
+                return;
+            }
+            
+            // Calcular cantidad de unidades
+            int cantidadUnidades = cantidadPaquetes * unidadesPorPaquete;
+            
+            // Validar que no exceda el stock disponible
+            if (cantidadUnidades > stockActual) {
+                request.setAttribute("error", "La cantidad solicitada (" + cantidadUnidades + " unidades) excede el stock disponible (" + stockActual + " unidades)");
+                request.getRequestDispatcher("/logistica/Distribucion/form_plan_transporte.jsp").forward(request, response);
+                return;
+            }
 
             // 2. Generamos el número de plan secuencial
             int ultimoId = planTransporteDao.obtenerUltimoId();
@@ -183,7 +234,7 @@ public class PlanTransporteServlet extends HttpServlet {
             String numeroPlan = String.format("PT%03d", nuevoId); // Formato PT001, PT011, etc.
 
             // 3. Llamamos al DAO para guardar en la BD
-            planTransporteDao.crearPlan(numeroPlan, loteId, conductorId, vehiculoId, fechaEntrega, distritoId);
+            planTransporteDao.crearPlan(numeroPlan, loteId, conductorId, vehiculoId, fechaEntrega, distritoId, cantidadUnidades);
 
             // 3.5. ========== NOTIFICACIÓN WEB A ALMACÉN ==========
             try {

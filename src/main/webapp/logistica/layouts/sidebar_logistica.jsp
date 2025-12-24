@@ -41,13 +41,6 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link <c:if test='${param.activeMenu == "Alertas"}'>active</c:if>'"
-                       href="${pageContext.request.contextPath}/logistica/alertas">
-                        <i class="fas fa-bell"></i>Alertas
-                    </a>
-                </li>
-
             </ul>
         </nav>
     </div>

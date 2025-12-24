@@ -43,7 +43,7 @@ public class InventarioDao extends DAOBase {
             }
         }
 
-        sql += "ORDER BY p.codigo_sku ASC, l.codigo_lote ASC";
+        sql += "ORDER BY l.id_lote DESC, p.codigo_sku ASC";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -108,10 +108,9 @@ public class InventarioDao extends DAOBase {
                 smc.stock_minimo_producto,
                 smc.stock_critico_producto,
                 CASE
-                    WHEN smc.id_stock_minimo IS NULL THEN 'No configurado'
                     WHEN SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) = 0 THEN 'Sin Stock'
-                    WHEN SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) <= smc.stock_critico_producto THEN 'Sin Stock'
-                    WHEN SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) <= smc.stock_minimo_producto THEN 'Poco Stock'
+                    WHEN smc.id_stock_minimo IS NULL THEN 'No configurado'
+                    WHEN SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) > 0 AND SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) <= smc.stock_minimo_producto THEN 'Poco Stock'
                     ELSE 'En Stock'
                 END AS estado_stock
             FROM productos p
@@ -143,7 +142,7 @@ public class InventarioDao extends DAOBase {
             }
         }
 
-        sql += "ORDER BY p.codigo_sku ASC LIMIT ? OFFSET ?";
+        sql += "ORDER BY p.id_producto DESC LIMIT ? OFFSET ?";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -203,10 +202,9 @@ public class InventarioDao extends DAOBase {
                     smc.stock_minimo_producto,
                     smc.stock_critico_producto,
                     CASE
-                        WHEN smc.id_stock_minimo IS NULL THEN 'No configurado'
                         WHEN SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) = 0 THEN 'Sin Stock'
-                        WHEN SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) <= smc.stock_critico_producto THEN 'Sin Stock'
-                        WHEN SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) <= smc.stock_minimo_producto THEN 'Poco Stock'
+                        WHEN smc.id_stock_minimo IS NULL THEN 'No configurado'
+                        WHEN SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) > 0 AND SUM(FLOOR(l.stock_actual / p.unidades_por_paquete)) <= smc.stock_minimo_producto THEN 'Poco Stock'
                         ELSE 'En Stock'
                     END AS estado_stock
                 FROM productos p

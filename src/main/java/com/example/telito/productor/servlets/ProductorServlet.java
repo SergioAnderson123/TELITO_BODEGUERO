@@ -742,7 +742,7 @@ public class ProductorServlet extends HttpServlet {
                         response.getWriter().write("{\"success\": false, \"message\": \"Lote no encontrado o no te pertenece\"}");
                         return;
                     }
-                    
+
                     int stockActualLote = (Integer) loteInfo[3]; // stock_actual en unidades
                     int unidadesPorPaqueteLote = (Integer) loteInfo[4];
                     

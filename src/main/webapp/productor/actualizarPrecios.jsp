@@ -32,10 +32,10 @@
            Paleta y tokens
         ====================== */
         :root {
-            --turquoise-dark: #00a896;
-            --seafoam: #83c5be;
-            --seafoam-light: #edf6f9;
-            --white: #ffffff;
+            --turquoise-dark: #6F4E37;
+            --seafoam: #8B6F47;
+            --seafoam-light: #FFFEF9;
+            --white: #FFFEF9;
             --text-dark: #2b2d42;
             --text-muted: #6c757d;
             --border-color: #e9ecef;
@@ -56,7 +56,7 @@
         ====================== */
         .dashboard-main-wrapper { display: flex; min-height: 100vh; }
         .dashboard-header {
-            background-color: #fff;
+            background-color: #FFFEF9;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: fixed; top: 0; right: 0; left: 250px; z-index: 999;
             height: 70px;
@@ -70,7 +70,7 @@
         ====================== */
         .nav-left-sidebar {
             width: 250px;
-            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             min-height: 100vh;
             position: fixed;
             left: 0;
@@ -80,7 +80,7 @@
         }
         .navbar-brand { font-weight: 700; color: var(--turquoise-dark); }
         .nav-link {
-            color: rgba(255,255,255,.95) !important;
+            color: #F5DEB3 !important;
             padding: 13px 20px;
             border-radius: 10px;
             margin: 6px 15px;
@@ -98,14 +98,14 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background: #fff;
+            background: #F5DEB3;
             transform: scaleY(0);
             transition: transform .3s ease;
             border-radius: 0 4px 4px 0;
         }
         .nav-link:hover, .nav-link.active {
-            background-color: rgba(255,255,255,.25);
-            color: #fff !important;
+            background-color: rgba(245, 222, 179, 0.15);
+            color: #FFF8DC !important;
             transform: translateX(8px);
             box-shadow: 0 4px 12px rgba(0,0,0,.15);
         }
@@ -114,14 +114,14 @@
         }
         .nav-link i { margin-right: 12px; width: 22px; font-size: 1.1rem; }
         .nav-divider {
-            color: rgba(255,255,255,.95);
+            color: #F5DEB3;
             font-weight: 700;
             padding: 18px 20px 8px;
             margin-top: 25px;
             font-size: .8rem;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            border-top: 1px solid rgba(255,255,255,.15);
+            border-top: 1px solid rgba(245, 222, 179, 0.3);
         }
 
         /* =====================
@@ -142,7 +142,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
-            background: linear-gradient(135deg, #00a896 0%, #83c5be 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: white;
             border-radius: 12px 12px 0 0;
             padding: 20px 30px;
@@ -152,7 +152,7 @@
         .card-header h2, .card-header h5 { margin: 0; color: white; font-weight: 700; }
         .card-body { padding: 0; }
         button, .btn {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: var(--white);
             border: none;
             padding: 12px 24px;
@@ -164,7 +164,7 @@
         }
         .btn-secondary { background: #8d99ae; border: none; }
         .btn-primary {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             border: none;
             color: #fff;
             font-weight: 600;
@@ -201,7 +201,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #00a896 !important;
+            color: #6F4E37 !important;
         }
         .pageheader-title i {
             color: var(--seafoam);
@@ -293,7 +293,7 @@
                         <span class="badge-notificacion" id="badgeNotificaciones" style="display: none;">0</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end notificaciones-dropdown" aria-labelledby="notificacionesDropdown" style="width: 380px;">
-                        <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; padding: 12px 20px;">
+                        <div class="dropdown-header d-flex justify-content-between align-items-center" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; padding: 12px 20px;">
                             <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notificaciones</h6>
                             <button class="btn btn-sm btn-light" onclick="marcarTodasLeidas()" style="font-size: 0.75rem; padding: 2px 8px;">
                                 <i class="fas fa-check-double me-1"></i>Marcar todas
@@ -306,7 +306,7 @@
                             </div>
                         </div>
                         <div class="dropdown-divider m-0"></div>
-                        <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #00a896 !important;">
+                        <a class="dropdown-item text-center fw-bold py-2" href="javascript:void(0);" onclick="event.preventDefault(); mostrarModalTodasNotificaciones();" style="color: #6F4E37 !important;">
                             <i class="fas fa-list me-2"></i>Ver todas las notificaciones
                         </a>
                     </div>
@@ -411,7 +411,7 @@
                         <input type="hidden" name="action" value="formActualizarPrecios">
                         <div class="col-md-10">
                             <label for="busqueda" class="form-label" style="font-weight: 600; font-size: 0.9rem;">
-                                <i class="fas fa-barcode me-2" style="color: #00a896;"></i>Buscar por SKU o Nombre de Producto
+                                <i class="fas fa-barcode me-2" style="color: #6F4E37;"></i>Buscar por SKU o Nombre de Producto
                             </label>
                             <input id="busqueda" type="text" class="form-control" name="busqueda" 
                                    placeholder="Ej: SKU019 o cerveza..." 
@@ -446,22 +446,22 @@
                             <thead style="background: #f8f9fa; position: sticky; top: 0; z-index: 10;">
                                 <tr>
                                     <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
-                                        <i class="fas fa-barcode me-1" style="color: #00a896;"></i>SKU
+                                        <i class="fas fa-barcode me-1" style="color: #6F4E37;"></i>SKU
                                     </th>
                                     <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
-                                        <i class="fas fa-box me-1" style="color: #00a896;"></i>Producto
+                                        <i class="fas fa-box me-1" style="color: #6F4E37;"></i>Producto
                                     </th>
                                     <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;">
-                                        <i class="fas fa-folder me-1" style="color: #00a896;"></i>Categoría
+                                        <i class="fas fa-folder me-1" style="color: #6F4E37;"></i>Categoría
                                     </th>
                                     <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; text-align: center;">
-                                        <i class="fas fa-dollar-sign me-1" style="color: #00a896;"></i>Precio Actual
+                                        <i class="fas fa-dollar-sign me-1" style="color: #6F4E37;"></i>Precio Actual
                                     </th>
                                     <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; text-align: center;">
-                                        <i class="fas fa-boxes me-1" style="color: #00a896;"></i>Lotes
+                                        <i class="fas fa-boxes me-1" style="color: #6F4E37;"></i>Lotes
                                     </th>
                                     <th style="padding: 12px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; text-align: center;">
-                                        <i class="fas fa-cog me-1" style="color: #00a896;"></i>Acción
+                                        <i class="fas fa-cog me-1" style="color: #6F4E37;"></i>Acción
                                     </th>
                                 </tr>
                             </thead>
@@ -474,7 +474,7 @@
                                     <td style="padding: 10px;"><%= p.getNombre() %></td>
                                     <td style="padding: 10px;"><%= p.getCategoria() != null ? p.getCategoria().getNombre() : "N/A" %></td>
                                     <td style="padding: 10px; text-align: center;">
-                                        <span style="color: #00a896; font-weight: 600; font-size: 1rem;">
+                                        <span style="color: #6F4E37; font-weight: 600; font-size: 1rem;">
                                             S/ <%= String.format("%.2f", p.getPrecioActual()) %>
                                         </span>
                                     </td>
@@ -511,7 +511,7 @@
             <div class="modal fade" id="modalActualizarPrecio" tabindex="-1" aria-labelledby="modalActualizarPrecioLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-                        <div class="modal-header text-white" style="background: linear-gradient(135deg, #00a896 0%, #028f80 100%); border-radius: 16px 16px 0 0; padding: 20px 25px; border-bottom: none;">
+                        <div class="modal-header text-white" style="background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); border-radius: 16px 16px 0 0; padding: 20px 25px; border-bottom: none;">
                             <h5 class="modal-title d-flex align-items-center" id="modalActualizarPrecioLabel" style="font-weight: 600; font-size: 1.2rem;">
                                 <span class="d-flex align-items-center justify-content-center me-3" style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 10px; width: 45px; height: 45px;">
                                     <i class="fas fa-tags" style="font-size: 1.2rem;"></i>
@@ -527,7 +527,7 @@
                                 <input type="hidden" name="idProducto" id="modalIdProducto">
                                 
                                 <!-- Info del Producto -->
-                                <div class="mb-4" style="background: white; padding: 15px 20px; border-radius: 12px; border-left: 4px solid #00a896;">
+                                <div class="mb-4" style="background: white; padding: 15px 20px; border-radius: 12px; border-left: 4px solid #6F4E37;">
                                     <div class="row">
                                         <div class="col-6">
                                             <small class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">SKU</small>
@@ -535,7 +535,7 @@
                                         </div>
                                         <div class="col-6">
                                             <small class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Producto</small>
-                                            <strong id="modalNombre" style="color: #00a896; font-size: 1rem;"></strong>
+                                            <strong id="modalNombre" style="color: #6F4E37; font-size: 1rem;"></strong>
                                         </div>
                                     </div>
                                 </div>
@@ -555,13 +555,13 @@
                                 <!-- Nuevo Precio -->
                                 <div class="mb-3" style="background: white; padding: 15px; border-radius: 10px;">
                                     <label for="nuevoPrecio" class="form-label" style="font-weight: 600; font-size: 0.9rem; color: #495057;">
-                                        <i class="fas fa-tag me-2" style="color: #00a896;"></i>Nuevo Precio <span class="text-danger">*</span>
+                                        <i class="fas fa-tag me-2" style="color: #6F4E37;"></i>Nuevo Precio <span class="text-danger">*</span>
                                     </label>
                                     <div class="input-group">
-                                        <span class="input-group-text" style="background: rgba(0,168,150,0.1); border: 2px solid #00a896; color: #00a896; font-weight: 600;">S/</span>
+                                        <span class="input-group-text" style="background: rgba(0,168,150,0.1); border: 2px solid #6F4E37; color: #6F4E37; font-weight: 600;">S/</span>
                                         <input type="number" class="form-control" id="nuevoPrecio" name="nuevoPrecio" 
                                                step="0.01" min="0.01" required
-                                               style="border: 2px solid #00a896; font-weight: 600; font-size: 1.1rem;"
+                                               style="border: 2px solid #6F4E37; font-weight: 600; font-size: 1.1rem;"
                                                placeholder="0.00">
                                     </div>
                                     <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">
@@ -748,7 +748,7 @@
     
     .notificacion-item.no-leida {
         background: #e8f4f8;
-        border-left: 4px solid #00a896;
+        border-left: 4px solid #6F4E37;
     }
     
     .notificacion-item.no-leida:hover {
@@ -855,12 +855,12 @@
     
     .notificacion-item-grande:hover {
         background: #f8f9fa;
-        border-left-color: #00a896;
+        border-left-color: #6F4E37;
     }
     
     .notificacion-item-grande.no-leida {
         background: #e8f4f8;
-        border-left-color: #00a896;
+        border-left-color: #6F4E37;
     }
     
     .notificacion-icon-grande {
@@ -1308,7 +1308,7 @@ function marcarTodasLeidasDesdeModal() {
 <div class="modal fade" id="modalNotificacion" tabindex="-1" aria-labelledby="modalNotificacionLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+            <div class="modal-header" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
                 <h5 class="modal-title" id="modalNotificacionLabel" style="font-weight: 600;">
                     <i class="fas fa-bell me-2"></i>Nueva Notificación
                 </h5>
@@ -1332,7 +1332,7 @@ function marcarTodasLeidasDesdeModal() {
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 8px 20px;">
                     <i class="fas fa-times me-2"></i>Cerrar
                 </button>
-                <button type="button" class="btn btn-primary" onclick="irANotificacion()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); border: none; border-radius: 8px; padding: 8px 20px;">
+                <button type="button" class="btn btn-primary" onclick="irANotificacion()" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; border-radius: 8px; padding: 8px 20px;">
                     <i class="fas fa-arrow-right me-2"></i>Ver Detalles
                 </button>
             </div>
@@ -1344,7 +1344,7 @@ function marcarTodasLeidasDesdeModal() {
 <div class="modal fade" id="modalTodasNotificaciones" tabindex="-1" aria-labelledby="modalTodasNotificacionesLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div class="modal-header" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
+            <div class="modal-header" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border-radius: 15px 15px 0 0; border: none; padding: 20px;">
                 <h5 class="modal-title" id="modalTodasNotificacionesLabel" style="font-weight: 600;">
                     <i class="fas fa-bell me-2"></i>Todas las Notificaciones
                 </h5>
@@ -1352,7 +1352,7 @@ function marcarTodasLeidasDesdeModal() {
             </div>
             <div class="modal-body" style="padding: 0;">
                 <div class="d-flex justify-content-between align-items-center p-3 border-bottom" style="background: #f8f9fa;">
-                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
+                    <button class="btn btn-sm" onclick="marcarTodasLeidasDesdeModal()" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border: none; border-radius: 8px; padding: 6px 15px;">
                         <i class="fas fa-check-double me-1"></i>Marcar todas como leídas
                     </button>
                     <span class="text-muted" id="contadorModalNotificaciones"></span>

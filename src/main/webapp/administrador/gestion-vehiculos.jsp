@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <!doctype html>
 <html lang="es">
@@ -171,6 +172,23 @@
             overflow: visible !important;
         }
         
+        /* Estilos para los encabezados de la tabla (igual que Gestion de Usuarios) */
+        #vehiculoTable thead th {
+            position: relative;
+            user-select: none;
+            color: var(--text-muted) !important;
+            text-transform: uppercase;
+        }
+        
+        /* Efecto hover verde en los encabezados (excepto Acciones) */
+        #vehiculoTable thead th:not(:last-child) {
+            cursor: pointer;
+        }
+        
+        #vehiculoTable thead th:not(:last-child):hover {
+            background-color: var(--seafoam) !important;
+        }
+        
         .card-body {
             overflow: visible !important;
         }
@@ -242,7 +260,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -300,7 +318,7 @@
             gap: 6px;
         }
         #addVehiculoModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #addVehiculoModal .form-group input {
@@ -314,7 +332,7 @@
             box-sizing: border-box;
         }
         #addVehiculoModal .form-group input:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -327,7 +345,7 @@
             gap: 6px;
         }
         #addVehiculoModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             margin-top: 2px;
         }
         #addVehiculoModal .modal-footer { 
@@ -428,7 +446,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%); 
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -486,7 +504,7 @@
             gap: 6px;
         }
         #sendEmailModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #sendEmailModal .form-group input,
@@ -502,7 +520,7 @@
         }
         #sendEmailModal .form-group input:focus,
         #sendEmailModal .form-group textarea:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -515,7 +533,7 @@
             gap: 6px;
         }
         #sendEmailModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             margin-top: 2px;
         }
         #sendEmailModal .modal-footer {
@@ -540,11 +558,11 @@
             gap: 8px;
         }
         #sendEmailModal .modal-footer button[type="submit"] {
-            background: linear-gradient(135deg, #00a896 0%, #028f80 100%);
+            background: linear-gradient(135deg, #6F4E37 0%, #8B6F47 100%);
             color: white;
         }
         #sendEmailModal .modal-footer button[type="submit"]:hover {
-            background: linear-gradient(135deg, #028f80 0%, #02796b 100%);
+            background: linear-gradient(135deg, #8B6F47 0%, #A0826D 100%);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,168,150,0.3);
         }
@@ -559,12 +577,12 @@
             margin-top: 1rem;
             padding: 12px 16px;
             border-radius: 8px;
-            border-left: 4px solid #00a896;
+            border-left: 4px solid #6F4E37;
             background: #e8f5f4;
-            color: #006d77;
+            color: #6F4E37;
         }
         #sendEmailModal .alert i {
-            color: #00a896;
+            color: #6F4E37;
         }
         @media (max-width: 768px) {
             #sendEmailModal .modal-content {
@@ -615,7 +633,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%); 
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); 
             padding: 20px 25px; 
             border-radius: 16px 16px 0 0;
             box-shadow: 0 4px 12px rgba(0,168,150,0.2);
@@ -673,7 +691,7 @@
             gap: 6px;
         }
         #editVehiculoModal .form-group label i {
-            color: #00a896;
+            color: #6F4E37;
             font-size: 0.85rem;
         }
         #editVehiculoModal .form-group input {
@@ -686,7 +704,7 @@
             background: white;
         }
         #editVehiculoModal .form-group input:focus {
-            border-color: #00a896;
+            border-color: #6F4E37;
             outline: none;
             box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
         }
@@ -702,7 +720,7 @@
             border-radius: 6px;
         }
         #editVehiculoModal .form-hint i {
-            color: #00a896;
+            color: #6F4E37;
             flex-shrink: 0;
         }
         #editVehiculoModal .modal-footer { 
@@ -736,7 +754,7 @@
             box-shadow: 0 4px 12px rgba(108,117,125,0.3);
         }
         #editVehiculoModal .modal-footer button[type="submit"] {
-            background: linear-gradient(165deg, #00a896 0%, #028f80 50%, #02796b 100%);
+            background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
             color: white;
             box-shadow: 0 4px 12px rgba(0,168,150,0.3);
         }
@@ -808,19 +826,19 @@
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Vehículos</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= totalVehiculos %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalVehiculos %></p>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Con Planes Asignados</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= vehiculosConPlanes %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= vehiculosConPlanes %></p>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                         <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Sin Planes Asignados</h3>
-                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #006d77;"><%= vehiculosSinPlanes %></p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= vehiculosSinPlanes %></p>
                         </div>
                     </div>
                 </div>
@@ -876,36 +894,135 @@
                                     <table id="vehiculoTable" class="table table-hover align-middle mb-0 datatable-server-side" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                         <thead class="table-light">
                                         <tr>
-                                            <th style="width: 5%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">#</th>
-                                            <th style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-id-card me-1"></i>Placa</th>
-                                            <th style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-industry me-1"></i>Marca</th>
-                                            <th style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-car me-1"></i>Modelo</th>
-                                            <th style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem;" class="fw-semibold"><i class="fas fa-weight me-1"></i>Capacidad (Kg)</th>
-                                            <th class="text-end fw-semibold text-success" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-cog me-1"></i>Acciones</th>
+                                            <th style="width: 3%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-hashtag me-1"></i>ID</th>
+                                            <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-id-card me-1"></i>Placa</th>
+                                            <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-industry me-1"></i>Marca</th>
+                                            <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-car me-1"></i>Modelo</th>
+                                            <th style="width: 6%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-calendar me-1"></i>Año</th>
+                                            <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-gas-pump me-1"></i>Combustible</th>
+                                            <th style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-barcode me-1"></i>VIN</th>
+                                            <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-weight me-1"></i>Capacidad</th>
+                                            <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-wrench me-1"></i>Última Revisión</th>
+                                            <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-shield-alt me-1"></i>Venc. SOAT</th>
+                                            <th class="text-end fw-semibold text-success" style="width: 9%; font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-cog me-1"></i>Acciones</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <%
-                                            Integer currentPageObj = (Integer) request.getAttribute("currentPage");
-                                            Integer sizeObj = (Integer) request.getAttribute("size");
-                                            int currentPageInt = (currentPageObj != null) ? currentPageObj : 1;
-                                            int sizeInt = (sizeObj != null) ? sizeObj : 5;
-                                            int contador = (currentPageInt - 1) * sizeInt + 1;
-                                        %>
                                         <c:forEach var="vehiculo" items="${listaVehiculos}">
                                             <tr class="align-middle" style="padding: 0;">
-                                                <td class="text-muted" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= contador++ %></td>
-                                                <td style="padding: 0.35rem 0.5rem;">
-                                                    <span class="badge bg-primary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                                        <i class="fas fa-id-card me-1"></i>${vehiculo.placa}
+                                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                                    <span style="font-size: 0.9rem; font-weight: 600; color: #2b2d42;">
+                                                        VEH<fmt:formatNumber value="${vehiculo.idVehiculo}" pattern="000"/>
                                                     </span>
                                                 </td>
-                                                <td style="padding: 0.35rem 0.5rem; font-size: 0.85rem;" class="fw-semibold">${vehiculo.marca}</td>
-                                                <td style="padding: 0.35rem 0.5rem; font-size: 0.85rem;" class="fw-semibold">${vehiculo.modelo}</td>
-                                                <td style="padding: 0.35rem 0.5rem;">
-                                                    <span class="badge bg-info-subtle text-info border border-info shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
-                                                        <i class="fas fa-weight me-1"></i>${vehiculo.capacidadKg} kg
+                                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                                    <span class="text-dark" style="font-size: 0.85rem;">
+                                                        ${vehiculo.placa}
                                                     </span>
+                                                </td>
+                                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                                    <c:choose>
+                                                        <c:when test="${not empty vehiculo.marca}">
+                                                            <span class="text-dark" style="font-size: 0.85rem;">${vehiculo.marca}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted" style="font-size: 0.85rem;">-</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                                    <c:choose>
+                                                        <c:when test="${not empty vehiculo.modelo}">
+                                                            <span class="text-dark" style="font-size: 0.85rem;">${vehiculo.modelo}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted" style="font-size: 0.85rem;">-</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                                    <c:choose>
+                                                        <c:when test="${not empty vehiculo.año}">
+                                                            <span class="text-dark" style="font-size: 0.85rem;">${vehiculo.año}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted" style="font-size: 0.85rem;">-</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                                    <c:choose>
+                                                        <c:when test="${not empty vehiculo.tipoCombustible}">
+                                                            <span class="text-dark" style="font-size: 0.85rem;">${vehiculo.tipoCombustible}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted" style="font-size: 0.85rem;">-</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                                    <c:choose>
+                                                        <c:when test="${not empty vehiculo.numeroSerieVin}">
+                                                            <span class="text-dark" style="font-size: 0.85rem;">${vehiculo.numeroSerieVin}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted" style="font-size: 0.85rem;">-</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                                    <span class="text-dark" style="font-size: 0.85rem;">
+                                                        ${vehiculo.capacidadKg} kg
+                                                    </span>
+                                                </td>
+                                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                                    <c:choose>
+                                                        <c:when test="${not empty vehiculo.fechaUltimaRevision}">
+                                                            <%
+                                                                com.example.telito.administrador.beans.Vehiculo veh = (com.example.telito.administrador.beans.Vehiculo) pageContext.getAttribute("vehiculo");
+                                                                if (veh != null && veh.getFechaUltimaRevision() != null) {
+                                                                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                                                                    String fechaFormateada = sdf.format(veh.getFechaUltimaRevision());
+                                                                    out.print("<span class='text-dark' style='font-size: 0.85rem;'>" + fechaFormateada + "</span>");
+                                                                } else {
+                                                                    out.print("<span class='text-muted' style='font-size: 0.85rem;'>-</span>");
+                                                                }
+                                                            %>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted" style="font-size: 0.85rem;">-</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                                    <c:choose>
+                                                        <c:when test="${not empty vehiculo.fechaVencimientoSoat}">
+                                                            <%
+                                                                com.example.telito.administrador.beans.Vehiculo veh2 = (com.example.telito.administrador.beans.Vehiculo) pageContext.getAttribute("vehiculo");
+                                                                if (veh2 != null && veh2.getFechaVencimientoSoat() != null) {
+                                                                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                                                                    String fechaFormateada = sdf.format(veh2.getFechaVencimientoSoat());
+                                                                    // Verificar si está próxima a vencer (30 días)
+                                                                    java.util.Date hoy = new java.util.Date();
+                                                                    long diffInMillies = veh2.getFechaVencimientoSoat().getTime() - hoy.getTime();
+                                                                    long diffInDays = diffInMillies / (1000 * 60 * 60 * 24);
+                                                                    
+                                                                    if (diffInDays < 0) {
+                                                                        // Ya venció
+                                                                        out.print("<span class='badge bg-danger shadow-sm' style='font-size: 0.8rem; padding: 0.3rem 0.6rem;'><i class='fas fa-exclamation-triangle me-1'></i>" + fechaFormateada + "</span>");
+                                                                    } else {
+                                                                        // Válida o próxima a vencer - mostrar solo texto
+                                                                        out.print("<span class='text-dark' style='font-size: 0.85rem;'>" + fechaFormateada + "</span>");
+                                                                    }
+                                                                } else {
+                                                                    out.print("<span class='text-muted' style='font-size: 0.85rem;'>-</span>");
+                                                                }
+                                                            %>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted" style="font-size: 0.85rem;">-</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </td>
                                                 <td class="text-end" style="padding: 0.35rem 0.5rem;">
                                                     <div class="dropdown">
@@ -1018,6 +1135,92 @@
                     <div class="form-hint">
                         <i class="fas fa-info-circle"></i>
                         <span>Ingresa la capacidad máxima en kilogramos</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editAño">
+                        <i class="fas fa-calendar"></i>
+                        Año del Vehículo <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" 
+                           name="año" 
+                           id="editAño" 
+                           placeholder="Ej: 2020" 
+                           min="1900"
+                           max="2100"
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el año de fabricación del vehículo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editTipoCombustible">
+                        <i class="fas fa-gas-pump"></i>
+                        Tipo de Combustible <span class="text-danger">*</span>
+                    </label>
+                    <select name="tipoCombustible" 
+                            id="editTipoCombustible" 
+                            required>
+                        <option value="">Seleccione un tipo</option>
+                        <option value="Gasolina">Gasolina</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="GLP">GLP</option>
+                        <option value="Eléctrico">Eléctrico</option>
+                        <option value="Híbrido">Híbrido</option>
+                    </select>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Selecciona el tipo de combustible del vehículo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editNumeroSerieVin">
+                        <i class="fas fa-barcode"></i>
+                        Número de Serie/VIN <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" 
+                           name="numeroSerieVin" 
+                           id="editNumeroSerieVin" 
+                           placeholder="Ej: 1HGBH41JXMN109186" 
+                           maxlength="50"
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el número de serie o VIN del vehículo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editFechaUltimaRevision">
+                        <i class="fas fa-wrench"></i>
+                        Fecha de Última Revisión Técnica <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" 
+                           name="fechaUltimaRevision" 
+                           id="editFechaUltimaRevision" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa la fecha de la última revisión técnica</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editFechaVencimientoSoat">
+                        <i class="fas fa-shield-alt"></i>
+                        Fecha de Vencimiento de SOAT/Seguro <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" 
+                           name="fechaVencimientoSoat" 
+                           id="editFechaVencimientoSoat" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa la fecha de vencimiento del SOAT o seguro</span>
                     </div>
                 </div>
             </div>
@@ -1191,6 +1394,92 @@
                         <span>Ingresa la capacidad máxima en kilogramos</span>
                     </div>
                 </div>
+                
+                <div class="form-group">
+                    <label for="modalAño">
+                        <i class="fas fa-calendar"></i>
+                        Año del Vehículo <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" 
+                           name="año" 
+                           id="modalAño" 
+                           placeholder="Ej: 2020" 
+                           min="1900"
+                           max="2100"
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el año de fabricación del vehículo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalTipoCombustible">
+                        <i class="fas fa-gas-pump"></i>
+                        Tipo de Combustible <span class="text-danger">*</span>
+                    </label>
+                    <select name="tipoCombustible" 
+                            id="modalTipoCombustible" 
+                            required>
+                        <option value="">Seleccione un tipo</option>
+                        <option value="Gasolina">Gasolina</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="GLP">GLP</option>
+                        <option value="Eléctrico">Eléctrico</option>
+                        <option value="Híbrido">Híbrido</option>
+                    </select>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Selecciona el tipo de combustible del vehículo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalNumeroSerieVin">
+                        <i class="fas fa-barcode"></i>
+                        Número de Serie/VIN <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" 
+                           name="numeroSerieVin" 
+                           id="modalNumeroSerieVin" 
+                           placeholder="Ej: 1HGBH41JXMN109186" 
+                           maxlength="50"
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa el número de serie o VIN del vehículo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalFechaUltimaRevision">
+                        <i class="fas fa-wrench"></i>
+                        Fecha de Última Revisión Técnica <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" 
+                           name="fechaUltimaRevision" 
+                           id="modalFechaUltimaRevision" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa la fecha de la última revisión técnica</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalFechaVencimientoSoat">
+                        <i class="fas fa-shield-alt"></i>
+                        Fecha de Vencimiento de SOAT/Seguro <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" 
+                           name="fechaVencimientoSoat" 
+                           id="modalFechaVencimientoSoat" 
+                           required>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Ingresa la fecha de vencimiento del SOAT o seguro</span>
+                    </div>
+                </div>
             </div>
             
             <div class="modal-footer">
@@ -1311,6 +1600,11 @@
                 document.getElementById('modalMarca').value = '';
                 document.getElementById('modalModelo').value = '';
                 document.getElementById('modalCapacidadKg').value = '';
+                document.getElementById('modalAño').value = '';
+                document.getElementById('modalTipoCombustible').value = '';
+                document.getElementById('modalNumeroSerieVin').value = '';
+                document.getElementById('modalFechaUltimaRevision').value = '';
+                document.getElementById('modalFechaVencimientoSoat').value = '';
                 
                 addVehiculoModal.classList.add('show');
                 addVehiculoModal.style.display = 'flex';
@@ -1475,7 +1769,7 @@
             // Mostrar loading overlay
             const modalBody = editVehiculoModal.querySelector('.modal-body');
             if (modalBody) {
-                modalBody.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x mb-3" style="color: #00a896;"></i><p>Cargando datos del vehículo...</p></div>';
+                modalBody.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x mb-3" style="color: #6F4E37;"></i><p>Cargando datos del vehículo...</p></div>';
             }
             
             abrirModalEditarVehiculo();
@@ -1485,10 +1779,19 @@
                 headers: { 'Content-Type': 'application/json' }
             })
             .then(response => {
-                if (!response.ok) throw new Error('Error al cargar los datos del vehículo');
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.mensaje || 'Error al cargar los datos del vehículo');
+                    });
+                }
                 return response.json();
             })
             .then(data => {
+                // Verificar si hay un error en la respuesta
+                if (data.exito === false) {
+                    throw new Error(data.mensaje || 'Error al cargar los datos del vehículo');
+                }
+                
                 // Restore original form HTML
                 modalBody.innerHTML = originalModalBodyContent;
                 
@@ -1498,11 +1801,55 @@
                 document.getElementById('editMarca').value = data.marca || '';
                 document.getElementById('editModelo').value = data.modelo || '';
                 document.getElementById('editCapacidadKg').value = data.capacidadKg || '';
+                document.getElementById('editAño').value = data.año || '';
+                document.getElementById('editTipoCombustible').value = data.tipoCombustible || '';
+                document.getElementById('editNumeroSerieVin').value = data.numeroSerieVin || '';
+                
+                // Formatear fechas para el input date (YYYY-MM-DD)
+                if (data.fechaUltimaRevision) {
+                    try {
+                        if (typeof data.fechaUltimaRevision === 'string' && data.fechaUltimaRevision.match(/^\d{4}-\d{2}-\d{2}/)) {
+                            document.getElementById('editFechaUltimaRevision').value = data.fechaUltimaRevision.substring(0, 10);
+                        } else {
+                            const fecha = new Date(data.fechaUltimaRevision);
+                            if (!isNaN(fecha.getTime())) {
+                                const fechaFormateada = fecha.toISOString().split('T')[0];
+                                document.getElementById('editFechaUltimaRevision').value = fechaFormateada;
+                            } else {
+                                document.getElementById('editFechaUltimaRevision').value = '';
+                            }
+                        }
+                    } catch (e) {
+                        document.getElementById('editFechaUltimaRevision').value = '';
+                    }
+                } else {
+                    document.getElementById('editFechaUltimaRevision').value = '';
+                }
+                
+                if (data.fechaVencimientoSoat) {
+                    try {
+                        if (typeof data.fechaVencimientoSoat === 'string' && data.fechaVencimientoSoat.match(/^\d{4}-\d{2}-\d{2}/)) {
+                            document.getElementById('editFechaVencimientoSoat').value = data.fechaVencimientoSoat.substring(0, 10);
+                        } else {
+                            const fecha = new Date(data.fechaVencimientoSoat);
+                            if (!isNaN(fecha.getTime())) {
+                                const fechaFormateada = fecha.toISOString().split('T')[0];
+                                document.getElementById('editFechaVencimientoSoat').value = fechaFormateada;
+                            } else {
+                                document.getElementById('editFechaVencimientoSoat').value = '';
+                            }
+                        }
+                    } catch (e) {
+                        document.getElementById('editFechaVencimientoSoat').value = '';
+                    }
+                } else {
+                    document.getElementById('editFechaVencimientoSoat').value = '';
+                }
             })
             .catch(error => {
                 console.error('Error al cargar vehículo:', error);
                 cerrarModalEditarVehiculo();
-                alert('Error al cargar los datos del vehículo. Por favor, intenta nuevamente.');
+                alert('Error al cargar los datos del vehículo: ' + (error.message || 'Por favor, intenta nuevamente.'));
             });
         };
         

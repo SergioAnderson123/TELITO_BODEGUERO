@@ -88,6 +88,8 @@ public class OrdenCompraServlet extends HttpServlet {
                 int totalOrdenes = ordenCompraDao.contarOrdenes(null, null, null);
                 int ordenesPendientes = ordenCompraDao.contarOrdenes(null, null, "Pendiente");
                 int ordenesAprobadas = ordenCompraDao.contarOrdenes(null, null, "Aprobado");
+                int ordenesRechazadas = ordenCompraDao.contarOrdenes(null, null, "Rechazado");
+                int ordenesRecibidas = ordenCompraDao.contarOrdenes(null, null, "Recibido");
 
                 // Cargar proveedores para filtro
                 request.setAttribute("listaProveedores", proveedorDao.listarProductores());
@@ -104,6 +106,8 @@ public class OrdenCompraServlet extends HttpServlet {
                 request.setAttribute("totalOrdenes", totalOrdenes);
                 request.setAttribute("ordenesPendientes", ordenesPendientes);
                 request.setAttribute("ordenesAprobadas", ordenesAprobadas);
+                request.setAttribute("ordenesRechazadas", ordenesRechazadas);
+                request.setAttribute("ordenesRecibidas", ordenesRecibidas);
                 request.setAttribute("baseUrl", request.getContextPath() + "/orden-compra");
                 request.setAttribute("itemName", "órdenes");
 
