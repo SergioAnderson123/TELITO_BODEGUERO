@@ -21,10 +21,14 @@ import com.example.telito.util.NotificacionService;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // Gestión de planes de transporte - CRUD completo con filtros y paginación
 @WebServlet(name = "PlanTransporteServlet", value = "/planes-transporte")
 public class PlanTransporteServlet extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(PlanTransporteServlet.class);
 
     @Override
     public void init() throws ServletException {
@@ -212,7 +216,8 @@ public class PlanTransporteServlet extends HttpServlet {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Error al obtener información del lote", e);
+                System.err.println("✗ Error al obtener información del lote: " + e.getMessage());
+                e.printStackTrace();
                 request.setAttribute("error", "Error al obtener información del lote");
                 request.getRequestDispatcher("/logistica/Distribucion/form_plan_transporte.jsp").forward(request, response);
                 return;
@@ -239,10 +244,10 @@ public class PlanTransporteServlet extends HttpServlet {
             // 3.5. ========== NOTIFICACIÓN WEB A ALMACÉN ==========
             try {
                 // Obtener información del lote y destino para la notificación
-                LoteDao loteDao = new LoteDao();
+                // Reutilizar loteDao ya declarado arriba
                 DistritoDao distritoDao = new DistritoDao();
                 
-                String sqlLote = "SELECT l.codigo_lote, p.nombre AS nombre_producto, " +
+                String sqlLoteNotificacion = "SELECT l.codigo_lote, p.nombre AS nombre_producto, " +
                                 "FLOOR(l.stock_actual / p.unidades_por_paquete) AS paquetes " +
                                 "FROM lotes l " +
                                 "INNER JOIN productos p ON l.producto_id = p.id_producto " +
@@ -253,7 +258,7 @@ public class PlanTransporteServlet extends HttpServlet {
                 int paquetes = 0;
                 
                 try (java.sql.Connection conn = com.example.telito.util.DatabaseConnection.getConnection();
-                     java.sql.PreparedStatement pstmt = conn.prepareStatement(sqlLote)) {
+                     java.sql.PreparedStatement pstmt = conn.prepareStatement(sqlLoteNotificacion)) {
                     pstmt.setInt(1, loteId);
                     try (java.sql.ResultSet rs = pstmt.executeQuery()) {
                         if (rs.next()) {
@@ -322,13 +327,13 @@ public class PlanTransporteServlet extends HttpServlet {
                 if (!emailsAlmacen.isEmpty()) {
                     System.out.println("✓ Se encontraron " + emailsAlmacen.size() + " email(s) para notificar");
                     // Obtener información del plan recién creado para el correo
-                    LoteDao loteDao = new LoteDao();
+                    // Reutilizar loteDao ya declarado arriba
                     ConductorDao conductorDao = new ConductorDao();
-                    DistritoDao distritoDao = new DistritoDao();
+                    DistritoDao distritoDaoEmail = new DistritoDao();
                     VehiculoDao vehiculoDao = new VehiculoDao();
                     
                     // Obtener datos básicos del lote
-                    String sqlLote = "SELECT l.codigo_lote, p.nombre AS nombre_producto, l.stock_actual " +
+                    String sqlLoteEmail = "SELECT l.codigo_lote, p.nombre AS nombre_producto, l.stock_actual " +
                                     "FROM lotes l " +
                                     "INNER JOIN productos p ON l.producto_id = p.id_producto " +
                                     "WHERE l.id_lote = ?";
@@ -338,7 +343,7 @@ public class PlanTransporteServlet extends HttpServlet {
                     int stock = 0;
                     
                     try (java.sql.Connection conn = com.example.telito.util.DatabaseConnection.getConnection();
-                         java.sql.PreparedStatement pstmt = conn.prepareStatement(sqlLote)) {
+                         java.sql.PreparedStatement pstmt = conn.prepareStatement(sqlLoteEmail)) {
                         pstmt.setInt(1, loteId);
                         try (java.sql.ResultSet rs = pstmt.executeQuery()) {
                             if (rs.next()) {
