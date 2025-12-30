@@ -1,6 +1,7 @@
 package com.example.telito.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -28,8 +29,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Los recursos estáticos están en webapp/ y Spring Boot los sirve automáticamente
-        // No necesitamos configuración adicional para un WAR ejecutable
+        // Configurar recursos estáticos con orden bajo para que los servlets tengan prioridad
+        // Esto asegura que rutas como /logout se resuelvan como servlets, no como recursos estáticos
+        // Los recursos estáticos se servirán automáticamente desde webapp/ por Spring Boot
+        // pero con menor prioridad que los servlets registrados con @WebServlet
+        registry.setOrder(Ordered.LOWEST_PRECEDENCE);
     }
 }
 
