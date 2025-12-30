@@ -74,6 +74,11 @@
             border: 1px solid #6c757d !important;
             background-image: none !important;
         }
+        
+        /* Quitar borde marrón del card de filtros */
+        .card.shadow-sm {
+            border: 1px solid #dee2e6 !important;
+        }
     </style>
     <style>
         /* Estilos mejorados para el dropdown de acciones */
@@ -806,47 +811,16 @@
             max-width: 250px;
         }
         
-        /* Estilos para encabezados de tabla con hover verde y ordenamiento */
-        #userTable thead th {
-            position: relative;
-            user-select: none;
-            color: var(--text-muted) !important;
-            text-transform: uppercase;
-        }
-        
-        /* Solo los th ordenables (que no son "Acciones") tienen hover y cursor pointer */
-        #userTable thead th:not(:last-child) {
-            cursor: pointer;
-        }
-        
-        #userTable thead th:not(:last-child):hover {
-            background-color: var(--seafoam) !important;
-        }
-        
-        /* Eliminar cualquier flecha de ordenamiento de TODOS los encabezados */
-        #userTable thead th::after,
-        #userTable thead th::before {
-            content: none !important;
-            display: none !important;
-        }
-        
-        #userTable thead th.sort-asc::after,
-        #userTable thead th.sort-desc::after,
-        #userTable thead th.sort-asc::before,
-        #userTable thead th.sort-desc::before {
-            content: none !important;
-            display: none !important;
-        }
-        
-        /* Asegurar que los enlaces dentro de th no interfieran con el hover */
-        #userTable thead th a {
-            display: block;
-            width: 100%;
-            color: inherit;
-        }
-        
-        #userTable thead th a:hover {
-            color: inherit;
+        /* Estilos para encabezados de tabla - igual que Inventario General */
+        #userTable thead.table-light th,
+        #userTable thead th,
+        table#userTable thead.table-light th,
+        table#userTable thead th,
+        .table#userTable thead.table-light th,
+        .table#userTable thead th {
+            vertical-align: middle;
+            background-color: #f8f9fa !important;
+            background: #f8f9fa !important;
         }
     </style>
 </head>
@@ -888,13 +862,13 @@
                     if (currentSortBy != null && !currentSortBy.isEmpty()) sendUrl += "&sortBy=" + currentSortBy;
                     if (currentSortOrder != null && !currentSortOrder.isEmpty()) sendUrl += "&sortOrder=" + currentSortOrder;
                 %>
-                <a href="<%= exportUrl %>" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                <a href="<%= exportUrl %>" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: #C9A87A; color: white; border: none;">
                     <i class="fas fa-file-excel me-1"></i>Exportar a Excel
                 </a>
-                <button type="button" id="openSendEmailModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                <button type="button" id="openSendEmailModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #E8B86D 0%, #D4A574 100%); border: none;">
                     <i class="fas fa-envelope me-1"></i>Enviar por Correo
                 </button>
-                <button type="button" id="openModalBtn" class="btn btn-sm shadow-sm btn-agregar-usuario" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
+                <button type="button" id="openModalBtn" class="btn btn-sm shadow-sm btn-agregar-usuario" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; color: white; font-weight: 600;">
                     <i class="fas fa-plus me-1"></i>Agregar Usuario
                 </button>
             </div>
@@ -914,19 +888,19 @@
     <!-- ===================== Tarjetas de estadísticas ===================== -->
     <div class="row g-2 mb-3">
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-            <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+            <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                 <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Usuarios</h3>
                 <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalUsuarios %></p>
             </div>
         </div>
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-            <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+            <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                 <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Activos</h3>
                 <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= usuariosActivos %></p>
             </div>
         </div>
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-            <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+            <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                 <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Inactivos</h3>
                 <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= usuariosInactivos %></p>
             </div>
@@ -934,7 +908,7 @@
     </div>
 
     <!-- ===================== Card: Búsqueda y filtros ===================== -->
-    <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+    <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; border: 1px solid #dee2e6 !important;">
         <form action="<%= request.getContextPath() %>/UsuarioServlet" method="GET" id="filterForm">
             <input type="hidden" name="action" value="listar">
             <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
@@ -983,7 +957,7 @@
                 <div class="card-header" style="padding: 0.5rem 0.75rem;">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div>
-                            <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-users me-2"></i>Tabla de Usuarios</h5>
+                            <h5 class="mb-0 fw-semibold" style="font-size: 1.25rem; line-height: 1.2;"><i class="fas fa-users me-2"></i>Tabla de Usuarios</h5>
                             <small class="text-white" style="font-size: 0.75rem; line-height: 1.2; opacity: 1;">Gestiona todos los usuarios del sistema</small>
                         </div>
                     </div>
@@ -995,9 +969,9 @@
                             <thead class="table-light">
                             <tr>
                                 <th class="fw-semibold" onclick="sortUserTable(0)" style="width: 5%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer; text-align: center;">
-                                    <i class="fas fa-hashtag me-1"></i>ID
+                                    <i class="fas fa-hashtag me-1"></i>N° Usuario
                                 </th>
-                                <th class="fw-semibold" onclick="sortUserTable(1)" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer;">
+                                <th class="fw-semibold" onclick="sortUserTable(1)" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer; text-align: center;">
                                     <i class="fas fa-user me-1"></i>Usuario
                                 </th>
                                 <th class="fw-semibold" onclick="sortUserTable(2)" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer; text-align: center;">
@@ -1009,7 +983,7 @@
                                 <th class="fw-semibold" onclick="sortUserTable(4)" style="width: 8%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: pointer; text-align: center;">
                                     <i class="fas fa-toggle-on me-1"></i>Estado
                                 </th>
-                                <th class="text-end fw-semibold text-success" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: default;">
+                                <th class="fw-semibold text-success" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor: default; text-align: center;">
                                     <i class="fas fa-cog me-1"></i>Acciones
                                 </th>
                             </tr>
@@ -1018,25 +992,29 @@
                             <% if (listaUsuarios != null && !listaUsuarios.isEmpty()) { %>
                             <% for (Usuario usuario : listaUsuarios) {
                                 String roleName = usuario.getRol().getNombre();
-                                String badgeClass = "text-bg-secondary"; // Default color
+                                String badgeStyle = ""; // Estilo inline para el badge
                                 switch (roleName) {
                                     case "Administrador":
-                                        badgeClass = "text-bg-primary";
+                                        badgeStyle = "background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border: none;";
                                         break;
                                     case "Logística":
-                                        badgeClass = "text-bg-info";
+                                        badgeStyle = "background: linear-gradient(135deg, #D4A574 0%, #C9A87A 100%); color: white; border: none;";
                                         break;
                                     case "Productor":
-                                        badgeClass = "text-bg-success";
+                                        badgeStyle = "background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; border: none;";
                                         break;
+                                    case "Almacenero":
                                     case "Almacén":
-                                        badgeClass = "text-bg-warning";
+                                        badgeStyle = "background: linear-gradient(135deg, #E8B86D 0%, #D4A574 100%); color: white; border: none;";
+                                        break;
+                                    default:
+                                        badgeStyle = "background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white; border: none;";
                                         break;
                                 }
                             %>
                             <tr class="align-middle" style="padding: 0;">
                                 <td style="padding: 0.35rem 0.5rem; text-align: center;">
-                                    <span style="font-size: 0.9rem; font-weight: 600; color: #2b2d42;">
+                                    <span class="badge" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                         USR<%= String.format("%03d", usuario.getIdUsuario()) %>
                                     </span>
                                 </td>
@@ -1087,13 +1065,13 @@
                                     <% } %>
                                 </td>
                                 <td style="padding: 0.35rem 0.5rem; text-align: center;">
-                                    <span class="badge <%= badgeClass %> shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                    <span class="badge shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; <%= badgeStyle %>">
                                         <i class="fas fa-user-tag me-1"></i><%= roleName %>
                                     </span>
                                 </td>
                                 <td style="padding: 0.35rem 0.5rem; text-align: center;">
                                     <% if (usuario.isActivo()) { %>
-                                        <span class="badge text-bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                        <span class="badge shadow-sm" style="background-color: #c8e6c9; color: #2e7d32; font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                             <i class="fas fa-check-circle me-1"></i>Activo
                                         </span>
                                     <% } else { %>
@@ -1303,6 +1281,12 @@
         requestAnimationFrame(function() {
             setTimeout(function() {
                 ajustarDropdowns();
+                // Forzar el color del encabezado de la tabla
+                const tableHeaders = document.querySelectorAll('#userTable thead th');
+                tableHeaders.forEach(function(header) {
+                    header.style.backgroundColor = '#f8f9fa';
+                    header.style.background = '#f8f9fa';
+                });
             }, 0);
         });
         const filterForm = document.getElementById('filterForm');
@@ -1365,12 +1349,24 @@
         );
     }
     
+    // Función para aplicar el color del encabezado de la tabla
+    function aplicarColorEncabezado() {
+        const tableHeaders = document.querySelectorAll('#userTable thead th');
+        tableHeaders.forEach(function(header) {
+            header.style.setProperty('background-color', '#f8f9fa', 'important');
+            header.style.setProperty('background', '#f8f9fa', 'important');
+        });
+    }
+    
     // Inicializar tooltips después de que la página cargue
     document.addEventListener('DOMContentLoaded', function() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
+        
+        // Aplicar color del encabezado
+        aplicarColorEncabezado();
         
         // ===================== Manejo del Modal de Agregar Usuario =====================
         const addUserModal = document.getElementById('addUserModal');
@@ -1887,6 +1883,31 @@
             });
         };
     });
+    
+    // Aplicar color del encabezado cuando la ventana esté completamente cargada
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            aplicarColorEncabezado();
+        }, 100);
+    });
+    
+    // Usar MutationObserver para detectar cambios en el DOM y aplicar el color
+    if (typeof MutationObserver !== 'undefined') {
+        const observer = new MutationObserver(function(mutations) {
+            aplicarColorEncabezado();
+        });
+        
+        // Observar cambios en la tabla
+        const table = document.getElementById('userTable');
+        if (table) {
+            observer.observe(table, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['style', 'class']
+            });
+        }
+    }
 </script>
 
 <!-- ===================== Modal: Agregar Usuario ===================== -->

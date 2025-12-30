@@ -22,6 +22,11 @@
             border: 1px solid #6c757d !important;
             background-image: none !important;
         }
+        
+        /* Quitar borde marrón del card de filtros */
+        .card.shadow-sm {
+            border: 1px solid #dee2e6 !important;
+        }
     </style>
     <style>
         /* Estilos mejorados para el dropdown de acciones */
@@ -173,20 +178,9 @@
         }
         
         /* Estilos para los encabezados de la tabla (igual que Gestion de Usuarios) */
+        /* Estilos para encabezados de tabla - igual que Inventario General */
         #vehiculoTable thead th {
-            position: relative;
-            user-select: none;
-            color: var(--text-muted) !important;
-            text-transform: uppercase;
-        }
-        
-        /* Efecto hover verde en los encabezados (excepto Acciones) */
-        #vehiculoTable thead th:not(:last-child) {
-            cursor: pointer;
-        }
-        
-        #vehiculoTable thead th:not(:last-child):hover {
-            background-color: var(--seafoam) !important;
+            vertical-align: middle;
         }
         
         .card-body {
@@ -796,13 +790,13 @@
                                     <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Administra los vehículos del sistema de transporte.</p>
                                 </div>
                                 <div class="d-flex gap-2 flex-wrap">
-                                    <a href="${pageContext.request.contextPath}/administrador/VehiculoReporteServlet?action=exportar" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                    <a href="${pageContext.request.contextPath}/administrador/VehiculoReporteServlet?action=exportar" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #D4A574 0%, #C9A87A 100%); color: white; border: none;">
                                         <i class="fas fa-file-excel me-1"></i>Exportar a Excel
                                     </a>
-                                    <button type="button" id="openSendEmailModalBtn" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                    <button type="button" id="openSendEmailModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #E8B86D 0%, #D4A574 100%); border: none;">
                                         <i class="fas fa-envelope me-1"></i>Enviar por Correo
                                     </button>
-                                    <button type="button" id="openAddVehiculoModalBtn" class="btn btn-sm shadow-sm btn-agregar-vehiculo" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
+                                    <button type="button" id="openAddVehiculoModalBtn" class="btn btn-sm shadow-sm btn-agregar-vehiculo" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; color: white; font-weight: 600;">
                                         <i class="fas fa-plus me-1"></i>Agregar Vehículo
                                     </button>
                                 </div>
@@ -824,19 +818,19 @@
                 <!-- ===================== Tarjetas de estadísticas ===================== -->
                 <div class="row g-2 mb-3">
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Vehículos</h3>
                             <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalVehiculos %></p>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Con Planes Asignados</h3>
                             <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= vehiculosConPlanes %></p>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Sin Planes Asignados</h3>
                             <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= vehiculosSinPlanes %></p>
                         </div>
@@ -844,7 +838,7 @@
                 </div>
 
                 <!-- ===================== Card: Búsqueda y filtros ===================== -->
-                <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+                <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; border: 1px solid #dee2e6 !important;">
                     <form action="${pageContext.request.contextPath}/administrador/VehiculoServlet" method="GET" id="filterForm">
                         <input type="hidden" name="action" value="listar">
                         <input type="hidden" name="size" value="${size != null ? size : 5}">
@@ -884,7 +878,7 @@
                             <div class="card-header" style="padding: 0.5rem 0.75rem;">
                                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                     <div>
-                                        <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-truck me-2"></i>Tabla de Vehículos</h5>
+                                        <h5 class="mb-0 fw-semibold" style="font-size: 1.25rem; line-height: 1.2;"><i class="fas fa-truck me-2"></i>Tabla de Vehículos</h5>
                                         <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todos los vehículos del sistema</small>
                                     </div>
                                 </div>
@@ -894,7 +888,7 @@
                                     <table id="vehiculoTable" class="table table-hover align-middle mb-0 datatable-server-side" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                         <thead class="table-light">
                                         <tr>
-                                            <th style="width: 3%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-hashtag me-1"></i>ID</th>
+                                            <th style="width: 3%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-hashtag me-1"></i>N° Vehículo</th>
                                             <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-id-card me-1"></i>Placa</th>
                                             <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-industry me-1"></i>Marca</th>
                                             <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-car me-1"></i>Modelo</th>
@@ -904,14 +898,14 @@
                                             <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-weight me-1"></i>Capacidad</th>
                                             <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-wrench me-1"></i>Última Revisión</th>
                                             <th style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold"><i class="fas fa-shield-alt me-1"></i>Venc. SOAT</th>
-                                            <th class="text-end fw-semibold text-success" style="width: 9%; font-size: 0.85rem; padding: 0.4rem 0.5rem;"><i class="fas fa-cog me-1"></i>Acciones</th>
+                                            <th class="fw-semibold text-success" style="width: 9%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;"><i class="fas fa-cog me-1"></i>Acciones</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         <c:forEach var="vehiculo" items="${listaVehiculos}">
                                             <tr class="align-middle" style="padding: 0;">
                                                 <td style="padding: 0.35rem 0.5rem; text-align: center;">
-                                                    <span style="font-size: 0.9rem; font-weight: 600; color: #2b2d42;">
+                                                    <span class="badge" style="background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); color: white; font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                         VEH<fmt:formatNumber value="${vehiculo.idVehiculo}" pattern="000"/>
                                                     </span>
                                                 </td>
@@ -1008,11 +1002,11 @@
                                                                     long diffInDays = diffInMillies / (1000 * 60 * 60 * 24);
                                                                     
                                                                     if (diffInDays < 0) {
-                                                                        // Ya venció
-                                                                        out.print("<span class='badge bg-danger shadow-sm' style='font-size: 0.8rem; padding: 0.3rem 0.6rem;'><i class='fas fa-exclamation-triangle me-1'></i>" + fechaFormateada + "</span>");
+                                                                        // Ya venció - badge rojo
+                                                                        out.print("<span class='badge shadow-sm' style='background-color: #ffcdd2; color: #c62828; font-size: 0.8rem; padding: 0.3rem 0.6rem;'><i class='fas fa-exclamation-triangle me-1'></i>" + fechaFormateada + "</span>");
                                                                     } else {
-                                                                        // Válida o próxima a vencer - mostrar solo texto
-                                                                        out.print("<span class='text-dark' style='font-size: 0.85rem;'>" + fechaFormateada + "</span>");
+                                                                        // Válida - badge verde
+                                                                        out.print("<span class='badge shadow-sm' style='background-color: #c8e6c9; color: #2e7d32; font-size: 0.8rem; padding: 0.3rem 0.6rem;'><i class='fas fa-check-circle me-1'></i>" + fechaFormateada + "</span>");
                                                                     }
                                                                 } else {
                                                                     out.print("<span class='text-muted' style='font-size: 0.85rem;'>-</span>");
@@ -1024,8 +1018,8 @@
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
-                                                <td class="text-end" style="padding: 0.35rem 0.5rem;">
-                                                    <div class="dropdown">
+                                                <td style="padding: 0.35rem 0.5rem; text-align: center;">
+                                                    <div class="dropdown d-inline-block">
                                                         <button class="btn btn-sm btn-outline-success shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">
                                                             <i class="fas fa-ellipsis-v"></i>
                                                         </button>

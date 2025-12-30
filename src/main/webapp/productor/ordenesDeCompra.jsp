@@ -787,10 +787,10 @@
                         <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Gestiona y monitorea las órdenes de compra de tus productos.</p>
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
-                        <a href="<%= request.getContextPath() %>/productor/OrdenCompraReporteServlet?action=exportar" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; color: white; font-weight: 600;">
+                        <a href="<%= request.getContextPath() %>/productor/OrdenCompraReporteServlet?action=exportar" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: #C9A87A; color: white; border: none;">
                             <i class="fas fa-file-excel me-1"></i>Exportar a Excel
                         </a>
-                        <button type="button" id="openSendOrdenesModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; font-weight: 600;">
+                        <button type="button" id="openSendOrdenesModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #E8B86D 0%, #D4A574 100%); border: none;">
                             <i class="fas fa-envelope me-1"></i>Enviar por Correo
                         </button>
                     </div>
@@ -814,7 +814,7 @@
             </div>
 
             <!-- ===================== Card: Búsqueda y filtros ===================== -->
-            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; border: 1px solid #dee2e6 !important;">
                 <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
                     <div class="col-md-4">
                         <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
@@ -847,7 +847,7 @@
             <!-- ===================== Card: Tabla de órdenes ===================== -->
             <div class="row">
                 <div class="col-12">
-                    <div class="table-card shadow-sm">
+                    <div class="table-card shadow-sm" style="border: 1px solid #dee2e6 !important;">
                         <div class="card-header" style="padding: 0.5rem 0.75rem;">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <div>

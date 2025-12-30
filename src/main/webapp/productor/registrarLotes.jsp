@@ -571,10 +571,10 @@
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=exportar" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; font-weight: 600;">
+                            <a href="<%= request.getContextPath() %>/productor/LoteReporteServlet?action=exportar" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: #C9A87A; color: white; border: none;">
                                 <i class="fas fa-file-excel me-1"></i>Exportar Lotes
                             </a>
-                            <button type="button" id="openSendLotesModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; font-weight: 600;">
+                            <button type="button" id="openSendLotesModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #E8B86D 0%, #D4A574 100%); border: none;">
                                 <i class="fas fa-envelope me-1"></i>Enviar Lotes
                             </button>
                         </div>

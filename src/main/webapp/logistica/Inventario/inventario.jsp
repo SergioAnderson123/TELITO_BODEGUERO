@@ -122,7 +122,7 @@
         }
         .stat-card {
             background-color: #FFFEF9 !important;
-            border: 2px solid #6F4E37 !important;
+            border: 1px solid #dee2e6 !important;
         }
         .stat-card h3 {
             color: #6F4E37 !important;
@@ -443,19 +443,19 @@
             <!-- ===================== Tarjetas de estadísticas ===================== -->
             <div class="row g-2 mb-3">
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Total de Productos</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalProductos %></p>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">En Stock</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= enStock %></p>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Sin Stock</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= sinStock %></p>
                     </div>
@@ -463,7 +463,7 @@
             </div>
 
             <!-- ===================== Card: Búsqueda y filtros ===================== -->
-            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; background-color: #FFFEF9 !important; border: 2px solid #6F4E37 !important;">
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; background-color: #FFFEF9 !important; border: 1px solid #dee2e6 !important;">
                 <form action="<%= request.getContextPath() %>/InventarioServlet" method="GET" id="filterForm">
                     <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                     <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
@@ -500,7 +500,7 @@
                     <div class="table-card shadow-sm">
                         <div class="card-header" style="padding: 0.5rem 0.75rem;">
                             <div>
-                                <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-warehouse me-2"></i>Tabla de Productos</h5>
+                                <h5 class="mb-0 fw-semibold" style="font-size: 1.25rem; line-height: 1.2;"><i class="fas fa-warehouse me-2"></i>Tabla de Productos</h5>
                                 <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todos los productos del inventario</small>
                             </div>
                         </div>
@@ -510,22 +510,22 @@
                                 <table id="inventoryTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                     <thead class="table-light">
                                     <tr>
-                                        <th onclick="sortTable(0)" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(0)" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-barcode me-1"></i>SKU
                                         </th>
-                                        <th onclick="sortTable(1)" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(1)" style="width: 25%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-box me-1"></i>Nombre Producto
                                         </th>
-                                        <th onclick="sortTable(2)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(2)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-cubes me-1"></i>Cantidad Disponible
                                         </th>
-                                        <th onclick="sortTable(3)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(3)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-dollar-sign me-1"></i>Precio por Paquete
                                         </th>
-                                        <th onclick="sortTable(4)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(4)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-coins me-1"></i>Costo por Unidad
                                         </th>
-                                        <th onclick="sortTable(5)" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(5)" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-toggle-on me-1"></i>Estado
                                         </th>
                                     </tr>
@@ -562,7 +562,7 @@
                                                     <i class="fas fa-exclamation-triangle me-1"></i>Poco Stock
                                                 </span>
                                             <% } else if ("En Stock".equals(estadoStock) || "En stock".equals(estadoStock)) { %>
-                                                <span class="badge text-bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                                <span class="badge shadow-sm" style="background-color: #c8e6c9; color: #2e7d32; font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                     <i class="fas fa-check-circle me-1"></i>En Stock
                                                 </span>
                                             <% } else { %>

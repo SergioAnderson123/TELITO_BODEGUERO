@@ -27,28 +27,28 @@ public class DatabaseConnection {
         }
     }
     
-    // Carga configuración desde application-prod.properties o application.properties
+    // Carga configuración desde application.properties (local) o application-prod.properties (producción)
     private static void loadDatabaseConfig() {
         Properties props = new Properties();
         
-        // Primero intenta cargar application-prod.properties (producción)
+        // Primero intenta cargar application.properties (desarrollo local)
         try (InputStream input = DatabaseConnection.class.getClassLoader()
-                .getResourceAsStream("application-prod.properties")) {
+                .getResourceAsStream("application.properties")) {
             if (input != null) {
                 props.load(input);
-                System.out.println("✓ Cargando configuración desde application-prod.properties");
+                System.out.println("✓ Cargando configuración desde application.properties (BD local)");
             }
         } catch (Exception e) {
-            // Si no existe, intenta application.properties
+            // Si no existe, intenta application-prod.properties
         }
         
-        // Si no se cargó prod, intenta application.properties
+        // Si no se cargó application.properties, intenta application-prod.properties (producción RDS)
         if (props.isEmpty()) {
             try (InputStream input = DatabaseConnection.class.getClassLoader()
-                    .getResourceAsStream("application.properties")) {
+                    .getResourceAsStream("application-prod.properties")) {
                 if (input != null) {
                     props.load(input);
-                    System.out.println("✓ Cargando configuración desde application.properties");
+                    System.out.println("✓ Cargando configuración desde application-prod.properties (RDS)");
                 }
             } catch (Exception e) {
                 System.err.println("⚠ No se pudo cargar application.properties. Usando valores por defecto.");

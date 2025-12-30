@@ -39,6 +39,7 @@
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid #dee2e6 !important;
         }
         .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: #6c757d; font-weight: 600; }
         .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #6F4E37; }
@@ -92,7 +93,7 @@
                         </div>
                         <div class="d-flex gap-2 flex-wrap">
                             <% if (!esAdministrador) { %>
-                            <a href="<%= request.getContextPath() %>/almacen/LoteServlet" class="btn btn-sm btn-primary shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <a href="<%= request.getContextPath() %>/almacen/LoteServlet" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; color: white; font-weight: 600;">
                                 <i class="fas fa-plus me-1"></i>Reportar desde Inventario
                             </a>
                             <% } %>
@@ -113,19 +114,19 @@
                 <!-- ===================== Tarjetas de estadísticas ===================== -->
                 <div class="row g-2 mb-3">
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Total de Incidencias</h3>
                             <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalIncidencias %></p>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Pendientes</h3>
                             <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= incidenciasPendientes %></p>
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+                        <div class="stat-card" style="background-color: #ffffff; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                             <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6c757d; font-weight: 600;">Resueltas</h3>
                             <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= incidenciasResueltas %></p>
                         </div>
@@ -133,7 +134,7 @@
                 </div>
 
                 <!-- ===================== Card: Búsqueda y filtros ===================== -->
-                <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+                <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; border: 1px solid #dee2e6 !important;">
                     <form action="<%= request.getContextPath() %>/almacen/IncidenciaServlet" method="GET" id="filterForm">
                         <input type="hidden" name="action" value="listar">
                         <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
@@ -175,7 +176,7 @@
                 </div>
 
                 <!-- ===================== Card: Tabla de incidencias ===================== -->
-                <div class="table-card shadow-sm">
+                <div class="table-card shadow-sm" style="border: 1px solid #dee2e6 !important;">
                     <div class="card-header" style="padding: 0.5rem 0.75rem;">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <div>

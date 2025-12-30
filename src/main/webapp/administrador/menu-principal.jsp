@@ -95,6 +95,34 @@
             padding-top: 0.75rem !important;
             padding-bottom: 0.75rem !important;
         }
+        
+        /* Bordes izquierdos de las cards en colores cálidos que combinan con café (igual que logística) */
+        .stat-card.border-warning,
+        .stat-card.border-start.border-warning {
+            border-left-color: #D4A574 !important; /* Terracota suave */
+            border-left-width: 4px !important;
+        }
+        .stat-card.border-info,
+        .stat-card.border-start.border-info {
+            border-left-color: #E8B86D !important; /* Dorado suave */
+            border-left-width: 4px !important;
+        }
+        .stat-card.border-success,
+        .stat-card.border-start.border-success {
+            border-left-color: #C9A87A !important; /* Beige dorado */
+            border-left-width: 4px !important;
+        }
+        .stat-card.border-danger,
+        .stat-card.border-start.border-danger {
+            border-left-color: #B8865B !important; /* Café tostado */
+            border-left-width: 4px !important;
+        }
+        
+        /* Asegurar que las cards tengan fondo blanco y borde gris */
+        .stat-card {
+            background-color: #ffffff !important;
+            border: 1px solid #dee2e6 !important;
+        }
     </style>
 </head>
 <body>
@@ -120,15 +148,15 @@
     <!-- Primera fila de métricas principales -->
     <div class="row g-2 mb-3">
         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-            <div class="card stat-card shadow-sm border-start border-3" style="border-start-color: #D4A574 !important; transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto; background-color: #FFFEF9;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+            <div class="card stat-card shadow-sm border-start border-warning border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                 <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="flex-grow-1">
-                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #6F4E37;">Usuarios activos</h6>
-                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #6F4E37;"><%= request.getAttribute("usuariosActivos") != null ? request.getAttribute("usuariosActivos") : "0" %></h2>
+                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Usuarios activos</h6>
+                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= request.getAttribute("usuariosActivos") != null ? request.getAttribute("usuariosActivos") : "0" %></h2>
                             <small style="font-size: 0.8rem; color: #4a4a4a;"><%= request.getAttribute("porcentajeActivos") != null ? request.getAttribute("porcentajeActivos") : "0" %>% del total</small>
                         </div>
-                        <div class="stat-icon ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0; color: #6F4E37;">
+                        <div class="stat-icon text-warning ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                             <i class="fas fa-users"></i>
                         </div>
                     </div>
@@ -136,12 +164,12 @@
             </div>
         </div>
         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-            <div class="card stat-card shadow-sm border-start border-danger border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto; background-color: #FFFEF9;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+            <div class="card stat-card shadow-sm border-start border-danger border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                 <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="flex-grow-1">
-                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #6F4E37;">Usuarios baneados</h6>
-                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #6F4E37;"><%= request.getAttribute("usuariosBaneados") != null ? request.getAttribute("usuariosBaneados") : "0" %></h2>
+                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Usuarios baneados</h6>
+                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= request.getAttribute("usuariosBaneados") != null ? request.getAttribute("usuariosBaneados") : "0" %></h2>
                             <small style="font-size: 0.8rem; color: #4a4a4a;">Acceso deshabilitado</small>
                         </div>
                         <div class="stat-icon text-danger ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
@@ -152,15 +180,15 @@
             </div>
         </div>
         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-            <div class="card stat-card shadow-sm border-start border-3" style="border-start-color: #B8865B !important; transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto; background-color: #FFFEF9;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+            <div class="card stat-card shadow-sm border-start border-warning border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                 <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="flex-grow-1">
-                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #6F4E37;">Alertas abiertas</h6>
-                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #6F4E37;"><%= request.getAttribute("alertasAbiertas") != null ? request.getAttribute("alertasAbiertas") : "0" %></h2>
+                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Alertas abiertas</h6>
+                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= request.getAttribute("alertasAbiertas") != null ? request.getAttribute("alertasAbiertas") : "0" %></h2>
                             <small style="font-size: 0.8rem; color: #4a4a4a;">Requieren atención</small>
                         </div>
-                        <div class="stat-icon ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0; color: #6F4E37;">
+                        <div class="stat-icon text-warning ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                             <i class="fas fa-exclamation-triangle"></i>
                         </div>
                     </div>
@@ -168,15 +196,15 @@
             </div>
         </div>
         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-            <div class="card stat-card shadow-sm border-start border-3" style="border-start-color: #E8B86D !important; transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto; background-color: #FFFEF9;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+            <div class="card stat-card shadow-sm border-start border-info border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                 <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="flex-grow-1">
-                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #6F4E37;">Acciones hoy</h6>
-                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #6F4E37;"><%= request.getAttribute("accionesHoy") != null ? request.getAttribute("accionesHoy") : "0" %></h2>
+                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Acciones hoy</h6>
+                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= request.getAttribute("accionesHoy") != null ? request.getAttribute("accionesHoy") : "0" %></h2>
                             <small style="font-size: 0.8rem; color: #4a4a4a;">Registradas en auditoría</small>
                         </div>
-                        <div class="stat-icon ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0; color: #6F4E37;">
+                        <div class="stat-icon text-info ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                             <i class="fas fa-history"></i>
                         </div>
                     </div>
@@ -188,15 +216,15 @@
     <!-- Segunda fila de métricas del sistema -->
     <div class="row g-2 mb-3">
         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-            <div class="card stat-card shadow-sm border-start border-3" style="border-start-color: #D4A574 !important; transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto; background-color: #FFFEF9;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+            <div class="card stat-card shadow-sm border-start border-success border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                 <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="flex-grow-1">
-                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #6F4E37;">Productos</h6>
-                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #6F4E37;"><%= request.getAttribute("totalProductos") != null ? request.getAttribute("totalProductos") : "0" %></h2>
+                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Productos</h6>
+                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= request.getAttribute("totalProductos") != null ? request.getAttribute("totalProductos") : "0" %></h2>
                             <small style="font-size: 0.8rem; color: #4a4a4a;">En el inventario</small>
                         </div>
-                        <div class="stat-icon ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0; color: #6F4E37;">
+                        <div class="stat-icon text-success ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                             <i class="fas fa-boxes-stacked"></i>
                         </div>
                     </div>
@@ -204,15 +232,15 @@
             </div>
         </div>
         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-            <div class="card stat-card shadow-sm border-start border-3" style="border-start-color: #C9A87A !important; transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto; background-color: #FFFEF9;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+            <div class="card stat-card shadow-sm border-start border-info border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                 <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="flex-grow-1">
-                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #6F4E37;">Lotes</h6>
-                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #6F4E37;"><%= request.getAttribute("totalLotes") != null ? request.getAttribute("totalLotes") : "0" %></h2>
+                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Lotes</h6>
+                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= request.getAttribute("totalLotes") != null ? request.getAttribute("totalLotes") : "0" %></h2>
                             <small style="font-size: 0.8rem; color: #4a4a4a;">Registrados</small>
                         </div>
-                        <div class="stat-icon ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0; color: #6F4E37;">
+                        <div class="stat-icon text-info ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                             <i class="fas fa-layer-group"></i>
                         </div>
                     </div>
@@ -220,15 +248,15 @@
             </div>
         </div>
         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-            <div class="card stat-card shadow-sm border-start border-3" style="border-start-color: #C9A87A !important; transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto; background-color: #FFFEF9;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+            <div class="card stat-card shadow-sm border-start border-success border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                 <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="flex-grow-1">
-                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #6F4E37;">Eficiencia logística</h6>
-                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #6F4E37;"><%= request.getAttribute("eficienciaLogistica") != null ? request.getAttribute("eficienciaLogistica") : "0" %>%</h2>
+                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Eficiencia logística</h6>
+                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= request.getAttribute("eficienciaLogistica") != null ? request.getAttribute("eficienciaLogistica") : "0" %>%</h2>
                             <small style="font-size: 0.8rem; color: #4a4a4a;">Entregas completadas</small>
                         </div>
-                        <div class="stat-icon ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0; color: #6F4E37;">
+                        <div class="stat-icon text-success ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                             <i class="fas fa-truck-fast"></i>
                         </div>
                     </div>
@@ -236,15 +264,15 @@
             </div>
         </div>
         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-            <div class="card stat-card shadow-sm border-start border-3" style="border-start-color: #B8865B !important; transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto; background-color: #FFFEF9;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+            <div class="card stat-card shadow-sm border-start border-warning border-3" style="transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                 <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="flex-grow-1">
-                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #6F4E37;">Rutas activas</h6>
-                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #6F4E37;"><%= request.getAttribute("rutasActivas") != null ? request.getAttribute("rutasActivas") : "0" %></h2>
+                            <h6 class="mb-1 text-uppercase" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px; color: #4a4a4a;">Rutas activas</h6>
+                            <h2 class="mb-0 fw-bold" style="font-size: 2.3rem; line-height: 1.1; color: #000000;"><%= request.getAttribute("rutasActivas") != null ? request.getAttribute("rutasActivas") : "0" %></h2>
                             <small style="font-size: 0.8rem; color: #4a4a4a;">En proceso</small>
                         </div>
-                        <div class="stat-icon ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0; color: #6F4E37;">
+                        <div class="stat-icon text-warning ms-2" style="font-size: 2.2rem; opacity: 0.15; flex-shrink: 0;">
                             <i class="fas fa-route"></i>
                         </div>
                     </div>
@@ -260,7 +288,7 @@
             </h5>
         </div>
         <div class="col-lg-3 col-md-6 mb-2">
-            <a href="<%= request.getContextPath() %>/administrador/reportes?action=globales" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+            <a href="<%= request.getContextPath() %>/administrador/reportes?action=globales" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: 1px solid #dee2e6; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                 <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                     <div class="mb-1" style="color: #6F4E37;">
                         <i class="fas fa-chart-pie" style="font-size: 1.9rem;"></i>
@@ -271,7 +299,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-md-6 mb-2">
-            <a href="<%= request.getContextPath() %>/administrador/acceso-roles.jsp" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+            <a href="<%= request.getContextPath() %>/administrador/acceso-roles.jsp" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: 1px solid #dee2e6; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                 <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                     <div class="mb-1" style="color: #6F4E37;">
                         <i class="fas fa-user-shield" style="font-size: 1.9rem;"></i>
@@ -282,7 +310,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-md-6 mb-2">
-            <a href="<%= request.getContextPath() %>/administrador/configuracion.jsp" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+            <a href="<%= request.getContextPath() %>/administrador/configuracion.jsp" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: 1px solid #dee2e6; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                 <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                     <div class="mb-1" style="color: #6F4E37;">
                         <i class="fas fa-cogs" style="font-size: 1.9rem;"></i>
@@ -293,7 +321,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-md-6 mb-2">
-            <a href="<%= request.getContextPath() %>/UsuarioServlet" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: none; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+            <a href="<%= request.getContextPath() %>/UsuarioServlet" class="card quick-link-card shadow-sm text-decoration-none" style="transition: all 0.3s ease; border: 1px solid #dee2e6; min-height: auto;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                 <div class="card-body text-center p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                     <div class="mb-1" style="color: #6F4E37;">
                         <i class="fas fa-users-cog" style="font-size: 1.9rem;"></i>

@@ -72,7 +72,7 @@
 
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 15px; text-align: center; border-bottom: 1px solid var(--border-color); }
-    thead th { background-color: var(--seafoam-light); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; }
+    thead th { background-color: var(--seafoam-light); font-weight: 700; color: var(--text-muted); font-size: 0.85rem; }
     tbody tr { transition: all 0.3s ease; cursor: pointer; }
     tbody tr:hover { 
         background-color: rgba(0, 168, 150, 0.1) !important; 

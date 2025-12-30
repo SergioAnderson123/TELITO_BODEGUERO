@@ -114,7 +114,7 @@
         }
         .stat-card {
             background-color: #FFFEF9 !important;
-            border: 2px solid #6F4E37 !important;
+            border: 1px solid #dee2e6 !important;
         }
         .stat-card h3 {
             color: #6F4E37 !important;
@@ -402,19 +402,19 @@
             <!-- ===================== Tarjetas de estadísticas ===================== -->
             <div class="row g-2 mb-3">
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Total de Movimientos</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalMovimientos %></p>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Entradas</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalEntradas %></p>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Salidas</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalSalidas %></p>
                     </div>
@@ -422,7 +422,7 @@
             </div>
 
             <!-- ===================== Card: Búsqueda y filtros ===================== -->
-            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; background-color: #FFFEF9 !important; border: 2px solid #6F4E37 !important;">
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; background-color: #FFFEF9 !important; border: 1px solid #dee2e6 !important;">
                 <form action="<%= request.getContextPath() %>/MovimientoProductoServlet" method="GET">
                     <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                     <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
@@ -468,7 +468,7 @@
                         <div class="card-header" style="padding: 0.5rem 0.75rem;">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <div>
-                                    <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-exchange-alt me-2"></i>Tabla de Movimientos</h5>
+                                    <h5 class="mb-0 fw-semibold" style="font-size: 1.25rem; line-height: 1.2;"><i class="fas fa-exchange-alt me-2"></i>Tabla de Movimientos</h5>
                                     <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todos los movimientos de inventario</small>
                                 </div>
                             </div>
@@ -479,27 +479,27 @@
                                     <thead class="table-light">
                                     <tr>
                                         <th style="width: 8%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;" class="fw-semibold">
-                                            <i class="fas fa-hashtag me-1"></i>N° DE MOV
+                                            <i class="fas fa-hashtag me-1"></i>N° Movimiento
                                         </th>
-                                        <th onclick="sortTable(0)" style="width: 8%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(0)" style="width: 8%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-calendar-alt me-1"></i>Fecha
                                         </th>
-                                        <th onclick="sortTable(1)" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(1)" style="width: 20%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-box me-1"></i>Producto
                                         </th>
-                                        <th onclick="sortTable(2)" style="width: 8%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(2)" style="width: 8%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-exchange-alt me-1"></i>Tipo
                                         </th>
-                                        <th onclick="sortTable(3)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(3)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-map-marker-alt me-1"></i>Destino
                                         </th>
-                                        <th onclick="sortTable(4)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(4)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-barcode me-1"></i>Lote
                                         </th>
-                                        <th onclick="sortTable(5)" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(5)" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-user me-1"></i>Personal Responsable
                                         </th>
-                                        <th onclick="sortTable(6)" style="width: 11%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(6)" style="width: 11%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-comment me-1"></i>Observaciones
                                         </th>
                                     </tr>
@@ -518,11 +518,11 @@
                                                 MOV<%= String.format("%03d", movimiento.getIdMovimiento()) %>
                                             </strong>
                                         </td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getFechaFormateada() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getNombreProducto() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= movimiento.getFechaFormateada() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= movimiento.getNombreProducto() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;">
                                             <% if ("Entrada".equalsIgnoreCase(movimiento.getTipo())) { %>
-                                            <span class="badge text-bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                            <span class="badge shadow-sm" style="background-color: #c8e6c9; color: #2e7d32; font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                 <i class="fas fa-arrow-down me-1"></i><%= movimiento.getTipo() %>
                                             </span>
                                             <% } else if ("Salida".equalsIgnoreCase(movimiento.getTipo())) { %>
@@ -535,12 +535,12 @@
                                             </span>
                                             <% } %>
                                         </td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getDestino() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= movimiento.getDestino() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;">
                                                 <%= movimiento.getCodigoLote() %>
                                         </td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getResponsable() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= movimiento.getObservaciones() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= movimiento.getResponsable() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= movimiento.getObservaciones() %></td>
                                     </tr>
                                     <%
                                             }

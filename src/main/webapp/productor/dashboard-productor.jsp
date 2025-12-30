@@ -94,7 +94,7 @@
             border-top: 1px solid rgba(245, 222, 179, 0.3);
         }
         .navbar-brand { font-weight: 700; color: var(--turquoise-dark); }
-        .card { border: 2px solid #6F4E37; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.3s ease; background-color: #FFFEF9; }
+        .card { border: 1px solid #dee2e6; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.3s ease; background-color: #FFFEF9; }
         .card:hover { transform: translateY(-2px); }
         .page-header { margin-bottom: 30px; }
         .page-header h2 { color: #6F4E37; font-weight: 700; margin-bottom: 10px; }
@@ -301,7 +301,7 @@
                 <!-- Primera fila: Productos y Lotes -->
                 <div class="row g-2 mb-3">
                     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-                        <div class="card stat-card shadow-sm border-start border-3" style="border-start-color: #D4A574 !important; transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto; background-color: #FFFEF9;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                        <div class="card stat-card shadow-sm border-start border-3" style="border-start-color: #D4A574 !important; transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto; background-color: #FFFEF9; border: 1px solid #dee2e6 !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                             <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
@@ -401,7 +401,7 @@
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12">
-                        <div class="card stat-card shadow-sm border-start border-3" style="border-start-color: #D4A574 !important; transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto; background-color: #FFFEF9;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
+                        <div class="card stat-card shadow-sm border-start border-3" style="border-start-color: #D4A574 !important; transition: transform 0.2s ease, box-shadow 0.2s ease; min-height: auto; background-color: #FFFEF9; border: 1px solid #dee2e6 !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.05)'">
                             <div class="card-body p-2" style="padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">

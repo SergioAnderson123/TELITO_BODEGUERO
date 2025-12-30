@@ -121,7 +121,7 @@
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         margin-bottom: 40px;
-        border: 2px solid #6F4E37;
+        border: 1px solid #dee2e6;
     }
     .card-header { 
         display: flex; 

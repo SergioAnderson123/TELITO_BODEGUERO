@@ -29,7 +29,7 @@
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <div class="card">
+                        <div class="card" style="border: 1px solid #dee2e6 !important;">
                             <div class="card-header">
                                 <h5>Formulario de Recepción</h5>
                             </div>

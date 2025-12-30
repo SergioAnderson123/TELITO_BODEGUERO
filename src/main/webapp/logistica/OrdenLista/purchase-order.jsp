@@ -117,7 +117,7 @@
         }
         .stat-card {
             background-color: #FFFEF9 !important;
-            border: 2px solid #6F4E37 !important;
+            border: 1px solid #dee2e6 !important;
         }
         .stat-card h3 {
             color: #6F4E37 !important;
@@ -405,31 +405,31 @@
             <!-- ===================== Tarjetas de estadísticas ===================== -->
             <div class="row g-2 mb-3" style="display: flex; flex-wrap: nowrap;">
                 <div class="col" style="flex: 1 1 0%; min-width: 0;">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Total de Órdenes</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalOrdenes %></p>
                     </div>
                 </div>
                 <div class="col" style="flex: 1 1 0%; min-width: 0;">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Pendientes</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= ordenesPendientes %></p>
                     </div>
                 </div>
                 <div class="col" style="flex: 1 1 0%; min-width: 0;">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Aprobadas</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= ordenesAprobadas %></p>
                     </div>
                 </div>
                 <div class="col" style="flex: 1 1 0%; min-width: 0;">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Rechazadas</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= ordenesRechazadas %></p>
                     </div>
                 </div>
                 <div class="col" style="flex: 1 1 0%; min-width: 0;">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Recibidas</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= ordenesRecibidas %></p>
                     </div>
@@ -437,7 +437,7 @@
             </div>
 
             <!-- ===================== Card: Búsqueda y filtros ===================== -->
-            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; background-color: #FFFEF9 !important; border: 2px solid #6F4E37 !important;">
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; background-color: #FFFEF9 !important; border: 1px solid #dee2e6 !important;">
                 <form action="${pageContext.request.contextPath}/orden-compra" method="GET" id="filterForm">
                     <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                     <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
@@ -494,7 +494,7 @@
                         <div class="card-header" style="padding: 0.5rem 0.75rem;">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <div>
-                                    <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-file-invoice-dollar me-2"></i>Tabla de Ordenes</h5>
+                                    <h5 class="mb-0 fw-semibold" style="font-size: 1.25rem; line-height: 1.2;"><i class="fas fa-file-invoice-dollar me-2"></i>Tabla de Ordenes</h5>
                                     <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todas las órdenes de compra</small>
                                 </div>
                             </div>
@@ -505,28 +505,28 @@
                                 <table id="purchaseTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                     <thead class="table-light">
                                     <tr>
-                                        <th onclick="sortTable(0)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(0)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-hashtag me-1"></i>N° de Orden
                                         </th>
-                                        <th onclick="sortTable(1)" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(1)" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-truck me-1"></i>Proveedor
                                         </th>
-                                        <th onclick="sortTable(2)" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(2)" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-box me-1"></i>Producto
                                         </th>
-                                        <th onclick="sortTable(3)" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(3)" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-cubes me-1"></i>Cantidad
                                         </th>
-                                        <th onclick="sortTable(4)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(4)" style="width: 15%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-user me-1"></i>Personal Responsable
                                         </th>
-                                        <th onclick="sortTable(5)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(5)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-toggle-on me-1"></i>Estado
                                         </th>
-                                        <th onclick="sortTable(6)" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(6)" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-dollar-sign me-1"></i>Monto
                                         </th>
-                                        <th class="text-center fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem;">
+                                        <th class="fw-semibold" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; text-align: center;">
                                             <i class="fas fa-cog me-1"></i>Acciones
                                         </th>
                                     </tr>
@@ -544,18 +544,18 @@
                                             for (OrdenCompraBean orden : listaOrdenes) {
                                     %>
                                     <tr class="align-middle" style="padding: 0;">
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong><%= orden.getNumeroOrden() %></strong></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= orden.getNombreProveedor() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= orden.getNombreProducto() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= orden.getCantidadPaquetes() %> paquetes</td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= orden.getPersonalResponsable() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><strong><%= orden.getNumeroOrden() %></strong></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= orden.getNombreProveedor() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= orden.getNombreProducto() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= orden.getCantidadPaquetes() %> paquetes</td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= orden.getPersonalResponsable() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;">
                                             <% if ("Pendiente".equals(orden.getEstado())) { %>
                                             <span class="badge text-bg-warning shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                 <i class="fas fa-clock me-1"></i><%= orden.getEstado() %>
                                             </span>
                                             <% } else if ("Aprobado".equals(orden.getEstado())) { %>
-                                            <span class="badge text-bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                            <span class="badge shadow-sm" style="background-color: #c8e6c9; color: #2e7d32; font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                 <i class="fas fa-check-circle me-1"></i><%= orden.getEstado() %>
                                             </span>
                                             <% } else if ("Rechazado".equals(orden.getEstado())) { %>
@@ -572,8 +572,8 @@
                                             </span>
                                             <% } %>
                                         </td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong><%= orden.getMontoTotal() %></strong></td>
-                                        <td class="text-center" style="font-size: 0.85rem; padding: 0.5rem;">
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><strong><%= orden.getMontoTotal() %></strong></td>
+                                        <td style="font-size: 0.85rem; padding: 0.5rem; text-align: center;">
                                             <% if ("Recibido".equals(orden.getEstado())) { %>
                                             <button class="btn btn-sm shadow-sm" onclick="editarOrden('<%= orden.getNumeroOrden() %>')" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; border: none; color: white; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); transition: all 0.2s ease; white-space: nowrap; font-weight: 600;" onmouseover="this.style.background='linear-gradient(165deg, #8B6F47 0%, #6F4E37 50%, #A0826D 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(111,78,55,0.3)';" onmouseout="this.style.background='linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
                                                 <i class="fas fa-eye me-1"></i>Ver

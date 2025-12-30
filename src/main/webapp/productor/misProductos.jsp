@@ -152,7 +152,7 @@
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            border: 2px solid #6F4E37;
+            border: 1px solid #dee2e6;
         }
         .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: var(--text-muted); font-weight: 600; }
         .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #6F4E37; }
@@ -164,7 +164,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
             margin-bottom: 40px;
-            border: 2px solid #6F4E37;
+            border: 1px solid #dee2e6;
             transition: box-shadow .3s ease;
         }
         .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); }
@@ -1263,13 +1263,13 @@
                         <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Vista general de tu inventario y herramientas de gestión.</p>
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
-                        <button id="openModalBtn" class="btn btn-sm shadow-sm btn-agregar-producto" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600;">
+                        <button id="openModalBtn" class="btn btn-sm shadow-sm btn-agregar-producto" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; color: white; font-weight: 600;">
                             <i class="fas fa-plus me-1"></i>Agregar Producto
                         </button>
-                        <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=exportar" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; color: white; font-weight: 600;">
+                        <a href="<%= request.getContextPath() %>/productor/ProductoReporteServlet?action=exportar" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: #C9A87A; color: white; border: none;">
                             <i class="fas fa-file-excel me-1"></i>Exportar Productos
                         </a>
-                        <button type="button" id="openSendProductosModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%); border: none; font-weight: 600;">
+                        <button type="button" id="openSendProductosModalBtn" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #E8B86D 0%, #D4A574 100%); border: none;">
                             <i class="fas fa-envelope me-1"></i>Enviar Productos
                         </button>
                     </div>
@@ -1313,7 +1313,7 @@
             </div>
 
             <!-- ===================== Card: Búsqueda y filtros de productos ===================== -->
-            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; border: 1px solid #dee2e6 !important;">
                 <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
                     <div class="col-md-4">
                         <label class="form-label small text-muted mb-0" style="font-size: 0.8rem; margin-bottom: 0.25rem !important;"><i class="fas fa-search me-1"></i>Buscar</label>
@@ -1352,7 +1352,7 @@
     <!-- ===================== Card: Inventario actual (tabla) ===================== -->
     <div class="row">
         <div class="col-12">
-            <div class="table-card shadow-sm">
+            <div class="table-card shadow-sm" style="border: 1px solid #dee2e6 !important;">
                 <div class="card-header" style="padding: 0.5rem 0.75rem;">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div>

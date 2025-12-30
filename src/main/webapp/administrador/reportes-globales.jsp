@@ -60,7 +60,16 @@
     </jsp:include>
     <jsp:include page="/administrador/layouts/header_admin.jsp" />
     <div class="dashboard-wrapper">
-        <div class="dashboard-content">
+        <!-- Pantalla de carga - solo sobre el contenido principal -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-content">
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                </div>
+                <p class="loading-text">Cargando reportes...</p>
+            </div>
+        </div>
+        <div class="dashboard-content" id="dashboardContent" style="opacity: 0;">
             <div class="container-fluid px-4">
                 <div class="page-header mb-4">
                     <h2 class="pageheader-title mb-0">
@@ -352,53 +361,53 @@
         transform: translateX(5px);
     }
 
-    /* Colores originales restaurados */
+    /* Colores con gradientes de logística */
     .logistica-card .report-card-header {
-        background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
+        background: linear-gradient(135deg, #D4A574 0%, #C9A87A 100%);
     }
 
     .logistica-card:hover {
-        border-color: #17a2b8;
+        border-color: #D4A574;
     }
 
     .logistica-card .stat-number {
-        color: #17a2b8;
+        color: #D4A574;
     }
 
     .logistica-card .report-action {
-        color: #17a2b8;
+        color: #D4A574;
     }
 
     .productor-card .report-card-header {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        background: linear-gradient(165deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
     }
 
     .productor-card:hover {
-        border-color: #28a745;
+        border-color: #6F4E37;
     }
 
     .productor-card .stat-number {
-        color: #28a745;
+        color: #6F4E37;
     }
 
     .productor-card .report-action {
-        color: #28a745;
+        color: #6F4E37;
     }
 
     .almacen-card .report-card-header {
-        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        background: linear-gradient(135deg, #E8B86D 0%, #D4A574 100%);
     }
 
     .almacen-card:hover {
-        border-color: #ffc107;
+        border-color: #E8B86D;
     }
 
     .almacen-card .stat-number {
-        color: #fd7e14;
+        color: #E8B86D;
     }
 
     .almacen-card .report-action {
-        color: #fd7e14;
+        color: #E8B86D;
     }
 
     /* Responsive */
@@ -472,10 +481,149 @@
     .report-card:nth-child(3) {
         animation-delay: 0.3s;
     }
-</style>
+    
+    /* =====================
+       PANTALLA DE CARGA
+    ====================== */
+    
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 254, 249, 0);
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        transition: opacity 0.5s ease-out;
+        animation: blurIn 0.3s ease-out 0.3s forwards;
+    }
+    
+    @keyframes blurIn {
+        to {
+            background-color: rgba(255, 254, 249, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+    }
+    
+    .dashboard-wrapper {
+        position: relative;
+    }
+    
+    .loading-overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .loading-content {
+        text-align: center;
+        color: #6F4E37;
+    }
+    
+    .spinner-container {
+        margin-bottom: 20px;
+        animation: fadeIn 0.2s ease-out 0.2s both;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    .spinner {
+        width: 60px;
+        height: 60px;
+        border: 6px solid rgba(111, 78, 55, 0.2);
+        border-top-color: #6F4E37;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+    
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    
+    .loading-text {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #6F4E37;
+        margin: 0;
+        letter-spacing: 0.5px;
+        animation: fadeInUp 0.2s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    </style>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // =====================
+    // PANTALLA DE CARGA
+    // =====================
+    (function() {
+        function initLoadingScreen() {
+            var loadingOverlay = document.getElementById('loadingOverlay');
+            var dashboardContent = document.getElementById('dashboardContent');
+            
+            // Ocultar el contenido al inicio
+            if (dashboardContent) {
+                dashboardContent.style.opacity = '0';
+                dashboardContent.style.transition = 'opacity 0.5s ease-in';
+            }
+            
+            if (loadingOverlay) {
+                // Asegurar que el overlay esté visible
+                loadingOverlay.style.display = 'flex';
+                loadingOverlay.style.opacity = '1';
+                
+                // Ocultar el overlay y mostrar el contenido después de 0.5 segundos
+                setTimeout(function() {
+                    loadingOverlay.classList.add('hidden');
+                    // Mostrar el contenido
+                    if (dashboardContent) {
+                        dashboardContent.style.opacity = '1';
+                    }
+                    // Remover el elemento del DOM después de la animación
+                    setTimeout(function() {
+                        if (loadingOverlay && loadingOverlay.parentNode) {
+                            loadingOverlay.parentNode.removeChild(loadingOverlay);
+                        }
+                    }, 500); // Después de que termine la animación de fade out
+                }, 500); // 0.5 segundos
+            }
+        }
+        
+        // Ejecutar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initLoadingScreen);
+        } else {
+            // Si el DOM ya está cargado, ejecutar inmediatamente
+            initLoadingScreen();
+        }
+    })();
+    
     // Asegurar que el fondo se mantenga correcto durante toda la carga
     (function() {
         function setBackground() {
@@ -504,6 +652,28 @@
         // Ejecutar cuando la ventana esté completamente cargada
         window.addEventListener('load', setBackground);
     })();
+    
+    // Asegurar que los dropdowns de Bootstrap funcionen correctamente
+    document.addEventListener('DOMContentLoaded', function() {
+        // Esperar a que Bootstrap esté completamente cargado
+        if (typeof bootstrap !== 'undefined') {
+            // Inicializar todos los dropdowns
+            var dropdownElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="dropdown"]'));
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+        } else {
+            // Si Bootstrap aún no está cargado, esperar un poco más
+            setTimeout(function() {
+                if (typeof bootstrap !== 'undefined') {
+                    var dropdownElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="dropdown"]'));
+                    var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                        return new bootstrap.Dropdown(dropdownToggleEl);
+                    });
+                }
+            }, 100);
+        }
+    });
 </script>
 </body>
 </html>

@@ -23,12 +23,17 @@
 
     <style>
         :root {
-            --primary-green: #006d77;
-            --primary-green-dark: #004f56;
-            --secondary-green: #83c5be;
-            --accent-green: #20c997;
-            --light-green: #e0f2f1;
-            --gradient-green: linear-gradient(135deg, #006d77 0%, #20c997 100%);
+            --primary-brown: #6F4E37;
+            --primary-brown-dark: #5a3e2a;
+            --secondary-brown: #8B6F47;
+            --accent-beige: #C9A87A;
+            --accent-gold: #D4A574;
+            --accent-yellow: #E8B86D;
+            --light-beige: #FFFEF9;
+            --medium-beige: #F5DEB3;
+            --gradient-brown: linear-gradient(135deg, #6F4E37 0%, #8B6F47 50%, #A0826D 100%);
+            --gradient-beige: linear-gradient(135deg, #D4A574 0%, #C9A87A 100%);
+            --gradient-gold: linear-gradient(135deg, #E8B86D 0%, #D4A574 100%);
             --dark: #1a1a1a;
             --gray: #6c757d;
             --light: #f8f9fa;
@@ -79,7 +84,7 @@
         .navbar-brand {
             font-weight: 800;
             font-size: 1.5rem;
-            color: var(--primary-green) !important;
+            color: var(--primary-brown) !important;
             display: flex;
             align-items: center;
             gap: 15px;
@@ -93,19 +98,19 @@
 
         .navbar-brand img {
             height: 55px;
-            filter: drop-shadow(0 3px 12px rgba(0, 109, 119, 0.4));
+            filter: drop-shadow(0 3px 12px rgba(111, 78, 55, 0.4));
             transition: all 0.3s ease;
         }
         
         .navbar-brand:hover img {
             transform: scale(1.05);
-            filter: drop-shadow(0 5px 20px rgba(0, 109, 119, 0.5));
+            filter: drop-shadow(0 5px 20px rgba(111, 78, 55, 0.5));
         }
         
         .brand-text {
             font-size: 1.6rem;
             font-weight: 900;
-            background: var(--gradient-green);
+            background: var(--gradient-brown);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -132,7 +137,7 @@
             transform: translateX(-50%);
             width: 0;
             height: 3px;
-            background: var(--gradient-green);
+            background: var(--gradient-brown);
             border-radius: 2px;
             transition: width 0.3s ease;
         }
@@ -143,25 +148,25 @@
         }
 
         .nav-link-custom:hover {
-            color: var(--primary-green) !important;
+            color: var(--primary-brown) !important;
         }
 
         .btn-login-custom {
-            background: linear-gradient(135deg, #20c997 0%, #83c5be 100%);
+            background: var(--gradient-beige);
             color: white;
             font-weight: 600;
             padding: 0.7rem 2rem;
             border-radius: 50px;
             border: none;
-            box-shadow: 0 4px 15px rgba(32, 201, 151, 0.3);
+            box-shadow: 0 4px 15px rgba(212, 165, 116, 0.3);
             transition: all 0.3s ease;
         }
 
         .btn-login-custom:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(32, 201, 151, 0.4);
+            box-shadow: 0 8px 25px rgba(212, 165, 116, 0.4);
             color: white;
-            background: linear-gradient(135deg, #26d9a5 0%, #95d4cd 100%);
+            background: var(--gradient-gold);
         }
 
         /* ============================================
@@ -171,7 +176,7 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
-            background: var(--gradient-green);
+            background: var(--gradient-brown);
             position: relative;
             overflow: hidden;
             padding: 8rem 0 4rem;
@@ -195,8 +200,8 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 30% 50%, rgba(131, 197, 190, 0.15) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 50%, rgba(32, 201, 151, 0.15) 0%, transparent 50%);
+            background: radial-gradient(circle at 30% 50%, rgba(212, 165, 116, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(201, 168, 122, 0.15) 0%, transparent 50%);
             animation: float 20s ease-in-out infinite;
         }
         
@@ -250,7 +255,7 @@
 
         .btn-hero-primary {
             background: white;
-            color: var(--primary-green);
+            color: var(--primary-brown);
             font-weight: 700;
             font-size: 1.1rem;
             padding: 1rem 3rem;
@@ -264,8 +269,8 @@
         .btn-hero-primary:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-            background: #f8f9fa;
-            color: var(--primary-green);
+            background: var(--light-beige);
+            color: var(--primary-brown);
         }
 
         .btn-hero-secondary {
@@ -282,7 +287,7 @@
 
         .btn-hero-secondary:hover {
             background: white;
-            color: var(--primary-green);
+            color: var(--primary-brown);
             transform: translateY(-5px);
         }
 
@@ -340,8 +345,8 @@
 
         .section-badge {
             display: inline-block;
-            background: var(--light-green);
-            color: var(--primary-green);
+            background: var(--light-beige);
+            color: var(--primary-brown);
             padding: 0.5rem 1.5rem;
             border-radius: 50px;
             font-size: 0.85rem;
@@ -354,7 +359,7 @@
         .section-title {
             font-size: 3rem;
             font-weight: 900;
-            color: var(--primary-green);
+            color: var(--primary-brown);
             margin-bottom: 1.5rem;
         }
 
@@ -375,20 +380,20 @@
 
         .feature-card-modern:hover {
             transform: translateY(-10px);
-            border-color: var(--secondary-green);
-            box-shadow: 0 20px 50px rgba(0, 109, 119, 0.15);
+            border-color: var(--accent-beige);
+            box-shadow: 0 20px 50px rgba(111, 78, 55, 0.15);
         }
 
         .feature-icon-modern {
             width: 80px;
             height: 80px;
-            background: var(--gradient-green);
+            background: var(--gradient-brown);
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 109, 119, 0.2);
+            box-shadow: 0 10px 30px rgba(111, 78, 55, 0.2);
         }
 
         .feature-icon-modern i {
@@ -399,7 +404,7 @@
         .feature-title {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--primary-green);
+            color: var(--primary-brown);
             margin-bottom: 1rem;
         }
 
@@ -414,7 +419,7 @@
         ============================================ */
         .benefits-section {
             padding: 8rem 0;
-            background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+            background: linear-gradient(135deg, #FFFEF9 0%, #F5DEB3 100%);
             position: relative;
             overflow: hidden;
         }
@@ -426,7 +431,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="boxes" width="100" height="100" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="50" height="50" fill="none" stroke="rgba(0,109,119,0.08)" stroke-width="1"/><rect x="50" y="50" width="50" height="50" fill="none" stroke="rgba(0,109,119,0.08)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23boxes)"/></svg>');
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="boxes" width="100" height="100" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="50" height="50" fill="none" stroke="rgba(111,78,55,0.08)" stroke-width="1"/><rect x="50" y="50" width="50" height="50" fill="none" stroke="rgba(111,78,55,0.08)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23boxes)"/></svg>');
             opacity: 1;
         }
 
@@ -441,12 +446,12 @@
             width: 60px;
             height: 60px;
             min-width: 60px;
-            background: var(--gradient-green);
+            background: var(--gradient-brown);
             border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 20px rgba(0, 109, 119, 0.2);
+            box-shadow: 0 8px 20px rgba(111, 78, 55, 0.2);
         }
 
         .benefit-icon i {
@@ -457,7 +462,7 @@
         .benefit-content h4 {
             font-size: 1.3rem;
             font-weight: 700;
-            color: var(--primary-green);
+            color: var(--primary-brown);
             margin-bottom: 0.8rem;
         }
 
@@ -472,7 +477,7 @@
         ============================================ */
         .cta-section {
             padding: 6rem 0;
-            background: var(--gradient-green);
+            background: var(--gradient-brown);
             color: white;
             text-align: center;
             position: relative;
@@ -530,7 +535,7 @@
             font-size: 1.5rem;
             font-weight: 800;
             margin-bottom: 1rem;
-            color: var(--secondary-green);
+            color: var(--accent-beige);
         }
 
         .footer-description {
@@ -542,7 +547,7 @@
         .footer-links h5 {
             font-weight: 700;
             margin-bottom: 1.5rem;
-            color: var(--secondary-green);
+            color: var(--accent-beige);
         }
 
         .footer-links ul {
@@ -561,7 +566,7 @@
         }
 
         .footer-links ul li a:hover {
-            color: var(--secondary-green);
+            color: var(--accent-beige);
         }
 
         .footer-bottom {
@@ -1074,7 +1079,7 @@
                 }
             },
             color: {
-                value: "#83c5be"
+                value: "#C9A87A"
             },
             shape: {
                 type: "circle"
@@ -1090,7 +1095,7 @@
             line_linked: {
                 enable: true,
                 distance: 150,
-                color: "#83c5be",
+                color: "#C9A87A",
                 opacity: 0.4,
                 width: 1
             },

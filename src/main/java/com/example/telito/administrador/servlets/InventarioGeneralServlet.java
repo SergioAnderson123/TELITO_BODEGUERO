@@ -8,7 +8,7 @@ import com.example.telito.administrador.beans.Producto;
 import com.example.telito.administrador.daos.ProductoDAO;
 import com.example.telito.logistica.daos.ProveedorDao;
 import com.example.telito.logistica.beans.ProveedorBean;
-import com.example.telito.productor.daos.OrdenCompraDao;
+import com.example.telito.logistica.daos.OrdenCompraDao;
 import com.example.telito.almacen.daos.MovimientoDao;
 import com.example.telito.util.AuthorizationHelper;
 import jakarta.servlet.RequestDispatcher;
@@ -20,6 +20,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,129 +58,183 @@ public class InventarioGeneralServlet extends HttpServlet {
         }
         request.setAttribute("tabActivo", tab);
         
-        // Inventario desde perspectiva de Logística (agrupado por producto)
-        InventarioDao inventarioDao = new InventarioDao();
-        ArrayList<InventarioBean> listaLogistica = inventarioDao.obtenerInventarioAgrupado(busquedaLogistica, null, 1, 100);
-        request.setAttribute("listaLogistica", listaLogistica);
+        // Inventario desde perspectiva de Logística: Mostrar ÓRDENES DE COMPRA (exclusivo de logística)
+        com.example.telito.logistica.daos.OrdenCompraDao ordenCompraDao = new com.example.telito.logistica.daos.OrdenCompraDao();
+        
+        // Obtener filtro de usuario de logística
+        String filtroUsuarioLogistica = request.getParameter("filtroUsuarioLogistica");
+        
+        // Obtener órdenes de compra con filtros (sin filtro de productor, ya que no es relevante para logística)
+        ArrayList<com.example.telito.logistica.beans.OrdenCompraBean> listaOrdenesCompra = 
+            ordenCompraDao.obtenerOrdenes(busquedaLogistica, null, filtroLogistica, 1, 100);
+        
+        // Obtener lista de usuarios de logística para el filtro
+        com.example.telito.administrador.daos.UsuarioDAO usuarioDAO = new com.example.telito.administrador.daos.UsuarioDAO();
+        ArrayList<com.example.telito.administrador.beans.Usuario> usuariosLogistica = usuarioDAO.listarUsuarios(null, "2", "1", null, null, 1, 1000); // Rol 2 = Logística
+        
+        // Filtrar por usuario de logística si se especifica (filtrar por nombre del personal responsable)
+        if (filtroUsuarioLogistica != null && !filtroUsuarioLogistica.trim().isEmpty()) {
+            int usuarioId = Integer.parseInt(filtroUsuarioLogistica);
+            // Obtener el nombre del usuario para comparar
+            String nombreUsuarioFiltro = null;
+            for (com.example.telito.administrador.beans.Usuario u : usuariosLogistica) {
+                if (u.getIdUsuario() == usuarioId) {
+                    nombreUsuarioFiltro = u.getNombres() + " " + u.getApellidos();
+                    break;
+                }
+            }
+            if (nombreUsuarioFiltro != null) {
+                final String nombreFinal = nombreUsuarioFiltro;
+                listaOrdenesCompra.removeIf(orden -> !orden.getPersonalResponsable().equals(nombreFinal));
+            }
+        }
+        
+        request.setAttribute("listaOrdenesCompra", listaOrdenesCompra);
         request.setAttribute("busquedaLogistica", busquedaLogistica);
+        request.setAttribute("usuariosLogistica", usuariosLogistica);
+        request.setAttribute("filtroUsuarioLogistica", filtroUsuarioLogistica);
 
-        // Inventario desde perspectiva de Almacén (lotes registrados)
-        com.example.telito.almacen.daos.LoteDao loteDao = new com.example.telito.almacen.daos.LoteDao();
+        // Inventario desde perspectiva de Almacén: Mostrar MOVIMIENTOS DE INVENTARIO (exclusivo de almacén)
+        MovimientoDao movimientoDao = new MovimientoDao();
         String busquedaAlmacen = request.getParameter("busquedaAlmacen");
-        // El filtro de almacén se aplica por estado (Activo, Vencido, Por Vencer)
-        // pero el método listarLotesRegistrados usa estadoStock (En Stock, Poco Stock, Sin Stock)
-        // Por ahora, solo aplicamos la búsqueda
-        ArrayList<com.example.telito.almacen.beans.Lote> listaAlmacen = loteDao.listarLotesRegistrados(1, busquedaAlmacen, null);
-        request.setAttribute("listaAlmacen", listaAlmacen);
+        String filtroTipoMovimiento = request.getParameter("filtroTipoMovimiento");
+        String filtroUsuarioAlmacen = request.getParameter("filtroUsuarioAlmacen");
+        
+        // Obtener lista de usuarios de almacén para el filtro
+        com.example.telito.administrador.daos.UsuarioDAO usuarioDAOAlmacen = new com.example.telito.administrador.daos.UsuarioDAO();
+        ArrayList<com.example.telito.administrador.beans.Usuario> usuariosAlmacen = usuarioDAOAlmacen.listarUsuarios(null, "4", "1", null, null, 1, 1000); // Rol 4 = Almacenero
+        
+        // Obtener nombre del usuario si se especifica el filtro
+        String responsableNombre = null;
+        if (filtroUsuarioAlmacen != null && !filtroUsuarioAlmacen.trim().isEmpty()) {
+            int usuarioId = Integer.parseInt(filtroUsuarioAlmacen);
+            for (com.example.telito.administrador.beans.Usuario u : usuariosAlmacen) {
+                if (u.getIdUsuario() == usuarioId) {
+                    responsableNombre = u.getNombres() + " " + u.getApellidos();
+                    break;
+                }
+            }
+        }
+        
+        // Obtener movimientos de inventario con filtros
+        ArrayList<com.example.telito.almacen.beans.Movimiento> listaMovimientos = 
+            movimientoDao.listarMovimientosPaginado(100, 0, busquedaAlmacen, filtroTipoMovimiento, responsableNombre);
+        
+        request.setAttribute("listaMovimientos", listaMovimientos);
         request.setAttribute("busquedaAlmacen", busquedaAlmacen);
-        request.setAttribute("filtroAlmacen", filtroAlmacen);
+        request.setAttribute("filtroTipoMovimiento", filtroTipoMovimiento);
+        request.setAttribute("usuariosAlmacen", usuariosAlmacen);
+        request.setAttribute("filtroUsuarioAlmacen", filtroUsuarioAlmacen);
         request.setAttribute("filtroLogistica", filtroLogistica);
         request.setAttribute("filtroProductor", filtroProductor);
         request.setAttribute("busquedaProductores", busquedaProductores);
 
-        // Inventario desde perspectiva de Productores - AGRUPADO POR PRODUCTOR
-        ProductoDAO productoDao = new ProductoDAO();
+        // Inventario desde perspectiva de Productores: Mostrar LOTES REGISTRADOS (exclusivo de productores)
+        String filtroEstadoLote = request.getParameter("filtroEstadoLote");
         
-        // Obtener todos los productores
+        // Obtener todos los productores para el filtro
         ProveedorDao proveedorDao = new ProveedorDao();
         ArrayList<ProveedorBean> listaProductoresUsuarios = proveedorDao.listarProductores();
         
-        // Agrupar productos por productor con órdenes de compra y movimientos
-        Map<Integer, Map<String, Object>> inventarioPorProductor = new HashMap<>();
-        OrdenCompraDao ordenCompraDao = new OrdenCompraDao();
-        MovimientoDao movimientoDao = new MovimientoDao();
+        // Obtener lotes con información del productor
+        ArrayList<Map<String, Object>> listaLotesProductores = obtenerLotesConProductor(busquedaProductores, filtroProductor, filtroEstadoLote);
         
-        for (ProveedorBean productor : listaProductoresUsuarios) {
-            int productorId = productor.getId();
-            String nombreProductor = productor.getNombre();
-            
-            // Aplicar filtro por productor
-            if (filtroProductor != null && !filtroProductor.trim().isEmpty()) {
-                if (!String.valueOf(productorId).equals(filtroProductor.trim())) {
-                    continue; // Saltar este productor si no coincide con el filtro
-                }
-            }
-            
-            // Obtener productos de este productor
-            ArrayList<Producto> productos = productoDao.listarProductosPorProductor(productorId);
-            
-            // Aplicar búsqueda de productos si existe
-            if (busquedaProductores != null && !busquedaProductores.trim().isEmpty()) {
-                String busquedaLower = busquedaProductores.toLowerCase().trim();
-                ArrayList<Producto> productosFiltrados = new ArrayList<>();
-                for (Producto p : productos) {
-                    if ((p.getCodigoSku() != null && p.getCodigoSku().toLowerCase().contains(busquedaLower)) ||
-                        (p.getNombre() != null && p.getNombre().toLowerCase().contains(busquedaLower)) ||
-                        (p.getCategoriaNombre() != null && p.getCategoriaNombre().toLowerCase().contains(busquedaLower))) {
-                        productosFiltrados.add(p);
-                    }
-                }
-                productos = productosFiltrados;
-            }
-            
-            // Limitar a 9 productos por productor
-            if (productos.size() > 9) {
-                productos = new ArrayList<>(productos.subList(0, 9));
-            }
-            
-            // Solo agregar si tiene productos o si no hay filtro aplicado
-            if (!productos.isEmpty() || (filtroProductor == null || filtroProductor.trim().isEmpty())) {
-                Map<String, Object> datosProductor = new HashMap<>();
-                datosProductor.put("id", productorId);
-                datosProductor.put("nombre", nombreProductor);
-                datosProductor.put("productos", productos);
-                
-                // Obtener estadísticas del productor
-                int totalProductos = productos.size();
-                int totalStock = productos.stream().mapToInt(Producto::getStock).sum();
-                datosProductor.put("totalProductos", totalProductos);
-                datosProductor.put("totalStock", totalStock);
-                
-                // Obtener órdenes de compra del productor
-                try {
-                    List<Object[]> ordenesCompra = ordenCompraDao.listarOrdenesPorProductor(productorId);
-                    datosProductor.put("ordenesCompra", ordenesCompra);
-                    datosProductor.put("totalOrdenes", ordenesCompra.size());
-                } catch (Exception e) {
-                    System.err.println("Error al obtener órdenes de compra para productor " + productorId + ": " + e.getMessage());
-                    datosProductor.put("ordenesCompra", new ArrayList<>());
-                    datosProductor.put("totalOrdenes", 0);
-                }
-                
-                // Obtener movimientos por cada producto del productor
-                Map<Integer, List<Object>> movimientosPorProducto = new HashMap<>();
-                int totalMovimientos = 0;
-                
-                for (Producto producto : productos) {
-                    try {
-                        // Obtener movimientos del producto (últimos 10)
-                        List<Object> movimientos = obtenerMovimientosPorProducto(producto.getIdProducto(), movimientoDao);
-                        movimientosPorProducto.put(producto.getIdProducto(), movimientos);
-                        totalMovimientos += movimientos.size();
-                    } catch (Exception e) {
-                        System.err.println("Error al obtener movimientos para producto " + producto.getIdProducto() + ": " + e.getMessage());
-                        movimientosPorProducto.put(producto.getIdProducto(), new ArrayList<>());
-                    }
-                }
-                
-                datosProductor.put("movimientosPorProducto", movimientosPorProducto);
-                datosProductor.put("totalMovimientos", totalMovimientos);
-                
-                inventarioPorProductor.put(productorId, datosProductor);
-            }
-        }
-        
-        request.setAttribute("inventarioPorProductor", inventarioPorProductor);
+        request.setAttribute("listaLotesProductores", listaLotesProductores);
         request.setAttribute("listaProductoresUsuarios", listaProductoresUsuarios);
         request.setAttribute("filtroProductor", filtroProductor);
         request.setAttribute("busquedaProductores", busquedaProductores);
-        
-        // Para compatibilidad con el JSP existente
-        ArrayList<Producto> listaProductores = productoDao.listarProductos();
-        request.setAttribute("listaProductores", listaProductores);
+        request.setAttribute("filtroEstadoLote", filtroEstadoLote);
 
         RequestDispatcher rd = request.getRequestDispatcher("/administrador/inventario-general.jsp");
         rd.forward(request, response);
+    }
+    
+    /**
+     * Obtiene lotes con información del productor (exclusivo de productores)
+     */
+    private ArrayList<Map<String, Object>> obtenerLotesConProductor(String busqueda, String filtroProductor, String filtroEstado) {
+        ArrayList<Map<String, Object>> listaLotes = new ArrayList<>();
+        
+        String sql = "SELECT " +
+                "l.codigo_lote, " +
+                "p.nombre AS nombre_producto, " +
+                "l.stock_actual AS cantidad, " +
+                "l.costo_produccion, " +
+                "l.fecha_vencimiento, " +
+                "l.estado, " +
+                "CONCAT(u.nombres, ' ', u.apellidos) AS nombre_productor, " +
+                "u.id_usuario AS productor_id " +
+                "FROM lotes l " +
+                "INNER JOIN productos p ON l.producto_id = p.id_producto " +
+                "INNER JOIN usuarios u ON p.productor_id = u.id_usuario " +
+                "WHERE 1=1";
+        
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        
+        // Filtro por productor
+        if (filtroProductor != null && !filtroProductor.trim().isEmpty()) {
+            sql += " AND u.id_usuario = ?";
+            params.add(Integer.parseInt(filtroProductor));
+        }
+        
+        // Filtro por estado
+        if (filtroEstado != null && !filtroEstado.trim().isEmpty()) {
+            sql += " AND l.estado = ?";
+            params.add(filtroEstado);
+        }
+        
+        // Filtro por búsqueda (código lote, producto, productor)
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            sql += " AND (l.codigo_lote LIKE ? OR p.nombre LIKE ? OR CONCAT(u.nombres, ' ', u.apellidos) LIKE ?)";
+            String busquedaParam = "%" + busqueda.trim() + "%";
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+            params.add(busquedaParam);
+        }
+        
+        sql += " ORDER BY l.codigo_lote DESC";
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = com.example.telito.util.DatabaseConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            
+            // Establecer parámetros
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+            
+            rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                Map<String, Object> lote = new HashMap<>();
+                lote.put("codigoLote", rs.getString("codigo_lote"));
+                lote.put("nombreProducto", rs.getString("nombre_producto"));
+                lote.put("cantidad", rs.getInt("cantidad"));
+                lote.put("costoProduccion", rs.getBigDecimal("costo_produccion"));
+                lote.put("fechaVencimiento", rs.getDate("fecha_vencimiento"));
+                lote.put("estado", rs.getString("estado"));
+                lote.put("nombreProductor", rs.getString("nombre_productor"));
+                lote.put("productorId", rs.getInt("productor_id"));
+                listaLotes.add(lote);
+            }
+        } catch (Exception e) {
+            System.err.println("Error al obtener lotes de productores: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+                if (conn != null) conn.close();
+            } catch (Exception e) {
+                System.err.println("Error al cerrar recursos: " + e.getMessage());
+            }
+        }
+        
+        return listaLotes;
     }
     
     /**

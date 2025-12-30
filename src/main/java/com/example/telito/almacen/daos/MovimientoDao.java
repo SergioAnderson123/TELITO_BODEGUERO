@@ -300,14 +300,15 @@ public class MovimientoDao extends DAOBase {
                 "p.nombre AS nombre_producto, " +
                 "CONCAT(u.nombres, ' ', u.apellidos) AS nombre_usuario, " +
                 "ped.numero_pedido, " +
-                "oc.numero_orden " +
+                "IFNULL(oc.numero_Orden, CONCAT('OC', LPAD(oc.id_orden_compra, 3, '0'))) AS numero_orden " +
                 "FROM movimientos_inventario m " +
                 "INNER JOIN lotes l ON (m.lote_id = l.id_lote) " +
                 "INNER JOIN productos p ON (l.producto_id = p.id_producto) " +
                 "INNER JOIN usuarios u ON (m.usuario_id = u.id_usuario) " +
+                "INNER JOIN roles r ON (u.rol_id = r.id_rol) " +
                 "LEFT JOIN pedidos ped ON (m.pedido_id = ped.id_pedido) " +
                 "LEFT JOIN ordenes_compra oc ON (m.orden_compra_id = oc.id_orden_compra) " +
-                "WHERE 1=1";
+                "WHERE u.rol_id = 4";
 
         java.util.List<Object> params = new java.util.ArrayList<>();
         

@@ -17,6 +17,7 @@
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid #dee2e6 !important;
         }
         .stat-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: #6c757d; font-weight: 600; }
         .stat-card p { margin: 0; font-size: 2rem; font-weight: 800; color: #6F4E37; }
@@ -254,10 +255,10 @@
                             <p class="pageheader-text mb-0" style="font-size: 0.85rem; margin-top: 0.2rem;">Gestiona pedidos y planes de transporte pendientes de preparación.</p>
                         </div>
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="<%= request.getContextPath() %>/almacen/PedidoReporteServlet?action=exportar" class="btn btn-sm btn-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <a href="<%= request.getContextPath() %>/almacen/PedidoReporteServlet?action=exportar" class="btn btn-sm shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: #C9A87A; color: white; border: none;">
                                 <i class="fas fa-file-excel me-1"></i>Exportar a Excel
                             </a>
-                            <button type="button" id="openSendEmailModal" class="btn btn-sm btn-info text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                            <button type="button" id="openSendEmailModal" class="btn btn-sm text-white shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: linear-gradient(135deg, #E8B86D 0%, #D4A574 100%); border: none;">
                                 <i class="fas fa-envelope me-1"></i>Enviar por Correo
                             </button>
                         </div>
@@ -297,7 +298,7 @@
                 </div>
 
                 <!-- ===================== Card: Búsqueda y filtros ===================== -->
-                <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px;">
+                <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; border: 1px solid #dee2e6 !important;">
                     <form action="<%= request.getContextPath() %>/almacen/PedidoServlet" method="GET" id="filterForm">
                         <input type="hidden" name="action" value="lista">
                         <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
@@ -329,7 +330,7 @@
                 </div>
 
                 <!-- TABLA DE PLANES DE TRANSPORTE -->
-                <div class="table-card shadow-sm">
+                <div class="table-card shadow-sm" style="border: 1px solid #dee2e6 !important;">
                     <div class="card-header" style="padding: 0.5rem 0.75rem;">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <div>

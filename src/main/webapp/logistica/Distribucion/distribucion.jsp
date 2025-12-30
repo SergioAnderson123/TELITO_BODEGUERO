@@ -122,7 +122,7 @@
         }
         .stat-card {
             background-color: #FFFEF9 !important;
-            border: 2px solid #6F4E37 !important;
+            border: 1px solid #dee2e6 !important;
         }
         .stat-card h3 {
             color: #6F4E37 !important;
@@ -710,37 +710,37 @@
             <!-- ===================== Tarjetas de estadísticas ===================== -->
             <div class="row g-2 mb-3" style="display: flex; flex-wrap: nowrap;">
                 <div class="col" style="flex: 1 1 0%; min-width: 0;">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Total de Planes</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= totalPlanes %></p>
                     </div>
                 </div>
                 <div class="col" style="flex: 1 1 0%; min-width: 0;">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Pendiente</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= planesPendientes %></p>
                     </div>
                 </div>
                 <div class="col" style="flex: 1 1 0%; min-width: 0;">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Salida</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= planesSalida %></p>
                     </div>
                 </div>
                 <div class="col" style="flex: 1 1 0%; min-width: 0;">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">En Ruta</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= planesEnRuta %></p>
                     </div>
                 </div>
                 <div class="col" style="flex: 1 1 0%; min-width: 0;">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Entregados</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= planesEntregados %></p>
                     </div>
                 </div>
                 <div class="col" style="flex: 1 1 0%; min-width: 0;">
-                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 2px solid #6F4E37;">
+                    <div class="stat-card" style="background-color: #FFFEF9; padding: 12px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); border: 1px solid #dee2e6;">
                         <h3 style="margin: 0 0 5px 0; font-size: 0.8rem; color: #6F4E37; font-weight: 600;">Cancelado</h3>
                         <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #6F4E37;"><%= planesCancelados %></p>
                     </div>
@@ -748,7 +748,7 @@
             </div>
 
             <!-- ===================== Card: Búsqueda y filtros ===================== -->
-            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; background-color: #FFFEF9 !important; border: 2px solid #6F4E37 !important;">
+            <div class="card shadow-sm" style="padding: 0.75rem; margin-bottom: 15px; background-color: #FFFEF9 !important; border: 1px solid #dee2e6 !important;">
                 <form action="${pageContext.request.contextPath}/planes-transporte" method="GET" id="filterForm">
                     <input type="hidden" name="size" value="<%= request.getAttribute("size") != null ? request.getAttribute("size") : 5 %>">
                     <div class="row g-2 mb-2" style="margin-bottom: 0.75rem !important;">
@@ -814,7 +814,7 @@
                         <div class="card-header" style="padding: 0.5rem 0.75rem;">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <div>
-                                    <h5 class="mb-0 fw-semibold" style="font-size: 1.05rem; line-height: 1.2;"><i class="fas fa-truck me-2"></i>Tabla de Transportes</h5>
+                                    <h5 class="mb-0 fw-semibold" style="font-size: 1.25rem; line-height: 1.2;"><i class="fas fa-truck me-2"></i>Tabla de Transportes</h5>
                                     <small class="text-white-50" style="font-size: 0.75rem; line-height: 1.2;">Gestiona todos los planes de transporte</small>
                                 </div>
                             </div>
@@ -825,28 +825,28 @@
                                 <table id="distribucionTable" class="table table-hover align-middle mb-0" style="font-size: 0.9rem; margin-bottom: 0 !important; width: 100%; table-layout: auto;">
                                     <thead class="table-light">
                                     <tr>
-                                        <th onclick="sortTable(0)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(0)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-hashtag me-1"></i>N° de Viaje
                                         </th>
-                                        <th onclick="sortTable(1)" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(1)" style="width: 18%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-box me-1"></i>Producto
                                         </th>
-                                        <th onclick="sortTable(2)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(2)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-barcode me-1"></i>Lote
                                         </th>
-                                        <th onclick="sortTable(3)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(3)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-toggle-on me-1"></i>Estado
                                         </th>
-                                        <th onclick="sortTable(4)" style="width: 13%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(4)" style="width: 13%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-user me-1"></i>Conductor
                                         </th>
-                                        <th onclick="sortTable(5)" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(5)" style="width: 10%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-car me-1"></i>Placa
                                         </th>
-                                        <th onclick="sortTable(6)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(6)" style="width: 12%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-calendar me-1"></i>Fecha de Entrega
                                         </th>
-                                        <th onclick="sortTable(7)" style="width: 14%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer;" class="fw-semibold">
+                                        <th onclick="sortTable(7)" style="width: 14%; font-size: 0.85rem; padding: 0.4rem 0.5rem; cursor:pointer; text-align: center;" class="fw-semibold">
                                             <i class="fas fa-map-marker-alt me-1"></i>Destino
                                         </th>
                                     </tr>
@@ -864,12 +864,12 @@
                                             for (PlanTransporteBean plan : listaPlanes) {
                                     %>
                                     <tr class="align-middle" style="padding: 0;">
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><strong><%= plan.getNumeroViaje() %></strong></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= plan.getNombreProducto() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= plan.getCodigoLote() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><strong><%= plan.getNumeroViaje() %></strong></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= plan.getNombreProducto() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= plan.getCodigoLote() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;">
                                             <% if ("Entregado".equals(plan.getEstado())) { %>
-                                            <span class="badge text-bg-success shadow-sm" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">
+                                            <span class="badge shadow-sm" style="background-color: #c8e6c9; color: #2e7d32; font-size: 0.8rem; padding: 0.3rem 0.6rem;">
                                                 <i class="fas fa-check-circle me-1"></i><%= plan.getEstado() %>
                                             </span>
                                             <% } else if ("En Ruta".equals(plan.getEstado())) { %>
@@ -894,10 +894,10 @@
                                             </span>
                                             <% } %>
                                         </td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= plan.getNombreConductor() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= plan.getPlacaVehiculo() %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= plan.getFechaEntrega() != null ? plan.getFechaEntrega() : "-" %></td>
-                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem;"><%= plan.getNombreDestino() != null ? plan.getNombreDestino() : "-" %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= plan.getNombreConductor() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= plan.getPlacaVehiculo() %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= plan.getFechaEntrega() != null ? plan.getFechaEntrega() : "-" %></td>
+                                        <td style="font-size: 0.85rem; padding: 0.35rem 0.5rem; text-align: center;"><%= plan.getNombreDestino() != null ? plan.getNombreDestino() : "-" %></td>
                                     </tr>
                                     <%
                                             }
